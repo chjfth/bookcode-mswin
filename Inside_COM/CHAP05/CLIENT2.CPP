@@ -11,7 +11,7 @@
 void trace(const char* msg) { cout << "Client 2:\t" << msg << endl ;}
 
 //
-// Client
+// Client 2
 //
 int main()
 {
