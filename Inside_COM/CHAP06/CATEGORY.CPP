@@ -233,6 +233,13 @@ BOOL RegisterCategory()
 		             hr) ;
 		return FALSE ;
 	}
+	else if(hr==S_FALSE)
+	{
+		cout << "ERROR: ICatRegister.RegisterCategories() returns S_FALSE. "
+			"This may occur if you are not running as Administrator." 
+			<< endl;
+	}
+
 	return TRUE ;
 }
 
