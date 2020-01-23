@@ -113,7 +113,7 @@ int main()
 	//
 	// Register our sample component category.
 	//
-	cout << "--------Register---------------" << endl ;
+	cout << endl << "--------Register---------------" << endl;
 	if (!RegisterCategory())
 	{
 		goto Release ;
@@ -123,24 +123,24 @@ int main()
 	ListCategories() ;
 	
 	// Add component to our sample category.
-	cout << "--------Add Component----------" << endl ;
+	cout << endl << "--------Add Component----------" << endl;
 	AddComponent() ;
 
 	// List all components implementing our sample category.
-	cout << "--------List Category----------" << endl ;
+	cout << endl << "--------ListCategoryMembers()----------" << endl;
 	ListCategoryMembers();	
 
 	// Remove class from our sample category.
-	cout << "--------Remove Component-------" << endl ;
+	cout << endl << "--------Remove Component-------" << endl;
 	RemoveComponent();
 
 	// List all components implementing our sample category. 
 	// Should be empty.
-	cout << "--------List Category----------" << endl ;
+	cout << endl << "--------ListCategoryMembers()----------" << endl;
 	ListCategoryMembers() ;	
 
 	// Unregister our sample component category.
-	cout << "--------Unregister-------------" << endl ;
+	cout << endl << "--------Unregister-------------" << endl;
 	UnregisterCategory() ;
 
 	// List the categories to show that the component category
@@ -175,6 +175,8 @@ Uninitialize:
 //
 BOOL ListCategories()
 {
+	cout << endl << "---- ListCategories() ----" << endl;
+
 	BOOL bReturn = TRUE ;
 
 	// Get an enumerator for the categories.
