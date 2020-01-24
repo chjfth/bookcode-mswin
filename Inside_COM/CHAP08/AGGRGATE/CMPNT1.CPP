@@ -68,8 +68,8 @@ private:
 	long m_cRef ;
 	
 	// Pointer to the aggregated component's IY interface
-	// (We do not have to retain an IY pointer. However, we
-	// can use it in QueryInterface.)
+	// (We do not have to retain an IY pointer. 
+	// We can acquire it later by calling m_pUnknownInner->QueryInterface().)
 	IY* m_pIY ;                 // @N
 	
 	// Pointer to inner component's IUnknown
@@ -82,7 +82,7 @@ private:
 //
 CA::CA() 
 : m_cRef(1), 
-  m_pUnknownInner(NULL) //@N
+  m_pUnknownInner(NULL), m_pIY(NULL) //@N
 { 
 	::InterlockedIncrement(&g_cComponents) ; 
 }
