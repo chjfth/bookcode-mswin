@@ -14,7 +14,7 @@ void trace(const char* msg) { cout << msg << endl ;}
 //
 // Global variables
 //
-static HMODULE g_hModule = NULL ;   // DLL module handle
+static HINSTANCE g_hModule = NULL ;   // DLL module handle
 static long g_cComponents = 0 ;     // Count of active components
 static long g_cServerLocks = 0 ;    // Count of locks
 
@@ -303,7 +303,7 @@ STDAPI DllUnregisterServer()
 //
 // DLL module information
 //
-BOOL APIENTRY DllMain(HANDLE hModule,
+BOOL APIENTRY DllMain(HINSTANCE hModule,
                       DWORD dwReason,
                       void* lpReserved)
 {
