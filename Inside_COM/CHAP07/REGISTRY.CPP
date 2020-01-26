@@ -11,9 +11,9 @@
 //
 // Internal helper functions prototypes
 //
-
+typedef DWORD WinError_t;
 // Set the given key and its value.
-BOOL setKeyAndValue(const char* pszPath,
+WinError_t setKeyAndValue(const char* pszPath,
                     const char* szSubkey,
                     const char* szValue) ;
 
@@ -22,8 +22,8 @@ void CLSIDtochar(const CLSID& clsid,
                  char* szCLSID,
                  int length) ;
 
-// Delete szKeyChild and all of its descendents.
-LONG recursiveDeleteKey(HKEY hKeyParent, const char* szKeyChild) ;
+// Delete szKeyChild and all of its descendants.
+WinError_t recursiveDeleteKey(HKEY hKeyParent, const char* szKeyChild) ;
 
 ////////////////////////////////////////////////////////
 //
@@ -64,8 +64,14 @@ HRESULT RegisterServer(HMODULE hModule,            // DLL module handle
 	strcpy(szKey, "CLSID\\") ;
 	strcat(szKey, szCLSID) ;
   
+	WinError_t winerr = 0;
+
 	// Add the CLSID to the registry.
-	setKeyAndValue(szKey, NULL, szFriendlyName) ;
+	winerr = setKeyAndValue(szKey, NULL, szFriendlyName) ;
+	if(winerr) {
+		// winerr will be ERROR_ACCESS_DENIED if not run as administrator(on Win7)
+		return HRESULT_FROM_WIN32(winerr);
+	}
 
 	// Add the server filename subkey under the CLSID key.
 	setKeyAndValue(szKey, "InprocServer32", szModule) ;
@@ -106,7 +112,7 @@ LONG UnregisterServer(const CLSID& clsid,         // Class ID
 	strcat(szKey, szCLSID) ;
 
 	// Delete the CLSID Key - CLSID\{...}
-	LONG lResult = recursiveDeleteKey(HKEY_CLASSES_ROOT, szKey) ;
+	WinError_t lResult = recursiveDeleteKey(HKEY_CLASSES_ROOT, szKey) ;
 	assert((lResult == ERROR_SUCCESS) ||
 	       (lResult == ERROR_FILE_NOT_FOUND)) ; // Subkey may not exist.
 
@@ -147,28 +153,28 @@ void CLSIDtochar(const CLSID& clsid,
 }
 
 //
-// Delete a key and all of its descendents.
+// Delete a key and all of its descendants.
 //
-LONG recursiveDeleteKey(HKEY hKeyParent,           // Parent of key to delete
+WinError_t recursiveDeleteKey(HKEY hKeyParent,           // Parent of key to delete
                         const char* lpszKeyChild)  // Key to delete
 {
 	// Open the child.
 	HKEY hKeyChild ;
-	LONG lRes = RegOpenKeyEx(hKeyParent, lpszKeyChild, 0,
+	WinError_t lRes = RegOpenKeyEx(hKeyParent, lpszKeyChild, 0,
 	                         KEY_ALL_ACCESS, &hKeyChild) ;
 	if (lRes != ERROR_SUCCESS)
 	{
 		return lRes ;
 	}
 
-	// Enumerate all of the decendents of this child.
+	// Enumerate all of the descendants of this child.
 	FILETIME time ;
 	char szBuffer[256] ;
 	DWORD dwSize = 256 ;
 	while (RegEnumKeyEx(hKeyChild, 0, szBuffer, &dwSize, NULL,
 	                    NULL, NULL, &time) == S_OK)
 	{
-		// Delete the decendents of this child.
+		// Delete the descendants of this child.
 		lRes = recursiveDeleteKey(hKeyChild, szBuffer) ;
 		if (lRes != ERROR_SUCCESS)
 		{
@@ -188,10 +194,12 @@ LONG recursiveDeleteKey(HKEY hKeyParent,           // Parent of key to delete
 
 //
 // Create a key and set its value.
-//   - This helper function was borrowed and modifed from
+//   - This helper function was borrowed and modified from
 //     Kraig Brockschmidt's book Inside OLE.
 //
-BOOL setKeyAndValue(const char* szKey,
+// Chj: Now return Win32 error code for more concrete error reporting.
+//
+WinError_t setKeyAndValue(const char* szKey,
                     const char* szSubkey,
                     const char* szValue)
 {
@@ -209,24 +217,24 @@ BOOL setKeyAndValue(const char* szKey,
 	}
 
 	// Create and open key and subkey.
-	long lResult = RegCreateKeyEx(HKEY_CLASSES_ROOT ,
+	WinError_t lResult = RegCreateKeyEx(HKEY_CLASSES_ROOT ,
 	                              szKeyBuf, 
 	                              0, NULL, REG_OPTION_NON_VOLATILE,
 	                              KEY_ALL_ACCESS, NULL, 
 	                              &hKey, NULL) ;
 	if (lResult != ERROR_SUCCESS)
 	{
-		return FALSE ;
+		return lResult ;
 	}
 
 	// Set the Value.
 	if (szValue != NULL)
 	{
-		RegSetValueEx(hKey, NULL, 0, REG_SZ, 
+		lResult = RegSetValueEx(hKey, NULL, 0, REG_SZ, 
 		              (BYTE *)szValue, 
 		              strlen(szValue)+1) ;
 	}
 
 	RegCloseKey(hKey) ;
-	return TRUE ;
+	return lResult ;
 }
