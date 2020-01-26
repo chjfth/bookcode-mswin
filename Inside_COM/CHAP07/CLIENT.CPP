@@ -16,8 +16,7 @@ int main()
 	// Initialize COM Library
 	CoInitialize(NULL) ;
 
-	trace("Call CoCreateInstance to create") ;
-	trace("  component and get interface IX.") ;
+	trace("Call CoCreateInstance to create component and get interface IX.") ;
 	IX* pIX = NULL ; 
 	HRESULT hr = ::CoCreateInstance(CLSID_Component1,
 	                                NULL, 
