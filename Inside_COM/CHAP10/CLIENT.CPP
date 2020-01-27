@@ -4,6 +4,7 @@
 #include <objbase.h>
 #include <iostream.h>
 #include <assert.h>
+#include <conio.h>
 
 #include "Util.h"
 #include "Iface.h"
@@ -139,6 +140,11 @@ int main()
 		{
 			trace("Could not get interface IZ from IX.", hr) ;
 		}
+
+		trace("Chj: == Press any key to to go on doing final Release(). ==");
+		trace("     == You can take the chance to inspect this process. ==");
+		_getch();
+
 		trace("Release IX.") ;
 		pIX->Release() ;
 	}
