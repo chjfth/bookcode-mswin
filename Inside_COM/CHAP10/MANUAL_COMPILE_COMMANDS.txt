@@ -1,11 +1,14 @@
 # midl
-midl /Oicf /h iface.h /iid guids.c /proxy proxy.c server.idl
+midl /Oicf /h iface.h /iid guids.c /proxy proxy.c /dlldata dlldata.c server.idl
 
 # Proxy.dll
-cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL proxy.c dlldata.c guids.c
-link /dll /out:proxy.dll /def:proxy.def proxy.obj dlldata.obj guids.obj rpcrt4.lib
+cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL guids.c proxy.c
+cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL /P dlldata.c &&  copy /y dlldata.i dlldata.i.c
+# -- We can reformat dlldata.i.c to be more debugger friendly now, break *long* macro expanded lines etc. --
+cl /c /MTd /Zi /Od dlldata.i.c
+link /debug /dll /out:proxy.dll /def:proxy.def /map proxy.obj dlldata.i.obj guids.obj rpcrt4.lib
 
 # Client.exe 
 cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG client.cpp util.cpp guids.c
-link /debug client.obj util.obj guids.obj
+link /debug client.obj util.obj guids.obj ole32.lib
 
