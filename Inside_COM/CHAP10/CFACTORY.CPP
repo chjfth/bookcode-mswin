@@ -185,11 +185,13 @@ HRESULT CFactory::RegisterAll()
 {
 	for(int i = 0 ; i < g_cFactoryDataEntries ; i++)
 	{
-		RegisterServer(s_hModule,
+		HRESULT hr = RegisterServer(s_hModule,
 		               *(g_FactoryDataArray[i].m_pCLSID),
 		               g_FactoryDataArray[i].m_RegistryName,
 		               g_FactoryDataArray[i].m_szVerIndProgID, 
 		               g_FactoryDataArray[i].m_szProgID) ;
+		if(hr!=S_OK)
+			return hr;
 	}
 	return S_OK ;
 }   
@@ -198,9 +200,11 @@ HRESULT CFactory::UnregisterAll()
 {
 	for(int i = 0 ; i < g_cFactoryDataEntries ; i++)   
 	{
-		UnregisterServer(*(g_FactoryDataArray[i].m_pCLSID),
+		HRESULT hr = UnregisterServer(*(g_FactoryDataArray[i].m_pCLSID),
 		                 g_FactoryDataArray[i].m_szVerIndProgID, 
 		                 g_FactoryDataArray[i].m_szProgID) ;
+		if(hr!=S_OK)
+			return hr;
 	}
 	return S_OK ;
 }

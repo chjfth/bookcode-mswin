@@ -10,7 +10,7 @@ namespace Util
 {
 	void Trace(char* szLabel, char* szText, HRESULT hr) ;
 
-	void ErrorMessage(HRESULT hr) ;
+	void ErrorMessage(HRESULT hr, bool useMsgbox=false) ;
 } ;
 
 

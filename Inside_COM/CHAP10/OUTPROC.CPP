@@ -5,6 +5,9 @@
 #include "CFactory.h"
 #include "Resource.h"
 
+#include "Util.h"
+using namespace Util;
+
 ///////////////////////////////////////////////////////////
 //
 // Outproc.cpp
@@ -53,17 +56,23 @@ extern "C" int WINAPI WinMain(HINSTANCE hInstance,
 	{
 		if (_stricmp(szToken, "UnregServer") == 0)
 		{
-			CFactory::UnregisterAll() ;
+			hr = CFactory::UnregisterAll() ;
 			// We are done, so exit.
 			bExit = TRUE ;
 			bUI = FALSE ;
 		}
 		else if (_stricmp(szToken, "RegServer") == 0)
 		{
-			CFactory::RegisterAll() ;
+			hr = CFactory::RegisterAll() ;
 			// We are done, so exit.
 			bExit = TRUE ;
 			bUI = FALSE ;
+
+			if(hr!=S_OK) 
+			{
+				ErrorMessage(hr, TRUE);
+				return 4;
+			}
 		}
 		else if (_stricmp(szToken, "Embedding") == 0)
 		{

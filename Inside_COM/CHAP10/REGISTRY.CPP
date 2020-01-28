@@ -12,10 +12,12 @@
 // Internal helper functions prototypes
 //
 
+typedef DWORD WinError_t;
 // Set the given key and its value.
-BOOL setKeyAndValue(const char* pszPath,
+WinError_t setKeyAndValue(const char* pszPath,
                     const char* szSubkey,
                     const char* szValue) ;
+
 
 // Convert a CLSID into a char string.
 void CLSIDtochar(const CLSID& clsid, 
@@ -69,7 +71,12 @@ HRESULT RegisterServer(HMODULE hModule,            // DLL module handle
 	strcat(szKey, szCLSID) ;
   
 	// Add the CLSID to the registry.
-	setKeyAndValue(szKey, NULL, szFriendlyName) ;
+	WinError_t winerr = 0;
+	winerr = setKeyAndValue(szKey, NULL, szFriendlyName) ;
+	if(winerr) {
+		// winerr will be ERROR_ACCESS_DENIED if not run as administrator(on Win7)
+		return HRESULT_FROM_WIN32(winerr);
+	}
 
 	// Add the server filename subkey under the CLSID key.
 #ifdef _OUTPROC_SERVER_
@@ -251,9 +258,11 @@ BOOL SubkeyExists(const char* pszPath,    // Path of key to check
 //   - This helper function was borrowed and modifed from
 //     Kraig Brockschmidt's book Inside OLE.
 //
-BOOL setKeyAndValue(const char* szKey,
-                    const char* szSubkey,
-                    const char* szValue)
+// Chj: Now return Win32 error code for more concrete error reporting.
+//
+WinError_t setKeyAndValue(const char* szKey,
+	const char* szSubkey,
+	const char* szValue)
 {
 	HKEY hKey;
 	char szKeyBuf[1024] ;
@@ -269,24 +278,24 @@ BOOL setKeyAndValue(const char* szKey,
 	}
 
 	// Create and open key and subkey.
-	long lResult = RegCreateKeyEx(HKEY_CLASSES_ROOT ,
-	                              szKeyBuf, 
-	                              0, NULL, REG_OPTION_NON_VOLATILE,
-	                              KEY_ALL_ACCESS, NULL, 
-	                              &hKey, NULL) ;
+	WinError_t lResult = RegCreateKeyEx(HKEY_CLASSES_ROOT ,
+		szKeyBuf, 
+		0, NULL, REG_OPTION_NON_VOLATILE,
+		KEY_ALL_ACCESS, NULL, 
+		&hKey, NULL) ;
 	if (lResult != ERROR_SUCCESS)
 	{
-		return FALSE ;
+		return lResult ;
 	}
 
 	// Set the Value.
 	if (szValue != NULL)
 	{
-		RegSetValueEx(hKey, NULL, 0, REG_SZ, 
-		              (BYTE *)szValue, 
-		              strlen(szValue)+1) ;
+		lResult = RegSetValueEx(hKey, NULL, 0, REG_SZ, 
+			(BYTE *)szValue, 
+			strlen(szValue)+1) ;
 	}
 
 	RegCloseKey(hKey) ;
-	return TRUE ;
+	return lResult ;
 }

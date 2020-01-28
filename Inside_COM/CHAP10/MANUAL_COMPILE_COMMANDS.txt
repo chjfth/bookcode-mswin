@@ -18,8 +18,8 @@ link /debug client.obj util.obj guids.obj ole32.lib
 ### CFactory.cpp , utils.cpp , registry.cpp
 
 # Server.exe
-rc server.rc
-cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG server.cpp cmpnt1.cpp cmpnt2.cpp cmpnt3.cpp guids.c
-cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG -D_OUTPROC_SERVER_ outproc.cpp CUnknown.cpp CFactory.cpp registry.cpp util.cpp 
-link server.obj cmpnt1.obj cmpnt2.obj cmpnt3.obj CUnknown.obj CFactory.obj registry.obj util.obj outproc.obj guids.obj server.res ole32.lib user32.lib gdi32.lib advapi32.lib
+rc server.rc	
+cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG                    server.cpp cmpnt1.cpp cmpnt2.cpp cmpnt3.cpp
+cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG -D_OUTPROC_SERVER_ outproc.cpp CUnknown.cpp CFactory.cpp registry.cpp util.cpp guids.c
+link /debug server.obj cmpnt1.obj cmpnt2.obj cmpnt3.obj CUnknown.obj CFactory.obj registry.obj util.obj outproc.obj guids.obj server.res ole32.lib user32.lib gdi32.lib advapi32.lib
 
