@@ -62150,20 +62150,23 @@ void __stdcall GetProxyDllInfo(const ProxyFileInfo*** pInfo, const CLSID** pId)
 
 HRESULT __stdcall DllGetClassObject(const IID* rclsid, const IID* riid, void** ppv) 
 { 
-	return NdrDllGetClassObject(rclsid, riid, ppv, aProxyFileList, 
+	HRESULT hr = NdrDllGetClassObject(rclsid, riid, ppv, aProxyFileList, 
 		(aProxyFileList[0]->pStubVtblList[0] != 0 ? aProxyFileList[0]->pStubVtblList[0]->header.piid : 0), 
 		&gPFactory
 	); 
+	return hr;
 }
 
 HRESULT __stdcall DllCanUnloadNow() 
 {	
-	return NdrDllCanUnloadNow(&gPFactory); 
+	HRESULT hr = NdrDllCanUnloadNow(&gPFactory); 
+	return hr;
 }
 
 ULONG __stdcall CStdStubBuffer_Release(IRpcStubBuffer* This) 
 { 
-	return NdrCStdStubBuffer_Release(This, (IPSFactoryBuffer*)&gPFactory); 
+	HRESULT hr = NdrCStdStubBuffer_Release(This, (IPSFactoryBuffer*)&gPFactory); 
+	return hr;
 }
 
 void __cdecl _purecall(void) {}
@@ -62180,13 +62183,15 @@ BOOL __stdcall DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 }
 
 HRESULT __stdcall DllRegisterServer() { 
-	return NdrDllRegisterProxy(hProxyDll, aProxyFileList, 
+	HRESULT hr = NdrDllRegisterProxy(hProxyDll, aProxyFileList, 
 		(aProxyFileList[0]->pStubVtblList[0] != 0 ? aProxyFileList[0]->pStubVtblList[0]->header.piid : 0)
 	); 
+	return hr;
 }
 
 HRESULT __stdcall DllUnregisterServer() { 
-	return NdrDllUnregisterProxy(hProxyDll, aProxyFileList, 
+	HRESULT hr = NdrDllUnregisterProxy(hProxyDll, aProxyFileList, 
 		(aProxyFileList[0]->pStubVtblList[0] != 0 ? aProxyFileList[0]->pStubVtblList[0]->header.piid : 0)
 	); 
+	return hr;
 }

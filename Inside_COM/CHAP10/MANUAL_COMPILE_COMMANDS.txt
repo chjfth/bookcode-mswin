@@ -1,3 +1,4 @@
+# [2020-01-28] VC6 SP6+MsSDK2003 build command line sample.
 # midl
 midl /Oicf /h iface.h /iid guids.c /proxy proxy.c /dlldata dlldata.c server.idl
 
@@ -5,7 +6,8 @@ midl /Oicf /h iface.h /iid guids.c /proxy proxy.c /dlldata dlldata.c server.idl
 cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL guids.c proxy.c
 cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL /P dlldata.c &&  copy /y dlldata.i dlldata.i.c
 # -- We can reformat dlldata.i.c to be more debugger friendly now, break *long* macro expanded lines etc. --
-cl /c /MTd /Zi /Od dlldata.i.c
+# -- Alternative: Use my stock 'dlldata.i.vc6sample.c' in place of 'dlldata.i.c'
+cl /c /MTd /Zi /Od  /Fo"dlldata.i.obj"   dlldata.i.c
 link /debug /dll /out:proxy.dll /def:proxy.def /map proxy.obj dlldata.i.obj guids.obj rpcrt4.lib
 
 # Client.exe 
