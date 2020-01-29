@@ -7,6 +7,8 @@
 #include <stdio.h>    //sprintf
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
 // #include <tchar.h>
 
 #include "util.h"
@@ -19,6 +21,9 @@
 	static inline void output(const char* sz)
 	{
 		::SendMessage(g_hWndListBox, LB_ADDSTRING, 0, (LPARAM)sz) ;
+		
+		unsigned int lines = ::SendMessage(g_hWndListBox, LB_GETCOUNT, 0, 0) ;
+		::SendMessage(g_hWndListBox, LB_SETCURSEL, lines-1, 0) ;
 	}
 
 #else
@@ -41,7 +46,7 @@ namespace Util
 //
 void Trace(char* szLabel, char* szText, HRESULT hr)
 {
-	char buf[256] ;
+	char buf[2560] ;
 	sprintf(buf, "%s: \t%s", szLabel, szText) ;
 	output(buf) ;
 
@@ -50,6 +55,35 @@ void Trace(char* szLabel, char* szText, HRESULT hr)
 		ErrorMessage(hr) ;
 	}
 }
+
+void vlTrace(HRESULT hr, char *szLabel, char *fmt, va_list args)
+{
+	static int s_count = 0;
+	s_count++;
+
+	char buf[2560] = {0};
+	_snprintf(buf, sizeof(buf)-1, "[%d] ", s_count);
+	int prefixlen = strlen(buf);
+
+	_vsnprintf(buf+prefixlen, sizeof(buf)-prefixlen, fmt, args);
+	Trace(szLabel, buf, hr);
+}
+
+void vTrace(HRESULT hr, char *szLabel, char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	vlTrace(hr, szLabel, fmt, args);
+	va_end(args);
+}
+void vTrace(char *szLabel, char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	vlTrace(S_OK, szLabel, fmt, args);
+	va_end(args);
+}
+
 
 //
 // Print out the COM/OLE error string for an HRESULT.

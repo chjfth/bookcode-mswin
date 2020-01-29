@@ -106,6 +106,7 @@ extern "C" int WINAPI WinMain(HINSTANCE hInstance,
 		MSG msg ;
 		while (::GetMessage(&msg, 0, 0, 0))
 		{
+			vTrace("OUTPROC", "       GetMessage() : msg=0x%04X", msg.message);
 			::DispatchMessage(&msg) ;
 		}
 

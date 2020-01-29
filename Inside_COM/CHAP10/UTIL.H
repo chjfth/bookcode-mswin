@@ -10,6 +10,9 @@ namespace Util
 {
 	void Trace(char* szLabel, char* szText, HRESULT hr) ;
 
+	void vTrace(HRESULT hr, char *szLabel, char *fmt, ...);
+	void vTrace(char *szLabel, char *fmt, ...);
+
 	void ErrorMessage(HRESULT hr, bool useMsgbox=false) ;
 } ;
 
