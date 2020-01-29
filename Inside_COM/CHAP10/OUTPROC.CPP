@@ -36,6 +36,8 @@ extern "C" int WINAPI WinMain(HINSTANCE hInstance,
 	// If TRUE, don't loop.
 	BOOL bExit = FALSE ;
 
+	bool is_verbose = false;
+
 	// Initialize the COM Library.
 	HRESULT hr = CoInitialize(NULL) ;
 	if (FAILED(hr))
@@ -80,6 +82,11 @@ extern "C" int WINAPI WinMain(HINSTANCE hInstance,
 			bUI = FALSE ;
 			break ;
 		}
+		else if (_stricmp(szToken, "verbose") == 0)
+		{
+			is_verbose = true;
+			break ;
+		}
 		szToken = strtok(NULL, szTokens) ;
 	}
 
@@ -106,7 +113,10 @@ extern "C" int WINAPI WinMain(HINSTANCE hInstance,
 		MSG msg ;
 		while (::GetMessage(&msg, 0, 0, 0))
 		{
-			vTrace("OUTPROC", "       GetMessage() : msg=0x%04X", msg.message);
+			if(is_verbose) {
+				vTrace("OUTPROC", "       GetMessage() : msg=0x%04X", msg.message);
+			}
+			
 			::DispatchMessage(&msg) ;
 		}
 
