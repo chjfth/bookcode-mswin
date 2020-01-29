@@ -139,7 +139,7 @@ HRESULT CA::Init()
 //
 void CA::FinalRelease()
 {
-	// Call base class to incremement m_cRef to prevent recusion.
+	// Call base class to increment m_cRef to prevent recursion.
 	CUnknown::FinalRelease() ;
 
 	// Counter the GetOuterUnknown()->Release in the Init method.
@@ -147,7 +147,8 @@ void CA::FinalRelease()
 
 	// Properly release the pointer; there may be per-interface
 	// reference counts.
-	m_pIZ->Release() ;
+	if(m_pIZ)
+		m_pIZ->Release() ;
 
 	// Release the aggregated component.
 	if (m_pUnknownInner != NULL)

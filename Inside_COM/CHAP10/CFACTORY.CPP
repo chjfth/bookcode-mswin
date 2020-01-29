@@ -83,7 +83,7 @@ HRESULT __stdcall CFactory::CreateInstance(IUnknown* pUnknownOuter,
 	}
 
 	// Create the component.
-	CUnknown* pNewComponent ;
+	CUnknown* pNewComponent = NULL;
 	HRESULT hr = m_pFactoryData->CreateInstance(pUnknownOuter,
 	                                            &pNewComponent) ;
 	if (FAILED(hr))
