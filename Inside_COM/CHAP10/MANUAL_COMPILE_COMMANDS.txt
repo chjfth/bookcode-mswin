@@ -4,9 +4,9 @@ midl /Oicf /h iface.h /iid guids.c /proxy proxy.c /dlldata dlldata.c server.idl
 
 ### Be aware: These cpp generates different .obj files according to whether _OUTPROC_SERVER_ macro is defined:
 ### CFactory.cpp , utils.cpp , registry.cpp
-### So, we should better generate Client and Server in their own output directories.
+### So, we should better generate Client files and Server files in their own output directories.
 
-#------------- Client-side: Execute in inproc folder -------------
+#------------- Client-side: Execute them in inproc folder -------------
 # Note: I do not use /Fo"inproc" bcz it allows compile only one c/c++ file once.
 
 # Proxy.dll
@@ -30,10 +30,12 @@ link /debug /dll /out:server.dll /def:..\server.def /map server.obj cmpnt1.obj c
 cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG ..\client.cpp ..\util.cpp ..\guids.c
 link /debug client.obj util.obj guids.obj ole32.lib user32.lib
 
+#------------- Server-side: Execute them in inproc folder -------------
+
 # Server.exe
-rc server.rc	
-cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG                    server.cpp cmpnt1.cpp cmpnt2.cpp cmpnt3.cpp
-cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG -D_OUTPROC_SERVER_ outproc.cpp CUnknown.cpp CFactory.cpp registry.cpp util.cpp guids.c
+rc /fo".\server.res" ..\server.rc
+cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG -D_OUTPROC_SERVER_ ..\outproc.cpp ..\CUnknown.cpp ..\CFactory.cpp ..\registry.cpp ..\util.cpp ..\guids.c
+cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG                    ..\server.cpp ..\cmpnt1.cpp ..\cmpnt2.cpp ..\cmpnt3.cpp
 link /debug server.obj cmpnt1.obj cmpnt2.obj cmpnt3.obj CUnknown.obj CFactory.obj registry.obj util.obj outproc.obj guids.obj server.res ole32.lib user32.lib gdi32.lib advapi32.lib
 
 
