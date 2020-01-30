@@ -6,8 +6,8 @@ midl /Oicf /h iface.h /iid guids.c /proxy proxy.c /dlldata dlldata.c server.idl
 ### CFactory.cpp , utils.cpp , registry.cpp
 ### So, we should better generate Client files and Server files in their own output directories.
 
-#------------- Client-side: Execute them in inproc folder -------------
-# Note: I do not use /Fo"inproc" bcz it allows compile only one c/c++ file once.
+#------------- Client-side: Please execute them in Xinproc folder -------------
+# Note: I do not use /Fo"Xinproc" in root folder bcz the /Fo allows compile only one c/c++ file once.
 
 # Proxy.dll
 cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL ..\guids.c ..\proxy.c
@@ -30,7 +30,7 @@ link /debug /dll /out:server.dll /def:..\server.def /map server.obj cmpnt1.obj c
 cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG ..\client.cpp ..\util.cpp ..\guids.c
 link /debug client.obj util.obj guids.obj ole32.lib user32.lib
 
-#------------- Server-side: Execute them in inproc folder -------------
+#------------- Server-side: Please execute them in Xoutproc folder -------------
 
 # Server.exe
 rc /fo".\server.res" ..\server.rc
