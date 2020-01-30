@@ -25,7 +25,7 @@ CPP_FLAGS = /c /MTd /Zi /Od /D_DEBUG
 EXE_LINK_FLAGS = /NOD /DEBUG
 DLL_LINK_FLAGS = /NOD /DLL /DEBUG
 
-LIBS = kernel32.lib uuid.lib advapi32.lib ole32.lib
+LIBS = kernel32.lib uuid.lib advapi32.lib ole32.lib user32.lib
 
 #################################################
 #
@@ -43,10 +43,10 @@ iface.h server.tlb proxy.c guids.c dlldata.c : server.idl
 
 !IF "$(OUTPROC)" != ""
 dlldata.obj : dlldata.c 
-	cl /c /DWIN32 /DREGISTER_PROXY_DLL dlldata.c
+	cl /c /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL dlldata.c
 
 proxy.obj : proxy.c 
-	cl /c /DWIN32 /DREGISTER_PROXY_DLL proxy.c
+	cl /c /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL proxy.c
 
 PROXYSTUBOBJS = dlldata.obj   \
                 proxy.obj     \
