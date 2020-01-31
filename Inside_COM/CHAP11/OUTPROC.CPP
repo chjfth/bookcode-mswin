@@ -149,7 +149,7 @@ BOOL InitWindow(int nCmdShow)
 
 	hWndMain = ::CreateWindow(
 		"MyServerWinClass",
-		"Component Server", 
+		"Component Server (CHAP11)", 
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT,
