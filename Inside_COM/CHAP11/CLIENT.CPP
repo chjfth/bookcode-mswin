@@ -25,24 +25,22 @@ int main()
 	DWORD clsctx ;
 	if (i == 1)
 	{
-		clsctx = CLSCTX_INPROC_SERVER ;		
+		clsctx = CLSCTX_INPROC_SERVER ;
 		trace("Attempt to create in-proc component.") ;
 	}
 	else
 	{
-		clsctx = CLSCTX_LOCAL_SERVER ;		
+		clsctx = CLSCTX_LOCAL_SERVER ;
 		trace("Attempt to create local component.") ;
 	}
 
 	// Initialize COM Library
 	CoInitialize(NULL) ;
 
-	IX* pIX = NULL ; 
+	IX* pIX = NULL; 
 	HRESULT hr = CoCreateInstance(CLSID_Component,
-	                              NULL,
-	                              clsctx, 
-	                              IID_IX,
-	                              (void**)&pIX) ;
+	                              NULL, clsctx, 
+	                              IID_IX, (void**)&pIX) ;
 	if (SUCCEEDED(hr))
 	{
 		trace("Successfully created component.") ;
@@ -60,7 +58,7 @@ int main()
 		ostrstream sout ;
 		sout << "FxStringOut returned a string:  "
 		     << bstrOut 
-		     << ends;
+		     << ends ;
 		trace(sout.str()) ;
 		::SysFreeString(bstrOut ) ;
 

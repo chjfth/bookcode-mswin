@@ -83,7 +83,7 @@ HRESULT __stdcall CFactory::CreateInstance(IUnknown* pUnknownOuter,
 	}
 
 	// Create the component.
-	CUnknown* pNewComponent ;
+	CUnknown* pNewComponent = NULL;
 	HRESULT hr = m_pFactoryData->CreateInstance(pUnknownOuter,
 	                                            &pNewComponent) ;
 	if (FAILED(hr))
@@ -185,12 +185,14 @@ HRESULT CFactory::RegisterAll()
 {
 	for(int i = 0 ; i < g_cFactoryDataEntries ; i++)
 	{
-		RegisterServer(s_hModule,
+		HRESULT hr = RegisterServer(s_hModule,
 		               *(g_FactoryDataArray[i].m_pCLSID),
 		               g_FactoryDataArray[i].m_RegistryName,
 		               g_FactoryDataArray[i].m_szVerIndProgID, 
 		               g_FactoryDataArray[i].m_szProgID,
 		               *(g_FactoryDataArray[i].m_pLIBID)) ;
+		if(hr!=S_OK)
+			return hr;
 	}
 	return S_OK ;
 }   
@@ -199,9 +201,11 @@ HRESULT CFactory::UnregisterAll()
 {
 	for(int i = 0 ; i < g_cFactoryDataEntries ; i++)   
 	{
-		UnregisterServer(*(g_FactoryDataArray[i].m_pCLSID),
+		HRESULT hr = UnregisterServer(*(g_FactoryDataArray[i].m_pCLSID),
 		                 g_FactoryDataArray[i].m_szVerIndProgID, 
 		                 g_FactoryDataArray[i].m_szProgID) ;
+		if(hr!=S_OK)
+			return hr;
 	}
 	return S_OK ;
 }
@@ -245,7 +249,7 @@ STDAPI DllUnregisterServer()
 //
 // DLL module information
 //
-BOOL APIENTRY DllMain(HANDLE hModule, 
+BOOL APIENTRY DllMain(HINSTANCE hModule, 
                       DWORD dwReason, 
                       void* lpReserved )
 {

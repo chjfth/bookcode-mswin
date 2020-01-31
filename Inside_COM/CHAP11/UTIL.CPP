@@ -54,7 +54,7 @@ void Trace(char* szLabel, char* szText, HRESULT hr)
 //
 // Print out the COM/OLE error string for an HRESULT.
 //
-void ErrorMessage(HRESULT hr)
+void ErrorMessage(HRESULT hr, bool useMsgbox)
 {
 	void* pMsgBuf ;
  
@@ -68,9 +68,12 @@ void ErrorMessage(HRESULT hr)
 		NULL 
 	) ;
 
-	char buf[256] ;
+	char buf[2048] ;
 	sprintf(buf, "Error (%x): %s", hr, (char*)pMsgBuf) ;
-	output(buf) ;
+	if(useMsgbox)
+		MessageBox(NULL, buf, "Error", MB_OK|MB_ICONSTOP);
+	else
+		output(buf) ;
 		
 	// Free the buffer.
 	LocalFree(pMsgBuf) ;

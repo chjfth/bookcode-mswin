@@ -20,7 +20,7 @@ CPP_FLAGS=/c /MTd /Zi /Od /D_DEBUG
 EXE_LINK_FLAGS= /NOD /DEBUG
 DLL_LINK_FLAGS=/NOD /DLL /DEBUG
 
-LIBS = kernel32.lib uuid.lib advapi32.lib ole32.lib oleaut32.lib
+LIBS = kernel32.lib uuid.lib advapi32.lib ole32.lib oleaut32.lib user32.lib
 
 # NOTE: Added oleaut32.lib
 
