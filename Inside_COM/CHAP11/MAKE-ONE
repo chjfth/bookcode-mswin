@@ -133,7 +133,7 @@ Server.exe:  $(SERVER_OBJS) $(DIR_SERVER)\OutProc.obj Server.res
 #
 
 AClient.exe : Client.obj Guids.obj Util.obj
-	link $(EXE_LINK_FLAGS) Client.obj Guids.obj Util.obj   \
+	link $(EXE_LINK_FLAGS) /out:$@ Client.obj Guids.obj Util.obj   \
 		libcmtd.lib libcimtd.lib $(LIBS)
 	
 DClient.exe : DClient.obj Util.obj
