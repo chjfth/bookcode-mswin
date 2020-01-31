@@ -29,7 +29,7 @@ LIBS = kernel32.lib uuid.lib advapi32.lib ole32.lib oleaut32.lib user32.lib
 # Targets
 #
 
-all : Client.exe DClient.exe $(TARGETS)
+all : AClient.exe DClient.exe $(TARGETS)
 
 #################################################
 #
@@ -132,7 +132,7 @@ Server.exe:  $(SERVER_OBJS) $(DIR_SERVER)\OutProc.obj Server.res
 # Link clients
 #
 
-Client.exe : Client.obj Guids.obj Util.obj
+AClient.exe : Client.obj Guids.obj Util.obj
 	link $(EXE_LINK_FLAGS) Client.obj Guids.obj Util.obj   \
 		libcmtd.lib libcimtd.lib $(LIBS)
 	
