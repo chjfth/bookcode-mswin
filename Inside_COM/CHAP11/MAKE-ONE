@@ -33,10 +33,10 @@ all : Client.exe DClient.exe $(TARGETS)
 
 #################################################
 #
-# Proxy source files
+# We need Iface.h and Guids.c from MIDL output.
 #
-Iface.h Server.tlb Proxy.c Guids.c DllData.c : Server.idl
-	midl /h Iface.h /iid Guids.c /proxy Proxy.c Server.idl
+Iface.h Server.tlb Guids.c DllData.c : Server.idl
+	midl /h Iface.h /iid Guids.c Server.idl
 
 #################################################
 #
@@ -44,7 +44,7 @@ Iface.h Server.tlb Proxy.c Guids.c DllData.c : Server.idl
 #
 
 Guids.obj : Guids.c
-		cl /c /DWIN32 /DREGISTER_PROXY_DLL Guids.c
+		cl /c /DWIN32 Guids.c
 
 #################################################
 #
