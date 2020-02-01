@@ -31,11 +31,16 @@ extern "C" int WINAPI WinMain(HINSTANCE hInstance,
                               int nCmdShow)
 {
 	// Chj: When env-var SERVER_EXE_STARTUP_PAUSE=1 ,
-	// Show a message box and pause, for process inspecting.
-	char szval[4] = {0};
+	// Show a message box and pause, for process inspecting (attach a remote debugger etc).
+	char szval[8] = {0};
 	GetEnvironmentVariable("SERVER_EXE_STARTUP_PAUSE", szval, sizeof(szval));
 	if(szval[0]=='1') {
 		MessageBox(NULL, "SERVER.EXE paused due to env-var SERVER_EXE_STARTUP_PAUSE=1", "Info", MB_OK);
+	} else {
+		// [2020-02-01] If server.exe is launched remotely by remote machine's DcomLaunch,
+		// The MessageBox will not be displayed on screen, so we have to use silent delay instead.
+		int delay_sec = atoi(szval);
+		Sleep(delay_sec*1000);
 	}
 
 	// Controls whether UI is shown or not

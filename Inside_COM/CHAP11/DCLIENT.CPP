@@ -5,6 +5,7 @@
 //   through the dispinterface.
 //
 #include <windows.h>
+#include <conio.h>
 #include "Util.h"
 
 static inline void trace(char* msg)
@@ -265,6 +266,10 @@ int main()
 			trace(sout.str()) ;
 		}
 	}
+
+	trace("Chj: == Press any key to to go on doing final Release(). ==");
+	trace("     == You can take the chance to inspect this process. ==");
+	_getch();
 
 	// Release the dispatch interface.
 	pIDispatch->Release() ;
