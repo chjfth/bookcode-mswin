@@ -296,7 +296,7 @@ HRESULT __stdcall CA::Invoke(
 
 	::SetErrorInfo(0, NULL) ;
 
-	trace("Invoke call succeeded.") ;
+	trace("Invoke call on going...") ;
 	HRESULT hr = m_pITypeInfo->Invoke(
 		static_cast<IDispatch*>(this),
 		dispidMember, wFlags, pDispParams,
