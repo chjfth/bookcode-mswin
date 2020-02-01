@@ -148,13 +148,13 @@ SERVER_OBJS = $(DIR_SERVER)\Server.obj     \
 
 !IF "$(OUTPROC)" == ""
 Server.dll:  $(SERVER_OBJS) Server.def 
-	link $(DLL_LINK_FLAGS) $(SERVER_OBJS) libcmtd.lib   \
+	link /out:"$@" $(DLL_LINK_FLAGS) $(SERVER_OBJS) libcmtd.lib   \
 		libcimtd.lib $(LIBS) /DEF:Server.def 
 	regsvr32 -s Server.dll
 
 !ELSE
 Server.exe:  $(SERVER_OBJS) $(DIR_SERVER)\outproc.obj Server.res 
-	link $(EXE_LINK_FLAGS) $(SERVER_OBJS)	               \
+	link /out:"$@" $(EXE_LINK_FLAGS) $(SERVER_OBJS)	               \
 		$(DIR_SERVER)\Outproc.obj Server.res libcmtd.lib   \
 		libcimtd.lib $(LIBS) user32.lib gdi32.lib
 	server /RegServer
@@ -167,7 +167,7 @@ Server.exe:  $(SERVER_OBJS) $(DIR_SERVER)\outproc.obj Server.res
 #
 
 Client.exe : Client.obj Guids.obj Util.obj
-	link $(EXE_LINK_FLAGS) Client.obj Guids.obj Util.obj   \
+	link /out:"$@" $(EXE_LINK_FLAGS) Client.obj Guids.obj Util.obj   \
 		libcmtd.lib libcimtd.lib $(LIBS) 
 
 

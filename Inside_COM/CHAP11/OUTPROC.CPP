@@ -30,6 +30,14 @@ extern "C" int WINAPI WinMain(HINSTANCE hInstance,
                               LPSTR lpCmdLine, 
                               int nCmdShow)
 {
+	// Chj: When env-var SERVER_EXE_STARTUP_PAUSE=1 ,
+	// Show a message box and pause, for process inspecting.
+	char szval[4] = {0};
+	GetEnvironmentVariable("SERVER_EXE_STARTUP_PAUSE", szval, sizeof(szval));
+	if(szval[0]=='1') {
+		MessageBox(NULL, "SERVER.EXE paused due to env-var SERVER_EXE_STARTUP_PAUSE=1", "Info", MB_OK);
+	}
+
 	// Controls whether UI is shown or not
 	BOOL bUI = TRUE ;
 
