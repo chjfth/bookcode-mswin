@@ -63,7 +63,10 @@ int main()
 
 		trace("Get interface IY.") ;
 		IY* pIY = NULL ;
-		hr = pIX->QueryInterface(IID_IY, (void**)&pIY) ;
+		
+		const IID &iy = __uuidof(pIY);
+		hr = pIX->QueryInterface(iy, (void**)&pIY) ; //hr = pIX->QueryInterface(IID_IY, (void**)&pIY) ;
+
 		if (SUCCEEDED(hr))
 		{
 			// Send an array to the component. 
