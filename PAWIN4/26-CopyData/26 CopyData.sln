@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "26 CopyData", "26 CopyData.vcxproj", "{CCF07C92-232E-DC79-1C1E-DA55A360635D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Alpha32 Debug|Win32 = Alpha32 Debug|Win32
+		Alpha32 Release|Win32 = Alpha32 Release|Win32
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Template|Win32 = Template|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Alpha32 Debug|Win32.ActiveCfg = Alpha32 Debug|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Alpha32 Debug|Win32.Build.0 = Alpha32 Debug|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Alpha32 Release|Win32.ActiveCfg = Alpha32 Release|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Alpha32 Release|Win32.Build.0 = Alpha32 Release|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Debug|Win32.Build.0 = Debug|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Release|Win32.ActiveCfg = Release|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Release|Win32.Build.0 = Release|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Template|Win32.ActiveCfg = Template|Win32
+		{CCF07C92-232E-DC79-1C1E-DA55A360635D}.Template|Win32.Build.0 = Template|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

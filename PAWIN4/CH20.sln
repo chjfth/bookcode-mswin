@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "20-DelayLoadLib", "20-DelayLoadLib\20-DelayLoadLib.vcxproj", "{279546C8-A7D4-6A2E-5570-35984686AB4C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "20-DelayLoadApp", "20-DelayLoadApp\20-DelayLoadApp.vcxproj", "{137905A7-3316-FFC6-C3FF-1025DA00E730}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{279546C8-A7D4-6A2E-5570-35984686AB4C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{279546C8-A7D4-6A2E-5570-35984686AB4C}.Debug|Win32.Build.0 = Debug|Win32
+		{279546C8-A7D4-6A2E-5570-35984686AB4C}.Release|Win32.ActiveCfg = Release|Win32
+		{279546C8-A7D4-6A2E-5570-35984686AB4C}.Release|Win32.Build.0 = Release|Win32
+		{137905A7-3316-FFC6-C3FF-1025DA00E730}.Debug|Win32.ActiveCfg = Debug|Win32
+		{137905A7-3316-FFC6-C3FF-1025DA00E730}.Debug|Win32.Build.0 = Debug|Win32
+		{137905A7-3316-FFC6-C3FF-1025DA00E730}.Release|Win32.ActiveCfg = Release|Win32
+		{137905A7-3316-FFC6-C3FF-1025DA00E730}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
