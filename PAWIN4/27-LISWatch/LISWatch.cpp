@@ -148,6 +148,13 @@ void Dlg_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void u_GetWindowText(HWND hwnd, TCHAR textbuf[], int bufchars)
+{
+	// Chj: MSDN requires that cross-process get-window-text can only be achieved
+	// by explicitly sending WM_GETTEXT messeage, not by calling GetWindowText().
+	SendMessage(hwnd, WM_GETTEXT, bufchars, (LPARAM)textbuf);
+}
+
 
 static void CalcWndText(HWND hwnd, PTSTR szBuf, int nLen) 
 {
@@ -164,7 +171,9 @@ static void CalcWndText(HWND hwnd, PTSTR szBuf, int nLen)
 
 	TCHAR szClass[50], szCaption[50], szBufT[150];
 	GetClassName(hwnd, szClass, chDIMOF(szClass));
-	GetWindowText(hwnd, szCaption, chDIMOF(szCaption));
+	
+	u_GetWindowText(hwnd, szCaption, chDIMOF(szCaption));
+	
 	wsprintf(szBufT, TEXT("[%s] %s"), (PTSTR)szClass,
 		(szCaption[0] == 0) ? (PTSTR)TEXT("(no caption)") : (PTSTR)szCaption);
 	_tcsncpy(szBuf, szBufT, nLen - 1);
