@@ -152,6 +152,14 @@ static void CalcWndText(HWND hwnd, PTSTR szBuf, int nLen)
 
 void Dlg_OnTimer(HWND hwnd, UINT id) 
 {
+	static bool s_isInTimer = false;
+
+	if (s_isInTimer) {
+		// avoid timer re-trigger when the timer WndProc display a message-box
+		return;
+	}
+
+	s_isInTimer = true;
 
 	TCHAR szBuf[100] = TEXT("System-wide");
 	HWND hwndForeground = GetForegroundWindow();
@@ -188,8 +196,10 @@ void Dlg_OnTimer(HWND hwnd, UINT id)
 	if (g_dwThreadIdAttachTo == 0) {
 		// If monitoring local input state system-wide, detach our input
 		// state from the thread that created the current foreground window.
-		AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, FALSE);
+		u_AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, FALSE);
 	}
+
+	s_isInTimer = false;
 }
 
 
