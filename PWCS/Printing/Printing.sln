@@ -1,0 +1,51 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotepadCloneWithPrinting", "NotepadCloneWithPrinting\NotepadCloneWithPrinting.csproj", "{8AAE909E-F840-4332-97E7-B2FEC2A5E443}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintThreePages", "PrintThreePages\PrintThreePages.csproj", "{0F0F8FEC-8C22-4F8A-A62F-37A7CC7FC226}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintWithMargins", "PrintWithMargins\PrintWithMargins.csproj", "{E743597B-BBBA-4C9C-8D23-B32A55621E24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintWithStatusBar", "PrintWithStatusBar\PrintWithStatusBar.csproj", "{DB99EA2D-7B3B-40BA-BC18-7D42CE56FA1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimplePrintDialog", "SimplePrintDialog\SimplePrintDialog.csproj", "{A2057311-FB2C-4EF5-94AB-A293F9172ED2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagePrint", "ImagePrint\ImagePrint.csproj", "{5E21E9A3-4BE7-49BA-9202-17B3226876B5}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{8AAE909E-F840-4332-97E7-B2FEC2A5E443}.Debug.ActiveCfg = Debug|.NET
+		{8AAE909E-F840-4332-97E7-B2FEC2A5E443}.Debug.Build.0 = Debug|.NET
+		{8AAE909E-F840-4332-97E7-B2FEC2A5E443}.Release.ActiveCfg = Release|.NET
+		{8AAE909E-F840-4332-97E7-B2FEC2A5E443}.Release.Build.0 = Release|.NET
+		{0F0F8FEC-8C22-4F8A-A62F-37A7CC7FC226}.Debug.ActiveCfg = Debug|.NET
+		{0F0F8FEC-8C22-4F8A-A62F-37A7CC7FC226}.Debug.Build.0 = Debug|.NET
+		{0F0F8FEC-8C22-4F8A-A62F-37A7CC7FC226}.Release.ActiveCfg = Release|.NET
+		{0F0F8FEC-8C22-4F8A-A62F-37A7CC7FC226}.Release.Build.0 = Release|.NET
+		{E743597B-BBBA-4C9C-8D23-B32A55621E24}.Debug.ActiveCfg = Debug|.NET
+		{E743597B-BBBA-4C9C-8D23-B32A55621E24}.Debug.Build.0 = Debug|.NET
+		{E743597B-BBBA-4C9C-8D23-B32A55621E24}.Release.ActiveCfg = Release|.NET
+		{E743597B-BBBA-4C9C-8D23-B32A55621E24}.Release.Build.0 = Release|.NET
+		{DB99EA2D-7B3B-40BA-BC18-7D42CE56FA1D}.Debug.ActiveCfg = Debug|.NET
+		{DB99EA2D-7B3B-40BA-BC18-7D42CE56FA1D}.Debug.Build.0 = Debug|.NET
+		{DB99EA2D-7B3B-40BA-BC18-7D42CE56FA1D}.Release.ActiveCfg = Release|.NET
+		{DB99EA2D-7B3B-40BA-BC18-7D42CE56FA1D}.Release.Build.0 = Release|.NET
+		{A2057311-FB2C-4EF5-94AB-A293F9172ED2}.Debug.ActiveCfg = Debug|.NET
+		{A2057311-FB2C-4EF5-94AB-A293F9172ED2}.Debug.Build.0 = Debug|.NET
+		{A2057311-FB2C-4EF5-94AB-A293F9172ED2}.Release.ActiveCfg = Release|.NET
+		{A2057311-FB2C-4EF5-94AB-A293F9172ED2}.Release.Build.0 = Release|.NET
+		{5E21E9A3-4BE7-49BA-9202-17B3226876B5}.Debug.ActiveCfg = Debug|.NET
+		{5E21E9A3-4BE7-49BA-9202-17B3226876B5}.Debug.Build.0 = Debug|.NET
+		{5E21E9A3-4BE7-49BA-9202-17B3226876B5}.Release.ActiveCfg = Release|.NET
+		{5E21E9A3-4BE7-49BA-9202-17B3226876B5}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

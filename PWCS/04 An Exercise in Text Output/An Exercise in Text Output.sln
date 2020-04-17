@@ -1,0 +1,92 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoFirstTry", "SysInfoFirstTry\SysInfoFirstTry.csproj", "{B30C25F8-EF0F-49A5-AB7F-0B433B938388}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoList", "SysInfoList\SysInfoList.csproj", "{8A7F1A22-9686-4586-AE97-B6F3A10999A6}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoScroll", "SysInfoScroll\SysInfoScroll.csproj", "{418E33A0-3131-48AC-B899-80FCC7900854}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoPanel", "SysInfoPanel\SysInfoPanel.csproj", "{66D78862-CC21-454E-89C8-D4C8FF759C6F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoUpdate", "SysInfoUpdate\SysInfoUpdate.csproj", "{572F3CA1-71A0-4BFC-8520-65C727FA3BF3}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoReflection", "SysInfoReflection\SysInfoReflection.csproj", "{24D208C3-30AC-4D0A-96AE-CBDCBDB963A1}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoEfficient", "SysInfoEfficient\SysInfoEfficient.csproj", "{8ED152F5-8294-4872-8AA8-3E5CBB8BF2CC}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoColumns", "SysInfoColumns\SysInfoColumns.csproj", "{69419C8D-B115-44BC-8BB4-366614E9CCFC}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+		DoSign = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

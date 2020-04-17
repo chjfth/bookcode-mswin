@@ -1,0 +1,104 @@
+<VisualStudioProject>
+    <CSHARP
+        ProjectType = "Local"
+        ProductVersion = "7.0.9148"
+        SchemaVersion = "1.0"
+    >
+        <Build>
+            <Settings
+                ApplicationIcon = ""
+                AssemblyKeyContainerName = ""
+                AssemblyName = "DualWink"
+                AssemblyOriginatorKeyFile = ""
+                DefaultClientScript = "JScript"
+                DefaultHTMLPageLayout = "Grid"
+                DefaultTargetSchema = "IE50"
+                DefaultServerScript = "VBScript"
+                DefaultSessionState = "True"
+                DelaySign = "false"
+                NoStandardLibraries = "false"
+                OutputType = "Exe"
+                RootNamespace = "Wink"
+                StartupObject = "DualWink"
+            >
+                <Config
+                    Name = "Debug"
+                    AllowUnsafeBlocks = "false"
+                    BaseAddress = "0"
+                    CheckForOverflowUnderflow = "false"
+                    DefineConstants = "DEBUG;TRACE"
+                    DocumentationFile = ""
+                    DebugSymbols = "true"
+                    IncrementalBuild = "false"
+                    FileAlignment = "4096"
+                    NoLogo = "true"
+                    NoOutput = "false"
+                    Optimize = "false"
+                    OutputPath = "bin\Debug\"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "4"
+                />
+                <Config
+                    Name = "Release"
+                    AllowUnsafeBlocks = "false"
+                    BaseAddress = "0"
+                    CheckForOverflowUnderflow = "false"
+                    DefineConstants = "TRACE"
+                    DocumentationFile = ""
+                    DebugSymbols = "false"
+                    IncrementalBuild = "false"
+                    FileAlignment = "4096"
+                    NoLogo = "true"
+                    NoOutput = "false"
+                    Optimize = "true"
+                    OutputPath = "bin\Release\"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "4"
+                />
+            </Settings>
+            <References>
+                <Reference Name = "System" />
+                <Reference Name = "System.Drawing" />
+                <Reference Name = "System.Windows.Forms" />
+            </References>
+        </Build>
+        <Files>
+            <Include>
+                <File
+                    RelPath = "DualWink.cs"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "Eye1.png"
+                    Link = "..\Wink\Eye1.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Eye2.png"
+                    Link = "..\Wink\Eye2.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Eye3.png"
+                    Link = "..\Wink\Eye3.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Eye4.png"
+                    Link = "..\Wink\Eye4.png"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "Wink.cs"
+                    Link = "..\Wink\Wink.cs"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+            </Include>
+        </Files>
+    </CSHARP>
+</VisualStudioProject>
+

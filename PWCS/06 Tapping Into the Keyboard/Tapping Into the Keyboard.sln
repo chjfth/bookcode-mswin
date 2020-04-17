@@ -1,0 +1,62 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyExamine", "KeyExamine\KeyExamine.csproj", "{7A314099-9D4D-4AF0-B95D-EC3F422F7E09}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfoKeyboard", "SysInfoKeyboard\SysInfoKeyboard.csproj", "{85386BF7-7AC1-4584-A8E7-03AEE8A0C064}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExitOnX", "ExitOnX\ExitOnX.csproj", "{778557E8-B3D6-4F15-898E-DE56325F5BC3}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeAway", "TypeAway\TypeAway.csproj", "{9158D5C6-95E8-4111-A788-9E1180F11A30}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyExamineWithScroll", "KeyExamineWithScroll\KeyExamineWithScroll.csproj", "{414060F5-0598-4157-9AF5-97670D788756}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+		DoSign = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

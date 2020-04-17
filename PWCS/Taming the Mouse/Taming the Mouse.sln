@@ -1,0 +1,192 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scribble", "Scribble\Scribble.csproj", "{5922DB09-6B89-4DEE-807E-722085F7A688}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checker", "Checker\Checker.csproj", "{5A1621CE-FFB6-4725-9EF2-4DEA948CFE32}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckerWithKeyboard", "CheckerWithKeyboard\CheckerWithKeyboard.csproj", "{3BB9113D-DD8A-479C-B3F5-F9DFF8C9E577}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckerWithChildren", "CheckerWithChildren\CheckerWithChildren.csproj", "{5339DFF5-8580-47B8-BB00-A7AD8F3A6AB2}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseConnect", "MouseConnect\MouseConnect.csproj", "{D7503F57-3BA1-4729-A348-8927C544FAD5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckerWithChildrenAndFocus", "CheckerWithChildrenAndFocus\CheckerWithChildrenAndFocus.csproj", "{63EDE5F4-1373-41C3-84B9-8053E35CC40C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnterLeave", "EnterLeave\EnterLeave.csproj", "{A11450BB-AE75-448E-A2F5-0183D0338D94}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseWeb", "MouseWeb\MouseWeb.csproj", "{4BCF318F-F212-4560-8EE0-99A6618DA694}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseCursors", "MouseCursors\MouseCursors.csproj", "{8B1D8F83-C235-4C34-8584-63E8FF4EF9E6}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoePoem", "PoePoem\PoePoem.csproj", "{7A2C2C7C-9437-413E-9AEA-4C25AF162162}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseConnectWaitCursor", "MouseConnectWaitCursor\MouseConnectWaitCursor.csproj", "{9E407AC7-6EE2-4C32-900E-8B90C9B9AB60}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockOut", "BlockOut\BlockOut.csproj", "{A98915E5-B09A-412F-BE5B-7F04CC4E7E1F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MouseCursorsProperty", "MouseCursorsProperty\MouseCursorsProperty.csproj", "{9DF9BC22-ED03-45D4-AE91-0F5A97A2A9D4}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterBlockOut", "BetterBlockOut\BetterBlockOut.csproj", "{D6286288-B983-4C2C-91F3-990B88E249A9}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvenBetterBlockOut", "EvenBetterBlockOut\EvenBetterBlockOut.csproj", "{BBE1B255-7479-4A7D-AD10-4EECD3FFBAE1}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptureLoss", "CaptureLoss\CaptureLoss.csproj", "{41D688E1-EB63-4665-A3AE-789F5DE72639}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HitTestText", "HitTestText\HitTestText.csproj", "{570D8A61-79E8-44C8-BD6D-3220D8AEDCF6}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScribbleWithSave", "ScribbleWithSave\ScribbleWithSave.csproj", "{23E72B8E-8F2F-4BE8-B070-83204E8C27C9}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Release
+		ConfigName.1 = Debug
+		DoSign = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

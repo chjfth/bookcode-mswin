@@ -1,0 +1,92 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormSize", "FormSize\FormSize.csproj", "{E8199A49-726E-4836-9CA4-9FAE0F31465F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomClear", "RandomClear\RandomClear.csproj", "{D40A4F46-9F50-4FEE-9BB7-574BDD8CF154}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomClearResizeRedraw", "RandomClearResizeRedraw\RandomClearResizeRedraw.csproj", "{214BDF3E-8634-46BC-97F6-E784310E355A}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloCenteredAlignment", "HelloCenteredAlignment\HelloCenteredAlignment.csproj", "{7099893A-0097-4DDA-8A5F-0FA5E889D833}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloCenteredMeasured", "HelloCenteredMeasured\HelloCenteredMeasured.csproj", "{1A83FF8E-1326-4E5F-80BB-A6B18DE503F5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloCenteredRectangle", "HelloCenteredRectangle\HelloCenteredRectangle.csproj", "{9938FB06-9282-4EF5-87A7-F0C510FDCBCF}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuckleberryFinn", "HuckleberryFinn\HuckleberryFinn.csproj", "{C46D2658-11A6-47BC-8B4F-894748E91C19}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourCorners", "FourCorners\FourCorners.csproj", "{B86523E3-9C02-4D45-8D85-2CFFA7C0B8D7}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+	ProjectSection(SolutionConfiguration) = postProject
+		Release.ActiveCfg = Release|.NET
+		Release.Build.0 = Release|.NET
+		Debug.ActiveCfg = Debug|.NET
+		Debug.Build.0 = Debug|.NET
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+		DoSign = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

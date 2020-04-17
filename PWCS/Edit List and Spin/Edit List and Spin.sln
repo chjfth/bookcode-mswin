@@ -1,0 +1,75 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotepadCloneWithFile", "NotepadCloneWithFile\NotepadCloneWithFile.csproj", "{C7311AAF-3541-4135-9E43-BB941E59048B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotepadCloneWithEdit", "NotepadCloneWithEdit\NotepadCloneWithEdit.csproj", "{BAA0AD2B-31A7-49A0-BB3B-05E0CCEE3CF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transform", "Transform\Transform.csproj", "{6DDBCE23-A6FD-4E10-AA6A-CA496968F01F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextBoxDemo", "TextBoxDemo\TextBoxDemo.csproj", "{4F93E844-15E8-4602-9767-F400AA73788B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnvironmentVars", "EnvironmentVars\EnvironmentVars.csproj", "{E9801E61-782A-4401-942B-3E0848590587}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotepadCloneWithRegistry", "NotepadCloneWithRegistry\NotepadCloneWithRegistry.csproj", "{80948FC5-D7C5-4DDB-B5F5-6B3461E7CE87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnumerateEnumerationCombo", "EnumerateEnumerationCombo\EnumerateEnumerationCombo.csproj", "{549C0606-83F7-4B26-B1FE-E400E64D054D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnumerateEnumeration", "EnumerateEnumeration\EnumerateEnumeration.csproj", "{6AFE9D07-7E08-42B1-8033-E2436540C785}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotepadCloneNoMenu", "NotepadCloneNoMenu\NotepadCloneNoMenu.csproj", "{2300868E-45BD-46D5-929B-EC4F9F0B2500}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotepadCloneWithFormat", "NotepadCloneWithFormat\NotepadCloneWithFormat.csproj", "{0120E080-78E8-48E9-837F-5CB78DE024A8}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{C7311AAF-3541-4135-9E43-BB941E59048B}.Debug.ActiveCfg = Debug|.NET
+		{C7311AAF-3541-4135-9E43-BB941E59048B}.Debug.Build.0 = Debug|.NET
+		{C7311AAF-3541-4135-9E43-BB941E59048B}.Release.ActiveCfg = Release|.NET
+		{C7311AAF-3541-4135-9E43-BB941E59048B}.Release.Build.0 = Release|.NET
+		{BAA0AD2B-31A7-49A0-BB3B-05E0CCEE3CF7}.Debug.ActiveCfg = Debug|.NET
+		{BAA0AD2B-31A7-49A0-BB3B-05E0CCEE3CF7}.Debug.Build.0 = Debug|.NET
+		{BAA0AD2B-31A7-49A0-BB3B-05E0CCEE3CF7}.Release.ActiveCfg = Release|.NET
+		{BAA0AD2B-31A7-49A0-BB3B-05E0CCEE3CF7}.Release.Build.0 = Release|.NET
+		{6DDBCE23-A6FD-4E10-AA6A-CA496968F01F}.Debug.ActiveCfg = Debug|.NET
+		{6DDBCE23-A6FD-4E10-AA6A-CA496968F01F}.Debug.Build.0 = Debug|.NET
+		{6DDBCE23-A6FD-4E10-AA6A-CA496968F01F}.Release.ActiveCfg = Release|.NET
+		{6DDBCE23-A6FD-4E10-AA6A-CA496968F01F}.Release.Build.0 = Release|.NET
+		{4F93E844-15E8-4602-9767-F400AA73788B}.Debug.ActiveCfg = Debug|.NET
+		{4F93E844-15E8-4602-9767-F400AA73788B}.Debug.Build.0 = Debug|.NET
+		{4F93E844-15E8-4602-9767-F400AA73788B}.Release.ActiveCfg = Release|.NET
+		{4F93E844-15E8-4602-9767-F400AA73788B}.Release.Build.0 = Release|.NET
+		{E9801E61-782A-4401-942B-3E0848590587}.Debug.ActiveCfg = Debug|.NET
+		{E9801E61-782A-4401-942B-3E0848590587}.Debug.Build.0 = Debug|.NET
+		{E9801E61-782A-4401-942B-3E0848590587}.Release.ActiveCfg = Release|.NET
+		{E9801E61-782A-4401-942B-3E0848590587}.Release.Build.0 = Release|.NET
+		{80948FC5-D7C5-4DDB-B5F5-6B3461E7CE87}.Debug.ActiveCfg = Debug|.NET
+		{80948FC5-D7C5-4DDB-B5F5-6B3461E7CE87}.Debug.Build.0 = Debug|.NET
+		{80948FC5-D7C5-4DDB-B5F5-6B3461E7CE87}.Release.ActiveCfg = Release|.NET
+		{80948FC5-D7C5-4DDB-B5F5-6B3461E7CE87}.Release.Build.0 = Release|.NET
+		{549C0606-83F7-4B26-B1FE-E400E64D054D}.Debug.ActiveCfg = Debug|.NET
+		{549C0606-83F7-4B26-B1FE-E400E64D054D}.Debug.Build.0 = Debug|.NET
+		{549C0606-83F7-4B26-B1FE-E400E64D054D}.Release.ActiveCfg = Release|.NET
+		{549C0606-83F7-4B26-B1FE-E400E64D054D}.Release.Build.0 = Release|.NET
+		{6AFE9D07-7E08-42B1-8033-E2436540C785}.Debug.ActiveCfg = Debug|.NET
+		{6AFE9D07-7E08-42B1-8033-E2436540C785}.Debug.Build.0 = Debug|.NET
+		{6AFE9D07-7E08-42B1-8033-E2436540C785}.Release.ActiveCfg = Release|.NET
+		{6AFE9D07-7E08-42B1-8033-E2436540C785}.Release.Build.0 = Release|.NET
+		{2300868E-45BD-46D5-929B-EC4F9F0B2500}.Debug.ActiveCfg = Debug|.NET
+		{2300868E-45BD-46D5-929B-EC4F9F0B2500}.Debug.Build.0 = Debug|.NET
+		{2300868E-45BD-46D5-929B-EC4F9F0B2500}.Release.ActiveCfg = Release|.NET
+		{2300868E-45BD-46D5-929B-EC4F9F0B2500}.Release.Build.0 = Release|.NET
+		{0120E080-78E8-48E9-837F-5CB78DE024A8}.Debug.ActiveCfg = Debug|.NET
+		{0120E080-78E8-48E9-837F-5CB78DE024A8}.Debug.Build.0 = Debug|.NET
+		{0120E080-78E8-48E9-837F-5CB78DE024A8}.Release.ActiveCfg = Release|.NET
+		{0120E080-78E8-48E9-837F-5CB78DE024A8}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

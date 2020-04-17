@@ -1,0 +1,57 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateMetafile", "CreateMetafile\CreateMetafile.csproj", "{6D4A9787-7A38-4666-9427-BE600FCFA6C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateMetafileReload", "CreateMetafileReload\CreateMetafileReload.csproj", "{25E0CBEB-92AA-40A7-96CF-6868F0A5D4F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateMetafileMemory", "CreateMetafileMemory\CreateMetafileMemory.csproj", "{93B97771-9CD9-4E87-8F6E-45525114CD9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnumMetafile", "EnumMetafile\EnumMetafile.csproj", "{37854780-5F79-484F-8C3A-CE3AF6C14A98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetafileViewer", "MetafileViewer\MetafileViewer.csproj", "{C51CBE8D-A2B0-42E9-BD1E-CD0946AE2081}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetafileConvert", "MetafileConvert\MetafileConvert.csproj", "{39058B08-C451-4434-8C98-71535BC9044F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetafilePageUnits", "MetafilePageUnits\MetafilePageUnits.csproj", "{30AFFFD4-A5C4-45ED-A5A1-661342F5129D}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{6D4A9787-7A38-4666-9427-BE600FCFA6C1}.Debug.ActiveCfg = Debug|.NET
+		{6D4A9787-7A38-4666-9427-BE600FCFA6C1}.Debug.Build.0 = Debug|.NET
+		{6D4A9787-7A38-4666-9427-BE600FCFA6C1}.Release.ActiveCfg = Release|.NET
+		{6D4A9787-7A38-4666-9427-BE600FCFA6C1}.Release.Build.0 = Release|.NET
+		{25E0CBEB-92AA-40A7-96CF-6868F0A5D4F4}.Debug.ActiveCfg = Debug|.NET
+		{25E0CBEB-92AA-40A7-96CF-6868F0A5D4F4}.Debug.Build.0 = Debug|.NET
+		{25E0CBEB-92AA-40A7-96CF-6868F0A5D4F4}.Release.ActiveCfg = Release|.NET
+		{25E0CBEB-92AA-40A7-96CF-6868F0A5D4F4}.Release.Build.0 = Release|.NET
+		{93B97771-9CD9-4E87-8F6E-45525114CD9A}.Debug.ActiveCfg = Debug|.NET
+		{93B97771-9CD9-4E87-8F6E-45525114CD9A}.Debug.Build.0 = Debug|.NET
+		{93B97771-9CD9-4E87-8F6E-45525114CD9A}.Release.ActiveCfg = Release|.NET
+		{93B97771-9CD9-4E87-8F6E-45525114CD9A}.Release.Build.0 = Release|.NET
+		{37854780-5F79-484F-8C3A-CE3AF6C14A98}.Debug.ActiveCfg = Debug|.NET
+		{37854780-5F79-484F-8C3A-CE3AF6C14A98}.Debug.Build.0 = Debug|.NET
+		{37854780-5F79-484F-8C3A-CE3AF6C14A98}.Release.ActiveCfg = Release|.NET
+		{37854780-5F79-484F-8C3A-CE3AF6C14A98}.Release.Build.0 = Release|.NET
+		{C51CBE8D-A2B0-42E9-BD1E-CD0946AE2081}.Debug.ActiveCfg = Debug|.NET
+		{C51CBE8D-A2B0-42E9-BD1E-CD0946AE2081}.Debug.Build.0 = Debug|.NET
+		{C51CBE8D-A2B0-42E9-BD1E-CD0946AE2081}.Release.ActiveCfg = Release|.NET
+		{C51CBE8D-A2B0-42E9-BD1E-CD0946AE2081}.Release.Build.0 = Release|.NET
+		{39058B08-C451-4434-8C98-71535BC9044F}.Debug.ActiveCfg = Debug|.NET
+		{39058B08-C451-4434-8C98-71535BC9044F}.Debug.Build.0 = Debug|.NET
+		{39058B08-C451-4434-8C98-71535BC9044F}.Release.ActiveCfg = Release|.NET
+		{39058B08-C451-4434-8C98-71535BC9044F}.Release.Build.0 = Release|.NET
+		{30AFFFD4-A5C4-45ED-A5A1-661342F5129D}.Debug.ActiveCfg = Debug|.NET
+		{30AFFFD4-A5C4-45ED-A5A1-661342F5129D}.Debug.Build.0 = Debug|.NET
+		{30AFFFD4-A5C4-45ED-A5A1-661342F5129D}.Release.ActiveCfg = Release|.NET
+		{30AFFFD4-A5C4-45ED-A5A1-661342F5129D}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,129 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HatchBrushArray", "HatchBrushArray\HatchBrushArray.csproj", "{225C3CB8-0B8A-44A4-9D8C-73690B98676B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OverlappingHatchBrushes", "OverlappingHatchBrushes\OverlappingHatchBrushes.csproj", "{F7E398EC-B246-4C2D-B935-05F98CB35B77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HatchBrushMenu", "HatchBrushMenu\HatchBrushMenu.csproj", "{9A73663C-739D-4E97-9161-CA35BE0871A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HatchBrushRenderingOrigin", "HatchBrushRenderingOrigin\HatchBrushRenderingOrigin.csproj", "{6BB884A2-90CB-4CBB-83A5-392F91123483}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoPointLinearGradientBrush", "TwoPointLinearGradientBrush\TwoPointLinearGradientBrush.csproj", "{B9C2D398-72B7-4144-BFA9-F79CF72F0CCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextureBrushDemo", "TextureBrushDemo\TextureBrushDemo.csproj", "{BA69730F-3AD3-415E-9E2D-12FB39D6FDE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TriangleGradientBrush", "TriangleGradientBrush\TriangleGradientBrush.csproj", "{F7CDFEB9-DA69-4F41-B2BD-369BDC703A21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RectangleLinearGradientBrush", "RectangleLinearGradientBrush\RectangleLinearGradientBrush.csproj", "{6009BF43-2673-4943-8C8B-471805447115}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TriangleTile", "TriangleTile\TriangleTile.csproj", "{F4F6A44B-20EC-4FBA-84BB-D433D1248985}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquareTile", "SquareTile\SquareTile.csproj", "{39E7BE2D-CABF-4898-AEDD-8CE56CD37A05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoTriangleTile", "TwoTriangleTile\TwoTriangleTile.csproj", "{79969A52-1609-4325-BD2C-3F9F9C193738}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonGradientBrush", "HexagonGradientBrush\HexagonGradientBrush.csproj", "{F99928FF-64BE-4E90-8AD6-56EAAC5094EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarGradientBrush", "StarGradientBrush\StarGradientBrush.csproj", "{E8801835-228B-4837-8B16-73DDE810D6EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GradientPen", "GradientPen\GradientPen.csproj", "{28BC3613-594E-4C70-9A72-67286C029799}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BouncingGradientBrushBall", "BouncingGradientBrushBall\BouncingGradientBrushBall.csproj", "{4290AC98-4077-4332-AF10-9DB8E6B1A7DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PenDashStyles", "PenDashStyles\PenDashStyles.csproj", "{5F5F4024-5BA7-4CDE-AE66-4D6A09A3D670}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineJoins", "LineJoins\LineJoins.csproj", "{5A7E8049-E263-4AEB-885C-787DB73D52C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PenDashCaps", "PenDashCaps\PenDashCaps.csproj", "{F2D98304-1731-4840-8C6A-3560FD6E13FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineCaps", "LineCaps\LineCaps.csproj", "{502FBCD0-8BDC-4CF9-A9BC-1CB37E6E2677}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{225C3CB8-0B8A-44A4-9D8C-73690B98676B}.Debug.ActiveCfg = Debug|.NET
+		{225C3CB8-0B8A-44A4-9D8C-73690B98676B}.Debug.Build.0 = Debug|.NET
+		{225C3CB8-0B8A-44A4-9D8C-73690B98676B}.Release.ActiveCfg = Release|.NET
+		{225C3CB8-0B8A-44A4-9D8C-73690B98676B}.Release.Build.0 = Release|.NET
+		{F7E398EC-B246-4C2D-B935-05F98CB35B77}.Debug.ActiveCfg = Debug|.NET
+		{F7E398EC-B246-4C2D-B935-05F98CB35B77}.Debug.Build.0 = Debug|.NET
+		{F7E398EC-B246-4C2D-B935-05F98CB35B77}.Release.ActiveCfg = Release|.NET
+		{F7E398EC-B246-4C2D-B935-05F98CB35B77}.Release.Build.0 = Release|.NET
+		{9A73663C-739D-4E97-9161-CA35BE0871A0}.Debug.ActiveCfg = Debug|.NET
+		{9A73663C-739D-4E97-9161-CA35BE0871A0}.Debug.Build.0 = Debug|.NET
+		{9A73663C-739D-4E97-9161-CA35BE0871A0}.Release.ActiveCfg = Release|.NET
+		{9A73663C-739D-4E97-9161-CA35BE0871A0}.Release.Build.0 = Release|.NET
+		{6BB884A2-90CB-4CBB-83A5-392F91123483}.Debug.ActiveCfg = Debug|.NET
+		{6BB884A2-90CB-4CBB-83A5-392F91123483}.Debug.Build.0 = Debug|.NET
+		{6BB884A2-90CB-4CBB-83A5-392F91123483}.Release.ActiveCfg = Release|.NET
+		{6BB884A2-90CB-4CBB-83A5-392F91123483}.Release.Build.0 = Release|.NET
+		{B9C2D398-72B7-4144-BFA9-F79CF72F0CCF}.Debug.ActiveCfg = Debug|.NET
+		{B9C2D398-72B7-4144-BFA9-F79CF72F0CCF}.Debug.Build.0 = Debug|.NET
+		{B9C2D398-72B7-4144-BFA9-F79CF72F0CCF}.Release.ActiveCfg = Release|.NET
+		{B9C2D398-72B7-4144-BFA9-F79CF72F0CCF}.Release.Build.0 = Release|.NET
+		{BA69730F-3AD3-415E-9E2D-12FB39D6FDE6}.Debug.ActiveCfg = Debug|.NET
+		{BA69730F-3AD3-415E-9E2D-12FB39D6FDE6}.Debug.Build.0 = Debug|.NET
+		{BA69730F-3AD3-415E-9E2D-12FB39D6FDE6}.Release.ActiveCfg = Release|.NET
+		{BA69730F-3AD3-415E-9E2D-12FB39D6FDE6}.Release.Build.0 = Release|.NET
+		{F7CDFEB9-DA69-4F41-B2BD-369BDC703A21}.Debug.ActiveCfg = Debug|.NET
+		{F7CDFEB9-DA69-4F41-B2BD-369BDC703A21}.Debug.Build.0 = Debug|.NET
+		{F7CDFEB9-DA69-4F41-B2BD-369BDC703A21}.Release.ActiveCfg = Release|.NET
+		{F7CDFEB9-DA69-4F41-B2BD-369BDC703A21}.Release.Build.0 = Release|.NET
+		{6009BF43-2673-4943-8C8B-471805447115}.Debug.ActiveCfg = Debug|.NET
+		{6009BF43-2673-4943-8C8B-471805447115}.Debug.Build.0 = Debug|.NET
+		{6009BF43-2673-4943-8C8B-471805447115}.Release.ActiveCfg = Release|.NET
+		{6009BF43-2673-4943-8C8B-471805447115}.Release.Build.0 = Release|.NET
+		{F4F6A44B-20EC-4FBA-84BB-D433D1248985}.Debug.ActiveCfg = Debug|.NET
+		{F4F6A44B-20EC-4FBA-84BB-D433D1248985}.Debug.Build.0 = Debug|.NET
+		{F4F6A44B-20EC-4FBA-84BB-D433D1248985}.Release.ActiveCfg = Release|.NET
+		{F4F6A44B-20EC-4FBA-84BB-D433D1248985}.Release.Build.0 = Release|.NET
+		{39E7BE2D-CABF-4898-AEDD-8CE56CD37A05}.Debug.ActiveCfg = Debug|.NET
+		{39E7BE2D-CABF-4898-AEDD-8CE56CD37A05}.Debug.Build.0 = Debug|.NET
+		{39E7BE2D-CABF-4898-AEDD-8CE56CD37A05}.Release.ActiveCfg = Release|.NET
+		{39E7BE2D-CABF-4898-AEDD-8CE56CD37A05}.Release.Build.0 = Release|.NET
+		{79969A52-1609-4325-BD2C-3F9F9C193738}.Debug.ActiveCfg = Debug|.NET
+		{79969A52-1609-4325-BD2C-3F9F9C193738}.Debug.Build.0 = Debug|.NET
+		{79969A52-1609-4325-BD2C-3F9F9C193738}.Release.ActiveCfg = Release|.NET
+		{79969A52-1609-4325-BD2C-3F9F9C193738}.Release.Build.0 = Release|.NET
+		{F99928FF-64BE-4E90-8AD6-56EAAC5094EE}.Debug.ActiveCfg = Debug|.NET
+		{F99928FF-64BE-4E90-8AD6-56EAAC5094EE}.Debug.Build.0 = Debug|.NET
+		{F99928FF-64BE-4E90-8AD6-56EAAC5094EE}.Release.ActiveCfg = Release|.NET
+		{F99928FF-64BE-4E90-8AD6-56EAAC5094EE}.Release.Build.0 = Release|.NET
+		{E8801835-228B-4837-8B16-73DDE810D6EF}.Debug.ActiveCfg = Debug|.NET
+		{E8801835-228B-4837-8B16-73DDE810D6EF}.Debug.Build.0 = Debug|.NET
+		{E8801835-228B-4837-8B16-73DDE810D6EF}.Release.ActiveCfg = Release|.NET
+		{E8801835-228B-4837-8B16-73DDE810D6EF}.Release.Build.0 = Release|.NET
+		{28BC3613-594E-4C70-9A72-67286C029799}.Debug.ActiveCfg = Debug|.NET
+		{28BC3613-594E-4C70-9A72-67286C029799}.Debug.Build.0 = Debug|.NET
+		{28BC3613-594E-4C70-9A72-67286C029799}.Release.ActiveCfg = Release|.NET
+		{28BC3613-594E-4C70-9A72-67286C029799}.Release.Build.0 = Release|.NET
+		{4290AC98-4077-4332-AF10-9DB8E6B1A7DD}.Debug.ActiveCfg = Debug|.NET
+		{4290AC98-4077-4332-AF10-9DB8E6B1A7DD}.Debug.Build.0 = Debug|.NET
+		{4290AC98-4077-4332-AF10-9DB8E6B1A7DD}.Release.ActiveCfg = Release|.NET
+		{4290AC98-4077-4332-AF10-9DB8E6B1A7DD}.Release.Build.0 = Release|.NET
+		{5F5F4024-5BA7-4CDE-AE66-4D6A09A3D670}.Debug.ActiveCfg = Debug|.NET
+		{5F5F4024-5BA7-4CDE-AE66-4D6A09A3D670}.Debug.Build.0 = Debug|.NET
+		{5F5F4024-5BA7-4CDE-AE66-4D6A09A3D670}.Release.ActiveCfg = Release|.NET
+		{5F5F4024-5BA7-4CDE-AE66-4D6A09A3D670}.Release.Build.0 = Release|.NET
+		{5A7E8049-E263-4AEB-885C-787DB73D52C8}.Debug.ActiveCfg = Debug|.NET
+		{5A7E8049-E263-4AEB-885C-787DB73D52C8}.Debug.Build.0 = Debug|.NET
+		{5A7E8049-E263-4AEB-885C-787DB73D52C8}.Release.ActiveCfg = Release|.NET
+		{5A7E8049-E263-4AEB-885C-787DB73D52C8}.Release.Build.0 = Release|.NET
+		{F2D98304-1731-4840-8C6A-3560FD6E13FD}.Debug.ActiveCfg = Debug|.NET
+		{F2D98304-1731-4840-8C6A-3560FD6E13FD}.Debug.Build.0 = Debug|.NET
+		{F2D98304-1731-4840-8C6A-3560FD6E13FD}.Release.ActiveCfg = Release|.NET
+		{F2D98304-1731-4840-8C6A-3560FD6E13FD}.Release.Build.0 = Release|.NET
+		{502FBCD0-8BDC-4CF9-A9BC-1CB37E6E2677}.Debug.ActiveCfg = Debug|.NET
+		{502FBCD0-8BDC-4CF9-A9BC-1CB37E6E2677}.Debug.Build.0 = Debug|.NET
+		{502FBCD0-8BDC-4CF9-A9BC-1CB37E6E2677}.Release.ActiveCfg = Release|.NET
+		{502FBCD0-8BDC-4CF9-A9BC-1CB37E6E2677}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

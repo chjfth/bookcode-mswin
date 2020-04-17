@@ -1,0 +1,69 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipText", "ClipText\ClipText.csproj", "{02944C18-DF7F-4728-8659-51ED63D63994}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipView", "ClipView\ClipView.csproj", "{647088AA-7782-4293-A579-33676968F358}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetafileClip", "MetafileClip\MetafileClip.csproj", "{63F637DE-476A-49F4-B972-75A7BB160840}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageDrop", "ImageDrop\ImageDrop.csproj", "{13FBAC31-D94D-44B0-ADCA-F3C16196C21E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotepadClone", "NotepadClone\NotepadClone.csproj", "{C3F10E30-91C4-4567-BBF7-1C5F31EE1F45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RichTextPaste", "RichTextPaste\RichTextPaste.csproj", "{DC494D29-BF48-44FD-90F4-C50924580CFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiCopy", "MultiCopy\MultiCopy.csproj", "{1AE2F98E-5066-47AC-BE05-D6E36EF5CDB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipViewAll", "ClipViewAll\ClipViewAll.csproj", "{E4341D5A-921F-4D55-9504-B6B5881DE9BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageClip", "ImageClip\ImageClip.csproj", "{B803EC7F-1B6C-406C-90DC-2220FED42F6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{02944C18-DF7F-4728-8659-51ED63D63994}.Debug.ActiveCfg = Debug|.NET
+		{02944C18-DF7F-4728-8659-51ED63D63994}.Debug.Build.0 = Debug|.NET
+		{02944C18-DF7F-4728-8659-51ED63D63994}.Release.ActiveCfg = Release|.NET
+		{02944C18-DF7F-4728-8659-51ED63D63994}.Release.Build.0 = Release|.NET
+		{647088AA-7782-4293-A579-33676968F358}.Debug.ActiveCfg = Debug|.NET
+		{647088AA-7782-4293-A579-33676968F358}.Debug.Build.0 = Debug|.NET
+		{647088AA-7782-4293-A579-33676968F358}.Release.ActiveCfg = Release|.NET
+		{647088AA-7782-4293-A579-33676968F358}.Release.Build.0 = Release|.NET
+		{63F637DE-476A-49F4-B972-75A7BB160840}.Debug.ActiveCfg = Debug|.NET
+		{63F637DE-476A-49F4-B972-75A7BB160840}.Debug.Build.0 = Debug|.NET
+		{63F637DE-476A-49F4-B972-75A7BB160840}.Release.ActiveCfg = Release|.NET
+		{63F637DE-476A-49F4-B972-75A7BB160840}.Release.Build.0 = Release|.NET
+		{13FBAC31-D94D-44B0-ADCA-F3C16196C21E}.Debug.ActiveCfg = Debug|.NET
+		{13FBAC31-D94D-44B0-ADCA-F3C16196C21E}.Debug.Build.0 = Debug|.NET
+		{13FBAC31-D94D-44B0-ADCA-F3C16196C21E}.Release.ActiveCfg = Release|.NET
+		{13FBAC31-D94D-44B0-ADCA-F3C16196C21E}.Release.Build.0 = Release|.NET
+		{C3F10E30-91C4-4567-BBF7-1C5F31EE1F45}.Debug.ActiveCfg = Debug|.NET
+		{C3F10E30-91C4-4567-BBF7-1C5F31EE1F45}.Debug.Build.0 = Debug|.NET
+		{C3F10E30-91C4-4567-BBF7-1C5F31EE1F45}.Release.ActiveCfg = Release|.NET
+		{C3F10E30-91C4-4567-BBF7-1C5F31EE1F45}.Release.Build.0 = Release|.NET
+		{DC494D29-BF48-44FD-90F4-C50924580CFF}.Debug.ActiveCfg = Debug|.NET
+		{DC494D29-BF48-44FD-90F4-C50924580CFF}.Debug.Build.0 = Debug|.NET
+		{DC494D29-BF48-44FD-90F4-C50924580CFF}.Release.ActiveCfg = Release|.NET
+		{DC494D29-BF48-44FD-90F4-C50924580CFF}.Release.Build.0 = Release|.NET
+		{1AE2F98E-5066-47AC-BE05-D6E36EF5CDB7}.Debug.ActiveCfg = Debug|.NET
+		{1AE2F98E-5066-47AC-BE05-D6E36EF5CDB7}.Debug.Build.0 = Debug|.NET
+		{1AE2F98E-5066-47AC-BE05-D6E36EF5CDB7}.Release.ActiveCfg = Release|.NET
+		{1AE2F98E-5066-47AC-BE05-D6E36EF5CDB7}.Release.Build.0 = Release|.NET
+		{E4341D5A-921F-4D55-9504-B6B5881DE9BA}.Debug.ActiveCfg = Debug|.NET
+		{E4341D5A-921F-4D55-9504-B6B5881DE9BA}.Debug.Build.0 = Debug|.NET
+		{E4341D5A-921F-4D55-9504-B6B5881DE9BA}.Release.ActiveCfg = Release|.NET
+		{E4341D5A-921F-4D55-9504-B6B5881DE9BA}.Release.Build.0 = Release|.NET
+		{B803EC7F-1B6C-406C-90DC-2220FED42F6D}.Debug.ActiveCfg = Debug|.NET
+		{B803EC7F-1B6C-406C-90DC-2220FED42F6D}.Debug.Build.0 = Debug|.NET
+		{B803EC7F-1B6C-406C-90DC-2220FED42F6D}.Release.ActiveCfg = Release|.NET
+		{B803EC7F-1B6C-406C-90DC-2220FED42F6D}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

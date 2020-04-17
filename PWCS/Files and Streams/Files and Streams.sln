@@ -1,0 +1,39 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexDump", "HexDump\HexDump.csproj", "{2893222D-3010-4104-BE4C-279183337373}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildCardHexDump", "WildCardHexDump\WildCardHexDump.csproj", "{13F725BF-C957-4246-9271-8231AFE4A22F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlDump", "HtmlDump\HtmlDump.csproj", "{93848C60-957C-403E-BB68-8AB0664F3DD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StreamWriterDemo", "StreamWriterDemo\StreamWriterDemo.csproj", "{9CEF87D5-70A1-4B7C-8AF7-EE3541E3E0E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{2893222D-3010-4104-BE4C-279183337373}.Debug.ActiveCfg = Debug|.NET
+		{2893222D-3010-4104-BE4C-279183337373}.Debug.Build.0 = Debug|.NET
+		{2893222D-3010-4104-BE4C-279183337373}.Release.ActiveCfg = Release|.NET
+		{2893222D-3010-4104-BE4C-279183337373}.Release.Build.0 = Release|.NET
+		{13F725BF-C957-4246-9271-8231AFE4A22F}.Debug.ActiveCfg = Debug|.NET
+		{13F725BF-C957-4246-9271-8231AFE4A22F}.Debug.Build.0 = Debug|.NET
+		{13F725BF-C957-4246-9271-8231AFE4A22F}.Release.ActiveCfg = Release|.NET
+		{13F725BF-C957-4246-9271-8231AFE4A22F}.Release.Build.0 = Release|.NET
+		{93848C60-957C-403E-BB68-8AB0664F3DD0}.Debug.ActiveCfg = Debug|.NET
+		{93848C60-957C-403E-BB68-8AB0664F3DD0}.Debug.Build.0 = Debug|.NET
+		{93848C60-957C-403E-BB68-8AB0664F3DD0}.Release.ActiveCfg = Release|.NET
+		{93848C60-957C-403E-BB68-8AB0664F3DD0}.Release.Build.0 = Release|.NET
+		{9CEF87D5-70A1-4B7C-8AF7-EE3541E3E0E5}.Debug.ActiveCfg = Debug|.NET
+		{9CEF87D5-70A1-4B7C-8AF7-EE3541E3E0E5}.Debug.Build.0 = Debug|.NET
+		{9CEF87D5-70A1-4B7C-8AF7-EE3541E3E0E5}.Release.ActiveCfg = Release|.NET
+		{9CEF87D5-70A1-4B7C-8AF7-EE3541E3E0E5}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

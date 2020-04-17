@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringAppend", "StringAppend\StringAppend.csproj", "{7627F75C-74B6-45FF-81F9-5DD7C8B6457B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringBuilderAppend", "StringBuilderAppend\StringBuilderAppend.csproj", "{DDF23B9A-7ABB-4A14-97F7-991BEFB413DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringWriterAppend", "StringWriterAppend\StringWriterAppend.csproj", "{85D7E9A3-4713-4824-BE5B-CAECA5700884}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{7627F75C-74B6-45FF-81F9-5DD7C8B6457B}.Debug.ActiveCfg = Debug|.NET
+		{7627F75C-74B6-45FF-81F9-5DD7C8B6457B}.Debug.Build.0 = Debug|.NET
+		{7627F75C-74B6-45FF-81F9-5DD7C8B6457B}.Release.ActiveCfg = Release|.NET
+		{7627F75C-74B6-45FF-81F9-5DD7C8B6457B}.Release.Build.0 = Release|.NET
+		{DDF23B9A-7ABB-4A14-97F7-991BEFB413DB}.Debug.ActiveCfg = Debug|.NET
+		{DDF23B9A-7ABB-4A14-97F7-991BEFB413DB}.Debug.Build.0 = Debug|.NET
+		{DDF23B9A-7ABB-4A14-97F7-991BEFB413DB}.Release.ActiveCfg = Release|.NET
+		{DDF23B9A-7ABB-4A14-97F7-991BEFB413DB}.Release.Build.0 = Release|.NET
+		{85D7E9A3-4713-4824-BE5B-CAECA5700884}.Debug.ActiveCfg = Debug|.NET
+		{85D7E9A3-4713-4824-BE5B-CAECA5700884}.Debug.Build.0 = Debug|.NET
+		{85D7E9A3-4713-4824-BE5B-CAECA5700884}.Release.ActiveCfg = Release|.NET
+		{85D7E9A3-4713-4824-BE5B-CAECA5700884}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
