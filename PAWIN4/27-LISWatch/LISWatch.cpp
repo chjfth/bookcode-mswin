@@ -6,6 +6,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "..\CmnHdr.h"     /* See Appendix A. */
 #include <tchar.h>
+#include <stdio.h>
 #include <windowsx.h>
 #include "Resource.h"
 #include "..\share\dbgprint.h"
@@ -29,7 +30,6 @@ BOOL u_AttachThreadInput(DWORD tid_from, DWORD tid_to, BOOL fAttach)
 	BOOL succ = AttachThreadInput(tid_from, tid_to, fAttach);
 	if (!succ)
 	{
-		DWORD winerr = GetLastError();
 		vaMsgBoxWinErr(NULL, _T("AttachThreadInput(%d, %d, %s) fail."),
 			tid_from, tid_to, fAttach?_T("TRUE"):_T("FALSE"));
 	}
@@ -41,6 +41,12 @@ BOOL u_AttachThreadInput(DWORD tid_from, DWORD tid_to, BOOL fAttach)
 BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) {
 
    chSETDLGICONS(hwnd, IDI_LISWATCH);
+
+   TCHAR title[50] = {};
+   int bufsize = sizeof(title) / sizeof(title[0]) - 1;
+   DWORD pid = GetCurrentProcessId();
+   _snprintf_s(title, bufsize, _T("LISWatch (pid=%d)"), pid);
+   SetWindowText(hwnd, title);
 
    // Update our contents periodically
    g_uTimerId = SetTimer(hwnd, g_uTimerId, TIMER_DELAY, NULL);
