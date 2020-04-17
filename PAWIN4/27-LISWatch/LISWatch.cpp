@@ -22,7 +22,7 @@ DWORD g_dwThreadIdAttachTo = 0;  // 0=System-wide; Non-zero=specifc thread
 HWND g_hwndMain = NULL;
 
 DWORD g_msec_mouse_down = 0;
-const int MSEC_CAPTURE_HOLD = 500; 
+const int MSEC_CAPTURE_HOLD = 200; 
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -31,11 +31,19 @@ BOOL u_AttachThreadInput(DWORD tid_from, DWORD tid_to, BOOL fAttach)
 	if (tid_from == tid_to)
 		return FALSE;
 
+	const TCHAR *torf = fAttach ? _T("TRUE") : _T("FALSE");
+
+	dbgprint("LISWatch: AttachThreadInput(%d, %d, %s)...", tid_from, tid_to, torf);
+
 	BOOL succ = AttachThreadInput(tid_from, tid_to, fAttach);
 	if (!succ)
 	{
+		DWORD winerr = GetLastError();
 		vaMsgBoxWinErr(g_hwndMain, _T("AttachThreadInput(%d, %d, %s) fail."),
-			tid_from, tid_to, fAttach?_T("TRUE"):_T("FALSE"));
+			tid_from, tid_to, torf);
+
+		dbgprint(_T("LISWatch: AttachThreadInput(%d, %d, %s) fail with winerr=%d.", ),
+			tid_from, tid_to, torf, winerr);
 	}
 	return succ;
 }
