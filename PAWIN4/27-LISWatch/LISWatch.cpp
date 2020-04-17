@@ -192,7 +192,7 @@ void Dlg_OnTimer(HWND hwnd, UINT id)
 	}
 	else {
 
-		wsprintf(szBuf, TEXT("0x%08x"), dwThreadIdAttachTo);
+		wsprintf(szBuf, TEXT("%d"), dwThreadIdAttachTo);
 	}
 
 	SetWindowText(GetDlgItem(hwnd, IDC_THREADID), szBuf);
