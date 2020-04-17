@@ -58,7 +58,8 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	TCHAR title[50] = {};
 	int bufsize = sizeof(title) / sizeof(title[0]) - 1;
 	DWORD pid = GetCurrentProcessId();
-	_snprintf_s(title, bufsize, _T("LISWatch (pid=%d)"), pid);
+	DWORD tid = GetCurrentThreadId();
+	_snprintf_s(title, bufsize, _T("LISWatch (pid=%d, tid=%d)"), pid, tid);
 	SetWindowText(hwnd, title);
 
 	// Update our contents periodically
