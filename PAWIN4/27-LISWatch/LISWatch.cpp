@@ -18,7 +18,11 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 UINT_PTR g_uTimerId = 1;
 DWORD g_dwThreadIdAttachTo = 0;  // 0=System-wide; Non-zero=specifc thread
+
 HWND g_hwndMain = NULL;
+
+DWORD g_msec_mouse_down = 0;
+const int MSEC_CAPTURE_HOLD = 500; 
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -63,7 +67,6 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 void Dlg_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,	UINT keyFlags) 
 {
-
 	chMB("To monitor a specific thread, click the left mouse button in "
 		"the main window and release it in the desired window.\n"
 		"To monitor all threads, double-click the left mouse button in "
@@ -74,37 +77,45 @@ void Dlg_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,	UINT keyFlags
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void Dlg_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,
-	UINT keyFlags) {
-
-	// If we're attached to a thread, detach from it
-	if (g_dwThreadIdAttachTo != 0) {
-		BOOL succ = u_AttachThreadInput(GetCurrentThreadId(), g_dwThreadIdAttachTo, FALSE);
-		if (!succ) {
-			// Chj: The target thread probably has exited, so abandon it.
-			g_dwThreadIdAttachTo = 0;
-		}
-	}
-
+void Dlg_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, 	UINT keyFlags) 
+{
 	// Set capture to ourself and change the mouse cursor
 	SetCapture(hwnd);
 	SetCursor(LoadCursor(GetModuleHandle(NULL), MAKEINTRESOURCE(IDC_EYES)));
+
+	g_msec_mouse_down = GetTickCount();
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void Dlg_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags) {
-
+void Dlg_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags) 
+{
 	if (GetCapture() == hwnd) {
+
+		ReleaseCapture();
+
+		if (GetTickCount() - g_msec_mouse_down < MSEC_CAPTURE_HOLD) {
+			// Chj: Not enough dragging time, consider it a mouse click, so don't do re-attach.
+			return;
+		}
 
 		// If we had mouse capture set, get the ID of the thread that
 		// created the window that is under the mouse cursor.
 		POINT pt;
 		pt.x = LOWORD(GetMessagePos());
 		pt.y = HIWORD(GetMessagePos());
-		ReleaseCapture();
+
+		// If we're attached to a thread, first detach from it
+		if (g_dwThreadIdAttachTo != 0) {
+			BOOL succ = u_AttachThreadInput(GetCurrentThreadId(), g_dwThreadIdAttachTo, FALSE);
+			if (!succ) {
+				// Chj: The target thread probably has exited, so abandon it.
+				g_dwThreadIdAttachTo = 0;
+			}
+		}
+
 		g_dwThreadIdAttachTo = GetWindowThreadProcessId(
 			ChildWindowFromPointEx(GetDesktopWindow(), pt, CWP_SKIPINVISIBLE),
 			NULL);
