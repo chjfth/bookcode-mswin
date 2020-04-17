@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "dbgprint.h"
 
@@ -54,4 +55,49 @@ const TCHAR * get_exename()
 		return exepath+finalbs+1;
 	else
 		return exepath;
+}
+
+void vaMsgBox(HWND hwndParent, const TCHAR *fmt, ...)
+{
+	TCHAR tbuf[1000] = {};
+	int tbufsize = sizeof(tbuf) / sizeof(tbuf[0]) - 1;
+
+	va_list args;
+	va_start(args, fmt);
+
+	vsnprintf_s(tbuf, tbufsize, fmt, args);
+
+	MessageBox(hwndParent, tbuf, _T("vaMsgBox"), MB_OK);
+
+	va_end(args);
+}
+
+void vaMsgBoxWinErr(HWND hwndParent, const TCHAR *fmt, ...)
+{
+	DWORD winerr = GetLastError();
+
+	TCHAR tbuf[1000] = {};
+	int tbufsize = sizeof(tbuf) / sizeof(tbuf[0]) - 1;
+
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf_s(tbuf, tbufsize, fmt, args);
+	va_end(args);
+
+	if (winerr)
+	{
+		TCHAR ebuf[200] = {};
+		int ebufsize = sizeof(ebuf) / sizeof(ebuf[0]) - 1;
+
+		DWORD retchars = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, winerr,
+			0, // LANGID
+			ebuf, ebufsize,
+			NULL); // A trailing \r\n has been filled.
+
+		_snprintf_s(tbuf, tbufsize, "%s\n\nWinErr=%d(0x%X) %s", tbuf, 
+			winerr, winerr, ebuf);
+	}
+
+
+	MessageBox(hwndParent, tbuf, _T("vaMsgBoxWinErr"), MB_OK);
 }

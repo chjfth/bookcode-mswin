@@ -175,7 +175,6 @@
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
       <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level4</WarningLevel>
@@ -249,10 +248,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\share\dbgprint.cpp" />
     <ClCompile Include="LISWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LISWatch.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\share\dbgprint.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

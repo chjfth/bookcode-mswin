@@ -8,7 +8,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include <tchar.h>
 #include <windowsx.h>
 #include "Resource.h"
-
+#include "..\share\dbgprint.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -20,6 +20,22 @@ DWORD g_dwThreadIdAttachTo = 0;  // 0=System-wide; Non-zero=specifc thread
 
 
 ///////////////////////////////////////////////////////////////////////////////
+
+BOOL u_AttachThreadInput(DWORD tid_from, DWORD tid_to, BOOL fAttach)
+{
+	if (tid_from == tid_to)
+		return FALSE;
+
+	BOOL succ = AttachThreadInput(tid_from, tid_to, fAttach);
+	if (!succ)
+	{
+		DWORD winerr = GetLastError();
+		vaMsgBoxWinErr(NULL, _T("AttachThreadInput(%d, %d, %s) fail."),
+			tid_from, tid_to, fAttach?_T("TRUE"):_T("FALSE"));
+	}
+	return succ;
+}
+
 
 
 BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) {
@@ -56,7 +72,7 @@ void Dlg_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,
 
    // If we're attached to a thread, detach from it
    if (g_dwThreadIdAttachTo != 0)
-      AttachThreadInput(GetCurrentThreadId(), g_dwThreadIdAttachTo, FALSE);
+      u_AttachThreadInput(GetCurrentThreadId(), g_dwThreadIdAttachTo, FALSE);
 
    // Set capture to ourself and change the mouse cursor
    SetCapture(hwnd);
@@ -91,7 +107,7 @@ void Dlg_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags) {
 
          // The mouse button is released on a window that our thread didn't
          // create; monitor local input state for that thread only.
-         AttachThreadInput(GetCurrentThreadId(), g_dwThreadIdAttachTo, TRUE);	
+         u_AttachThreadInput(GetCurrentThreadId(), g_dwThreadIdAttachTo, TRUE);	
       }
    }
 }
@@ -137,7 +153,7 @@ void Dlg_OnTimer(HWND hwnd, UINT id) {
       // state to the thread that created the current foreground window.
       dwThreadIdAttachTo = 
          GetWindowThreadProcessId(hwndForeground, NULL);
-      AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, TRUE);	
+      u_AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, TRUE);	
 
    } else {
    
