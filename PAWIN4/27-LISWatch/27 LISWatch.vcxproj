@@ -257,6 +257,12 @@
   <ItemGroup>
     <ClInclude Include="..\share\dbgprint.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="LISWatch.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Eyes.cur" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

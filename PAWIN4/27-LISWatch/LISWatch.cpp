@@ -18,7 +18,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 UINT_PTR g_uTimerId = 1;
 DWORD g_dwThreadIdAttachTo = 0;  // 0=System-wide; Non-zero=specifc thread
-
+HWND g_hwndMain = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -30,7 +30,7 @@ BOOL u_AttachThreadInput(DWORD tid_from, DWORD tid_to, BOOL fAttach)
 	BOOL succ = AttachThreadInput(tid_from, tid_to, fAttach);
 	if (!succ)
 	{
-		vaMsgBoxWinErr(NULL, _T("AttachThreadInput(%d, %d, %s) fail."),
+		vaMsgBoxWinErr(g_hwndMain, _T("AttachThreadInput(%d, %d, %s) fail."),
 			tid_from, tid_to, fAttach?_T("TRUE"):_T("FALSE"));
 	}
 	return succ;
@@ -40,7 +40,7 @@ BOOL u_AttachThreadInput(DWORD tid_from, DWORD tid_to, BOOL fAttach)
 
 BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) 
 {
-
+	g_hwndMain = hwnd;
 	chSETDLGICONS(hwnd, IDI_LISWATCH);
 
 	TCHAR title[50] = {};
@@ -78,8 +78,13 @@ void Dlg_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,
 	UINT keyFlags) {
 
 	// If we're attached to a thread, detach from it
-	if (g_dwThreadIdAttachTo != 0)
-		u_AttachThreadInput(GetCurrentThreadId(), g_dwThreadIdAttachTo, FALSE);
+	if (g_dwThreadIdAttachTo != 0) {
+		BOOL succ = u_AttachThreadInput(GetCurrentThreadId(), g_dwThreadIdAttachTo, FALSE);
+		if (!succ) {
+			// Chj: The target thread probably has exited, so abandon it.
+			g_dwThreadIdAttachTo = 0;
+		}
+	}
 
 	// Set capture to ourself and change the mouse cursor
 	SetCapture(hwnd);
