@@ -74,7 +74,8 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void Dlg_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,	UINT keyFlags) 
+//void Dlg_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,	UINT keyFlags) 
+void ShowHelp()
 {
 	chMB("To monitor a specific thread, click the left mouse button in "
 		"the main window and release it in the desired window.\n"
@@ -203,8 +204,7 @@ void Dlg_OnTimer(HWND hwnd, UINT id)
 
 		// If monitoring local input state system-wide, attach our input
 		// state to the thread that created the current foreground window.
-		dwThreadIdAttachTo =
-			GetWindowThreadProcessId(hwndForeground, NULL);
+		dwThreadIdAttachTo = GetWindowThreadProcessId(hwndForeground, NULL);
 		u_AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, TRUE);
 
 	}
@@ -244,6 +244,9 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
 
 	switch (id) {
+	case IDC_HELP:
+		ShowHelp();
+		break;
 	case IDCANCEL:
 		EndDialog(hwnd, id);
 		break;
@@ -261,7 +264,7 @@ INT_PTR WINAPI Dlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		chHANDLE_DLGMSG(hwnd, WM_INITDIALOG, Dlg_OnInitDialog);
 		chHANDLE_DLGMSG(hwnd, WM_COMMAND, Dlg_OnCommand);
 		chHANDLE_DLGMSG(hwnd, WM_TIMER, Dlg_OnTimer);
-		chHANDLE_DLGMSG(hwnd, WM_RBUTTONDOWN, Dlg_OnRButtonDown);
+//		chHANDLE_DLGMSG(hwnd, WM_RBUTTONDOWN, Dlg_OnRButtonDown);
 		chHANDLE_DLGMSG(hwnd, WM_LBUTTONDOWN, Dlg_OnLButtonDown);
 		chHANDLE_DLGMSG(hwnd, WM_LBUTTONUP, Dlg_OnLButtonUp);
 	}

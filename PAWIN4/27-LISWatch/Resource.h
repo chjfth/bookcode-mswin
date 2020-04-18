@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by LISWatch.rc
 //
 #define IDD_LISWATCH                    101
@@ -10,6 +10,7 @@
 #define IDC_WNDFOREGRND                 1002
 #define IDC_THREADID                    1003
 #define IDC_WNDCAPTURE                  1004
+#define IDC_HELP                        1006
 
 // Next default values for new objects
 // 
