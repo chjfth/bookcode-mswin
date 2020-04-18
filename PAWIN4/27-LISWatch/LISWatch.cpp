@@ -197,16 +197,27 @@ void Dlg_OnTimer(HWND hwnd, UINT id)
 	s_isInTimer = true;
 
 	TCHAR szBuf[100] = TEXT("System-wide");
+	int nBuf = chDIMOF(szBuf);
 	HWND hwndForeground = GetForegroundWindow();
 	DWORD dwThreadIdAttachTo = g_dwThreadIdAttachTo;
 
 	if (dwThreadIdAttachTo == 0) {
 
-		// If monitoring local input state system-wide, attach our input
-		// state to the thread that created the current foreground window.
-		dwThreadIdAttachTo = GetWindowThreadProcessId(hwndForeground, NULL);
-		u_AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, TRUE);
+		if (hwndForeground)
+		{
+			// If monitoring local input state system-wide, attach our input
+			// state to the thread that created the current foreground window.
+			dwThreadIdAttachTo = GetWindowThreadProcessId(hwndForeground, NULL);
 
+			BOOL succ = u_AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, TRUE);
+			if( succ)
+				_sntprintf_s(szBuf, nBuf, _T("System-wide (now attach to %d)"), dwThreadIdAttachTo);
+		}
+		else
+		{	// Chj: We may see this when we user clicks on a frozen window.
+			// That frozen may due to it is being attached to and paused by a debugger.
+			_sntprintf_s(szBuf, nBuf, _T("%s"), _T("hwndForground=NULL"));
+		}
 	}
 	else {
 
@@ -230,7 +241,9 @@ void Dlg_OnTimer(HWND hwnd, UINT id)
 	if (g_dwThreadIdAttachTo == 0) {
 		// If monitoring local input state system-wide, detach our input
 		// state from the thread that created the current foreground window.
-		u_AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, FALSE);
+		if (dwThreadIdAttachTo != 0) {
+			u_AttachThreadInput(GetCurrentThreadId(), dwThreadIdAttachTo, FALSE);
+		}
 	}
 
 	s_isInTimer = false;
