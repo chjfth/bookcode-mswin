@@ -77,10 +77,11 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 //void Dlg_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,	UINT keyFlags) 
 void ShowHelp()
 {
-	chMB("To monitor a specific thread, click the left mouse button in "
-		"the main window and release it in the desired window.\n"
-		"To monitor all threads, double-click the left mouse button in "
-		"the main window.");
+	chMB("To monitor a specific thread, press and hold the left mouse button in "
+		"the main window, then drag and release it in the desired window.\n"
+		"\n"
+		"To monitor all threads, drag and release left mouse button in "
+		"LISWatch window itself.");
 }
 
 

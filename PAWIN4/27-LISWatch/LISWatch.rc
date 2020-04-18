@@ -56,7 +56,7 @@ CAPTION "LISWatch"
 FONT 10, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     LTEXT           "Thread:",IDC_STATIC,4,0,31,8
-    EDITTEXT        IDC_THREADID,36,0,100,8,ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_THREADID,36,0,172,8,ES_READONLY | NOT WS_BORDER
     LTEXT           "Focus:",IDC_STATIC,4,8,31,8
     LTEXT           "Focus window",IDC_WNDFOCUS,36,8,172,8
     LTEXT           "Active:",IDC_STATIC,4,16,31,8
