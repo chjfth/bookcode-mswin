@@ -41,8 +41,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	hwnd = CreateWindow(szAppName, TEXT("About Box Demo Program"),
 		WS_OVERLAPPEDWINDOW,
-		200, 200, // CW_USEDEFAULT, CW_USEDEFAULT,
-		200, 200, // CW_USEDEFAULT, CW_USEDEFAULT,
+		400, 200, // CW_USEDEFAULT, CW_USEDEFAULT,
+		400, 200, // CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL);
 
 	ShowWindow(hwnd, iCmdShow);
@@ -58,6 +58,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 void PaintWindow(HWND hwnd, int iColor, int iFigure)
 {
+	// Chj: `hwnd` can be the program's main window, or a control.
+
 	static COLORREF crColor[8] = { RGB(0,   0, 0), RGB(0,   0, 255),
 		RGB(0, 255, 0), RGB(0, 255, 255),
 		RGB(255,   0, 0), RGB(255,   0, 255),
