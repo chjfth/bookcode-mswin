@@ -4,6 +4,7 @@ ABOUT2.C -- About Box Demo Program No. 2
 ------------------------------------------*/
 
 #include <windows.h>
+#include <windowsx.h>
 #include "resource.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -40,8 +41,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	hwnd = CreateWindow(szAppName, TEXT("About Box Demo Program"),
 		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		200, 200, // CW_USEDEFAULT, CW_USEDEFAULT,
+		200, 200, // CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL);
 
 	ShowWindow(hwnd, iCmdShow);
@@ -96,6 +97,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 		hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+
+		// Chj: Let the color selection dialog pops out automatically.
+		PostMessage(hwnd, WM_COMMAND, GET_WM_COMMAND_MPS(IDM_APP_ABOUT, 0, 0));
 		return 0;
 
 	case WM_COMMAND:
