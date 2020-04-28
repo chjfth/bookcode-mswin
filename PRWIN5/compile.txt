@@ -1,0 +1,13 @@
+Compile programs here using Visual C++ compiler:
+=================================================
+
+Memo: Modify CFILES and RCFILE's value for each project, then execute the final cl command line to compile and link.
+
+set CFILES=About2.cpp
+set RCFILE=About2.rc
+
+set CFLAGS=/DUNICODE /D_UNICODE
+set LIBLIST=user32.lib gdi32.lib kernel32.lib comctl32.lib winmm.lib
+
+rc /nologo %RCFILE% && cl %CFLAGS% /Zi /Od %CFILES% %RCFILE:~0,-3%.res /link /debug %LIBLIST%
+
