@@ -39,7 +39,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0;
 	}
 
-	hwnd = CreateWindow(szAppName, TEXT("About Box Demo Program"),
+	hwnd = CreateWindow(szAppName, TEXT("About2 (single-source grouping)"),
 		WS_OVERLAPPEDWINDOW,
 		400, 200, // CW_USEDEFAULT, CW_USEDEFAULT,
 		400, 200, // CW_USEDEFAULT, CW_USEDEFAULT,
