@@ -217,7 +217,7 @@ void Dlg_OnTimer(HWND hwnd, UINT id)
 		else
 		{	// Chj: We may see this when we user clicks on a frozen window.
 			// That frozen may due to it is being attached to and paused by a debugger.
-			_sntprintf_s(szBuf, nBuf, _T("%s"), _T("hwndForground=NULL"));
+			_sntprintf_s(szBuf, nBuf, _T("%s"), _T("hwndForeground=NULL"));
 		}
 	}
 	else {
