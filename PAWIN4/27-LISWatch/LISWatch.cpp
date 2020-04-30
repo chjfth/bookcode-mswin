@@ -33,7 +33,7 @@ BOOL u_AttachThreadInput(DWORD tid_from, DWORD tid_to, BOOL fAttach)
 
 	const TCHAR *torf = fAttach ? _T("TRUE") : _T("FALSE");
 
-	dbgprint("LISWatch: AttachThreadInput(%d, %d, %s)...", tid_from, tid_to, torf);
+	dbgprint(_T("LISWatch: AttachThreadInput(%d, %d, %s)..."), tid_from, tid_to, torf);
 
 	BOOL succ = AttachThreadInput(tid_from, tid_to, fAttach);
 	if (!succ)
@@ -42,7 +42,7 @@ BOOL u_AttachThreadInput(DWORD tid_from, DWORD tid_to, BOOL fAttach)
 		vaMsgBoxWinErr(g_hwndMain, _T("AttachThreadInput(%d, %d, %s) fail."),
 			tid_from, tid_to, torf);
 
-		dbgprint(_T("LISWatch: AttachThreadInput(%d, %d, %s) fail with winerr=%d.", ),
+		dbgprint(_T("LISWatch: AttachThreadInput(%d, %d, %s) fail with winerr=%d."),
 			tid_from, tid_to, torf, winerr);
 	}
 	return succ;
@@ -59,7 +59,7 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	int bufsize = sizeof(title) / sizeof(title[0]) - 1;
 	DWORD pid = GetCurrentProcessId();
 	DWORD tid = GetCurrentThreadId();
-	_snprintf_s(title, bufsize, _T("LISWatch (pid=%d, tid=%d)"), pid, tid);
+	_sntprintf_s(title, bufsize, _T("LISWatch (pid=%d, tid=%d)"), pid, tid);
 	SetWindowText(hwnd, title);
 
 	// Update our contents periodically
@@ -77,10 +77,11 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 //void Dlg_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,	UINT keyFlags) 
 void ShowHelp()
 {
-	chMB("To monitor a specific thread, click the left mouse button in "
-		"the main window and release it in the desired window.\n"
-		"To monitor all threads, double-click the left mouse button in "
-		"the main window.");
+	chMB("To monitor a specific thread, press and hold the left mouse button in "
+		"the main window, then drag and release it in the desired window.\n"
+		"\n"
+		"To monitor all threads, drag and release left mouse button in "
+		"LISWatch window itself.");
 }
 
 
@@ -216,7 +217,7 @@ void Dlg_OnTimer(HWND hwnd, UINT id)
 		else
 		{	// Chj: We may see this when we user clicks on a frozen window.
 			// That frozen may due to it is being attached to and paused by a debugger.
-			_sntprintf_s(szBuf, nBuf, _T("%s"), _T("hwndForground=NULL"));
+			_sntprintf_s(szBuf, nBuf, _T("%s"), _T("hwndForeground=NULL"));
 		}
 	}
 	else {

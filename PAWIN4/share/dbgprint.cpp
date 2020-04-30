@@ -95,7 +95,7 @@ void vaMsgBoxWinErr(HWND hwndParent, const TCHAR *fmt, ...)
 			NULL); // A trailing \r\n has been filled.
 		(void)retchars;
 
-		_snprintf_s(tbuf, tbufsize, "%s\n\nWinErr=%d(0x%X) %s", tbuf, 
+		_sntprintf_s(tbuf, tbufsize, _T("%s\n\nWinErr=%d(0x%X) %s"), tbuf, 
 			winerr, winerr, ebuf);
 	}
 
