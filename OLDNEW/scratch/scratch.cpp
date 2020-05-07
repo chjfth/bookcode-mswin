@@ -83,13 +83,18 @@ OnPrintClient(HWND hwnd, HDC hdc)
 LRESULT CALLBACK
 WndProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
-    switch (uiMsg) {
+    switch (uiMsg) 
+    {{
     HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
     HANDLE_MSG(hwnd, WM_SIZE, OnSize);
     HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
     HANDLE_MSG(hwnd, WM_PAINT, OnPaint);
-    case WM_PRINTCLIENT: OnPrintClient(hwnd, (HDC)wParam); return 0;
+    case WM_PRINTCLIENT: 
+    {
+    	OnPrintClient(hwnd, (HDC)wParam); 
+    	return 0;
     }
+	}}
     return DefWindowProc(hwnd, uiMsg, wParam, lParam);
 }
 
