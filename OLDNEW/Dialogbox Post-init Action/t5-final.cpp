@@ -11,23 +11,27 @@ DlgProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
   switch (uiMsg) {
   case WM_INITDIALOG:
     return TRUE;
-
+  
   case WM_WINDOWPOSCHANGED:
-    if ((((WINDOWPOS*)lParam)->flags & SWP_SHOWWINDOW) && !g_fShown) 
-    {
+    if ((((WINDOWPOS*)lParam)->flags & SWP_SHOWWINDOW) && !g_fShown) {
       g_fShown = TRUE;
-      MessageBox(hwnd,
-                 IsWindowVisible(hwnd) ? TEXT("Visible") : TEXT("Not Visible"),
-                 TEXT("test four"), MB_OK);
+      PostMessage(hwnd, WM_APP, 0, 0);
     }
     break;
-
+  
+  case WM_APP:
+      MessageBox(hwnd,
+                 IsWindowVisible(hwnd) ? TEXT("Visible") : TEXT("Not Visible"),
+                 TEXT("test five"), MB_OK);
+      break;
+  
   case WM_CLOSE:
    EndDialog(hwnd, 0);
    break;
   }
   return FALSE;
 }
+
 
 
 int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
@@ -40,6 +44,6 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 /* Compiling commands:
 
 rc box.rc
-cl /Od /Zi t4-WM_WINDOWPOSCHANGED.cpp /link /debug user32.lib gdi32.lib box.res 
+cl /Od /Zi t5-final.cpp /link /debug user32.lib gdi32.lib box.res 
 
 */
