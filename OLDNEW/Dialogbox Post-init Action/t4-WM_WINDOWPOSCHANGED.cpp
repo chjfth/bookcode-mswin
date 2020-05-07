@@ -18,7 +18,7 @@ DlgProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
       g_fShown = TRUE;
       MessageBox(hwnd,
                  IsWindowVisible(hwnd) ? TEXT("Visible") : TEXT("Not Visible"),
-                 TEXT("t4ok-WM_WINDOWPOSCHANGED"), MB_OK);
+                 TEXT("t4-WM_WINDOWPOSCHANGED"), MB_OK);
     }
     break;
 
@@ -40,6 +40,6 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 /* Compiling commands:
 
 rc box.rc
-cl /Od /Zi t4ok-WM_WINDOWPOSCHANGED.cpp /link /debug user32.lib gdi32.lib box.res 
+cl /Od /Zi t4-WM_WINDOWPOSCHANGED.cpp /link /debug user32.lib gdi32.lib box.res 
 
 */
