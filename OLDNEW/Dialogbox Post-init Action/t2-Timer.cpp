@@ -6,13 +6,19 @@ INT_PTR CALLBACK
 DlgProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
   switch (uiMsg) {
+  
   case WM_INITDIALOG:
-    PostMessage(hwnd, WM_APP, 0, 0);
+    SetTimer(hwnd, 1, 1, 0);
+    Sleep(500); //simulate paging
     return TRUE;
-  case WM_APP:
-    MessageBox(hwnd,
-              IsWindowVisible(hwnd) ? TEXT("Visible") : TEXT("Not Visible"),
-              TEXT("t1-PostMessage"), MB_OK);
+  
+  case WM_TIMER:
+    if (wParam == 1) {
+      KillTimer(hwnd, 1);
+      MessageBox(hwnd,
+                IsWindowVisible(hwnd) ? TEXT("Visible") : TEXT("Not Visible"),
+                TEXT("t2-Timer"), MB_OK);
+    }
     break;
   case WM_CLOSE:
    EndDialog(hwnd, 0);
@@ -31,6 +37,6 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 /* Compiling commands:
 
 rc box.rc
-cl /Od /Zi t1-PostMessage.cpp /link /debug user32.lib gdi32.lib box.res
+cl /Od /Zi t2-Timer.cpp /link /debug user32.lib gdi32.lib box.res 
 
 */
