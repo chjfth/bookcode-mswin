@@ -1,9 +1,9 @@
 LIBRARY         Proxy.dll
-DESCRIPTION     'Inside COM CHAP10, Proxy/Stub DLL'
+; DESCRIPTION     'Inside COM CHAP10, Proxy/Stub DLL'
 
 EXPORTS
-	DllGetClassObject   @1	PRIVATE
-	DllCanUnloadNow     @2	PRIVATE
-	GetProxyDllInfo     @3	PRIVATE
-	DllRegisterServer   @4	PRIVATE
-	DllUnregisterServer @5	PRIVATE
+	DllGetClassObject   PRIVATE
+	DllCanUnloadNow     PRIVATE
+	GetProxyDllInfo     PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer PRIVATE

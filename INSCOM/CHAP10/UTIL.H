@@ -4,7 +4,9 @@
 //
 // Util.h - Shared utilities
 //
-#include <strstrea.h>
+//#include <strstrea.h> // old style, only for VC6
+#include <strstream>
+using namespace std; // OK for VC6 SP6 and VC2010
 
 namespace Util
 {

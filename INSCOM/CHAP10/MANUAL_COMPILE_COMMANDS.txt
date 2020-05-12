@@ -2,7 +2,7 @@
 # midl (required by both client & server)
 midl /Oicf /h iface.h /iid guids.c /proxy proxy.c /dlldata dlldata.c server.idl
 
-### Be aware: These cpp generates different .obj files according to whether _OUTPROC_SERVER_ macro is defined:
+### Be aware: Following .cpp-s generate different .obj-s according to whether _OUTPROC_SERVER_ macro is defined:
 ### CFactory.cpp , utils.cpp , registry.cpp
 ### So, we should better generate Client files and Server files in their own output directories.
 
@@ -10,32 +10,31 @@ midl /Oicf /h iface.h /iid guids.c /proxy proxy.c /dlldata dlldata.c server.idl
 # Note: I do not use /Fo"Xinproc" in root folder bcz the /Fo allows compile only one c/c++ file once.
 
 # Proxy.dll
-cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL ..\guids.c ..\proxy.c
-cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL ..\dlldata.c
+cl /c /EHsc /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL ..\guids.c ..\proxy.c
+cl /c /EHsc /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL ..\dlldata.c
 #
 # -- Alternative to prev cl command: 
 # --With VC6, use my stock 'dlldata.i.vc6sample.c' in place of 'dlldata.c'
 # -- dlldata.i.vc6sample.c is generated as follows:
-#   cl /c /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL /P ..\dlldata.c  &&  copy /y dlldata.i dlldata.i.vc6sample.c
+#   cl /c /EHsc /MTd /Zi /Od /DWIN32 /D_WIN32_WINNT=0x0501 /DREGISTER_PROXY_DLL /P ..\dlldata.c  &&  copy /y dlldata.i dlldata.i.vc6sample.c
 # -- Manually format dlldata.i.vc6sample.c to be debugger friendly(break *long* macro expanded lines etc), then
-#   cl /c /MTd /Zi /Od /Fo"dlldata.obj" dlldata.i.vc6sample.c
+#   cl /c /EHsc /MTd /Zi /Od /Fo"dlldata.obj" dlldata.i.vc6sample.c
 #
 link /debug /dll /out:proxy.dll /def:..\proxy.def /map proxy.obj dlldata.obj guids.obj rpcrt4.lib
 
 # Server.dll (as Client.exe's inproc-server dll)
-cl /c /MTd /Zi /Od /DWIN32 ..\server.cpp ..\cmpnt1.cpp ..\cmpnt2.cpp ..\cmpnt3.cpp ..\CUnknown.cpp ..\CFactory.cpp ..\Registry.cpp ..\Util.cpp ..\Guids.c
+cl /c /EHsc /MTd /Zi /Od /DWIN32 ..\server.cpp ..\cmpnt1.cpp ..\cmpnt2.cpp ..\cmpnt3.cpp ..\CUnknown.cpp ..\CFactory.cpp ..\Registry.cpp ..\Util.cpp ..\Guids.c
 link /debug /dll /out:server.dll /def:..\server.def /map server.obj cmpnt1.obj cmpnt2.obj cmpnt3.obj CUnknown.obj CFactory.obj Registry.obj Util.obj Guids.obj ole32.lib advapi32.lib user32.lib
 
 # Client.exe 
-cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG ..\client.cpp ..\util.cpp ..\guids.c
+cl /c /EHsc /MTd /Zi /Od /DWIN32 /D_DEBUG ..\client.cpp ..\util.cpp ..\guids.c
 link /debug client.obj util.obj guids.obj ole32.lib user32.lib
 
 #------------- Server-side: Please execute them in Xoutproc folder -------------
 
 # Server.exe
 rc /fo".\server.res" ..\server.rc
-cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG -D_OUTPROC_SERVER_ ..\outproc.cpp ..\CUnknown.cpp ..\CFactory.cpp ..\registry.cpp ..\util.cpp ..\guids.c
-cl /c /MTd /Zi /Od /DWIN32 /D_DEBUG                    ..\server.cpp ..\cmpnt1.cpp ..\cmpnt2.cpp ..\cmpnt3.cpp
+cl /c /EHsc /MTd /Zi /Od /DWIN32 /D_DEBUG -D _OUTPROC_SERVER_ ..\outproc.cpp ..\CUnknown.cpp ..\CFactory.cpp ..\registry.cpp ..\util.cpp ..\guids.c
+cl /c /EHsc /MTd /Zi /Od /DWIN32 /D_DEBUG                     ..\server.cpp ..\cmpnt1.cpp ..\cmpnt2.cpp ..\cmpnt3.cpp
 link /debug server.obj cmpnt1.obj cmpnt2.obj cmpnt3.obj CUnknown.obj CFactory.obj registry.obj util.obj outproc.obj guids.obj server.res ole32.lib user32.lib gdi32.lib advapi32.lib
-
 

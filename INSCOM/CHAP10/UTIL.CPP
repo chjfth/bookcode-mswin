@@ -28,7 +28,9 @@
 
 #else
 // We are building an in-proc server.
-#include <iostream.h>
+//#include <iostream.h> // old style for VC6 only
+#include <iostream>
+using namespace std;
 	static inline void output(const char* sz)
 	{
 		cout << sz << endl ;

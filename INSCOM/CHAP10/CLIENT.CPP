@@ -2,7 +2,11 @@
 // Client.cpp - client implementation
 //
 #include <objbase.h>
-#include <iostream.h>
+
+//#include <iostream.h> // old style for VC6 only
+#include <iostream>
+using namespace std;
+
 #include <assert.h>
 #include <conio.h>
 

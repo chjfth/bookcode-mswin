@@ -26,12 +26,13 @@ HRESULT __stdcall CB::FyCount(long* sizeArray)
 
 HRESULT __stdcall CB::FyArrayIn(long sizeIn, long arrayIn[])
 {
+	int i = 0;
 	// Display the array passed in.
 	ostrstream sout ;
 	sout << "FyArrayIn received " 
 	     << sizeIn
 	     << " elements: " ;
-	for (int i = 0 ; i < sizeIn ; i++)
+	for (i = 0 ; i < sizeIn ; i++)
 	{
 		sout << " " << arrayIn[i] ;
 	}
