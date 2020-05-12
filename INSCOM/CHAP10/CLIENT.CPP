@@ -148,9 +148,13 @@ int main()
 			trace("Could not get interface IZ from IX.", hr) ;
 		}
 
-		trace("Chj: == Press any key to to go on doing final Release(). ==");
-		trace("     == You can take the chance to inspect this process. ==");
+		trace("Chj: == Press any key to go on doing final Release(). ==");
+		trace("     == You can take the chance to inspect this process with a debugger. ==");
 		_getch();
+
+		// [2020-05-12] Chj: Do extra pair of AddRef() and Release():
+		pIX->AddRef();
+		pIX->Release() ;
 
 		trace("Release IX.") ;
 		pIX->Release() ;
