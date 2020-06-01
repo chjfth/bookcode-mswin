@@ -4,6 +4,7 @@
 
 #define UNICODE
 
+#include <tchar.h>
 #include <assert.h>
 #include <stdio.h>
 #include <windows.h>
@@ -41,8 +42,12 @@ void RegisterInterfaceMarshaler()
 //*******************************************************************
 //*  Client component's main() routine.
 //*******************************************************************
-void main(int argc, char **argv)
+void _tmain(int argc, WCHAR **argv)
 {
+	WCHAR *server = L"localhost"; // Chj
+	if(argc>1)
+		server = argv[1];
+
    // [Chapter 4:  Initialization and Termination]
    CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
@@ -52,8 +57,8 @@ void main(int argc, char **argv)
    // [Chapter 4:  Creating an Object]
    // Request for the IHello interface.
    MULTI_QI mqi[] = { {&IID_IHello, NULL, S_OK} };
-   // Target host name; replace "localhost" with you server name.
-   COSERVERINFO csi = {0, L"localhost", NULL, 0};
+   
+   COSERVERINFO csi = {0, server, NULL, 0};
    // Create an instance of the Hello distributed component object.
    CoCreateInstanceEx(CLSID_Hello, 
                       NULL, 
