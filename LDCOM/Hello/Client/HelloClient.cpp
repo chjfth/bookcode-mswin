@@ -52,8 +52,8 @@ void main(int argc, char **argv)
    // [Chapter 4:  Creating an Object]
    // Request for the IHello interface.
    MULTI_QI mqi[] = { {&IID_IHello, NULL, S_OK} };
-   // Target host name; replace "dog" with you server name.
-   COSERVERINFO csi = {0, L"dog", NULL, 0};
+   // Target host name; replace "localhost" with you server name.
+   COSERVERINFO csi = {0, L"localhost", NULL, 0};
    // Create an instance of the Hello distributed component object.
    CoCreateInstanceEx(CLSID_Hello, 
                       NULL, 
