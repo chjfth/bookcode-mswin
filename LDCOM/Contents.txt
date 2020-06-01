@@ -1,0 +1,23 @@
+The following table illustrates the contents of this directory.  The accompanying source for "Learning DCOM" is included within subdirectories.
+
+Chapter                                   Directory for Supporting Source Code 
+=================================         ====================================
+Chapter 1 (Distributed Computing)         N/A
+Chapter 2 (DCOM Overview)                 N/A
+Chapter 3 (Objects)                       Basics
+Chapter 4 (Components)                    Basics
+Chapter 5 (Infrastructure)                Infrastructure
+Chapter 6 (Building Components with ATL)  OCRServer
+Chapter 7 (Using COM Objects)             OCRClient
+Chapter 8 (COM in Cyberspace)             Cyber
+Chapter 9 (Applying Security)             Security
+Chapter 10 (Connecting Objects)           Chat
+
+The "include" directory contains several helper classes.
+
+The "Hello" directory contains the minimum (error checking and resource reclamation are ignored) source code required for building distributed components using COM.  Appendix D explains the code within this directory.
+
+The "FixAutomationMarshaler.reg" file contains the required registry entries for the 32-bit automation marshaler, which are incorrectly removed by ATL.  The details of this problem is discussed in KB Article ID: Q185599 (BUG: OleAut32.dll Is Unregistered Incorrectly).
+
+All projects are built using Visual C++ 6.0.
+

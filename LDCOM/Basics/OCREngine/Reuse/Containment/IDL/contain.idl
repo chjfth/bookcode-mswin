@@ -1,0 +1,34 @@
+//*******************************************************************
+//**  GUIDs are generated from guidgen.exe
+//*******************************************************************
+
+//*******************************************************************
+//** Include the specification of the IUnknown interface
+//*******************************************************************
+import "unknwn.idl";
+
+//*******************************************************************
+//**  IDictionary which delegates its method to the inner object
+//*******************************************************************
+[ object, uuid(F122AFB0-C465-11d1-83B4-006008CDD9AE) ]
+interface IDictionary : IUnknown
+{
+    HRESULT LookUp();
+}
+
+
+// notice you don't have to have specify library and coclass
+// if you don't want to create a typelibary
+
+//*******************************************************************
+//**  Spit out the class ID in the generated header file
+//*******************************************************************
+// {80DA2D21-C466-11d1-83B4-006008CDD9AE}
+cpp_quote("DEFINE_GUID(CLSID_Dictionary, 0x80da2d21, 0xc466, 0x11d1, 0x83, 0xb4, 0x0, 0x60, 0x8, 0xcd, 0xd9, 0xae);")
+
+//*******************************************************************
+//**  Spit out IID_IDictionary in the generated header file
+//*******************************************************************
+// {F122AFB0-C465-11d1-83B4-006008CDD9AE}
+cpp_quote("DEFINE_GUID(IID_IDictionary, 0xf122afb0, 0xc465, 0x11d1, 0x83, 0xb4, 0x0, 0x60, 0x8, 0xcd, 0xd9, 0xae);")
+
