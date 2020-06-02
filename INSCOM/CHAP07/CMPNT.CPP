@@ -1,7 +1,11 @@
 //
 // Cmpnt.cpp
 //
-#include <iostream.h>
+
+//#include <iostream.h> // old style for VC6 only
+#include <iostream>
+using namespace std;
+
 #include <objbase.h>
 
 #include "Iface.h"      // Interface declarations
