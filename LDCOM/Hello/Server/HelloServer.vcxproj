@@ -92,7 +92,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)\HelloServer.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>$(IntDir)\</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)\</ProgramDataBaseFileName>
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Midl>
       <TypeLibraryName>$(OutDir)\HelloServer.tlb</TypeLibraryName>
@@ -110,6 +110,7 @@
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\HelloServer.exe</OutputFile>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
