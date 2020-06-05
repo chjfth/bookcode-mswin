@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Marshaler">
+      <UniqueIdentifier>{b39ba0f1-f768-45b4-9e18-bc820447c3f5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\idl\dlldata.c">
+      <Filter>Marshaler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\idl\hello_p.c">
+      <Filter>Marshaler</Filter>
+    </ClCompile>
+    <ClCompile Include="HelloClient.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\idl\hello.h">
+      <Filter>Marshaler</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\idl\hello.idl">
+      <Filter>Marshaler</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
