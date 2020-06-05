@@ -25,9 +25,9 @@ if "%PlatformName%" == "Win32" (
 ) else (
 	set MIDL_CMD=midl /Oicf /x64   /out ..\idl\x64   %InputFilepath%
 )
-echo on
+
+call :EchoExec %MIDL_CMD%
 %MIDL_CMD%
-@echo off
 
 goto :END
 
@@ -37,6 +37,10 @@ REM =============================
 
 :Echos
   echo [%batfilenam%] %*
+exit /b
+
+:EchoExec
+  echo [%batfilenam%] EXEC: %*
 exit /b
 
 :END
