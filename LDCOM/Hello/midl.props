@@ -3,8 +3,8 @@
 
 <ItemGroup>
 	<CustomBuild Include="..\idl\hello.idl">
-		<Command>call $(SolutionDir).\call-midl.bat $(SolutionDir) $(ProjectDir) $(OutDir) %(FullPath)</Command>
-		<Outputs>..\idl\dlldata.c;..\idl\hello_p.c;..\idl\hello.h;..\idl\hello_i.c;%(Outputs)</Outputs>
+		<Command>call $(SolutionDir).\call-midl.bat $(SolutionDir) $(ProjectDir) $(OutDir) $(PlatformName) %(FullPath)</Command>
+		<Outputs>..\idl\$(PlatformName)\dlldata.c;..\idl\$(PlatformName)\hello_p.c;..\idl\$(PlatformName)\hello.h;..\idl\$(PlatformName)\hello_i.c;%(Outputs)</Outputs>
 	</CustomBuild>
 </ItemGroup>
 
