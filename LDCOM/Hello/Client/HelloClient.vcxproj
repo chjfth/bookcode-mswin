@@ -59,7 +59,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
       <MinimalRebuild>true</MinimalRebuild>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PreprocessorDefinitions>_DEBUG;_WIN32_DCOM;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>$(IntDir)\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>$(IntDir)\HelloClient.pch</PrecompiledHeaderOutputFile>
@@ -100,6 +100,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)\HelloClient.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>$(IntDir)\</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)\</ProgramDataBaseFileName>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Midl>
       <TypeLibraryName>$(OutDir)\HelloClient.tlb</TypeLibraryName>
@@ -127,10 +128,8 @@
   <ItemGroup>
     <ClInclude Include="..\idl\hello.h" />
   </ItemGroup>
-
   <!-- Chj added 1 Line: -->
   <Import Project="$(SolutionDir).\midl.props" />
-  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
