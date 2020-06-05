@@ -20,6 +20,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\idl\hello.idl" />
+    <CustomBuild Include="..\idl\hello.idl">
+      <Filter>Marshaler</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
