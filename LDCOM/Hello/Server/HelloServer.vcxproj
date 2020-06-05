@@ -135,6 +135,9 @@
   <ItemGroup>
     <ClInclude Include="..\idl\hello.h" />
   </ItemGroup>
+
+  <Import Project="$(SolutionDir).\midl.props" /> <!-- Chj added -->
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

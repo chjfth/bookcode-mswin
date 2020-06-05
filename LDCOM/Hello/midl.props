@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+<ItemGroup>
+	<CustomBuild Include="..\idl\hello.idl">
+		<Command>midl /Oicf /out ..\idl %(FullPath)</Command>
+		<Outputs>..\idl\dlldata.c;..\idl\hello_p.c;..\idl\hello.h;%(Outputs)</Outputs>
+	</CustomBuild>
+</ItemGroup>
+
+</Project>
