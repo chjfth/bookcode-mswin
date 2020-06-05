@@ -2,7 +2,9 @@
 //* Client component.
 //*******************************************************************
 
-#define UNICODE
+#ifndef UNICODE
+#define UNICODE         // UNICODE
+#endif
 
 #include <tchar.h>
 #include <assert.h>
