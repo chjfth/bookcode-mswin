@@ -36,7 +36,7 @@
     <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+  <PropertyGroup>
     <OutDir>$(SolutionDir)__$(Configuration)\$(Platform)\</OutDir>
     <IntDir>__$(Configuration)\$(Platform)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
