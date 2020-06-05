@@ -3,8 +3,8 @@
 
 <ItemGroup>
 	<CustomBuild Include="..\idl\hello.idl">
-		<Command>midl /Oicf /out ..\idl %(FullPath)</Command>
-		<Outputs>..\idl\dlldata.c;..\idl\hello_p.c;..\idl\hello.h;%(Outputs)</Outputs>
+		<Command>call $(SolutionDir).\call-midl.bat $(SolutionDir) $(ProjectDir) $(OutDir) %(FullPath)</Command>
+		<Outputs>..\idl\dlldata.c;..\idl\hello_p.c;..\idl\hello.h;..\idl\hello_i.c;%(Outputs)</Outputs>
 	</CustomBuild>
 </ItemGroup>
 
