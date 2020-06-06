@@ -135,6 +135,10 @@ public:
    }   
 };
 
+const IID IID_IAnyvalue = {
+	0x11111144,0x1111,0x1111,{0x11,0x11,0x11,0x11,0x11,0x11,0x11,0x11}
+};
+
 //*******************************************************************
 //* Internally register the marshaler for the IID_IHello interface.
 //*******************************************************************
@@ -144,9 +148,12 @@ void RegisterInterfaceMarshaler()
    DWORD dwCookie=0;
    IUnknown *pUnk=0;
    ::DllGetClassObject(IID_IHello, IID_IUnknown, (void**)&pUnk);
-   ::CoRegisterClassObject(IID_IHello, pUnk, CLSCTX_INPROC_SERVER,
+   Sleep(50);
+   ::CoRegisterClassObject(IID_IAnyvalue, pUnk, CLSCTX_INPROC_SERVER,
                            REGCLS_MULTIPLEUSE, &dwCookie);
-   ::CoRegisterPSClsid(IID_IHello, IID_IHello);
+   Sleep(50);
+   ::CoRegisterPSClsid(IID_IHello, IID_IAnyvalue); // COM background threads created inside
+   Sleep(50);
 }
 
 //*******************************************************************

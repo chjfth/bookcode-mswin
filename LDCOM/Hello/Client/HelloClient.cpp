@@ -26,6 +26,9 @@ const CLSID CLSID_Hello = {
 const IID IID_IHello = {
    0x11111111,0x1111,0x1111,{0x11,0x11,0x11,0x11,0x11,0x11,0x11,0x11}
 };
+const IID IID_IAnything = {
+	0x11111100,0x1111,0x1111,{0x11,0x11,0x11,0x11,0x11,0x11,0x11,0x11}
+};
 
 //*******************************************************************
 //* Internally register the marshaler for the IID_IHello interface.
@@ -35,10 +38,10 @@ void RegisterInterfaceMarshaler()
    // [Chapter 9][Chapter 10]
    DWORD dwCookie=0;
    IUnknown *pUnk=0;
-   ::DllGetClassObject(IID_IHello, IID_IUnknown, (void**)&pUnk);
-   ::CoRegisterClassObject(IID_IHello, pUnk, CLSCTX_INPROC_SERVER,
+   ::DllGetClassObject(IID_IHello, IID_IUnknown, (void**)&pUnk); // call into dlldata.c
+   ::CoRegisterClassObject(IID_IAnything, pUnk, CLSCTX_INPROC_SERVER,
                            REGCLS_MULTIPLEUSE, &dwCookie);
-   ::CoRegisterPSClsid(IID_IHello, IID_IHello);
+   ::CoRegisterPSClsid(IID_IHello, IID_IAnything);
 }
 
 //*******************************************************************
