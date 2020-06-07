@@ -1,4 +1,4 @@
-LIBRARY      "ocrps"
+LIBRARY      "OCRps"
 
 DESCRIPTION  'Proxy/Stub DLL'
 
