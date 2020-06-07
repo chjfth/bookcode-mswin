@@ -26,6 +26,15 @@ IDL
       regsrv32.exe ocrps.dll
 
    This is required for remote method invocation on custom interfaces.
+   
+   ----------------------------------------------------------------------------
+   [2020-06-07] Chj:
+   Using Visual Studio 2010 IDE, just open OCREngine.sln, F7 - Build the 
+   "IDL" project, and you are done, convenient! MIDL.EXE is automatically 
+   called and you can freely switch between 4 convigs(Debug/Release, Win32/x64
+   combination) without stomping on each other's output files.
+   ----------------------------------------------------------------------------
+   
 
 ===============================================================================
 Server  (out-of-proc server)
