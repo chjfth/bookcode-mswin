@@ -236,137 +236,137 @@ void DemoUsage()
 //*******************************************************************
 void main(int argc, char **argv)
 {
-   DisplayStatus(TEXT("Client: Started"), S_OK);
+	DisplayStatus(TEXT("Client: Started"), S_OK);
 
-   InitializeCriticalSection(&g_cs);
-   HRESULT hr = S_OK;
+	InitializeCriticalSection(&g_cs);
+	HRESULT hr = S_OK;
 
-   // Init COM
-   hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-   assert(SUCCEEDED(hr));
+	// Init COM
+	hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	assert(SUCCEEDED(hr));
 
-   //*******************************************************************
-   //*******************************************************************
-   //*** QI interface before use.
-   //*** Release the correct interface.
-   //*** AddRef when copying an interface.
-   //*******************************************************************
-   //*******************************************************************
-   DemoUsage();
+	//*******************************************************************
+	//*******************************************************************
+	//*** QI interface before use.
+	//*** Release the correct interface.
+	//*** AddRef when copying an interface.
+	//*******************************************************************
+	//*******************************************************************
+	DemoUsage();
 
-   //*******************************************************************
-   //*******************************************************************
-   //*** MultiQI exists only when there is a proxy object.
-   //*******************************************************************
-   //*******************************************************************
-   DemoMultiQI();
+	//*******************************************************************
+	//*******************************************************************
+	//*** MultiQI exists only when there is a proxy object.
+	//*******************************************************************
+	//*******************************************************************
+	DemoMultiQI();
 
-   //*******************************************************************
-   //*******************************************************************
-   //*** Use ISpell and IOcr
-   //*******************************************************************
-   //*******************************************************************
-   COSERVERINFO csi, *pcsi=NULL;
-   wchar_t wsz [MAX_PATH];
-   DWORD dwClsCtx = CLSCTX_INPROC_SERVER;
+	//*******************************************************************
+	//*******************************************************************
+	//*** Use ISpell and IOcr
+	//*******************************************************************
+	//*******************************************************************
+	COSERVERINFO csi, *pcsi=NULL;
+	wchar_t wsz [MAX_PATH];
+	DWORD dwClsCtx = CLSCTX_INPROC_SERVER;
 
-   if (argc > 1) {
-      // machine name
-      mbstowcs(wsz, argv[1], strlen(argv[1])+1);
-      memset(&csi, 0, sizeof(COSERVERINFO));
-      csi.pwszName = wsz;
-      pcsi = &csi;
-      dwClsCtx = CLSCTX_LOCAL_SERVER|CLSCTX_REMOTE_SERVER;
-   }
+	if (argc > 1) {
+		// machine name
+		mbstowcs(wsz, argv[1], strlen(argv[1])+1);
+		memset(&csi, 0, sizeof(COSERVERINFO));
+		csi.pwszName = wsz;
+		pcsi = &csi;
+		dwClsCtx = CLSCTX_LOCAL_SERVER|CLSCTX_REMOTE_SERVER;
+	}
 
-   // create an object on the remote machine
-   DisplayStatus(TEXT("Creating instance..."), S_OK);
+	// create an object on the remote machine
+	DisplayStatus(TEXT("Creating instance..."), S_OK);
 
-   MULTI_QI mqi[] = { {&IID_IOcr, NULL, S_OK}, {&IID_ISpell, NULL, S_OK} };
+	MULTI_QI mqi[] = { {&IID_IOcr, NULL, S_OK}, {&IID_ISpell, NULL, S_OK} };
 
-   hr = CoCreateInstanceEx(CLSID_OcrEngine, 
-                           NULL, 
-                           dwClsCtx, 
-                           pcsi, 
-                           sizeof(mqi)/sizeof(mqi[0]), 
-                           mqi);
+	hr = CoCreateInstanceEx(CLSID_OcrEngine, 
+							NULL, 
+							dwClsCtx, 
+							pcsi, 
+							sizeof(mqi)/sizeof(mqi[0]), 
+							mqi);
 
-    if (FAILED(hr)) {
+	if (FAILED(hr)) {
 
-        DisplayStatus(TEXT("CoCreateInstanceEx failed"), hr);
+		DisplayStatus(TEXT("CoCreateInstanceEx failed"), hr);
 
-    } else {
+	} else {
 
-        IOcr * pOcr = NULL ;
-        ISpell * pSpell = NULL ;
+		IOcr * pOcr = NULL ;
+		ISpell * pSpell = NULL ;
 
-        pOcr = static_cast<IOcr*>(mqi[0].pItf);
+		pOcr = static_cast<IOcr*>(mqi[0].pItf);
 
-        do {
-            // write the binary data to disk
-            char szFile[MAX_PATH] = {"test.tif"} ;
-            if (argc>2)
-            {
-                strcpy(szFile, argv[2]);
-            }
+		do {
+			// write the binary data to disk
+			char szFile[MAX_PATH] = {"test.tif"} ;
+			if (argc>2)
+			{
+				strcpy(szFile, argv[2]);
+			}
 
-            wchar_t wcFile[MAX_PATH];
-            mbstowcs(wcFile, szFile, strlen(szFile)+1);
+			wchar_t wcFile[MAX_PATH];
+			mbstowcs(wcFile, szFile, strlen(szFile)+1);
 
-            HANDLE hFile = CreateFile(wcFile,
-                GENERIC_READ,
-                FILE_SHARE_READ, 
-                NULL, 
-                OPEN_EXISTING, 
-                FILE_ATTRIBUTE_NORMAL, NULL);
+			HANDLE hFile = CreateFile(wcFile,
+				GENERIC_READ,
+				FILE_SHARE_READ, 
+				NULL, 
+				OPEN_EXISTING, 
+				FILE_ATTRIBUTE_NORMAL, NULL);
 
-            if (hFile==INVALID_HANDLE_VALUE)
-            {
-                wprintf(TEXT("hFile invalid\n"));
-                break;
-            }
+			if (hFile==INVALID_HANDLE_VALUE)
+			{
+				wprintf(TEXT("hFile invalid\n"));
+				break;
+			}
 
-            DWORD dwFileSize = GetFileSize(hFile, &dwFileSize);
-            BYTE *pbImage = new BYTE[dwFileSize];
-            DWORD dwRead = 0;
-            BOOL bRc = ReadFile(hFile, (void *)pbImage,
-                                dwFileSize, &dwRead, NULL);
-            CloseHandle(hFile);
+			DWORD dwFileSize = GetFileSize(hFile, &dwFileSize);
+			BYTE *pbImage = new BYTE[dwFileSize];
+			DWORD dwRead = 0;
+			BOOL bRc = ReadFile(hFile, (void *)pbImage,
+								dwFileSize, &dwRead, NULL);
+			CloseHandle(hFile);
 
-            wchar_t *pOut=0;
-            hr = pOcr->OcrImage(dwFileSize, (byte*)pbImage, &pOut);
+			wchar_t *pOut=0;
+			hr = pOcr->OcrImage(dwFileSize, (byte*)pbImage, &pOut);
 
-            delete [] pbImage ;
+			delete [] pbImage ;
 
-            if (FAILED(hr))
-            {
-                DisplayStatus(TEXT("IOcr::OcrImage failed"), hr);
-                break ;
-            }
-            wprintf(TEXT("IOcr::OcrImage returned: (%s)\n"), pOut);
-            CoTaskMemFree(pOut);
+			if (FAILED(hr))
+			{
+				DisplayStatus(TEXT("IOcr::OcrImage failed"), hr);
+				break ;
+			}
+			wprintf(TEXT("IOcr::OcrImage returned: (%s)\n"), pOut);
+			CoTaskMemFree(pOut);
 
-            #define arraysz 10
-            HANDLE threads[arraysz];
+			#define arraysz 10
+			HANDLE threads[arraysz];
 
-            for (short s=0; s<arraysz; s++)
-            {  // first method
-                DWORD dwTid=0;
-                threads[s] = CreateThread(NULL, 0, UseSpellFunc, 
-					                      (void*) mqi[1].pItf, 
-										  0, &dwTid);
-            }
+			for (short s=0; s<arraysz; s++)
+			{  // first method
+				DWORD dwTid=0;
+				threads[s] = CreateThread(NULL, 0, UseSpellFunc, 
+											(void*) mqi[1].pItf, 
+											0, &dwTid);
+			}
 
-            WaitForMultipleObjects(arraysz, threads, TRUE, INFINITE);
-        } while(false);
+			WaitForMultipleObjects(arraysz, threads, TRUE, INFINITE);
+		} while(false);
 
-        if (pSpell!=NULL) { pSpell->Release(); }
-        if (pOcr!=NULL) { pOcr->Release(); }
-    }
+		if (pSpell!=NULL) { pSpell->Release(); }
+		if (pOcr!=NULL) { pOcr->Release(); }
+	}
 
-    CoUninitialize();
-    DisplayStatus(TEXT("Client shutting down..."), S_OK);
+	CoUninitialize();
+	DisplayStatus(TEXT("Client shutting down..."), S_OK);
 
-    DeleteCriticalSection(&g_cs);
+	DeleteCriticalSection(&g_cs);
 }
 
