@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+<ItemGroup>
+	<CustomBuild Include=".\ocr.idl">
+		<!-- %(FullPath) is the full-qualified path of the input .idl file. -->
+		<Command>call $(ProjectDir).\call-midl.bat $(SolutionDir) $(ProjectDir) $(OutDir) $(PlatformName) %(FullPath)</Command>
+		<Outputs>$(PlatformName)\dlldata.c;$(PlatformName)\ocr_p.c;$(PlatformName)\ocr.h;$(PlatformName)\ocr_i.c;%(Outputs)</Outputs>
+	</CustomBuild>
+</ItemGroup>
+
+</Project>

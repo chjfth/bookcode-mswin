@@ -1,19 +1,27 @@
+
+
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
-/* File created by MIDL compiler version 5.01.0164 */
-/* at Sun Oct 25 16:51:14 1998
+ /* File created by MIDL compiler version 7.00.0555 */
+/* at Sun Jun 07 12:37:14 2020
  */
 /* Compiler settings for ocr.idl:
-    Oicf (OptLev=i2), W1, Zp8, env=Win32, ms_ext, c_ext
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
+    protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
+    VC __declspec() decoration level: 
+         __declspec(uuid()), __declspec(selectany), __declspec(novtable)
+         DECLSPEC_UUID(), MIDL_INTERFACE()
 */
-//@@MIDL_FILE_HEADING(  )
+/* @@MIDL_FILE_HEADING(  ) */
+
+#pragma warning( disable: 4049 )  /* more than 64k source lines */
 
 
 /* verify that the <rpcndr.h> version is high enough to compile this file*/
 #ifndef __REQUIRED_RPCNDR_H_VERSION__
-#define __REQUIRED_RPCNDR_H_VERSION__ 440
+#define __REQUIRED_RPCNDR_H_VERSION__ 475
 #endif
 
 #include "rpc.h"
@@ -31,9 +39,9 @@
 #ifndef __ocr_h__
 #define __ocr_h__
 
-#ifdef __cplusplus
-extern "C"{
-#endif 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#pragma once
+#endif
 
 /* Forward Declarations */ 
 
@@ -64,23 +72,25 @@ typedef struct CoOCREngine CoOCREngine;
 /* header files for imported files */
 #include "unknwn.h"
 
-void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
-void __RPC_USER MIDL_user_free( void __RPC_FAR * ); 
+#ifdef __cplusplus
+extern "C"{
+#endif 
 
-/* interface __MIDL_itf_ocr_0000 */
+
+/* interface __MIDL_itf_ocr_0000_0000 */
 /* [local] */ 
 
-struct  Zone
+struct Zone
     {
     short m_sX;
     short m_sY;
     short m_sWidth;
     short m_sHeight;
-    };
+    } ;
 
 
-extern RPC_IF_HANDLE __MIDL_itf_ocr_0000_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_ocr_0000_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_ocr_0000_0000_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_ocr_0000_0000_v0_0_s_ifspec;
 
 #ifndef __IOcr_INTERFACE_DEFINED__
 #define __IOcr_INTERFACE_DEFINED__
@@ -99,14 +109,14 @@ EXTERN_C const IID IID_IOcr;
     public:
         virtual HRESULT STDMETHODCALLTYPE OcrImage( 
             /* [in] */ long lImageSize,
-            /* [size_is][in] */ byte __RPC_FAR *pbImage,
-            /* [string][out] */ wchar_t __RPC_FAR *__RPC_FAR *pwszOcrText) = 0;
+            /* [size_is][in] */ byte *pbImage,
+            /* [string][out] */ wchar_t **pwszOcrText) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE OcrZone( 
             /* [in] */ long lImageSize,
-            /* [size_is][in] */ byte __RPC_FAR *pbImage,
+            /* [size_is][in] */ byte *pbImage,
             /* [in] */ struct Zone zone,
-            /* [string][out] */ wchar_t __RPC_FAR *__RPC_FAR *pwszOcrText) = 0;
+            /* [string][out] */ wchar_t **pwszOcrText) = 0;
         
     };
     
@@ -116,36 +126,37 @@ EXTERN_C const IID IID_IOcr;
     {
         BEGIN_INTERFACE
         
-        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )( 
-            IOcr __RPC_FAR * This,
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            IOcr * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
+            /* [annotation][iid_is][out] */ 
+            __RPC__deref_out  void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )( 
-            IOcr __RPC_FAR * This);
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            IOcr * This);
         
-        ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )( 
-            IOcr __RPC_FAR * This);
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            IOcr * This);
         
-        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *OcrImage )( 
-            IOcr __RPC_FAR * This,
+        HRESULT ( STDMETHODCALLTYPE *OcrImage )( 
+            IOcr * This,
             /* [in] */ long lImageSize,
-            /* [size_is][in] */ byte __RPC_FAR *pbImage,
-            /* [string][out] */ wchar_t __RPC_FAR *__RPC_FAR *pwszOcrText);
+            /* [size_is][in] */ byte *pbImage,
+            /* [string][out] */ wchar_t **pwszOcrText);
         
-        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *OcrZone )( 
-            IOcr __RPC_FAR * This,
+        HRESULT ( STDMETHODCALLTYPE *OcrZone )( 
+            IOcr * This,
             /* [in] */ long lImageSize,
-            /* [size_is][in] */ byte __RPC_FAR *pbImage,
+            /* [size_is][in] */ byte *pbImage,
             /* [in] */ struct Zone zone,
-            /* [string][out] */ wchar_t __RPC_FAR *__RPC_FAR *pwszOcrText);
+            /* [string][out] */ wchar_t **pwszOcrText);
         
         END_INTERFACE
     } IOcrVtbl;
 
     interface IOcr
     {
-        CONST_VTBL struct IOcrVtbl __RPC_FAR *lpVtbl;
+        CONST_VTBL struct IOcrVtbl *lpVtbl;
     };
 
     
@@ -154,20 +165,20 @@ EXTERN_C const IID IID_IOcr;
 
 
 #define IOcr_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IOcr_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IOcr_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #define IOcr_OcrImage(This,lImageSize,pbImage,pwszOcrText)	\
-    (This)->lpVtbl -> OcrImage(This,lImageSize,pbImage,pwszOcrText)
+    ( (This)->lpVtbl -> OcrImage(This,lImageSize,pbImage,pwszOcrText) ) 
 
 #define IOcr_OcrZone(This,lImageSize,pbImage,zone,pwszOcrText)	\
-    (This)->lpVtbl -> OcrZone(This,lImageSize,pbImage,zone,pwszOcrText)
+    ( (This)->lpVtbl -> OcrZone(This,lImageSize,pbImage,zone,pwszOcrText) ) 
 
 #endif /* COBJMACROS */
 
@@ -176,51 +187,22 @@ EXTERN_C const IID IID_IOcr;
 
 
 
-HRESULT STDMETHODCALLTYPE IOcr_OcrImage_Proxy( 
-    IOcr __RPC_FAR * This,
-    /* [in] */ long lImageSize,
-    /* [size_is][in] */ byte __RPC_FAR *pbImage,
-    /* [string][out] */ wchar_t __RPC_FAR *__RPC_FAR *pwszOcrText);
-
-
-void __RPC_STUB IOcr_OcrImage_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-HRESULT STDMETHODCALLTYPE IOcr_OcrZone_Proxy( 
-    IOcr __RPC_FAR * This,
-    /* [in] */ long lImageSize,
-    /* [size_is][in] */ byte __RPC_FAR *pbImage,
-    /* [in] */ struct Zone zone,
-    /* [string][out] */ wchar_t __RPC_FAR *__RPC_FAR *pwszOcrText);
-
-
-void __RPC_STUB IOcr_OcrZone_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
 
 #endif 	/* __IOcr_INTERFACE_DEFINED__ */
 
 
-/* interface __MIDL_itf_ocr_0006 */
+/* interface __MIDL_itf_ocr_0000_0001 */
 /* [local] */ 
 
-struct  PossibleWords
+struct PossibleWords
     {
     wchar_t wszOne[ 16 ];
     wchar_t wszTwo[ 16 ];
-    };
+    } ;
 
 
-extern RPC_IF_HANDLE __MIDL_itf_ocr_0006_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_ocr_0006_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_ocr_0000_0001_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_ocr_0000_0001_v0_0_s_ifspec;
 
 #ifndef __ISpell_INTERFACE_DEFINED__
 #define __ISpell_INTERFACE_DEFINED__
@@ -238,8 +220,8 @@ EXTERN_C const IID IID_ISpell;
     {
     public:
         virtual HRESULT STDMETHODCALLTYPE Check( 
-            /* [string][in] */ wchar_t __RPC_FAR *pwszWord,
-            /* [out] */ struct PossibleWords __RPC_FAR *pWords) = 0;
+            /* [string][in] */ wchar_t *pwszWord,
+            /* [out] */ struct PossibleWords *pWords) = 0;
         
     };
     
@@ -249,28 +231,29 @@ EXTERN_C const IID IID_ISpell;
     {
         BEGIN_INTERFACE
         
-        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )( 
-            ISpell __RPC_FAR * This,
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ISpell * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
+            /* [annotation][iid_is][out] */ 
+            __RPC__deref_out  void **ppvObject);
         
-        ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )( 
-            ISpell __RPC_FAR * This);
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ISpell * This);
         
-        ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )( 
-            ISpell __RPC_FAR * This);
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ISpell * This);
         
-        HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Check )( 
-            ISpell __RPC_FAR * This,
-            /* [string][in] */ wchar_t __RPC_FAR *pwszWord,
-            /* [out] */ struct PossibleWords __RPC_FAR *pWords);
+        HRESULT ( STDMETHODCALLTYPE *Check )( 
+            ISpell * This,
+            /* [string][in] */ wchar_t *pwszWord,
+            /* [out] */ struct PossibleWords *pWords);
         
         END_INTERFACE
     } ISpellVtbl;
 
     interface ISpell
     {
-        CONST_VTBL struct ISpellVtbl __RPC_FAR *lpVtbl;
+        CONST_VTBL struct ISpellVtbl *lpVtbl;
     };
 
     
@@ -279,36 +262,23 @@ EXTERN_C const IID IID_ISpell;
 
 
 #define ISpell_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define ISpell_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define ISpell_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #define ISpell_Check(This,pwszWord,pWords)	\
-    (This)->lpVtbl -> Check(This,pwszWord,pWords)
+    ( (This)->lpVtbl -> Check(This,pwszWord,pWords) ) 
 
 #endif /* COBJMACROS */
 
 
 #endif 	/* C style interface */
 
-
-
-HRESULT STDMETHODCALLTYPE ISpell_Check_Proxy( 
-    ISpell __RPC_FAR * This,
-    /* [string][in] */ wchar_t __RPC_FAR *pwszWord,
-    /* [out] */ struct PossibleWords __RPC_FAR *pWords);
-
-
-void __RPC_STUB ISpell_Check_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
 
 
 
@@ -334,7 +304,7 @@ CoOCREngine;
 #endif
 #endif /* __OCREngineLib_LIBRARY_DEFINED__ */
 
-/* interface __MIDL_itf_ocr_0007 */
+/* interface __MIDL_itf_ocr_0000_0002 */
 /* [local] */ 
 
 DEFINE_GUID(OCREngineLib, 0x36efd0b1, 0xb326, 0x11d1, 0xab, 0xde, 0x0, 0x20, 0x78, 0x10, 0xd5, 0xfe);
@@ -343,8 +313,8 @@ DEFINE_GUID(IID_IOcr, 0xd9f23d61, 0xa647, 0x11d1, 0xab, 0xcd, 0x0, 0x20, 0x78, 0
 DEFINE_GUID(IID_ISpell, 0xd9f23d63, 0xa647, 0x11d1, 0xab, 0xcd, 0x0, 0x20, 0x78, 0x10, 0xd5, 0xfe);
 
 
-extern RPC_IF_HANDLE __MIDL_itf_ocr_0007_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_ocr_0007_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_ocr_0000_0002_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_ocr_0000_0002_v0_0_s_ifspec;
 
 /* Additional Prototypes for ALL interfaces */
 
@@ -355,3 +325,5 @@ extern RPC_IF_HANDLE __MIDL_itf_ocr_0007_v0_0_s_ifspec;
 #endif
 
 #endif
+
+

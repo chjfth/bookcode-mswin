@@ -1,0 +1,92 @@
+//*******************************************************************
+//**  GUIDs are generated from guidgen.exe
+//*******************************************************************
+
+//*******************************************************************
+//** Include the specification of the IUnknown interface
+//*******************************************************************
+import "unknwn.idl";
+
+//*******************************************************************
+//** Possible Words
+//*******************************************************************
+struct Zone 
+{
+   short m_sX;
+   short m_sY;
+   short m_sWidth;
+   short m_sHeight;
+};
+
+//*******************************************************************
+//**  Interface for OCRing
+//*******************************************************************
+[ object, uuid(D9F23D61-A647-11d1-ABCD-00207810D5FE) ]
+interface IOcr : IUnknown
+{
+    HRESULT OcrImage([in] long lImageSize, 
+                     [in, size_is(lImageSize)] byte * pbImage, 
+                     [out, string] wchar_t **pwszOcrText);
+
+    HRESULT OcrZone([in] long lImageSize, 
+                    [in, size_is(lImageSize)] byte * pbImage,
+                    [in] struct Zone zone,
+                    [out, string] wchar_t **pwszOcrText);
+}
+
+//*******************************************************************
+//** Possible Words
+//*******************************************************************
+struct PossibleWords 
+{
+	wchar_t wszOne[16];
+	wchar_t wszTwo[16];
+};
+
+//*******************************************************************
+//**  Interface for SpellChecking
+//*******************************************************************
+[ object, uuid(D9F23D63-A647-11d1-ABCD-00207810D5FE) ]
+interface ISpell : IUnknown
+{
+    HRESULT Check([in, string] wchar_t * pwszWord, 
+                  [out] struct PossibleWords *pWords);
+}
+
+
+[ uuid(36EFD0B1-B326-11d1-ABDE-00207810D5FE), version(1.0) ]
+library OCREngineLib
+{
+
+	[ uuid(DF22A6B2-A58A-11D1-ABCC-00207810d5fe) ]  
+	coclass CoOCREngine
+	{
+		[default] interface IOcr;
+		interface ISpell;
+	}
+}
+
+//*******************************************************************
+//**  Spit out the library ID
+//*******************************************************************
+// {36EFD0B1-B326-11d1-ABDE-00207810D5FE}
+cpp_quote("DEFINE_GUID(OCREngineLib, 0x36efd0b1, 0xb326, 0x11d1, 0xab, 0xde, 0x0, 0x20, 0x78, 0x10, 0xd5, 0xfe);")
+
+
+//*******************************************************************
+//**  Spit out the class ID in the generated header file
+//*******************************************************************
+// {DF22A6B2-A58A-11d1-ABCC-00207810D5FE}
+cpp_quote("DEFINE_GUID(CLSID_OcrEngine, 0xdf22a6b2, 0xa58a, 0x11d1, 0xab, 0xcc, 0x0, 0x20, 0x78, 0x10, 0xd5, 0xfe);")
+
+//*******************************************************************
+//**  Spit out IID_IOcr in the generated header file
+//*******************************************************************
+// {D9F23D61-A647-11d1-ABCD-00207810D5FE}
+cpp_quote("DEFINE_GUID(IID_IOcr, 0xd9f23d61, 0xa647, 0x11d1, 0xab, 0xcd, 0x0, 0x20, 0x78, 0x10, 0xd5, 0xfe);")
+
+//*******************************************************************
+//**  Spit out IID_ISpell in the generated header file
+//*******************************************************************
+// {D9F23D63-A647-11d1-ABCD-00207810D5FE}
+cpp_quote("DEFINE_GUID(IID_ISpell, 0xd9f23d63, 0xa647, 0x11d1, 0xab, 0xcd, 0x0, 0x20, 0x78, 0x10, 0xd5, 0xfe);")
