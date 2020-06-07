@@ -87,6 +87,12 @@
       <ModuleDefinitionFile>ocrps.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
+  <!-- Chj added this PostBuildEvent -->
+  <ItemDefinitionGroup>
+    <PostBuildEvent>
+      <Command>$(SolutionDir)PostBuildCmds.bat $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dlldata.c" />
     <ClCompile Include="ocr_i.c" />

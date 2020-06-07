@@ -109,6 +109,12 @@
       <ModuleDefinitionFile>.\ocrsvr.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
+  <!-- Chj added this PostBuildEvent -->
+  <ItemDefinitionGroup>
+    <PostBuildEvent>
+      <Command>$(SolutionDir)PostBuildCmds.bat $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ocrsvr-dll.cpp">
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>

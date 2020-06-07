@@ -97,7 +97,7 @@
   <!-- Chj added this PostBuildEvent -->
   <ItemDefinitionGroup>
     <PostBuildEvent>
-      <Command >$(SolutionDir)PostBuildCmds.bat $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName)</Command>
+      <Command>$(SolutionDir)PostBuildCmds.bat $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

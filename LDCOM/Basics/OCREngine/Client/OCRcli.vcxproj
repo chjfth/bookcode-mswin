@@ -93,6 +93,12 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <!-- Chj added this PostBuildEvent -->
+  <ItemDefinitionGroup>
+    <PostBuildEvent>
+      <Command>$(SolutionDir)PostBuildCmds.bat $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="OCRcli.cpp" />
   </ItemGroup>
