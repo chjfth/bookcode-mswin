@@ -73,8 +73,7 @@ void DisplayStatus(wchar_t *pwszMsg, HRESULT hr)
 	}
 
     wchar_t *pwszStatus;
-    FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM,
+    FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
         NULL,
         hr,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -158,8 +157,12 @@ void UnregisterServerFromSystem()
 class CoOcrEngine : public IOcr, public ISpell {
 public:
     // constructors/destructors
-    CoOcrEngine() : m_lRefCount(0) { ComponentAddRef(); }
-    ~CoOcrEngine() { ComponentRelease(); }
+    CoOcrEngine() : m_lRefCount(0) { 
+		ComponentAddRef(); 
+	}
+    ~CoOcrEngine() { 
+		ComponentRelease(); 
+	}
 
 	// The factory will call this method to actually 
 	// create this object
@@ -219,10 +222,14 @@ HRESULT CoOcrEngine::CreateObject(LPUNKNOWN pUnkOuter,
     *ppv = NULL;
 
 	// CoOcrEngine doesn't support aggregation
-    if (pUnkOuter != NULL) { return CLASS_E_NOAGGREGATION; }
+    if (pUnkOuter != NULL) { 
+		return CLASS_E_NOAGGREGATION; 
+	}
 
     CoOcrEngine * pEngine = new CoOcrEngine;
-    if (pEngine == NULL) { return E_OUTOFMEMORY; }
+    if (pEngine == NULL) { 
+		return E_OUTOFMEMORY; 
+	}
 
     HRESULT hr = pEngine->QueryInterface(riid, ppv);
 	if (FAILED(hr)) { delete pEngine; }
@@ -450,7 +457,9 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 	*ppv = NULL;
 
 	// Does our component support this particular class ID?
-	if (CLSID_OcrEngine!=rclsid) { return E_FAIL; }
+	if (CLSID_OcrEngine!=rclsid) { 
+		return E_FAIL; 
+	}
 
 	CoOcrEngineFactory * pCF = new CoOcrEngineFactory();
 	if (pCF==NULL) { return E_OUTOFMEMORY; }

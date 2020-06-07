@@ -180,8 +180,12 @@ void UnregisterComponent()
 class CoOcrEngine : public IOcr, public ISpell {
 public:
     // constructors/destructors
-    CoOcrEngine() : m_lRefCount(0) { ComponentAddRef(); }
-    ~CoOcrEngine() { ComponentRelease(); }
+    CoOcrEngine() : m_lRefCount(0) { 
+		ComponentAddRef(); 
+	}
+    ~CoOcrEngine() { 
+		ComponentRelease(); 
+	}
 
 	// The factory will call this method to actually 
 	// create this object
