@@ -49,7 +49,7 @@ Server  (out-of-proc server)
    Use -UnRegServer to unregister.
 
    ----------------------------------------------------------------------------
-   [2020-06-07] Chj: Use ocrsvr.vcxproj .
+   [2020-06-07] Chj: Use Server\ocrsvr.vcxproj .
    ----------------------------------------------------------------------------
    
 ===============================================================================
@@ -66,6 +66,10 @@ Inproc  (in-proc server)
 
       regsvr32.exe -u inproc.dll
    
+   ----------------------------------------------------------------------------
+   [2020-06-07] Chj: Use Inproc\Inproc.vcxproj .
+   ----------------------------------------------------------------------------
+   
 ===============================================================================
 Client (client component to test the in- and out-of-proc server.
 ===============================================================================
@@ -77,6 +81,11 @@ Client (client component to test the in- and out-of-proc server.
    You need to put the "test.tif" file in the same directory as ocrcli.exe,
    because ocrcli.exe loads this file and send the binary TIFF image data
    to the server component.
+
+   ----------------------------------------------------------------------------
+   [2020-06-07] Chj: Use Client\OCRcli.vcxproj .
+   ----------------------------------------------------------------------------
+   
 
 ===============================================================================
 Reuse 
