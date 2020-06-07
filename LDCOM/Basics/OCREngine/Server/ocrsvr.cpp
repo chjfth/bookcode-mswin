@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <initguid.h>
+#include "..\share.h"
 #include "..\idl\ocr.h"
 
 //-------------------------------------------------------------------
@@ -63,7 +64,7 @@ void DisplayStatus(wchar_t *pwszMsg, HRESULT hr)
 {
 
     if (hr == S_OK) {
-        wprintf(TEXT("%s\n"), pwszMsg);
+        wprintf(TEXT("%s: OK\n"), pwszMsg);
         return;
     }
 
@@ -95,20 +96,27 @@ inline long ByteLen(wchar_t *pwsz)
 
 //-------------------------------------------------------------------
 // Automatic registration; for out-of-process server support the
-// -regserver option
+// -RegServer option
 //-------------------------------------------------------------------
-void RegisterComponent()
+WinError_t RegisterComponent()
 {
     wchar_t wszKey[MAX_PATH];
     wchar_t wszValue[MAX_PATH];
     HKEY hKey = 0;
+	WinError_t winerr = 0;
 
     // HKEY_CLASSES_ROOT\CLSID\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}
     //  @="OcrEngine"
     wcscpy(wszKey, TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}"));
-    RegCreateKey(HKEY_CLASSES_ROOT, wszKey, &hKey);
+    winerr = RegCreateKey(HKEY_CLASSES_ROOT, wszKey, &hKey);
+	if(winerr) {
+		return winerr;
+	}
     wcscpy(wszValue, TEXT("OcrEngine"));
-    RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
+    winerr = RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
+	if(winerr) {
+		return winerr;
+	}
 
     //  "AppID"="{EF20ACA0-C12A-11d1-ABF6-00207810D5FE}"
     wcscpy(wszValue, TEXT("{EF20ACA0-C12A-11d1-ABF6-00207810D5FE}"));
@@ -118,8 +126,7 @@ void RegisterComponent()
 
     // HKEY_CLASSES_ROOT\CLSID\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}\LocalServer32
     //      @="...path...\ocrsvr.exe"
-    wcscpy(wszKey, TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}\\")
-           TEXT("LocalServer32"));
+    wcscpy(wszKey, TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}\\")TEXT("LocalServer32"));
     RegCreateKey(HKEY_CLASSES_ROOT, wszKey, &hKey);
     GetModuleFileName(0, wszValue, MAX_PATH);
     RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
@@ -142,30 +149,42 @@ void RegisterComponent()
     RegSetValueEx(hKey, 0, 0, REG_SZ, 
                   (BYTE*)wszValue, ByteLen(wszValue));
     RegCloseKey(hKey);
+
+	return NOERROR;
 }
 
 //-------------------------------------------------------------------
 // Automatic unregistration; for out-of-process server support the
 // -unregserver option
 //-------------------------------------------------------------------
-void UnregisterComponent()
+WinError_t UnregisterComponent()
 {   
     long lRc = 0 ;
     lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("CLSID\\") 
              TEXT("{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}\\") 
              TEXT("LocalServer32"));
     DisplayStatus(TEXT("Unregistered LocalServer32"), lRc);
+	if(lRc!=NOERROR)
+		return lRc;
     
 	lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("CLSID\\") 
              TEXT("{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}"));
     DisplayStatus(TEXT("Unregistered CLSID"), lRc);
+	if(lRc!=NOERROR)
+		return lRc;
     
 	lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("AppID\\") 
              TEXT("{EF20ACA0-C12A-11d1-ABF6-00207810D5FE}"));
     DisplayStatus(TEXT("Unregistered AppID"), lRc);
+	if(lRc!=NOERROR)
+		return lRc;
     
 	lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("AppID\\ocrsvr.exe"));
     DisplayStatus(TEXT("Unregistered ocrsvr.exe"), lRc);
+	if(lRc!=NOERROR)
+		return lRc;
+
+	return NOERROR;
 }
  
 //*******************************************************************
@@ -442,8 +461,9 @@ CoOcrEngineFactory::QueryInterface(REFIID riid, void** ppv)
 //***  Main Program
 //*******************************************************************
 //*******************************************************************
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
+	WinError_t winerr = 0;
     DisplayStatus(TEXT("Server: Started"), S_OK);
 
     g_hExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -452,14 +472,14 @@ void main(int argc, char **argv)
     // registration if required
     if (argc > 1) {
         if (_stricmp(argv[1], "-RegServer")==0){
-            RegisterComponent();
-            DisplayStatus(TEXT("Registered..."), S_OK);
-            return ;
+            winerr = RegisterComponent();
+            DisplayStatus(TEXT("RegServer..."), winerr);
+            return winerr;
         }
         if (_stricmp(argv[1], "-UnRegServer")==0){
-            UnregisterComponent();
-            DisplayStatus(TEXT("Unregistered..."), S_OK);
-            return ;
+            winerr = UnregisterComponent();
+            DisplayStatus(TEXT("UnRegServer... "), winerr);
+            return winerr;
         }
     }
 
@@ -490,4 +510,5 @@ void main(int argc, char **argv)
     DisplayStatus(TEXT("Server shutting down in 5 seconds..."), S_OK);
 
     Sleep(5000);
+	return 0;
 }
