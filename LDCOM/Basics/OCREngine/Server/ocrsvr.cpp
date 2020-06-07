@@ -245,10 +245,14 @@ HRESULT CoOcrEngine::CreateObject(LPUNKNOWN pUnkOuter,
     *ppv = NULL;
 
 	// CoOcrEngine doesn't support aggregation
-    if (pUnkOuter != NULL) { return CLASS_E_NOAGGREGATION; }
+    if (pUnkOuter != NULL) { 
+		return CLASS_E_NOAGGREGATION; 
+	}
 
     CoOcrEngine * pEngine = new CoOcrEngine;
-    if (pEngine == NULL) { return E_OUTOFMEMORY; }
+    if (pEngine == NULL) { 
+		return E_OUTOFMEMORY; 
+	}
 
     HRESULT hr = pEngine->QueryInterface(riid, ppv);
 	if (FAILED(hr)) { delete pEngine; }
