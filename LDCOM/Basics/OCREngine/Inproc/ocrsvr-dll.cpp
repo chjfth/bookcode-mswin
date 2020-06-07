@@ -92,7 +92,7 @@ void DisplayStatus(wchar_t *pwszMsg, HRESULT hr)
 //-------------------------------------------------------------------
 inline long ByteLen(wchar_t *pwsz) 
 {
-    return (sizeof(wchar_t)*(wcslen(pwsz)+1));
+    return (long)( (sizeof(wchar_t)*(wcslen(pwsz)+1)) );
 }
 
 //-------------------------------------------------------------------
@@ -302,7 +302,7 @@ CoOcrEngine::OcrImage(long lImageSize,
 
     // remember that we have to take the len of string including null
     // multiply by the sizeof wchar_t
-    long lAllocSize = (wcslen(wszOcrText)+1) * sizeof(wchar_t);
+    long lAllocSize = (long)( (wcslen(wszOcrText)+1) * sizeof(wchar_t) );
     wprintf(TEXT("lAllocSize = %u\n"), lAllocSize);
 
     *pwszOcrText = static_cast<wchar_t *>(CoTaskMemAlloc(lAllocSize));
