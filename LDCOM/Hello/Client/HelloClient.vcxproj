@@ -39,7 +39,8 @@
   <PropertyGroup>
     <OutDir>$(SolutionDir)__$(Configuration)\$(Platform)\</OutDir>
     <IntDir>__$(Configuration)\$(Platform)\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)'=='Debug'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)'=='Release'">false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
