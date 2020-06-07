@@ -15,7 +15,9 @@ call :Echos START for %TargetFilepath%
 REM
 REM ==== boilerplate code <<<<
 
-set DIR_SYNC_TO_FINAL=%DIR_SYNC_TO%\__%Conf%\%PlatformName%
+if not "%DIR_SYNC_TO%" == "" (
+  set DIR_SYNC_TO_FINAL=%DIR_SYNC_TO%\__%Conf%\%PlatformName%
+)
 
 REM --------------------------------------------------------------------------
 REM If DIR_SYNC_TO env-var is defined, we sync %TargetFilepath% to that dir.
