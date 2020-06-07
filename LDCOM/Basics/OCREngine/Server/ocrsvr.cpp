@@ -72,8 +72,7 @@ void DisplayStatus(wchar_t *pwszMsg, HRESULT hr)
 	}
 
     wchar_t *pwszStatus;
-    FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM,
+    FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
         NULL,
         hr,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -156,13 +155,16 @@ void UnregisterComponent()
              TEXT("{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}\\") 
              TEXT("LocalServer32"));
     DisplayStatus(TEXT("Unregistered LocalServer32"), lRc);
-    lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("CLSID\\") 
+    
+	lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("CLSID\\") 
              TEXT("{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}"));
     DisplayStatus(TEXT("Unregistered CLSID"), lRc);
-    lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("AppID\\") 
+    
+	lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("AppID\\") 
              TEXT("{EF20ACA0-C12A-11d1-ABF6-00207810D5FE}"));
     DisplayStatus(TEXT("Unregistered AppID"), lRc);
-    lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("AppID\\ocrsvr.exe"));
+    
+	lRc = RegDeleteKey(HKEY_CLASSES_ROOT, TEXT("AppID\\ocrsvr.exe"));
     DisplayStatus(TEXT("Unregistered ocrsvr.exe"), lRc);
 }
  
