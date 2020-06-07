@@ -38,7 +38,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <OutDir>$(SolutionDir)__$(Configuration)\$(Platform)\</OutDir>
-    <IntDir>__$(Configuration)\$(Platform)\</IntDir>
+    <IntDir>_$(Configuration)\$(Platform)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
