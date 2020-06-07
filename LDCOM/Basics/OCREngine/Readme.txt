@@ -8,7 +8,7 @@ NOTE:  Build these projects in the order shown below.
 ===============================================================================
 IDL
 ===============================================================================
-   This directory contains the interface defintion file for the interfaces
+   This directory contains the interface definition file for the interfaces
    that are used within the OCR examples throughout this book.
 
    You need to compile this IDL file using the midl.exe compiler, as follows:
@@ -16,7 +16,7 @@ IDL
       midl /Oicf ocr.idl
 
    to obtain the interface marshaling code for all interfaces defined within
-   the ocr.idl file.  To wrap up all this code into a DLL, you nned to use
+   the ocr.idl file.  To wrap up all this code into a DLL, you need to use
    nmake.exe, as follows:
 
       nmake -f ocrps.mk
