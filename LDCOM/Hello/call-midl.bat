@@ -8,7 +8,7 @@ set ProjectDir=%2
 set ProjectDir=%ProjectDir:~0,-1%
 set OutDir=%3
 set OutDir=%OutDir:~0,-1%
-REM Set CMD var for PlatformName
+REM Set CMD var for PlatformName (=Win32 or =x64)
 set PlatformName=%4
 REM Set CMD var for the input-file (xxx.idl)
 set InputFilepath=%5
@@ -21,9 +21,9 @@ REM
 REM ==== boilerplate code <<<<
 
 if "%PlatformName%" == "Win32" (
-	set MIDL_CMD=midl /Oicf /win32 /out ..\idl\Win32 %InputFilepath%
+	set MIDL_CMD=midl /Oicf  /win32  /out ..\idl\%PlatformName% %InputFilepath%
 ) else (
-	set MIDL_CMD=midl /Oicf /x64   /out ..\idl\x64   %InputFilepath%
+	set MIDL_CMD=midl /Oicf  /x64    /out ..\idl\%PlatformName%   %InputFilepath%
 )
 
 call :EchoExec %MIDL_CMD%
