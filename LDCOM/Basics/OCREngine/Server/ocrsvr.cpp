@@ -113,10 +113,7 @@ WinError_t RegisterComponent()
 		return winerr;
 	}
     wcscpy(wszValue, TEXT("OcrEngine"));
-    winerr = RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
-	if(winerr) {
-		return winerr;
-	}
+    RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
 
     //  "AppID"="{EF20ACA0-C12A-11d1-ABF6-00207810D5FE}"
     wcscpy(wszValue, TEXT("{EF20ACA0-C12A-11d1-ABF6-00207810D5FE}"));
@@ -129,7 +126,10 @@ WinError_t RegisterComponent()
     wcscpy(wszKey, TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}\\")TEXT("LocalServer32"));
     RegCreateKey(HKEY_CLASSES_ROOT, wszKey, &hKey);
     GetModuleFileName(0, wszValue, MAX_PATH);
-    RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
+    winerr = RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
+	if(winerr) {
+		return winerr;
+	}
     RegCloseKey(hKey);
 
     // HKEY_CLASSES_ROOT\AppID\ocrsvr.exe

@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <initguid.h>
+#include "..\share.h"
 #include "..\idl\ocr.h"
 
 //-------------------------------------------------------------------
@@ -98,17 +99,21 @@ inline long ByteLen(wchar_t *pwsz)
 // Automatic registration; for in-process server, do:
 //		regsvr32.exe xxx.dll
 //-------------------------------------------------------------------
-void RegisterServerToSystem()
+WinError_t RegisterServerToSystem()
 {
     wchar_t wszKey[MAX_PATH];
     wchar_t wszValue[MAX_PATH];
     HKEY hKey = 0;
+	WinError_t winerr = 0;
 
     // CLSID_OcrEngine = {DF22A6B2-A58A-11d1-ABCC-00207810D5FE}
     // HKEY_CLASSES_ROOT\CLSID\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}
     //      @="OcrEngine"
     wcscpy(wszKey, TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}"));
-    RegCreateKey(HKEY_CLASSES_ROOT, wszKey, &hKey);
+    winerr = RegCreateKey(HKEY_CLASSES_ROOT, wszKey, &hKey);
+	if(winerr) {
+		return winerr;
+	}
 	wcscpy(wszValue, TEXT("OcrEngine"));
     RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
     RegCloseKey(hKey);
@@ -116,22 +121,26 @@ void RegisterServerToSystem()
     // HKEY_CLASSES_ROOT\CLSID\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}\InprocServer32
     //      @="E:\DCOM\CODE\Essentials\inproc\DEBUG\inproc.dll"
     //      "ThreadingModel" = "Both"
-    wcscpy(wszKey, TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}")
-		   TEXT("\\InprocServer32"));
+    wcscpy(wszKey, TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}")TEXT("\\InprocServer32"));
     RegCreateKey(HKEY_CLASSES_ROOT, wszKey, &hKey);
     wcscpy(wszValue, g_wszModuleName);
-    RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
-    wcscpy(wszValue, TEXT("Both"));
-    RegSetValueEx(hKey, TEXT("ThreadingModel"), 0, REG_SZ, 
+    winerr = RegSetValueEx(hKey, 0, 0, REG_SZ, (BYTE*)wszValue, ByteLen(wszValue));
+	if(winerr) {
+		return winerr;
+	}    
+	wcscpy(wszValue, TEXT("Both"));
+	RegSetValueEx(hKey, TEXT("ThreadingModel"), 0, REG_SZ, 
                   (BYTE*)wszValue, ByteLen(wszValue));
     RegCloseKey(hKey);
+
+	return NOERROR;
 }
 
 //-------------------------------------------------------------------
 // Automatic registration; for in-process server, do:
 //		regsvr32.exe -u xxx.dll
 //-------------------------------------------------------------------
-void UnregisterServerFromSystem()
+WinError_t UnregisterServerFromSystem()
 {
     long lRc = 0 ;
 
@@ -139,10 +148,16 @@ void UnregisterServerFromSystem()
         TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}") 
 		TEXT("\\InprocServer32"));
     DisplayStatus(TEXT("Unregistered CLSID's InprocServer"), lRc);
+	if(lRc!=NOERROR)
+		return lRc;
 
     lRc=RegDeleteKey(HKEY_CLASSES_ROOT, 
         TEXT("CLSID\\{DF22A6B2-A58A-11d1-ABCC-00207810D5FE}"));
     DisplayStatus(TEXT("Unregistered CLSID"), lRc);
+	if(lRc!=NOERROR)
+		return lRc;
+
+	return lRc;
 }
  
 //*******************************************************************
@@ -481,8 +496,12 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 //*******************************************************************
 STDAPI DllRegisterServer(void)
 {
-    RegisterServerToSystem();
-	return S_OK;
+	WinError_t winerr = RegisterServerToSystem();
+
+	// For DllRegisterServer, return value's highest bit must be 1, 
+	// so that regsvr32.exe's exit code will be non-zero.
+	// Example: 5 => 0x80070005
+	return HRESULT_FROM_WIN32(winerr);
 }
 
 //*******************************************************************
@@ -492,6 +511,6 @@ STDAPI DllRegisterServer(void)
 //*******************************************************************
 STDAPI DllUnregisterServer(void)
 {
-    UnregisterServerFromSystem();
-	return S_OK;
+    WinError_t winerr = UnregisterServerFromSystem();
+	return HRESULT_FROM_WIN32(winerr);
 }
