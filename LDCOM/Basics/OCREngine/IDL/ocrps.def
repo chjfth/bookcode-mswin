@@ -1,6 +1,6 @@
 LIBRARY      "OCRps"
 
-DESCRIPTION  'Proxy/Stub DLL'
+; DESCRIPTION  'Proxy/Stub DLL'
 
 EXPORTS
 	DllGetClassObject       PRIVATE
