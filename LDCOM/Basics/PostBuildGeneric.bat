@@ -30,6 +30,11 @@ call :EchoVar PlatformName
 call :EchoVar TargetDir
 call :EchoVar TargetFilenam
 
+REM Call PostBuildSyncOutput.bat only if that file exist. If you need it, just copy it from the .template aside.
+if exist %SolutionDir%\PostBuildSyncOutput.bat (
+	call %SolutionDir%\PostBuildSyncOutput.bat %BuildConf% %PlatformName% %TargetDir%
+)
+
 goto :END
 
 REM =============================
