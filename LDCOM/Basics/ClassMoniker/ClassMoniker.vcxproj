@@ -96,7 +96,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="WordDispatch.cpp" />
+    <ClCompile Include="ClassMoniker.cpp" />
   </ItemGroup>
 
   <!-- Chj added this PostBuildEvent -->
