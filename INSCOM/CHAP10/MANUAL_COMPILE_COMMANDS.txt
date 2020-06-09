@@ -3,7 +3,7 @@
 midl /Oicf /h iface.h /iid guids.c /proxy proxy.c /dlldata dlldata.c server.idl
 
 ### Be aware: Following .cpp-s generate different .obj-s according to whether _OUTPROC_SERVER_ macro is defined:
-### CFactory.cpp , utils.cpp , registry.cpp
+### CFactory.cpp , util.cpp , registry.cpp
 ### So, we should better generate Client files and Server files in their own output directories.
 
 #------------- Client-side: Please execute them in Xinproc folder -------------
