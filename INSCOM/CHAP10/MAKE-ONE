@@ -58,7 +58,7 @@ PROXYSTUBLIBS = kernel32.lib  \
                 uuid.lib 
 
 proxy.dll : $(PROXYSTUBOBJS) proxy.def
-	link /dll /out:proxy.dll /def:proxy.def   \
+	link $(DLL_LINK_FLAGS) /out:proxy.dll /def:proxy.def   \
 		$(PROXYSTUBOBJS) $(PROXYSTUBLIBS)
 	@echo [[[[REMEMBER-TO-DO:]]]] regsvr32 /s proxy.dll
 
