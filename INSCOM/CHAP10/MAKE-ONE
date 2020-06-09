@@ -21,9 +21,10 @@ DIR_SERVER = OutProc
 #
 # Flags - Always compiles debug.
 #
-CPP_FLAGS = /nologo /c /EHsc /MT /Zi /Od /D_DEBUG 
-EXE_LINK_FLAGS = /DEBUG
-DLL_LINK_FLAGS = /DLL /DEBUG
+CPP_FLAGS = /nologo /c /EHsc /MT /Zi /Od # /D_DEBUG 
+	# If we use /MT, we should not use /D_DEBUG, otherwise, VC2010 will spout CRT errors on link.
+EXE_LINK_FLAGS = /nologo /DEBUG
+DLL_LINK_FLAGS = /nologo /DLL /DEBUG
 
 LIBS = kernel32.lib uuid.lib advapi32.lib ole32.lib user32.lib
 
@@ -53,15 +54,13 @@ PROXYSTUBOBJS = dlldata.obj   \
                 guids.obj
 
 PROXYSTUBLIBS = kernel32.lib  \
-                rpcndr.lib    \
-                rpcns4.lib    \
                 rpcrt4.lib    \
                 uuid.lib 
 
 proxy.dll : $(PROXYSTUBOBJS) proxy.def
 	link /dll /out:proxy.dll /def:proxy.def   \
 		$(PROXYSTUBOBJS) $(PROXYSTUBLIBS)
-	regsvr32 /s proxy.dll
+	@echo [[[[REMEMBER-TO-DO:]]]] regsvr32 /s proxy.dll
 
 !ENDIF 
 
@@ -71,7 +70,7 @@ proxy.dll : $(PROXYSTUBOBJS) proxy.def
 #
 
 guids.obj : guids.c
-		cl /c /DWIN32 /DREGISTER_PROXY_DLL guids.c
+		cl /nologo /c /MT /DWIN32 /DREGISTER_PROXY_DLL guids.c
 
 #################################################
 #
@@ -146,14 +145,14 @@ SERVER_OBJS = $(DIR_SERVER)\Server.obj     \
 !IF "$(OUTPROC)" == ""
 Server.dll:  $(SERVER_OBJS) Server.def 
 	link /out:"$@" $(DLL_LINK_FLAGS) $(SERVER_OBJS) $(LIBS) /DEF:Server.def 
-	regsvr32 -s Server.dll
+	@echo [[[[REMEMBER-TO-DO:]]]] regsvr32 -s Server.dll
 
 !ELSE
 Server.exe:  $(SERVER_OBJS) $(DIR_SERVER)\outproc.obj Server.res 
 	link /out:"$@" $(EXE_LINK_FLAGS) $(SERVER_OBJS)	       \
 		$(DIR_SERVER)\Outproc.obj Server.res               \
 		$(LIBS) user32.lib gdi32.lib
-	server /RegServer
+	@echo [[[[REMEMBER-TO-DO:]]]] server /RegServer
 !ENDIF
 
 
