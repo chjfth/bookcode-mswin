@@ -121,8 +121,17 @@
   <ItemGroup>
     <ClInclude Include="..\idl\hello.h" />
   </ItemGroup>
-  <!-- Chj added 1 Line: -->
+
+  <!-- Chj added midl.props -->
   <Import Project="$(SolutionDir).\midl.props" />
+
+  <!-- Chj added PostBuildEvent -->
+  <ItemDefinitionGroup>
+    <PostBuildEvent>
+      <Command>$(SolutionDir).\PostBuildGeneric.bat $(SolutionDir) $(ProjectDir) $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
