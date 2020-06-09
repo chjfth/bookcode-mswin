@@ -21,3 +21,15 @@ The "FixAutomationMarshaler.reg" file contains the required registry entries for
 
 All projects are built using Visual C++ 6.0.
 
+
+--------
+IID:
+        IOcr: D9F23D61-A647-11d1-ABCD-00207810D5FE
+      ISpell: D9F23D63-A647-11d1-ABCD-00207810D5FE
+
+CLSID:
+ CoOCREngine: DF22A6B2-A58A-11D1-ABCC-00207810d5fe
+
+LIBID:
+
+OCREngineLib: 36EFD0B1-B326-11d1-ABDE-00207810D5FE
