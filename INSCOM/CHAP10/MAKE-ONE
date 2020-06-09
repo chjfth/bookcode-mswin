@@ -21,9 +21,9 @@ DIR_SERVER = OutProc
 #
 # Flags - Always compiles debug.
 #
-CPP_FLAGS = /c /MTd /Zi /Od /D_DEBUG 
-EXE_LINK_FLAGS = /NOD /DEBUG
-DLL_LINK_FLAGS = /NOD /DLL /DEBUG
+CPP_FLAGS = /nologo /c /EHsc /MT /Zi /Od /D_DEBUG 
+EXE_LINK_FLAGS = /DEBUG
+DLL_LINK_FLAGS = /DLL /DEBUG
 
 LIBS = kernel32.lib uuid.lib advapi32.lib ole32.lib user32.lib
 
@@ -81,16 +81,13 @@ guids.obj : guids.c
 $(DIR_SERVER)\server.obj : server.cpp cunknown.h cfactory.h iface.h
 	cl $(CPP_FLAGS)  /Fo"$*.obj" server.cpp
 
-$(DIR_SERVER)\cmpnt1.obj : cmpnt1.cpp cmpnt1.h iface.h registry.h   \
-		CUnknown.h
+$(DIR_SERVER)\cmpnt1.obj : cmpnt1.cpp cmpnt1.h iface.h registry.h CUnknown.h
 	cl $(CPP_FLAGS) /Fo"$*.obj" cmpnt1.cpp
 
-$(DIR_SERVER)\cmpnt2.obj : cmpnt2.cpp cmpnt2.h iface.h registry.h   \
-		CUnknown.h
+$(DIR_SERVER)\cmpnt2.obj : cmpnt2.cpp cmpnt2.h iface.h registry.h CUnknown.h
 	cl $(CPP_FLAGS) /Fo"$*.obj" cmpnt2.cpp
 
-$(DIR_SERVER)\cmpnt3.obj : cmpnt3.cpp cmpnt3.h iface.h registry.h   \
-		CUnknown.h
+$(DIR_SERVER)\cmpnt3.obj : cmpnt3.cpp cmpnt3.h iface.h registry.h CUnknown.h
 	cl $(CPP_FLAGS) /Fo"$*.obj" cmpnt3.cpp
 
 #
@@ -148,15 +145,14 @@ SERVER_OBJS = $(DIR_SERVER)\Server.obj     \
 
 !IF "$(OUTPROC)" == ""
 Server.dll:  $(SERVER_OBJS) Server.def 
-	link /out:"$@" $(DLL_LINK_FLAGS) $(SERVER_OBJS) libcmtd.lib   \
-		libcimtd.lib $(LIBS) /DEF:Server.def 
+	link /out:"$@" $(DLL_LINK_FLAGS) $(SERVER_OBJS) $(LIBS) /DEF:Server.def 
 	regsvr32 -s Server.dll
 
 !ELSE
 Server.exe:  $(SERVER_OBJS) $(DIR_SERVER)\outproc.obj Server.res 
-	link /out:"$@" $(EXE_LINK_FLAGS) $(SERVER_OBJS)	               \
-		$(DIR_SERVER)\Outproc.obj Server.res libcmtd.lib   \
-		libcimtd.lib $(LIBS) user32.lib gdi32.lib
+	link /out:"$@" $(EXE_LINK_FLAGS) $(SERVER_OBJS)	       \
+		$(DIR_SERVER)\Outproc.obj Server.res               \
+		$(LIBS) user32.lib gdi32.lib
 	server /RegServer
 !ENDIF
 
@@ -167,7 +163,6 @@ Server.exe:  $(SERVER_OBJS) $(DIR_SERVER)\outproc.obj Server.res
 #
 
 Client.exe : Client.obj Guids.obj Util.obj
-	link /out:"$@" $(EXE_LINK_FLAGS) Client.obj Guids.obj Util.obj   \
-		libcmtd.lib libcimtd.lib $(LIBS) 
+	link /out:"$@" $(EXE_LINK_FLAGS) Client.obj Guids.obj Util.obj $(LIBS) 
 
 
