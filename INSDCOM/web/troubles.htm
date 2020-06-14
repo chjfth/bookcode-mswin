@@ -1,0 +1,112 @@
+<HTML>
+<HEAD>
+<TITLE>Troubleshooting Code Samples</TITLE>
+<STYLE TYPE="text/css">
+<!--
+A:link {color: #0000FF;
+       text-decoration: none}
+A:visited {color: #FF0000;
+          text-decoration: none}
+-->
+</STYLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" LEFTMARGIN="15">
+<BASEFONT SIZE="2">
+<FONT FACE="Verdana, Arial, Helvetica">
+
+<CENTER>
+<FONT SIZE="4"><B>Troubleshooting Code Samples</B></FONT>
+</CENTER>
+<BR><BR>
+If you have troubles getting the samples to build and run, try some
+of the following troubleshooting steps:
+<BR>
+
+<OL>
+<LI>Consult the README file in each sample directory to review
+    steps on how to build and run sample.
+<LI>Consult the README file in each sample to verify if you have
+    the proper software installed (i.e. DCOM for Windows 95,
+    Service Packs, Platform SDK, etc.).
+    See <A HREF="cdwhat.htm">What's on CD</A> and
+    <A HREF="software.htm">Software and Cool Links</A>
+    for more information.
+<LI>If a sample requires the Platform SDK, be sure that the path to
+    the SDK files is listed before the other compiler paths in
+    Visual C++ 5.0. To check this out, in Visual C++, choose 
+    Tools/Options and click the Directories tab. For a default
+    install of the Platform SDK, the following paths should be
+    listed first in Executable Files, Include Files, and Library
+    Files:<BR>
+        <BLOCKQUOTE>
+        C:\MSSDK\bin<BR>
+        C:\MSSDK\include<BR>
+        C:\MSSDK\lib<BR>
+        </BLOCKQUOTE>
+<LI>Make sure you have the proper EXEs and DLLs registered.
+    You typically register an EXE by running the EXE.
+    You typically register a DLL by using the REGSVR32.EXE utility
+    and using the following syntax:<BR>
+        <BLOCKQUOTE>REGSVR32 Component.dll</BLOCKQUOTE>
+    You can also register a DLL within Visual C++ 5.0 by making it
+    the active project and choosing Tools/Register Control.
+<LI>Registry entries from the configuration of previous samples may
+    conflict with the current sample being tested. If you suspect
+    that this is the case you can delete these entries from the
+    registry using the Registry Editor (REGEDIT.EXE).
+    Remember, it is always a good idea to back up your Registery
+    before you make changes to it.    
+    The Inside DCOM samples typically have a subkey with the
+    following format:<BR>
+        <BLOCKQUOTE>{1?000???-0000-0000-0000-0000000000??}</BLOCKQUOTE>
+    Some sample keys entered into the registry by the Inside
+    DCOM samples are shown here:<BR>
+	<BLOCKQUOTE>
+        HKEY_CLASSES_ROOT\AppID\{10000002-0000-0000-0000-000000000001}<BR>
+        HKEY_CLASSES_ROOT\CLSID\{10000002-0000-0000-0000-000000000001}<BR>
+        HKEY_CLASSES_ROOT\Component.InsideDCOM<BR>
+        HKEY_CLASSES_ROOT\Component.Prime<BR>
+        HKEY_CLASSES_ROOT\Interface\{10000001-0000-0000-0000-000000000001}<BR>
+        HKEY_CLASSES_ROOT\TypeLib\{10000003-0000-0000-0000-000000000001}
+	</BLOCKQUOTE>
+<LI>If you have an HRESULT error value, use the HRESULT Error
+    Utility or WINERROR.H to determine what the error value means.
+    The HRESULT Error Utility source files are located in the
+    HRESULT directory on this CD.  WINERROR.H is installed with
+    Visual C++ and by default is located in the directory
+    C:\Program Files\DevStudio\VC\include
+<LI>If you are testing a sample that runs remotely, be sure that it
+    will run properly locally first.
+<LI>If you are testing a sample that runs remotely, you may need to
+    adjust Location, Security, Identity settings with the DCOM
+    Configuration Utility (DCOMCNFG.EXE).
+<LI>If you are testing a sample that runs remotely, be aware that
+    Windows 95/98 does not support remote instantiation, so the
+    remote computer may need to running Windows NT 4.0 or higher.
+<LI>When the README instructions say to use the DCOM Configuration
+    utility to specify that the sample should run on a remote
+    computer, you should follow these steps:
+    <UL>
+        <LI>Run DCOMCNFG.EXE
+        <LI>Double click the registered executable component
+            (for most samples, it is "Inside DCOM Sample")
+        <LI>Click the Location tab
+        <LI>Make sure the Run Application On This Computer checkbox
+            is unchecked
+        <LI>Check Run Application On The Following Computer
+        <LI>Type the computer name in the text box and click OK
+	</UL>
+<LI>If you suspect security is an issue when testing a remote
+    sample, use the DCOM Configuration utility to specify full
+    access for Everyone for the component. Once you get the
+    component running, then you can specify proper access
+    permissions.
+<LI>When testing a remote sample, use the Windows NT Task Manager
+    to terminate possible component processes still running from a
+    previous sample.
+<LI>If possible, try testing using Windows NT or on another
+    computer.
+</OL>
+</BODY>
+</HTML>

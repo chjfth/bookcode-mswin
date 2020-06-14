@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<TITLE>Testing the Code Samples</TITLE>
+<STYLE TYPE="text/css">
+<!--
+A:link {color: #0000FF;
+       text-decoration: none}
+A:visited {color: #FF0000;
+          text-decoration: none}
+-->
+</STYLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" LEFTMARGIN="15">
+<BASEFONT SIZE="2">
+<FONT FACE="Verdana, Arial, Helvetica">
+
+<CENTER>
+<FONT SIZE="4"><B>Testing the Code Samples</B></FONT>
+</CENTER>
+<BR><BR>
+The SAMPLES directory on this CD contains C++, Visual Basic, and
+Java samples that demonstrate all of the topics discussed in the
+book.  The samples are arranged by topic rather than by chapter.
+Within the main topic directory is a README.TXT file that contains
+brief instructions on how to build and run the samples.
+<BR><BR><BR>
+
+<B>Configuration</B><BR>
+Various code samples will have different requirements as specified
+in the main topic README file. Many of the code samples only
+require the following configuration:
+<UL>
+<LI>Microsoft Windows 95 with DCOM installed or
+Microsoft Windows NT 4.0
+<LI>Microsoft Visual C++ 5.0
+</UL><BR>
+The configuration that the code samples were primarily tested on
+is as follows:
+<UL>
+<LI>Microsoft Windows 95 with DCOM installed or
+Microsoft Windows NT 4.0 Service Pack 3 (SP3)
+<LI>Microsoft Visual C++ 5.0 Professional SP3 (typical install)
+<LI>Microsoft Visual Basic 5.0 Professional SP3 (typical install)
+<LI>Microsoft Visual J++ 1.1 (typical install)
+<LI>Microsoft Windows Platform SDK (January 1998)
+</UL><BR>
+Some code samples also require the following:
+<UL>
+<LI>Microsoft Transaction Server 1.0/2.0
+<LI>Microsoft Internet Explorer 4.0 (available on this CD)
+<LI>Windows NT 5.0 beta 1 or later
+<LI>Microsoft SDK for Java version 2.01 (available on this CD)
+<LI>Microsoft virtual machine for Java (available on this CD)
+<LI>Microsoft Word
+</UL>
+<BR><BR>
+
+<B>Building the C++ and Java Samples</B><BR>
+All of the C++ projects and Java projects have been set up as
+workspaces to be used with Visual Studio.  You typically open the
+.DSW file and build the appropriate projects.  When you build the
+Component projects, the MIDL compiler is automatically called, so
+it is not necessary to run the MIDL compiler separately.  Also,
+many of the projects contain dependencies.  For example, if you
+build the Client project, which is dependent upon files generated
+by the Component build, the Component project is automatically
+built first and then the Client project is built.
+
+</BODY>
+</HTML>
