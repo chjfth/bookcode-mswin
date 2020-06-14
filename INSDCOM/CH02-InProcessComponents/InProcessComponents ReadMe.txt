@@ -42,7 +42,7 @@ InProcess sample
     the InprocServer32 path to the location of Component.dll.
     Be sure to use double back slashes between "\\" directories.
 4.  Once Component.reg is saved, in Windows Explorer double-click
-    the Component.reg icon to regiser Component.dll.
+    the Component.reg icon to register Component.dll.
     Note: If any of the directory names contain spaces and you are
     using Windows 95, you may receive an error about being unable
     to import file.  In this case, you can move Component.dll to a

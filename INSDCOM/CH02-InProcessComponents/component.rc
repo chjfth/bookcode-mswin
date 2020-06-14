@@ -20,7 +20,7 @@ BEGIN
             VALUE "FileDescription", "InsideDCOM Component\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "InsideDCOM\0"
-            VALUE "LegalCopyright", "Copyright © 1997\0"
+            VALUE "LegalCopyright", "Copyright 1997\0"
             VALUE "OriginalFilename", "component.dll\0"
             VALUE "ProductName", "Inside DCOM\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

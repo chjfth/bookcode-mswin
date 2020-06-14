@@ -135,9 +135,6 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\component.def" />
-    <CustomBuild Include="..\component.reg">
-      <FileType>Document</FileType>
-    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\component.idl">
