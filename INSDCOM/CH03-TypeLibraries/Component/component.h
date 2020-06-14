@@ -3,5 +3,5 @@
 #elif PlatformName==x64
 # include "x64\component.h"
 #else
-# error Target platform not supported.
+# error This PlatformName is not supported.
 #endif
