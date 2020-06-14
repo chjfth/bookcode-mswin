@@ -1,7 +1,7 @@
-#if defined(_M_IX86)
+#if PlatformName==Win32
 # include "Win32\dlldata.c"
-#elif defined(_M_AMD64)
+#elif PlatformName==x64
 # include "x64\dlldata.c"
 #else
-# error Target platform not supported.
+# error This PlatformName is not supported.
 #endif

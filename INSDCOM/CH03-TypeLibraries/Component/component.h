@@ -1,6 +1,6 @@
-#if defined(_M_IX86)
+#if PlatformName==Win32
 # include "Win32\component.h"
-#elif defined(_M_AMD64)
+#elif PlatformName==x64
 # include "x64\component.h"
 #else
 # error Target platform not supported.
