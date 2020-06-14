@@ -2,7 +2,7 @@
 LIBRARY         "Component-with-Registration.dll"
 DESCRIPTION     '(c)1997 Guy Eddon'
 EXPORTS
-                DllGetClassObject   @2	PRIVATE
-                DllCanUnloadNow     @3	PRIVATE
-                DllRegisterServer   @4	PRIVATE	; Add this
-                DllUnregisterServer @5	PRIVATE	; Add this
+                DllGetClassObject   PRIVATE
+                DllCanUnloadNow     PRIVATE
+                DllRegisterServer   PRIVATE	; Add this
+                DllUnregisterServer PRIVATE	; Add this
