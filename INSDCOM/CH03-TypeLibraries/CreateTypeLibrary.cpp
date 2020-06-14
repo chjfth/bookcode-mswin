@@ -43,6 +43,7 @@ void main()
 {
 	CoInitialize(NULL);
 
+	HRESULT hr = S_OK;
 	const wchar_t *tlbFilepath = L"MY_LIB.TLB";
 
 	// Create the type library file
@@ -151,7 +152,13 @@ void main()
 
 	// Save changes to disk 
 	// [2020-06-14] Chj: The tlb file is now created.
-	pCreateTypeLib2->SaveAllChanges();
+	hr = pCreateTypeLib2->SaveAllChanges();
+	if(SUCCEEDED(hr)) {
+		cout << "SaveAllChanges() success." << endl;
+	}
+	else {
+		cout << "SaveAllChanges() fail. HRESULT=0x" << std::hex << hr << endl;
+	}
 
 	// Release all references
 	pTypeInfoUnknown->Release();
