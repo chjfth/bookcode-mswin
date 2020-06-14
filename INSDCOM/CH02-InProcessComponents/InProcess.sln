@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcxproj", "{7910720D-5E5D-E131-A0D5-1364688287D6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6DF68213-6B10-734D-8EFE-460FFB580C85} = {6DF68213-6B10-734D-8EFE-460FFB580C85}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CoGetClassObjectClient", "CoGetClassObjectClient\CoGetClassObjectClient.vcxproj", "{7376D247-C291-6074-DB60-3AF731235CD4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6DF68213-6B10-734D-8EFE-460FFB580C85} = {6DF68213-6B10-734D-8EFE-460FFB580C85}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Component", "Component\Component.vcxproj", "{11C4E1F9-A024-22FC-38CF-AB65AA7B6315}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Component-with-Registration", "Component-with-Registration\Component-with-Registration.vcxproj", "{6DF68213-6B10-734D-8EFE-460FFB580C85}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TypeSaferQIClient", "TypeSaferQIClient\TypeSaferQIClient.vcxproj", "{B35988D2-4865-5BF0-3D3F-2429C584916D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6DF68213-6B10-734D-8EFE-460FFB580C85} = {6DF68213-6B10-734D-8EFE-460FFB580C85}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Template|Win32 = Template|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7910720D-5E5D-E131-A0D5-1364688287D6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7910720D-5E5D-E131-A0D5-1364688287D6}.Debug|Win32.Build.0 = Debug|Win32
+		{7910720D-5E5D-E131-A0D5-1364688287D6}.Release|Win32.ActiveCfg = Release|Win32
+		{7910720D-5E5D-E131-A0D5-1364688287D6}.Release|Win32.Build.0 = Release|Win32
+		{7910720D-5E5D-E131-A0D5-1364688287D6}.Template|Win32.ActiveCfg = Release|Win32
+		{7910720D-5E5D-E131-A0D5-1364688287D6}.Template|Win32.Build.0 = Release|Win32
+		{7376D247-C291-6074-DB60-3AF731235CD4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7376D247-C291-6074-DB60-3AF731235CD4}.Release|Win32.ActiveCfg = Release|Win32
+		{7376D247-C291-6074-DB60-3AF731235CD4}.Template|Win32.ActiveCfg = Template|Win32
+		{11C4E1F9-A024-22FC-38CF-AB65AA7B6315}.Debug|Win32.ActiveCfg = Debug|Win32
+		{11C4E1F9-A024-22FC-38CF-AB65AA7B6315}.Debug|Win32.Build.0 = Debug|Win32
+		{11C4E1F9-A024-22FC-38CF-AB65AA7B6315}.Release|Win32.ActiveCfg = Release|Win32
+		{11C4E1F9-A024-22FC-38CF-AB65AA7B6315}.Release|Win32.Build.0 = Release|Win32
+		{11C4E1F9-A024-22FC-38CF-AB65AA7B6315}.Template|Win32.ActiveCfg = Template|Win32
+		{11C4E1F9-A024-22FC-38CF-AB65AA7B6315}.Template|Win32.Build.0 = Template|Win32
+		{6DF68213-6B10-734D-8EFE-460FFB580C85}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6DF68213-6B10-734D-8EFE-460FFB580C85}.Debug|Win32.Build.0 = Debug|Win32
+		{6DF68213-6B10-734D-8EFE-460FFB580C85}.Release|Win32.ActiveCfg = Release|Win32
+		{6DF68213-6B10-734D-8EFE-460FFB580C85}.Release|Win32.Build.0 = Release|Win32
+		{6DF68213-6B10-734D-8EFE-460FFB580C85}.Template|Win32.ActiveCfg = Template|Win32
+		{6DF68213-6B10-734D-8EFE-460FFB580C85}.Template|Win32.Build.0 = Template|Win32
+		{B35988D2-4865-5BF0-3D3F-2429C584916D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B35988D2-4865-5BF0-3D3F-2429C584916D}.Debug|Win32.Build.0 = Debug|Win32
+		{B35988D2-4865-5BF0-3D3F-2429C584916D}.Release|Win32.ActiveCfg = Release|Win32
+		{B35988D2-4865-5BF0-3D3F-2429C584916D}.Release|Win32.Build.0 = Release|Win32
+		{B35988D2-4865-5BF0-3D3F-2429C584916D}.Template|Win32.ActiveCfg = Template|Win32
+		{B35988D2-4865-5BF0-3D3F-2429C584916D}.Template|Win32.Build.0 = Template|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
