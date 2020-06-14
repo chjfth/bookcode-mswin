@@ -36,15 +36,18 @@ library Component											// (2)
 
 #define _WIN32_DCOM
 #include <windows.h>
-#include <iostream.h>
+#include <iostream>
+using namespace std;
 
 void main()
 {
 	CoInitialize(NULL);
 
+	const wchar_t *tlbFilepath = L"MY_LIB.TLB";
+
 	// Create the type library file
 	ICreateTypeLib2* pCreateTypeLib2;
-	CreateTypeLib2(SYS_WIN32, L"C:\\MYLIB.TLB", &pCreateTypeLib2);
+	CreateTypeLib2(SYS_WIN32, tlbFilepath, &pCreateTypeLib2);
 
 	// (1) Set the library LIBID to {10000003-0000-0000-0000-000000000001}
 	GUID LIBID_Component = {0x10000003,0x0000,0x0000,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01}};
@@ -146,7 +149,8 @@ void main()
 	// Assign the v-table layout
 	pCreateTypeInfoInterface->LayOut();
 
-	// Save changes to disk
+	// Save changes to disk 
+	// [2020-06-14] Chj: The tlb file is now created.
 	pCreateTypeLib2->SaveAllChanges();
 
 	// Release all references
@@ -159,5 +163,5 @@ void main()
 	pCreateTypeInfoCoClass->Release();
 
 	CoUninitialize();
-	cout << "Type library created: C:\\MYLIB.TLB" << endl;
+	cout << "Type library created: " << tlbFilepath << endl;
 }
