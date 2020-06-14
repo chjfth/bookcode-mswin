@@ -113,6 +113,8 @@
       <AdditionalIncludeDirectories>\gitw\bookcode-mswin\INSDCOM\CH02-InProcessComponents;$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemGroup>
+  <!-- Chj add PostBuild.props: -->
+  <Import Project="$(ProjectDir).\PostBuild.props" />
   <!-- Chj add midl.props: -->
   <Import Project="$(ProjectDir).\midl.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
