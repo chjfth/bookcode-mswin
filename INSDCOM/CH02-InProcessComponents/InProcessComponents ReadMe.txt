@@ -1,8 +1,8 @@
 ---------------------------------
-In Process Components
+InProcess Components
 ---------------------------------
 See Chapter 2 "IUnknown and IClassFactory"
-for information on In Process Components
+for information on InProcess Components
 
 
 
@@ -13,31 +13,30 @@ Visual C++ 5.0 Professional
 
 
 
-In Process sample
+InProcess sample
   Self-Registering Component
   Client that uses CoCreateInstance
   Client that uses CoGetClassObject
   Client that uses TypeSaferQI
 ===================================
-1.  Open "In Process.dsw" in Visual C++
+1.  Open "InProcess.dsw" in Visual C++
 2.  Build Client.exe
     (this also builds "Component-with-Registration.dll")
 3.  Register "Component-with-Registration.dll"
 4.  Run Client.exe to test use of CoCreateInstance
-5.  Build "CoGetClassObject Client.exe"
-6.  Run "CoGetClassObject Client.exe" to test use of
-    CoGetClassObject
+5.  Build "CoGetClassObjectClient.exe"
+6.  Run "CoGetClassObjectClient.exe" to test use of CoGetClassObject
 7.  Build TypeSaferQIClient.exe
 8.  Run TypeSaferQIClient.exe to test use of TypeSaferQI
 
 
-In Process sample
+InProcess sample
   Component that cannot Self-Register
   Client that uses CoCreateInstance
   Client that uses CoGetClassObject
   Client that uses TypeSaferQI
 ======================================
-1.  Open "In Process.dsw" in Visual C++
+1.  Open "InProcess.dsw" in Visual C++
 2.  Build Component.dll
 3.  Open Component.reg in a text editor such as Notepad and edit
     the InprocServer32 path to the location of Component.dll.
