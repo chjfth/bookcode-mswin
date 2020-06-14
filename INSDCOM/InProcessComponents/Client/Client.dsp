@@ -85,7 +85,7 @@ SOURCE=..\client.cpp
 # End Source File
 # Begin Source File
 
-SOURCE="..\Component with Registration\component_i.c"
+SOURCE="..\Component-with-Registration\component_i.c"
 # End Source File
 # End Target
 # End Project

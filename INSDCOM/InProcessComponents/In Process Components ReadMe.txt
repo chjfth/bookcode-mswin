@@ -21,8 +21,8 @@ In Process sample
 ===================================
 1.  Open "In Process.dsw" in Visual C++
 2.  Build Client.exe
-    (this also builds "Component with Registration.dll")
-3.  Register "Component with Registration.dll"
+    (this also builds "Component-with-Registration.dll")
+3.  Register "Component-with-Registration.dll"
 4.  Run Client.exe to test use of CoCreateInstance
 5.  Build "CoGetClassObject Client.exe"
 6.  Run "CoGetClassObject Client.exe" to test use of

@@ -1,26 +1,26 @@
-# Microsoft Developer Studio Project File - Name="Component with Registration" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="Component-with-Registration" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 5.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=Component with Registration - Win32 Debug
+CFG=Component-with-Registration - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "Component with Registration.mak".
+!MESSAGE NMAKE /f "Component-with-Registration.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "Component with Registration.mak"\
- CFG="Component with Registration - Win32 Debug"
+!MESSAGE NMAKE /f "Component-with-Registration.mak"\
+ CFG="Component-with-Registration - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "Component with Registration - Win32 Release" (based on\
+!MESSAGE "Component-with-Registration - Win32 Release" (based on\
  "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "Component with Registration - Win32 Debug" (based on\
+!MESSAGE "Component-with-Registration - Win32 Debug" (based on\
  "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
@@ -31,7 +31,7 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "Component with Registration - Win32 Release"
+!IF  "$(CFG)" == "Component-with-Registration - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -61,7 +61,7 @@ PostBuild_Desc=Registering the component
 PostBuild_Cmds=regsvr32 /s release\component.dll
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "Component with Registration - Win32 Debug"
+!ELSEIF  "$(CFG)" == "Component-with-Registration - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -88,28 +88,28 @@ LINK32=link.exe
 # Begin Special Build Tool
 SOURCE=$(InputPath)
 PostBuild_Desc=Registering the component
-PostBuild_Cmds=regsvr32 /s debug\component with registration.dll
+PostBuild_Cmds=regsvr32 /s debug\Component-with-Registration.dll
 # End Special Build Tool
 
 !ENDIF 
 
 # Begin Target
 
-# Name "Component with Registration - Win32 Release"
-# Name "Component with Registration - Win32 Debug"
+# Name "Component-with-Registration - Win32 Release"
+# Name "Component-with-Registration - Win32 Debug"
 # Begin Source File
 
-SOURCE="..\component with registration.cpp"
+SOURCE="..\Component-with-Registration.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE="..\component with registration.def"
+SOURCE="..\Component-with-Registration.def"
 # End Source File
 # Begin Source File
 
 SOURCE=..\component.idl
 
-!IF  "$(CFG)" == "Component with Registration - Win32 Release"
+!IF  "$(CFG)" == "Component-with-Registration - Win32 Release"
 
 # Begin Custom Build
 InputPath=..\component.idl
@@ -130,7 +130,7 @@ BuildCmds= \
    $(BuildCmds)
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "Component with Registration - Win32 Debug"
+!ELSEIF  "$(CFG)" == "Component-with-Registration - Win32 Debug"
 
 # Begin Custom Build
 InputPath=..\component.idl

@@ -83,7 +83,7 @@ LINK32=link.exe
 # Name "TypeSaferQIClient - Win32 Debug"
 # Begin Source File
 
-SOURCE="..\Component with Registration\component_i.c"
+SOURCE="..\Component-with-Registration\component_i.c"
 # End Source File
 # Begin Source File
 

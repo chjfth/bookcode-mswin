@@ -5,7 +5,7 @@
 #define _WIN32_DCOM
 #include <iostream.h>
 #include <stdio.h>
-#include "Component with Registration\component.h"
+#include "Component-with-Registration\component.h"
 
 // {10000002-0000-0000-0000-000000000001}
 const CLSID CLSID_InsideDCOM = {0x10000002,0x0000,0x0000,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01}};
