@@ -3,7 +3,9 @@
 #define TypeSaferQI(ppObject) QueryInterface(__uuidof(*ppObject), (void**)ppObject)
 
 #define _WIN32_DCOM
-#include <iostream.h>
+#include <iostream>
+using namespace std;
+
 #include <stdio.h>
 #include "Component-with-Registration\component.h"
 

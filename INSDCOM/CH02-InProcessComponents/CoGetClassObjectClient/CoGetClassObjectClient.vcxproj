@@ -98,7 +98,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\TypeSaferQI.cpp" />
+    <ClCompile Include="..\client-with-CoGetClassObject.cpp" />
     <ClCompile Include="..\Component-with-Registration\component_i.c" />
   </ItemGroup>
   <!-- Chj add PostBuild.props: -->
