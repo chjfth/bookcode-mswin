@@ -1,5 +1,7 @@
 ; component.def
-LIBRARY         "Component-with-Registration.dll"
+;LIBRARY         "Component-with-Registration.dll"
+LIBRARY         "Component.dll"
+
 ;DESCRIPTION     '(c)1997 Guy Eddon'
 EXPORTS
                 DllGetClassObject   PRIVATE

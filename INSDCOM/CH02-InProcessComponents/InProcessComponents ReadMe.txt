@@ -22,6 +22,7 @@ InProcess sample
 1.  Open "InProcess.dsw" in Visual C++
 2.  Build Client.exe
     (this also builds "Component-with-Registration.dll")
+    [2020-06-14] Chj re-name this output to be Component.dll .
 3.  Register "Component-with-Registration.dll"
 4.  Run Client.exe to test use of CoCreateInstance
 5.  Build "CoGetClassObjectClient.exe"
@@ -31,7 +32,9 @@ InProcess sample
 
 
 InProcess sample
-  Component that cannot Self-Register
+  Component that cannot Self-Register 
+  	// [2020-06-14] Chj does not build this with VS2010 vcxproj, bcz the 
+  	// Self-Registering Component.dll is a superset of it.
   Client that uses CoCreateInstance
   Client that uses CoGetClassObject
   Client that uses TypeSaferQI

@@ -15,6 +15,10 @@ set PlatformName=%5
 REM Set CMD var for the input-file (xxx.idl)
 set InputFilepath=%6
 REM
+if "" == "%InputFilepath%" (
+	call :Echos Missing .bat parameters.
+	exit /b 4
+)
 call :Echos START for %ProjectDir%
 REM
 
