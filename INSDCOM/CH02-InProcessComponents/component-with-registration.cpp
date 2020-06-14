@@ -174,12 +174,29 @@ HRESULT __stdcall DllGetClassObject(REFCLSID clsid, REFIID riid, void** ppv)
 	return hr;
 }
 
+char g_wszDllFilepath[MAX_PATH];
+
+
 HRESULT __stdcall DllRegisterServer()
 {
-	return RegisterServer("Component-with-Registration.dll", CLSID_InsideDCOM, "Inside DCOM Sample", "Component.InsideDCOM", "Component.InsideDCOM.1", NULL);
+	return RegisterServer(g_wszDllFilepath, CLSID_InsideDCOM, "Inside DCOM Sample", "Component.InsideDCOM", "Component.InsideDCOM.1", NULL);
 }
 
 HRESULT __stdcall DllUnregisterServer()
 {
 	return UnregisterServer(CLSID_InsideDCOM, "Component.InsideDCOM", "Component.InsideDCOM.1");
+}
+
+extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, 
+	DWORD dwReason, 
+	LPVOID /*lpReserved*/)
+{
+	if (dwReason == DLL_PROCESS_ATTACH)
+	{
+		GetModuleFileName(hInstance, g_wszDllFilepath, MAX_PATH);
+	}
+	else if (dwReason == DLL_PROCESS_DETACH)
+	{
+	}
+	return TRUE;    // ok
 }

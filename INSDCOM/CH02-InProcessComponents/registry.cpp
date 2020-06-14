@@ -19,7 +19,7 @@ LONG recursiveDeleteKey(HKEY hKeyParent, const char* szKeyChild);
 const int CLSID_STRING_SIZE = 39;
 
 // Register the component in the registry.
-HRESULT RegisterServer(const char* szModuleName,     // DLL module handle
+HRESULT RegisterServer(const char* szModuleName,     // DLL module filename or filepath
                        REFCLSID clsid,               // Class ID
                        const char* szFriendlyName,   // Friendly Name
                        const char* szVerIndProgID,   // Programmatic
