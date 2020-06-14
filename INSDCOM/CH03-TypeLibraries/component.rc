@@ -1,2 +1,8 @@
 // component.rc
-1 TYPELIB "Component\component.tlb"
+// [2020-06-14] Chj: Really, VC2010 rc.exe pass us PlatformName here.
+#if PlatformName==Win32
+1 TYPELIB "Component\Win32\component.tlb"
+#elif PlatformName==x64
+1 TYPELIB "Component\x64\component.tlb"
+#endif
+
