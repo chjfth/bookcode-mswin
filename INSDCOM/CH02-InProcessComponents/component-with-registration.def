@@ -1,6 +1,6 @@
 ; component.def
 LIBRARY         "Component-with-Registration.dll"
-DESCRIPTION     '(c)1997 Guy Eddon'
+;DESCRIPTION     '(c)1997 Guy Eddon'
 EXPORTS
                 DllGetClassObject   PRIVATE
                 DllCanUnloadNow     PRIVATE
