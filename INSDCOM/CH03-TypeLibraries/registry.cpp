@@ -176,7 +176,7 @@ BOOL setKeyAndValue(const char* szKey, const char* szSubkey, const char* szValue
 
 	// Set the Value.
 	if(szValue != NULL)
-		RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)szValue, strlen(szValue)+1);
+		RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)szValue, (DWORD)strlen(szValue)+1);
 
 	RegCloseKey(hKey);
 	return TRUE;
@@ -198,7 +198,7 @@ BOOL setValueInKey(const char* szKey, const char* szNamedValue, const char* szVa
 
     // Set the Value.
 	if(szValue != NULL)
-		RegSetValueEx(hKey, szNamedValue, 0, REG_SZ, (BYTE*)szValue, strlen(szValue)+1);
+		RegSetValueEx(hKey, szNamedValue, 0, REG_SZ, (BYTE*)szValue, (DWORD)strlen(szValue)+1);
 
 	RegCloseKey(hKey);
 	return TRUE;

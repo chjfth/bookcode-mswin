@@ -1,0 +1,4 @@
+// component.rc
+// For VC6 only.
+1 TYPELIB "Component\component.tlb" 
+

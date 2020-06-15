@@ -162,7 +162,7 @@ BuildCmds= \
 # End Source File
 # Begin Source File
 
-SOURCE=..\component.rc
+SOURCE=..\component_vc6.rc
 # End Source File
 # Begin Source File
 
