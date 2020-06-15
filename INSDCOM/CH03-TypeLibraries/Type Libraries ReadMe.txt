@@ -16,7 +16,7 @@ Visual J++ 1.1
 
 
 
-Creating a Type Library sample
+<<1>> Creating a Type Library sample
 ==============================
 1.  Open "Type Libraries.dsw" in Visual C++
 2.  Review comments in "Create Type Library.cpp"
@@ -26,24 +26,24 @@ Creating a Type Library sample
     the contents of C:\MYLIB.TLB
 
 
-C++ Clients That Utilize the Type Library sample
+<<2>> C++ Clients That Utilize the Type Library sample
 ================================================
 C++ Component, Easy C++ Client
 1.  Open "Type Libraries.dsw" in Visual C++
-2.  Build Client.exe
+2.  Build Client.exe (easyclient.cpp)
     (this also builds Component.dll)
 3.  Register Component.dll
 4.  Run Client.exe to test
 
-C++ Component, Smart Pointer Client
+<<3>> C++ Component, Smart Pointer Client
 1.  Open "Type Libraries.dsw" in Visual C++
-2.  Build SmartPointerClient.exe
+2.  Build SmartPointerClient.exe (smartpointerclient.cpp)
     (this also builds Component.dll)
 3.  Register Component.dll
 4.  Run SmartPointerClient.exe to test
 
 
-C++ Component, Visual Basic Client sample
+<<4>> C++ Component, Visual Basic Client sample (vbclient: VB as client)
 =========================================
 1.  If you haven't already, build and register the Component.dll in
     "C++ Clients That Utilize the Type Library" above.
@@ -55,7 +55,7 @@ C++ Component, Visual Basic Client sample
 4.  Run program and press Command1 button to test
 
 
-Visual Basic Component, C++ Client sample
+<<5>> Visual Basic Component, C++ Client sample
 =========================================
 --------------------------------------
 NOTE: Threading Models in Visual Basic
@@ -83,11 +83,11 @@ obtain this Service Pack and other software.
 6.  Run VBClient.exe to test
 
 
-C++ Component, Java Client sample
+<<6>> C++ Component, Java Client sample
 =================================
 1.  If you haven't already, build and register the Component.dll
     in "C++ Clients That Utilize the Type Library" above.
-2.  Open VBnJava.dsw in Visual Studio (Visual C++/Visual J++)
+2.  Open VBnJava.dsw in Visual Visual J++. (Chj: SHOULD use JavaCode-vs98.sln for VJ++ 98)
 3.  Set TestCOM as the Active Project
 4.  Choose Project/Settings, and select the Debug tab
 5.  In the Class For Debugging/Executing text box, type "TestCOM"
@@ -104,7 +104,10 @@ C++ Component, Java Client sample
 Java Component, C++ Client sample
 =================================
 1.  Open VBnJava.dsw in Visual Studio (Visual C++/Visual J++)
+	(Chj: SHOULD use JavaCode-vs98.sln for VJ++ 98)
+	
 2.  Set JavaSum as the Active Project
+
 3.  In SumClass.java, comment out the import and implements
     statements as shown here:
 //import sumclasslib.*;
@@ -125,9 +128,13 @@ public class SumClass //implements sumclasslib.ISumClass
 }
 4.  Build JavaSum
 5.  Choose Tools/ActiveX Wizard For Java
-6.  In the What Java Class File Do You Want To Convert Into A COM-
-    Callable ActiveX Component text box enter the location for
+6.  In the 'What Java Class File Do You Want To Convert Into A COM-
+    Callable ActiveX Component' text box enter the location for
     SumClass, which should be in "Type Libraries\JavaSum\SumClass.class"
+
+	[2020-06-15] Chj: In VJ++ 98, the UI is quite different here. 
+	There is no Tools -> ActiveX Wizard For Java  menu-item. I'm trapped.
+
 7.  Click Next
 8.  Click Next
 9.  In the What Type Of Interface Would You Like To Create option,
