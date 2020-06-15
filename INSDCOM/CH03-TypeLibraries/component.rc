@@ -1,8 +1,15 @@
 // component.rc
-// [2020-06-14] Chj: Really, VC2010 rc.exe pass us PlatformName here.
-#if PlatformName==Win32
+// [2020-06-15] Chj: Really, VC6 & VC2010 rc.exe pass us PlatformName here.
+#if _MSC_VER <= 1200
+// for original VC6
+1 TYPELIB "Component\component.tlb" 
+#elif PlatformName==Win32
+// for VC2010+
 1 TYPELIB "Component\Win32\component.tlb"
 #elif PlatformName==x64
+// for VC2010+
 1 TYPELIB "Component\x64\component.tlb"
+#else
+# error Unknown PlatformName value.
 #endif
 

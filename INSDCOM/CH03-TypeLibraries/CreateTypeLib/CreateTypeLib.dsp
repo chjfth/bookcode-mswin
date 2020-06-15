@@ -1,5 +1,5 @@
 # Microsoft Developer Studio Project File - Name="CreateTypeLib" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 5.00
+# Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
@@ -17,13 +17,12 @@ CFG=CreateTypeLib - Win32 Debug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "CreateTypeLib - Win32 Release" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "CreateTypeLib - Win32 Debug" (based on\
- "Win32 (x86) Console Application")
+!MESSAGE "CreateTypeLib - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "CreateTypeLib - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
+# PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
@@ -65,7 +64,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -83,7 +82,7 @@ LINK32=link.exe
 # Name "CreateTypeLib - Win32 Debug"
 # Begin Source File
 
-SOURCE="..\Create Type Library.cpp"
+SOURCE="..\CreateTypeLibrary.cpp"
 # End Source File
 # End Target
 # End Project
