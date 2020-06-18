@@ -19,7 +19,7 @@ sample, you must have the following configuration:
 
 
 
-STA Model EXE sample (local)
+<<1>> STA Model EXE sample (local)
 ============================
 1.  Open "STA model EXE.dsw" in Visual C++
 2.  Build Client.exe
@@ -30,7 +30,7 @@ STA Model EXE sample (local)
 [2020-06-18] Chj: In order to use a debugger to debug Component.exe throughout all its life time,
 we can use Visual Studio IDE to remote launch Component.exe with -Embedding parameter.
 
-STA Model EXE sample (remote)
+<<2>> STA Model EXE sample (remote)
 =============================
 Local computer can be Windows 95 with DCOM or Windows NT 4.0
 Remote computer must be Windows NT 4.0
@@ -46,7 +46,7 @@ Remote computer must be Windows NT 4.0
 7.  Run Client.exe on local computer to test
 
 
-MTA Model EXE sample (local)
+<<3>> MTA Model EXE sample (local)
 ============================
 1.  Open "MTA model EXE.dsw" in Visual C++
 2.  Build Client.exe
@@ -54,7 +54,7 @@ MTA Model EXE sample (local)
 3.  Run Component.exe to register
 4.  Run Client.exe to test
 
-MTA Model EXE sample (remote)
+<<4>> MTA Model EXE sample (remote)
 =============================
 Local computer can be Windows 95 with DCOM or Windows NT 4.0
 Remote computer must be Windows NT 4.0
@@ -70,13 +70,13 @@ Remote computer must be Windows NT 4.0
 7.  Run Client.exe on local computer to test
 
 
-
 NOTE: You can also test the component in the following samples with
 different ThreadingModel values. For example, in the last parameter
 of the RegisterServer function in the component code, you can set
 the ThreadingModel value to Apartment, Free, or Both.
 
-Thread Safe In-Process sample
+
+<<5>> Thread Safe In-Process sample
 =============================
 1.  Open "Thread Safe.dsw" in Visual C++
 2.  Build Client.exe
@@ -85,7 +85,7 @@ Thread Safe In-Process sample
 4.  Run Client.exe to test
 
 
-Free Threaded Marshaler sample
+<<6>> Free Threaded Marshaler sample
 ==============================
 Component with Free Threaded Marshaler
 --------------------------------------
@@ -95,7 +95,8 @@ Component with Free Threaded Marshaler
 3.  Register "Component with FTM.dll"
 4.  Run Client.exe to test
 
-Component without Free Threaded Marshaler
+
+<<7>> Component without Free Threaded Marshaler
 -----------------------------------------
 1.  Open FTM.dsw in Visual C++
 2.  Build Client.exe
@@ -104,7 +105,7 @@ Component without Free Threaded Marshaler
 5.  Run Client.exe to test
 
 
-Global Interface Table sample
+<<8>> Global Interface Table sample
 =============================
 Requires Windows NT 4.0 SP3 and Platform SDK
 1.  Open GIT.dsw in Visual C++

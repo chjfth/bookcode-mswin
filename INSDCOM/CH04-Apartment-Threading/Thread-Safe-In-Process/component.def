@@ -1,8 +1,8 @@
 ; component.def
 LIBRARY         component.dll
-DESCRIPTION     '(c)1997 Guy Eddon'
+; DESCRIPTION     '(c)1997 Guy Eddon'
 EXPORTS
-                DllGetClassObject   @2	PRIVATE
-                DllCanUnloadNow     @3	PRIVATE
-                DllRegisterServer   @4	PRIVATE
-                DllUnregisterServer @5	PRIVATE
+                DllGetClassObject   PRIVATE
+                DllCanUnloadNow     PRIVATE
+                DllRegisterServer   PRIVATE
+                DllUnregisterServer PRIVATE
