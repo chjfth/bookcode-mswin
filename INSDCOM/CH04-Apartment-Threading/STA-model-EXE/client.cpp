@@ -1,6 +1,7 @@
 // client.cpp
 #define _WIN32_DCOM
 #include <iostream>
+#include <conio.h>
 using namespace std;
 
 #include "Component\component.h"
@@ -31,6 +32,12 @@ void main()
 	hr = pSum->Sum(4, 9, &sum);
 	if(SUCCEEDED(hr))
 		cout << "Client: Calling Sum() return value is " << sum << endl;
+	else
+		cout << "Client: Calling Sum() failed. HRESULT=0x" << std::hex << hr << endl;
+
+	cout << "Chj: == Press any key to go on doing final Release(). ==" << endl;
+	cout << "     == You can take the chance to inspect this process with a debugger. ==" << endl;
+	_getch();
 
 	cout << "Client: Calling Release() for pSum" << endl;
 	hr = pSum->Release();
