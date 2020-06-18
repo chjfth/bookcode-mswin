@@ -27,6 +27,9 @@ STA Model EXE sample (local)
 3.  Run Component.exe to register
 4.  Run Client.exe to test
 
+[2020-06-18] Chj: In order to use a debugger to debug Component.exe throughout all its life time,
+we can use Visual Studio IDE to remote launch Component.exe with -Embedding parameter.
+
 STA Model EXE sample (remote)
 =============================
 Local computer can be Windows 95 with DCOM or Windows NT 4.0

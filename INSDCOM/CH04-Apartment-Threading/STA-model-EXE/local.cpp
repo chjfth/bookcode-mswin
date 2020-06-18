@@ -1,12 +1,13 @@
 // local.cpp
 #define _WIN32_DCOM
+#include <assert.h>
 #include <iostream>
 using namespace std;
 
 #include "Component\component.h"
 #include "registry.h"
 
-HANDLE g_hEvent;
+// HANDLE g_hEvent;
 
 class CInsideDCOM : public ISum
 {
@@ -156,6 +157,10 @@ HRESULT CFactory::CreateInstance(IUnknown *pUnknownOuter, REFIID riid, void **pp
 
 HRESULT CFactory::LockServer(BOOL bLock)
 {
+	// [2020-06-18] Chj: We do not need this for an EXE server.
+	// We keep it just because IClassFactory requires it.
+	assert( ("EXE server should not execute this!", 0) );
+
 	if(bLock)
 		CoAddRefServerProcess();
 	else
