@@ -91,7 +91,6 @@
       <LinkDLL>true</LinkDLL>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>..\Component-with-Registration.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
