@@ -1,5 +1,15 @@
 // component.rc
-1 TYPELIB "Component\component.tlb"
+// [2020-06-15] Chj: Really, VC6 & VC2010 rc.exe pass us PlatformName here.
+#if PlatformName==Win32
+// for VC2010+
+1 TYPELIB "Component\Win32\component.tlb"
+#elif PlatformName==x64
+// for VC2010+
+1 TYPELIB "Component\x64\component.tlb"
+#else
+# error Unknown PlatformName value.
+#endif
+
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION 1,0,0,1
@@ -22,7 +32,7 @@ BEGIN
             VALUE "FileDescription", "InsideDCOM Component\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "InsideDCOM\0"
-            VALUE "LegalCopyright", "Copyright © 1997\0"
+            VALUE "LegalCopyright", "Copyright 1997\0"
             VALUE "OriginalFilename", "component.dll\0"
             VALUE "ProductName", "Inside DCOM\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

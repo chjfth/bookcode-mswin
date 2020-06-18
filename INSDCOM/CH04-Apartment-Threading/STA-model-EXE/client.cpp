@@ -1,6 +1,8 @@
 // client.cpp
 #define _WIN32_DCOM
-#include <iostream.h>
+#include <iostream>
+using namespace std;
+
 #include "Component\component.h"
 
 void main()
