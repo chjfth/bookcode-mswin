@@ -24,12 +24,14 @@ public:
 
 	// ISum
 	HRESULT __stdcall Sum(int x, int y, int* retval);
+	HRESULT __stdcall SetDelay(int millisec, int* old_delay);
 
-	CInsideDCOM() : m_cRef(1) { InterlockedIncrement(&g_cComponents); }
+	CInsideDCOM() : m_cRef(1), m_delaymillisec(0) { InterlockedIncrement(&g_cComponents); }
 	~CInsideDCOM() { InterlockedDecrement(&g_cComponents); }
 
 private:
 	long m_cRef;
+	int m_delaymillisec;
 };
 
 ULONG CInsideDCOM::AddRef()
@@ -71,8 +73,24 @@ HRESULT CInsideDCOM::QueryInterface(REFIID riid, void** ppv)
 
 HRESULT CInsideDCOM::Sum(int x, int y, int* retval)
 {
-	pl("Component: CInsideDCOM::Sum(%d, %d) called on thread-id %d", x, y, GetCurrentThreadId());
+	if(m_delaymillisec>0) {
+		pl("Component: CInsideDCOM::Sum(%d, %d) start, will cost %d millisec.", x, y, m_delaymillisec);
+		Sleep(m_delaymillisec);
+	}
+
+	pl("Component: CInsideDCOM::Sum(%d, %d) done on thread-id %d", x, y, GetCurrentThreadId());
 	*retval = x + y;
+	return S_OK;
+}
+
+HRESULT CInsideDCOM::SetDelay(int millisec, int* old_delay)
+{
+	pl("Component: CInsideDCOM::SetDelay() to %d millisec", millisec);
+
+	if(old_delay)
+		*old_delay = m_delaymillisec;
+	
+	m_delaymillisec = millisec;
 	return S_OK;
 }
 

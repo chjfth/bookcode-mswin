@@ -1,15 +1,20 @@
 //
 // [2020-06-19] Chj applies some improvements to the sample program:
 // 1. User can choose between STA or MTA for the created COM object.
-// 2. User can try using unmarshaled(=invald) pointer on the worker thread, .
-//	  Pass "badptr" as parameter to activate this.
-// 3. printf from different threads are serialized.
+// 2. If the parameter is a positive number(e.g. 3000), Sum() will executes
+//	  for 3000 milliseconds(delay inside). 
+//	  For MTA, you can see concurrent object calling behavior with this delay behavior.
+// 3. User can try using unmarshaled(=invald) pointer on the worker thread, .
+//	  Pass a *negative number* as parameter to activate this.
+//	  execution of the COM object.
+// 4. printf from different threads are serialized.
 //
 // client.cpp
 #define _WIN32_DCOM
 #include <iostream>  // For cout
 using namespace std;
 #include <stdio.h>
+#include <assert.h>
 #include <conio.h>
 
 #include <utils.h>
@@ -44,7 +49,7 @@ int MyThread(void *param)
 		pSum = ptp->pSum_bad;
 	}
 
-	for(int count = 0; count < 10; count++)
+	for(int count = 0; count < 5; count++)
 	{
 		int sum;
 		pl("Client: Calling Sum(%d, %d)...", count, count);
@@ -74,8 +79,15 @@ bool Choose_STA_MTA()
 int main(int argc, char *argv[])
 {
 	bool is_try_badptr = false;
-	if(argc==2 && strcmp(argv[1], "badptr")==0)
-		is_try_badptr = true;
+	int obj_delay_millisec = 0;
+	if(argc==2) {
+		obj_delay_millisec = strtoul(argv[1], NULL, 0);
+		
+		if(obj_delay_millisec<0) {
+			is_try_badptr = true;
+			obj_delay_millisec = -obj_delay_millisec;
+		}
+	}
 
 	bool isSTA = Choose_STA_MTA();
 
@@ -96,6 +108,13 @@ int main(int argc, char *argv[])
 	if(FAILED(hr)) {
 		pl("CoCreateInstance failed, hr=0x%X", hr);
 		return 4;
+	}
+
+	if(obj_delay_millisec>0) {
+		int old_delay = 0;
+		pSum->SetDelay(2, &old_delay); // just a test
+		pSum->SetDelay(obj_delay_millisec, &old_delay);
+		assert(old_delay==2);
 	}
 
 	IStream* pStream;
