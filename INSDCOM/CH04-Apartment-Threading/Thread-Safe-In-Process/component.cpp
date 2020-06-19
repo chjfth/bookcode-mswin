@@ -204,23 +204,23 @@ HRESULT __stdcall DllUnregisterServer()
 
 BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, void* pvReserved)
 {
-	cout << "Inprocess: DllMain() Reason = ";
+	cout << "Inprocess: DllMain() Reason=";
 	switch(fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-		cout << "DLL loaded";
+		cout << "[DLL loaded]";
 		break;
 	case DLL_THREAD_ATTACH:
-		cout << "thread created";
+		cout << "[thread created]";
 		break;
 	case DLL_PROCESS_DETACH:
-		cout << "DLL unloaded";
+		cout << "[DLL unloaded]";
 		break;
 	case DLL_THREAD_DETACH:
-		cout << "thread destroyed";
+		cout << "[thread destroyed]";
 		break;
 	}
-	cout << " Called on ThreadID = " << GetCurrentThreadId() << endl;
+	cout << " called on ThreadID=" << GetCurrentThreadId() << endl;
 	g_hInstance = hInstDLL;
 	return TRUE;
 }
