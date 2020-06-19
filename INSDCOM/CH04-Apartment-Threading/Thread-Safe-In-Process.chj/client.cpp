@@ -1,18 +1,16 @@
 //
 // [2020-06-19] Chj applies some improvements to the sample program:
-// 1. User can choose between STA or MTA for the created COM object.
-// 2. If the parameter is a positive number(e.g. 3000), Sum() will executes
+// 1. printf from different threads are serialized.
+// 2. User can choose between STA or MTA for the main thread and worker thread.
+// 3. If the parameter is a positive number(e.g. 3000), Sum() will executes
 //	  for 3000 milliseconds(delay inside). 
-//	  For MTA, you can see concurrent object calling behavior with this delay behavior.
-// 3. User can try using unmarshaled(=invald) pointer on the worker thread, .
+// 4. User can try using unmarshaled(=bare) pointer in the worker thread, .
 //	  Pass a *negative number* as parameter to activate this.
-//	  execution of the COM object.
-// 4. printf from different threads are serialized.
+//
+// Memo: For STA, you can see concurrent object calling behavior with this delay behavior.
 //
 // client.cpp
 #define _WIN32_DCOM
-#include <iostream>  // For cout
-using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <conio.h>
@@ -23,30 +21,36 @@ using namespace std;
 struct SThreadParam
 { 
 	IStream *pStream;
-	ISum *pSum_bad;
+	ISum *pSum_main;
+	bool is_sta;
 };
 
 int MyThread(void *param)
 {
 	DWORD mytid = GetCurrentThreadId();
-	pl("Worker thread already running, WorkThread-tid=%d", mytid);
+	pl("Work thread starts running, WorkThread-tid=%d", mytid);
 
 	SThreadParam *ptp = (SThreadParam*)param;
 	IStream* pStream = ptp->pStream;
 
-	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	DWORD coinit = ptp->is_sta ? COINIT_APARTMENTTHREADED : COINIT_MULTITHREADED;
+	HRESULT hr = CoInitializeEx(NULL, coinit);
 	if(FAILED(hr)) {
-		pl("Worker thread CoInitializeEx failed");
+		pl("Work thread CoInitializeEx failed");
 		return 4;
+	}
+	else {
+		pl("Work thread CoInitializeEx(%s) success.",
+			coinit==COINIT_APARTMENTTHREADED?"COINIT_APARTMENTTHREADED":"COINIT_MULTITHREADED");
 	}
 
 	ISum* pSum = NULL;
-	if(ptp->pSum_bad==NULL) {
+	if(ptp->pSum_main==NULL) {
 		// The correct way to use cross-thread pointer.
 		CoGetInterfaceAndReleaseStream(pStream, IID_ISum, (void**)&pSum);
 	}
 	else {
-		pSum = ptp->pSum_bad;
+		pSum = ptp->pSum_main;
 	}
 
 	for(int count = 0; count < 5; count++)
@@ -54,7 +58,13 @@ int MyThread(void *param)
 		int sum;
 		pl("Client: Calling Sum(%d, %d)...", count, count);
 		hr = pSum->Sum(count, count, &sum);
-		pl("Client: Sum(%d, %d) returns %d", count, count, sum);
+		if(SUCCEEDED(hr)) {
+			pl("Client: Sum(%d, %d) returned %d", count, count, sum);
+		}
+		else {
+			pl("Client: Sum(%d, %d) failed! HRESULT=0x%08X", count, count, hr);
+		}
+
 	}
 
 	pSum->Release();
@@ -62,11 +72,11 @@ int MyThread(void *param)
 	return 0;
 }
 
-bool Choose_STA_MTA()
+bool Choose_STA_MTA(const char *prefix)
 {
-	printf("Create COM component as STA or MTA? (1/0) ");
+	printf("%s-thread as STA or MTA? (1/0) ", prefix);
 	int key = _getch();
-	if(key=='1') {
+	if(!(key=='0')) {
 		printf("STA\n");
 		return true;
 	}
@@ -78,43 +88,52 @@ bool Choose_STA_MTA()
 
 int main(int argc, char *argv[])
 {
-	bool is_try_badptr = false;
+	bool is_try_bareptr = false;
 	int obj_delay_millisec = 0;
 	if(argc==2) {
 		obj_delay_millisec = strtoul(argv[1], NULL, 0);
 		
 		if(obj_delay_millisec<0) {
-			is_try_badptr = true;
+			is_try_bareptr = true;
 			obj_delay_millisec = -obj_delay_millisec;
 		}
 	}
 
-	bool isSTA = Choose_STA_MTA();
+	bool is_main_STA = Choose_STA_MTA("Main");
+	bool is_work_STA = Choose_STA_MTA("Work");
 
-	winPrintfLine_need_prefix("EXE-", true, true);
+	pl_need_prefix("EXE", true, true, true);
 
 	DWORD mytid = GetCurrentThreadId();
 	pl("Client: Calling CoInitialize(). MainThread-tid=%d", mytid);
 
-	HRESULT hr = CoInitializeEx(NULL, isSTA?COINIT_APARTMENTTHREADED:COINIT_MULTITHREADED);
+	DWORD coinit = is_main_STA ? COINIT_APARTMENTTHREADED : COINIT_MULTITHREADED;
+	HRESULT hr = CoInitializeEx(NULL, coinit);
 	if(FAILED(hr)) {
-		pl("CoInitializeEx failed, hr=0x%X", hr);
+		pl("Main thread CoInitializeEx failed, hr=0x%X", hr);
 		return 4;
+	}
+	else {
+		pl("Main thread CoInitializeEx(%s) success.",
+			coinit==COINIT_APARTMENTTHREADED?"COINIT_APARTMENTTHREADED":"COINIT_MULTITHREADED");
 	}
 
 	pl("Client: Calling CoCreateInstance()");
 	ISum* pSum;
 	hr = CoCreateInstance(CLSID_InsideDCOM, NULL, CLSCTX_INPROC_SERVER, IID_ISum, (void**)&pSum);
 	if(FAILED(hr)) {
-		pl("CoCreateInstance failed, hr=0x%X", hr);
+		pl("CoCreateInstance() failed, hr=0x%X", hr);
 		return 4;
+	}
+	else {
+		pl("CoCreateInstance() success, interface-ptr returned 0x%p", pSum);
 	}
 
 	if(obj_delay_millisec>0) {
 		int old_delay = 0;
-		pSum->SetDelay(2, &old_delay); // just a test
-		pSum->SetDelay(obj_delay_millisec, &old_delay);
-		assert(old_delay==2);
+//		pSum->SetDelay(2, &old_delay); // just a test
+		pSum->SetDelay(obj_delay_millisec, &old_delay); // cannot use NULL as 2nd param
+//		assert(old_delay==2);
 	}
 
 	IStream* pStream;
@@ -122,8 +141,9 @@ int main(int argc, char *argv[])
 
 	SThreadParam tp = {};
 	tp.pStream = pStream;
-	if(is_try_badptr) {
-		tp.pSum_bad = pSum;
+	tp.is_sta = is_work_STA;
+	if(is_try_bareptr) {
+		tp.pSum_main = pSum;
 		pSum->AddRef(); 
 	}
 	
@@ -133,7 +153,10 @@ int main(int argc, char *argv[])
 	hr = pSum->Sum(2, 3, &sum);
 	if(SUCCEEDED(hr)) {
 		// cout << "Client: Calling Sum(2, 3) = " << sum << endl;
-		pl("Client: Sum(2, 3) returns %d", sum);
+		pl("Client: Sum(2, 3) returned %d", sum);
+	}
+	else {
+		pl("Client: Sum(2, 3) failed. HRESULT=0x%X", hr);
 	}
 
 	DWORD refcount = pSum->Release();

@@ -151,7 +151,7 @@ HRESULT CFactory::CreateInstance(IUnknown *pUnknownOuter, REFIID riid, void** pp
 		return CLASS_E_NOAGGREGATION;
 
 	CInsideDCOM *pInsideDCOM = new CInsideDCOM;
-	pl("Component: CFactory::CreateInstance() returns ptr 0x%p",pInsideDCOM);
+	pl("Component: CFactory::CreateInstance() returning 0x%p (C++ new)",pInsideDCOM);
 
 	if(pInsideDCOM == NULL)
 		return E_OUTOFMEMORY;
@@ -229,7 +229,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, void* pvReserved)
 	{
 	case DLL_PROCESS_ATTACH:
 		g_hInstance = hInstDLL;
-		winPrintfLine_need_prefix("DLL-", true, true);
+		pl_need_prefix("DLL", true, true, true);
 		reason = "DLL loaded";
 		break;
 	case DLL_THREAD_ATTACH:
