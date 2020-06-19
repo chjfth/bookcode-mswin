@@ -71,7 +71,7 @@ HRESULT CInsideDCOM::QueryInterface(REFIID riid, void** ppv)
 
 HRESULT CInsideDCOM::Sum(int x, int y, int* retval)
 {
-	pl("Component: CInsideDCOM::Sum() called on thread-id %d", GetCurrentThreadId());
+	pl("Component: CInsideDCOM::Sum(%d, %d) called on thread-id %d", x, y, GetCurrentThreadId());
 	*retval = x + y;
 	return S_OK;
 }
@@ -211,7 +211,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL, DWORD fdwReason, void* pvReserved)
 	{
 	case DLL_PROCESS_ATTACH:
 		g_hInstance = hInstDLL;
-		winPrintfLine_need_prefix(true, true);
+		winPrintfLine_need_prefix("DLL-", true, true);
 		reason = "DLL loaded";
 		break;
 	case DLL_THREAD_ATTACH:

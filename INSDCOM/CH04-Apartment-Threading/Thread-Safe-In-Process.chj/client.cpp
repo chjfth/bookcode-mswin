@@ -40,8 +40,9 @@ DWORD __stdcall MyThread(void *param)
 	for(int count = 0; count < 10; count++)
 	{
 		int sum;
+		pl("Client: Calling Sum(%d, %d)...", count, count);
 		hr = pSum->Sum(count, count, &sum);
-		pl("Client: Calling Sum(%d, %d) = %d", count, count, sum);
+		pl("Client: Sum(%d, %d) returns %d", count, count, sum);
 	}
 
 	pSum->Release();
@@ -51,7 +52,7 @@ DWORD __stdcall MyThread(void *param)
 
 int main()
 {
-	winPrintfLine_need_prefix(true, true);
+	winPrintfLine_need_prefix("EXE-", true, true);
 	DWORD mytid = GetCurrentThreadId();
 	pl("Client: Calling CoInitialize(). Thread id of MainThread=%d", mytid);
 
@@ -82,7 +83,7 @@ int main()
 	hr = pSum->Sum(2, 3, &sum);
 	if(SUCCEEDED(hr)) {
 		// cout << "Client: Calling Sum(2, 3) = " << sum << endl;
-		pl("Client: Calling Sum(2, 3) = %d", sum);
+		pl("Client: Sum(2, 3) returns %d", sum);
 	}
 
 	DWORD refcount = pSum->Release();

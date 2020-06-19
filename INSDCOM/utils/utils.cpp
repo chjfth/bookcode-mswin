@@ -50,9 +50,11 @@ winCreateThread(PROC_WinThread proc, void *param, int stacksize, unsigned *pThre
 
 #define COUNT(ar) (sizeof(ar)/sizeof(ar[0]))
 
+static const TCHAR *s_prefix0 = TEXT("");
 static int s_prefix_seq = 0;
 static bool s_is_print_seq = false;
 static bool s_is_print_tid = false;
+
 
 int pl(const TCHAR *fmt, ...)
 {
@@ -65,13 +67,13 @@ int pl(const TCHAR *fmt, ...)
 	DWORD tid = GetCurrentThreadId();
 
 	if(s_is_print_seq && s_is_print_tid) {
-		_sntprintf_s(buf, COUNT(buf)-3, _TRUNCATE, TEXT("[%d.%u] "), ++s_prefix_seq, tid);
+		_sntprintf_s(buf, COUNT(buf)-3, _TRUNCATE, TEXT("[%s%d.%u] "), s_prefix0, ++s_prefix_seq, tid);
 	}
 	else if(s_is_print_seq && !s_is_print_tid) {
-		_sntprintf_s(buf, COUNT(buf)-3, _TRUNCATE, TEXT("[%d] "), ++s_prefix_seq);
+		_sntprintf_s(buf, COUNT(buf)-3, _TRUNCATE, TEXT("[%s%d] "), s_prefix0, ++s_prefix_seq);
 	}
 	else if(!s_is_print_seq && s_is_print_tid) {
-		_sntprintf_s(buf, COUNT(buf)-3, _TRUNCATE, TEXT("[.%u] "), tid);
+		_sntprintf_s(buf, COUNT(buf)-3, _TRUNCATE, TEXT("[%s.%u] "), s_prefix0, tid);
 	}
 
 	int prefixlen = (int)_tcslen(buf);
@@ -87,8 +89,9 @@ int pl(const TCHAR *fmt, ...)
 	return 0;
 }
 
-void winPrintfLine_need_prefix(bool need_seq, bool need_thread_id)
+void winPrintfLine_need_prefix(const TCHAR *pfx0, bool need_seq, bool need_thread_id)
 {
+	s_prefix0 = pfx0;
 	s_is_print_seq = need_seq;
 	s_is_print_tid = need_thread_id;
 }
