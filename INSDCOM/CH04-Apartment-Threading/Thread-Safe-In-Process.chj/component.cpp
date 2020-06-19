@@ -151,7 +151,7 @@ HRESULT CFactory::CreateInstance(IUnknown *pUnknownOuter, REFIID riid, void** pp
 		return CLASS_E_NOAGGREGATION;
 
 	CInsideDCOM *pInsideDCOM = new CInsideDCOM;
-	pl("Component: CFactory::CreateInstance() returning 0x%p (C++ new)",pInsideDCOM);
+	pl("Component: CFactory::CreateInstance() returning (C++ new) **0x%p**",pInsideDCOM);
 
 	if(pInsideDCOM == NULL)
 		return E_OUTOFMEMORY;

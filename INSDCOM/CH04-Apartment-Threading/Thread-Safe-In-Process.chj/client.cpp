@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 		return 4;
 	}
 	else {
-		pl("CoCreateInstance() success, interface-ptr returned 0x%p", pSum);
+		pl("CoCreateInstance() success, the interface-ptr returned is **0x%p**", pSum);
 	}
 
 	if(obj_delay_millisec>0) {
