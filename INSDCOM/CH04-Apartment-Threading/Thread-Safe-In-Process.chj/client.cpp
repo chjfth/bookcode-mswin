@@ -45,12 +45,19 @@ int MyThread(void *param)
 	}
 
 	ISum* pSum = NULL;
-	if(ptp->pSum_main==NULL) {
+	if(ptp->pSum_main==NULL) 
+	{
 		// The correct way to use cross-thread pointer.
-		CoGetInterfaceAndReleaseStream(pStream, IID_ISum, (void**)&pSum);
+		hr = CoGetInterfaceAndReleaseStream(pStream, IID_ISum, (void**)&pSum);
+		if(SUCCEEDED(hr))
+			pl("Work thread use marsptr: **0x%p**", pSum);
+		else
+			pl("Work thread CoGetInterfaceAndReleaseStream() fail! HRESULT=0x%X", hr);
 	}
-	else {
+	else 
+	{
 		pSum = ptp->pSum_main;
+		pl("Work thread use bareptr: 0x%p", pSum);
 	}
 
 	for(int count = 0; count < 5; count++)
@@ -62,7 +69,7 @@ int MyThread(void *param)
 			pl("Client: Sum(%d, %d) returned %d", count, count, sum);
 		}
 		else {
-			pl("Client: Sum(%d, %d) failed! HRESULT=0x%08X", count, count, hr);
+			pl("Client: Sum(%d, %d) failed! HRESULT=0x%X", count, count, hr);
 		}
 
 	}
@@ -149,14 +156,17 @@ int main(int argc, char *argv[])
 	
 	HANDLE thread_handle = winCreateThread(MyThread, (void*)&tp);
 
-	int sum;
-	hr = pSum->Sum(2, 3, &sum);
+	int sum, a1=20, a2=30;
+	pl("Client: Calling Sum(%d, %d)...", a1, a2);
+	
+	hr = pSum->Sum(a1, a2, &sum);
+
 	if(SUCCEEDED(hr)) {
 		// cout << "Client: Calling Sum(2, 3) = " << sum << endl;
-		pl("Client: Sum(2, 3) returned %d", sum);
+		pl("Client: Sum(%d, %d) returned %d", a1, a2, sum);
 	}
 	else {
-		pl("Client: Sum(2, 3) failed. HRESULT=0x%X", hr);
+		pl("Client: Sum(%d, %d) failed. HRESULT=0x%X", a1, a2, hr);
 	}
 
 	DWORD refcount = pSum->Release();
