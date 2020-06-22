@@ -10,9 +10,9 @@ BOOL setKeyAndValue(const char* pszPath, const char* szSubkey, const char* szVal
 BOOL setValueInKey(const char* szKey, const char* szNamedValue, const char* szValue);
 
 // Convert a CLSID into a char string.
-void CLSIDtochar(REFCLSID clsid, char* szCLSID, int length);
+//void CLSIDtochar(REFCLSID clsid, char* szCLSID, int length); // moved to .h
 
-// Delete szKeyChild and all of its descendents.
+// Delete szKeyChild and all of its descendants.
 LONG recursiveDeleteKey(HKEY hKeyParent, const char* szKeyChild);
 
 // Size of a CLSID as a string
@@ -176,7 +176,7 @@ BOOL setKeyAndValue(const char* szKey, const char* szSubkey, const char* szValue
 
 	// Set the Value.
 	if(szValue != NULL)
-		RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)szValue, strlen(szValue)+1);
+		RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)szValue, (DWORD)strlen(szValue)+1);
 
 	RegCloseKey(hKey);
 	return TRUE;
@@ -198,7 +198,7 @@ BOOL setValueInKey(const char* szKey, const char* szNamedValue, const char* szVa
 
     // Set the Value.
 	if(szValue != NULL)
-		RegSetValueEx(hKey, szNamedValue, 0, REG_SZ, (BYTE*)szValue, strlen(szValue)+1);
+		RegSetValueEx(hKey, szNamedValue, 0, REG_SZ, (BYTE*)szValue, (DWORD)strlen(szValue)+1);
 
 	RegCloseKey(hKey);
 	return TRUE;

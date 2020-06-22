@@ -15,7 +15,13 @@ THREAD_HANDLE winCreateThread(PROC_WinThread proc, void *param, int stacksize=0,
 
 int pl(const TCHAR *szfmt, ...); // Print a line.
 
-void winPrintfLine_need_prefix(const TCHAR *pfx0, bool need_seq, bool need_thread_id);
+void pl_need_prefix(const TCHAR *pfx0, bool need_ts, bool need_seq, bool need_thread_id);
+
+/////
+
+//void CLSIDtochar(REFCLSID clsid, char* szCLSID, int length);
+
+bool HKCR_GetValueSZ(const TCHAR* szKey, const TCHAR* itemname, TCHAR* itemvalue, int bufchars);
 
 
 #ifdef __cplusplus
