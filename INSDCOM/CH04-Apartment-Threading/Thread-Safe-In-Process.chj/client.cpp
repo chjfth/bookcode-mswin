@@ -193,7 +193,8 @@ int main(int argc, char *argv[])
 		DWORD dwResult = MsgWaitForMultipleObjects(1, &thread_handle, 
 			FALSE, // wait either thread-done or MSG appears
 			INFINITE, 
-			QS_ALLEVENTS);
+			QS_ALLINPUT // QS_ALLEVENTS
+			);
 
 		switch (dwResult) 
 		{{
