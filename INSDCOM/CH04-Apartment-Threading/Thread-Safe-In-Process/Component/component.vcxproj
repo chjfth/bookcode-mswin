@@ -98,7 +98,7 @@
   <ItemGroup>
     <ClCompile Include="..\component.cpp" />
     <ClCompile Include="component_i.c" />
-    <ClCompile Include="..\registry.cpp" />
+    <ClCompile Include="..\..\registry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\component.def" />

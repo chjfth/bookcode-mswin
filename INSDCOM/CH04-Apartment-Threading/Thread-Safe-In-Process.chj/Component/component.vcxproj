@@ -101,7 +101,7 @@
     <ClCompile Include="..\..\..\utils\utils.cpp" />
     <ClCompile Include="..\component.cpp" />
     <ClCompile Include="component_i.c" />
-    <ClCompile Include="..\registry.cpp" />
+    <ClCompile Include="..\..\registry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\component.def" />
@@ -112,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\utils\utils.h" />
+    <ClInclude Include="..\..\registry.h" />
   </ItemGroup>
   <!-- Chj add PostBuild.props: -->
   <Import Project="$(ProjectDir).\PostBuild.props" />

@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 #include "Component\component.h"
-#include "registry.h"
+#include "..\registry.h"
 
 HANDLE g_hEvent;
 
