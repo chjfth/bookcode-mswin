@@ -3,11 +3,10 @@
 #include <assert.h>
 #include <iostream>
 using namespace std;
-
 #include "Component\component.h"
 #include "registry.h"
 
-// HANDLE g_hEvent;
+HANDLE g_hEvent;
 
 class CInsideDCOM : public ISum
 {
@@ -30,7 +29,7 @@ private:
 void InitiateComponentShutdown()
 {
 	cout << "InitiateComponentShutdown()" << endl;
-	PostQuitMessage(0);
+	SetEvent(g_hEvent);
 }
 
 CInsideDCOM::CInsideDCOM() : m_cRef(1)
@@ -157,10 +156,6 @@ HRESULT CFactory::CreateInstance(IUnknown *pUnknownOuter, REFIID riid, void **pp
 
 HRESULT CFactory::LockServer(BOOL bLock)
 {
-	// [2020-06-18] Chj: We do not need this for an EXE server.
-	// We keep it just because IClassFactory requires it.
-	assert( ("EXE server should not execute this!", 0) );
-
 	if(bLock)
 		CoAddRefServerProcess();
 	else
@@ -172,9 +167,14 @@ HRESULT CFactory::LockServer(BOOL bLock)
 void RegisterComponent()
 {
 	ITypeLib* pTypeLib;
-	LoadTypeLibEx(L"component.exe", REGKIND_DEFAULT, &pTypeLib);
+	HRESULT hr = LoadTypeLibEx(L"component.exe", REGKIND_DEFAULT, &pTypeLib);
 	pTypeLib->Release();
-	RegisterServer("component.exe", CLSID_InsideDCOM, "Inside DCOM Sample", "Component.InsideDCOM", "Component.InsideDCOM.1", NULL);
+
+	RegisterServer("component.exe", CLSID_InsideDCOM, 
+		"Inside DCOM Sample", 
+		"Component.InsideDCOM", 
+		"Component.InsideDCOM.1", 
+		NULL);
 }
 
 void CommandLineParameters(int argc, char** argv)
@@ -210,16 +210,16 @@ void main(int argc, char** argv)
 {
 	CommandLineParameters(argc, argv);
 
-	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	CoInitializeEx(NULL, COINIT_MULTITHREADED); // make this thread MTA
+	g_hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	DWORD dwRegister;
 	IClassFactory *pIFactory = new CFactory();
 	CoRegisterClassObject(CLSID_InsideDCOM, pIFactory, CLSCTX_LOCAL_SERVER, REGCLS_SUSPENDED|REGCLS_MULTIPLEUSE, &dwRegister);
 	CoResumeClassObjects();
 
-	MSG msg;
-	while(GetMessage(&msg, NULL, 0, 0))
-		DispatchMessage(&msg);
+	WaitForSingleObject(g_hEvent, INFINITE);
+	CloseHandle(g_hEvent);
 
 	CoRevokeClassObject(dwRegister);
 	pIFactory->Release();
