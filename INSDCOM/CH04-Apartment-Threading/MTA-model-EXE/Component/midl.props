@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+<ItemGroup>
+  <CustomBuild Include="..\$(TargetName).idl">
+    <!-- %(FullPath) is the full-qualified path of the input .idl file. -->
+    <Command>call call-midl.bat $(SolutionDir) $(ProjectDir) $(TargetDir) $(TargetName) $(PlatformName) %(FullPath)</Command>
+    <Outputs>$(PlatformName)\dlldata.c;$(PlatformName)\$(TargetName)_p.c;$(PlatformName)\$(TargetName).h;$(PlatformName)\$(TargetName)_i.c;%(Outputs)</Outputs>
+  </CustomBuild>
+</ItemGroup>
+
+</Project>
