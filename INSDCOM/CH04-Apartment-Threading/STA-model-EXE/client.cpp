@@ -15,10 +15,14 @@ void main()
 	ISum* pSum;
 
 	cout << "Client: Calling CoCreateInstance() " << endl;
-	CoCreateInstance(CLSID_InsideDCOM, NULL, CLSCTX_LOCAL_SERVER, IID_IUnknown, (void**)&pUnknown);
+	HRESULT hr = CoCreateInstance(CLSID_InsideDCOM, NULL, CLSCTX_LOCAL_SERVER, IID_IUnknown, (void**)&pUnknown);
+	if(FAILED(hr)) {
+		cout << "CoCreateInstance() failed with HRESULT=0x" << hex << hr << endl;
+		return;
+	}
 
 	cout << "Client: Calling QueryInterface() for ISum on " << pUnknown << endl;
-	HRESULT hr = pUnknown->QueryInterface(IID_ISum, (void**)&pSum);
+	hr = pUnknown->QueryInterface(IID_ISum, (void**)&pSum);
 
 	if(FAILED(hr))
 		cout << "QueryInterface FAILED" << endl;

@@ -54,6 +54,8 @@ Remote computer must be Windows NT 4.0
 3.  Run Component.exe to register
 4.  Run Client.exe to test
 
+// Chj: The only difference of <<1>> and <<3>> is in local.cpp .
+
 <<4>> MTA Model EXE sample (remote)
 =============================
 Local computer can be Windows 95 with DCOM or Windows NT 4.0
