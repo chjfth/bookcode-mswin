@@ -63,7 +63,6 @@ int MyThread(void *param)
 	//
 	// Create COM object in worker thread. 
 	//
-
 	pl("Client: Work thread calling CoCreateInstance()...");
 	ISum* pSum = NULL;
 	hr = CoCreateInstance(CLSID_InsideDCOM, NULL, CLSCTX_INPROC_SERVER, IID_ISum, (void**)&pSum);
@@ -110,7 +109,7 @@ void MainThreadCallObject(bool is_coinit, IStream *pStream)
 	ISum* pSum = NULL;
 	hr = CoGetInterfaceAndReleaseStream(pStream, IID_ISum, (void**)&pSum);
 	if(SUCCEEDED(hr))
-		pl("Main thread got marsptr: **0x%p**", pSum);
+		pl("Main thread ----------- got marsptr: **0x%p**", pSum);
 	else {
 		pl("Main thread CoGetInterfaceAndReleaseStream() fail! HRESULT=0x%X", hr);
 		assert(pSum==NULL);
@@ -180,7 +179,7 @@ int main(int argc, char *argv[])
 			isObjReady ? &thread_handle : &tp.hEventObjReady, 
 			FALSE, // wait either thread-done or MSG appears
 			INFINITE, 
-			QS_ALLEVENTS);
+			QS_ALLINPUT);
 
 		switch (dwResult) 
 		{{
@@ -200,7 +199,7 @@ int main(int argc, char *argv[])
 
 		case WAIT_OBJECT_0 + 1: // A message is in our queue.
 			// Dispatch all of the messages.
-			MSG msg;
+			MSG msg = {};
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
 			{
 				if (msg.message == WM_QUIT) {
