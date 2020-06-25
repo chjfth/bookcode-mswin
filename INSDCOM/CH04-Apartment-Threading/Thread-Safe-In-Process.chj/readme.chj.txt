@@ -31,3 +31,9 @@ We can change it to ThreadingModel="Free" or ThreadingModel="Both" to see the di
 
 More details are recorded at https://www.evernote.com/l/ABVL36rYHw9NzI1bBnOmNQgEv8Heula2Jc8/
 
+
+Notes
+========================
+
+I use new CLSID/IID for this example, so that we can try it side-by-side with other examples.
+
