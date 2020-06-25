@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 	}
 
 	DWORD refcount = pSum->Release();
-	pl("Client: Calling pSum->Release(). reference count drops to %d", refcount);
+	pl("Client: Called pSum->Release(). reference count drops to %d", refcount);
 
 	// Now the message loop, pump message and wait for thread-done simultaneously.
 	BOOL fQuit = FALSE;
