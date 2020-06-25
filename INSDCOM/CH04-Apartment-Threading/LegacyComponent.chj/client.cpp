@@ -36,6 +36,39 @@ void PrintSum(ISum *pSum, int a1, int a2)
 	}
 }
 
+bool PumpMsg_and_WaitForSingleObject(HANDLE hobjWait)
+{
+	while (true) 
+	{
+		DWORD dwResult = MsgWaitForMultipleObjects(1, &hobjWait,
+			FALSE, // wait either thread-done or MSG appears
+			INFINITE, 
+			QS_ALLINPUT);
+
+		switch (dwResult) 
+		{{
+		case WAIT_OBJECT_0: // The event became signaled.
+			return true;
+
+		case WAIT_OBJECT_0 + 1: // A message is in our queue.
+			// Dispatch all of the messages.
+			MSG msg = {};
+			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
+			{
+				if (msg.message == WM_QUIT) {
+					// A WM_QUIT message, exit the loop
+					return false;
+				} else {
+					// Translate and dispatch the message.
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+			} // Our queue is empty.
+			break; // break out of `case`
+		}}
+	} // End of while loop
+}
+
 struct SThreadParam
 {
 	HANDLE hEventObjReady; // Work thread sets this event, telling main thread COM object ready. 
@@ -83,7 +116,8 @@ int MyThread(void *param)
 	if(ptp->hEventQuit)
 	{
 		pl("Work thread: Now wait for quit event...");
-		WaitForSingleObject(ptp->hEventQuit, INFINITE);
+		bool is_quit = PumpMsg_and_WaitForSingleObject(ptp->hEventQuit);
+		assert(is_quit);
 	}
 
 	pl("Work thread: Calling CoUninitialize() and quit self.");
