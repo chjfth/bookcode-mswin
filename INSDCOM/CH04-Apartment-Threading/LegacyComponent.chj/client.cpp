@@ -136,7 +136,7 @@ void MainThreadCallObject(bool is_coinit, IStream *pStream)
 			return;
 		}
 		else {
-			pl("Main thread CoInitialize() success.");
+			pl("Main thread ----------- CoInitialize() success.");
 		}
 	}
 
@@ -188,16 +188,21 @@ int main(int argc, char *argv[])
 			return 4;
 		}
 		else {
-			pl("Main thread CoInitialize() success.");
+			pl("Main thread ----------- CoInitialize() success.");
 		}
 	}
 
-	// Print COM objects apartment registry setting. (TODO: require value=null)
+	//
+	// Print COM objects apartment registry setting. 
+	//
 	char szregkey[1024] = {0}, szregvalue[1024] = {0}, szClsid[64] = {0};
 	CLSIDtochar(CLSID_InsideDCOM, szClsid, sizeof(szClsid));
 	_sntprintf_s(szregkey, sizeof(szregkey), _TRUNCATE, "CLSID\\%s\\InprocServer32", szClsid);
 	bool succ = HKCR_GetValueSZ(szregkey, "ThreadingModel", szregvalue, sizeof(szregvalue));
-	pl("COM object registry-setting ThreadingModel=%s", succ?szregvalue:"(not exist)");
+	if(!succ || szregvalue[0]=='\0')
+		pl("COM object registry-setting ThreadingModel Not-Exist (=Legacy Component)");
+	else
+		pl("COM object registry-setting ThreadingModel=%s", szregvalue);
 
 	SThreadParam tp = {};
 	tp.hEventObjReady = CreateEvent(NULL, TRUE, FALSE, NULL);
