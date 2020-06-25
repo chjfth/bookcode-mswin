@@ -211,7 +211,12 @@ HRESULT __stdcall DllRegisterServer()
 	pTypeLib->Release();
 
 	// Adjust the threading model here
-	return RegisterServer("component.dll", CLSID_InsideDCOM, "Inside DCOM Sample", "Component.InsideDCOM", "Component.InsideDCOM.1", "Apartment");
+	return RegisterServer("component.dll", CLSID_InsideDCOM, 
+		"Inside DCOM Sample", 
+		"Component.InsideDCOM", 
+		"Component.InsideDCOM.1", 
+		"Apartment" // Component runs in STA. We can later change it directly via regedit.exe .
+		);
 }
 
 HRESULT __stdcall DllUnregisterServer()
