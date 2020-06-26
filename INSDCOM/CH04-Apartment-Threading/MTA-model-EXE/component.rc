@@ -1,13 +1,10 @@
 // component.rc
-// [2020-06-15] Chj: Really, VC6 & VC2010 rc.exe pass us PlatformName here.
-#if PlatformName==Win32
-// for VC2010+
-1 TYPELIB "Component\Win32\component.tlb"
-#elif PlatformName==x64
-// for VC2010+
-1 TYPELIB "Component\x64\component.tlb"
+#if defined(PlatformName_Win32)
+1 TYPELIB "Component/Win32/component.tlb"
+#elif defined(PlatformName_x64)
+1 TYPELIB "Component/x64/component.tlb"
 #else
-# error Unknown PlatformName value.
+# error No PlatformName_xxx defined, I will not continue.
 #endif
 
 
