@@ -26,8 +26,14 @@ public:
 	HRESULT __stdcall Sum(int x, int y, int* retval);
 	HRESULT __stdcall SetDelay(int millisec, int* old_delay);
 
-	CInsideDCOM() : m_cRef(1), m_delaymillisec(0) { InterlockedIncrement(&g_cComponents); }
-	~CInsideDCOM() { InterlockedDecrement(&g_cComponents); }
+	CInsideDCOM() : m_cRef(1), m_delaymillisec(0) 
+	{ 
+		InterlockedIncrement(&g_cComponents); 
+	}
+	~CInsideDCOM() 
+	{ 
+		InterlockedDecrement(&g_cComponents); 
+	}
 
 private:
 	long m_cRef;
