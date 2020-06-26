@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 	pl("Client: Calling CoInitialize(). MainThread-tid=%d", mytid);
 
 	DWORD coinit = is_main_STA ? COINIT_APARTMENTTHREADED : COINIT_MULTITHREADED;
+
 	HRESULT hr = CoInitializeEx(NULL, coinit);
 	if(FAILED(hr)) {
 		pl("Main thread CoInitializeEx failed, hr=0x%X", hr);
@@ -132,6 +133,7 @@ int main(int argc, char *argv[])
 	char szregkey[1024] = {0}, szregvalue[1024] = {0}, szClsid[64] = {0};
 	CLSIDtochar(CLSID_InsideDCOM, szClsid, sizeof(szClsid));
 	_sntprintf_s(szregkey, sizeof(szregkey), _TRUNCATE, "CLSID\\%s\\InprocServer32", szClsid);
+	pl("Reading from regkey [%s]", szregkey);
 	bool succ = HKCR_GetValueSZ(szregkey, "ThreadingModel", szregvalue, sizeof(szregvalue));
 	pl("COM object registry-setting ThreadingModel=%s", succ?szregvalue:"(not exist)");
 
