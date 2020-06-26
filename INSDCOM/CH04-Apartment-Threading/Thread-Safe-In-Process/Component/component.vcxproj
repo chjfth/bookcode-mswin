@@ -105,6 +105,8 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\component.rc">
+      <PreprocessorDefinitions Condition="'$(Platform)'=='x64'">PlatformName_x64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Platform)'=='Win32'">PlatformName_Win32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemGroup>
   <!-- Chj add PostBuild.props: -->
