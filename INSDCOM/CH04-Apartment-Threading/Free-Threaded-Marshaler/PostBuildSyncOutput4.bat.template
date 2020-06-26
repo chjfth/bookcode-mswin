@@ -14,7 +14,7 @@ REM After copying this file to PostBuildSyncOutput.bat (drop the .template suffi
 REM customize DIR_COPY_TO's value to set where to duplicate the output EXE/DLL.
 REM For example, duplicate to a remote machine folder for remote debugging.
 REM 
-set DIR_COPY_TO=z:\bin-%TargetName%
+set DIR_COPY_TO=z:\bin
 REM
 REM =========================================================================
 

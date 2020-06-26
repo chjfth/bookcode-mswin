@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Component-with-FTM", "Component-with-FTM\Component-with-FTM.vcxproj", "{F8C938E5-3AD0-E0C6-C807-2BD123582E26}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Component-without-FTM", "Component-without-FTM\Component-without-FTM.vcxproj", "{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -32,6 +34,14 @@ Global
 		{F8C938E5-3AD0-E0C6-C807-2BD123582E26}.Release|Win32.Build.0 = Release|Win32
 		{F8C938E5-3AD0-E0C6-C807-2BD123582E26}.Release|x64.ActiveCfg = Release|x64
 		{F8C938E5-3AD0-E0C6-C807-2BD123582E26}.Release|x64.Build.0 = Release|x64
+		{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}.Debug|Win32.Build.0 = Debug|Win32
+		{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}.Debug|x64.ActiveCfg = Debug|x64
+		{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}.Debug|x64.Build.0 = Debug|x64
+		{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}.Release|Win32.ActiveCfg = Release|Win32
+		{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}.Release|Win32.Build.0 = Release|Win32
+		{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}.Release|x64.ActiveCfg = Release|x64
+		{47B3B6D3-1D81-70B1-385C-AD4C67FCF15C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -97,7 +97,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\component-with-FTM.cpp" />
+    <ClCompile Include="..\component-without-FTM.cpp" />
     <ClCompile Include="component_i.c" />
     <ClCompile Include="..\..\registry.cpp" />
   </ItemGroup>
@@ -105,7 +105,7 @@
     <CustomBuild Include="..\component.def" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\component-with-FTM.rc">
+    <ResourceCompile Include="..\component-without-FTM.rc">
     </ResourceCompile>
   </ItemGroup>
   <!-- Chj add PostBuild.props: -->
