@@ -1,5 +1,6 @@
  // client.cpp
 #define _WIN32_DCOM
+#include <conio.h>
 #include <iostream>  // For cout
 using namespace std;
 
@@ -13,6 +14,8 @@ void __stdcall MyThread(IStream* pScream)
 
 	ISum* pSum;
 	CoGetInterfaceAndReleaseStream(pScream, IID_ISum, (void**)&pSum);
+
+	printf(">>>> Work thread got marsptr=0x%p\n", pSum);
 
 	for(int count = 0; count < 10; count++)
 	{
@@ -50,8 +53,14 @@ void main()
 	if(SUCCEEDED(hr))
 		cout << "Client: Calling Sum(2, 3) = " << sum << endl;
 
+	Sleep(500); // To avoid thread console print intermix.
+	cout << endl;
+	cout << "Chj: == Press any key to go on doing final Release(). ==" << endl;
+	cout << "     == You can take the chance to inspect this process with a debugger. ==" << endl;
+	_getch();
+
 	hr = pSum->Release();
-	cout << "Client: Calling pSum->Release() reference count = " << hr << endl;
+	cout << "Client: Called pSum->Release(), reference count = " << hr << endl;
 
 	WaitForSingleObject(thread_handle, INFINITE);
 

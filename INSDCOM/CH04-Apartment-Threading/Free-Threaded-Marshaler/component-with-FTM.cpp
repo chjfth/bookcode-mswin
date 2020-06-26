@@ -196,6 +196,8 @@ HRESULT __stdcall DllGetClassObject(REFCLSID clsid, REFIID riid, void** ppv)
 	return hr;
 }
 
+char g_wszDllFilepath[MAX_PATH];
+
 HRESULT __stdcall DllRegisterServer()
 {
 	char DllPath[256];
@@ -209,7 +211,7 @@ HRESULT __stdcall DllRegisterServer()
 	pTypeLib->Release();
 
 	// Adjust the threading model here
-	return RegisterServer("Component with FTM.dll", CLSID_InsideDCOM, "Inside DCOM Sample", "Component.InsideDCOM", "Component.InsideDCOM.1", "Apartment");
+	return RegisterServer(g_wszDllFilepath, CLSID_InsideDCOM, "Inside DCOM Sample", "Component.InsideDCOM", "Component.InsideDCOM.1", "Apartment");
 }
 
 HRESULT __stdcall DllUnregisterServer()
@@ -223,5 +225,13 @@ HRESULT __stdcall DllUnregisterServer()
 BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, void* pv)
 {
 	g_hInstance = hInstance;
+
+	if (dwReason == DLL_PROCESS_ATTACH)
+	{
+		GetModuleFileName(hInstance, g_wszDllFilepath, MAX_PATH);
+	}
+	else if (dwReason == DLL_PROCESS_DETACH)
+	{
+	}
 	return TRUE;
 }
