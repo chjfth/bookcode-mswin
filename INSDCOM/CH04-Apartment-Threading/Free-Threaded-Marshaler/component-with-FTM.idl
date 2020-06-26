@@ -1,15 +1,15 @@
 // component.idl
 import "unknwn.idl";
 
-[ object, uuid(10000001-0000-0000-0000-000000000001),
+[ object, uuid(10004401-0000-0000-0000-000000000001),
   oleautomation ]
 interface ISum : IUnknown
 {
 	HRESULT Sum(int x, int y, [out, retval] int* retval);
 }
 
-[ uuid(10000003-0000-0000-0000-000000000001),
-  helpstring("Inside DCOM Component Type Library"),
+[ uuid(10004403-0000-0000-0000-000000000001),
+  helpstring("Inside DCOM Component Type Library with-FTM"),
   version(1.0) ]
 library Component
 {
@@ -17,7 +17,7 @@ library Component
 
 	interface ISum;
 
-	[ uuid(10000002-0000-0000-0000-000000000001) ]
+	[ uuid(10004402-0000-0000-0000-000000000001) ]
 	coclass InsideDCOM
 	{
 		interface ISum;
