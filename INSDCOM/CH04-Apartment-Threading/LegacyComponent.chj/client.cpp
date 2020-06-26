@@ -73,6 +73,7 @@ struct SThreadParam
 {
 	HANDLE hEventObjReady; // Work thread sets this event, telling main thread COM object ready. 
 	HANDLE hEventQuit;  // Main thread sets this event, telling work thread to quit.
+	bool is_quit_early;
 	IStream *pStream;   // set by worker, read by main
 };
 
@@ -109,15 +110,27 @@ int MyThread(void *param)
 
 	PrintSum(pSum, 1, 2);
 
+	pl("Work thread: Calling CoMarshalInterThreadInterfaceInStream()...");
 	CoMarshalInterThreadInterfaceInStream(IID_ISum, pSum, &(ptp->pStream));
+	pl("Work thread:  Called CoMarshalInterThreadInterfaceInStream().");
+
+	pl("Work thread: Calling pSum->Release()...");
+	DWORD refcount = pSum->Release();
+	pl("Work thread: Called pSum->Release(). reference count drops to %d", refcount);
 
 	SetEvent(ptp->hEventObjReady);
 
-	if(ptp->hEventQuit)
+	if(!ptp->is_quit_early)
 	{
 		pl("Work thread: Now wait for quit event...");
 		bool is_quit = PumpMsg_and_WaitForSingleObject(ptp->hEventQuit);
 		assert(is_quit);
+		pl("Work thread: Got quit event.");
+	}
+	else
+	{
+		pl("Work thread: NOT waiting for quit event. Quit early!");
+//		Sleep(500);
 	}
 
 	pl("Work thread: Calling CoUninitialize() and quit self.");
@@ -125,8 +138,14 @@ int MyThread(void *param)
 	return 0;
 }
 
-void MainThreadCallObject(bool is_coinit, IStream *pStream)
+void MainThreadCallObject(bool is_coinit, IStream *pStream, char quit_early)
 {
+	if(quit_early=='X')
+	{
+		pl("quit_early='%c', main-thread sleep 1 second.", quit_early);
+		Sleep(1000);
+	}
+
 	HRESULT hr = 0;
 	if(is_coinit)
 	{
@@ -140,10 +159,20 @@ void MainThreadCallObject(bool is_coinit, IStream *pStream)
 		}
 	}
 
+	if(quit_early=='x')
+	{
+		pl("quit_early='%c', main-thread sleep 1 second.", quit_early);
+		Sleep(1000);
+	}
+
 	ISum* pSum = NULL;
+	pl("Main thread: Calling CoGetInterfaceAndReleaseStream()...");
+	//
 	hr = CoGetInterfaceAndReleaseStream(pStream, IID_ISum, (void**)&pSum);
-	if(SUCCEEDED(hr))
-		pl("Main thread ----------- got marsptr: **0x%p**", pSum);
+	//
+	if(SUCCEEDED(hr)) {
+		pl("Main thread:  Called CoGetInterfaceAndReleaseStream(). Got marsptr: **0x%p**", pSum);
+	}
 	else {
 		pl("Main thread CoGetInterfaceAndReleaseStream() fail! HRESULT=0x%X", hr);
 		assert(pSum==NULL);
@@ -152,8 +181,9 @@ void MainThreadCallObject(bool is_coinit, IStream *pStream)
 
 	PrintSum(pSum, 20, 30);
 
+	pl("Main thread: Calling pSum->Release()...");
 	DWORD refcount = pSum->Release();
-	pl("Client: Called pSum->Release(). reference count drops to %d", refcount);
+	pl("Main thread: Called pSum->Release(). reference count drops to %d", refcount);
 }
 
 bool AskForLateCoinit()
@@ -161,17 +191,27 @@ bool AskForLateCoinit()
 	printf("For the main thread, do you want to call CoInitialize() *after* the work thread has created COM object? (y/N) ");
 	int key = _getch();
 	if(key=='y' || key=='Y') {
-		printf("AFTER\n");
+		printf("y=AFTER\n");
 		return true;
 	}
 	else {
-		printf("BEFORE\n");
+		printf("N=BEFORE\n");
 		return false;
 	}
 }
 
 int main(int argc, char *argv[])
 {
+	char quit_early = 0; // if true, let worker thread quit early
+	if(argc==2)
+	{
+		char c = argv[1][0]; 
+		if(c=='x' || c=='X')
+			quit_early = c;
+		else 
+			quit_early = 0;
+	}
+
 	HRESULT hr = 0;
 	bool is_late_coinit = AskForLateCoinit();
 
@@ -207,6 +247,7 @@ int main(int argc, char *argv[])
 	SThreadParam tp = {};
 	tp.hEventObjReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 	tp.hEventQuit = CreateEvent(NULL, TRUE, FALSE, NULL);
+	tp.is_quit_early = quit_early ? true : false;
 	HANDLE thread_handle = winCreateThread(MyThread, (void*)&tp);
 
 	// Now the message loop, pump message and wait for thread-done simultaneously.
@@ -226,8 +267,10 @@ int main(int argc, char *argv[])
 
 			if(!isObjReady)
 			{
+				// We know that tp.EventObjReady has just been ready.
 				isObjReady = true;
-				MainThreadCallObject(is_late_coinit, tp.pStream);
+				
+				MainThreadCallObject(is_late_coinit, tp.pStream, quit_early);
 				SetEvent(tp.hEventQuit);
 			}
 			else
@@ -255,6 +298,11 @@ int main(int argc, char *argv[])
 	} // End of while loop
 
 	hr = WaitForSingleObject(thread_handle, INFINITE);
+
+	CloseHandle(thread_handle);
+	CloseHandle(tp.hEventObjReady);
+	CloseHandle(tp.hEventQuit);
+
 
 	pl("Main thread: Calling CoUninitialize()");
 	CoUninitialize();
