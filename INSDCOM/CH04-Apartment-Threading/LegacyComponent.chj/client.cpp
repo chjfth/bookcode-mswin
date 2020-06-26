@@ -140,8 +140,9 @@ int MyThread(void *param)
 	}
 	else
 	{
-		pl("Work thread: NOT waiting for quit event. Quit early!");
-//		Sleep(500);
+		int sleepms = 500;
+		pl("Work thread: NOT waiting for quit event. Quit early after %dms!", sleepms);
+		Sleep(sleepms);
 	}
 
 	pl("Work thread: Calling CoUninitialize() and quit self.");
