@@ -36,6 +36,21 @@ void PrintSum(ISum *pSum, int a1, int a2)
 	}
 }
 
+bool MyCoInit(const char *prefix, bool isSTA)
+{
+	HRESULT hr = 0;
+	const char *szCoInit = isSTA?"COINIT_APARTMENTTHREADED":"COINIT_MULTITHREADED";
+	hr = CoInitializeEx(NULL, isSTA?COINIT_APARTMENTTHREADED:COINIT_MULTITHREADED);
+	if(FAILED(hr)) {
+		pl("%s CoInitialize(%s) failed, hr=0x%X", prefix, szCoInit, hr);
+		return false;
+	}
+	else {
+		pl("%s ----------- CoInitialize(%s) success.", prefix, szCoInit);
+		return true;
+	}
+}
+
 bool PumpMsg_and_WaitForSingleObject(HANDLE hobjWait)
 {
 	while (true) 
@@ -71,6 +86,7 @@ bool PumpMsg_and_WaitForSingleObject(HANDLE hobjWait)
 
 struct SThreadParam
 {
+	bool is_work_STA;
 	HANDLE hEventObjReady; // Work thread sets this event, telling main thread COM object ready. 
 	HANDLE hEventQuit;  // Main thread sets this event, telling work thread to quit.
 	bool is_quit_early;
@@ -79,20 +95,15 @@ struct SThreadParam
 
 int MyThread(void *param)
 {
+	HRESULT hr = 0;
 	DWORD mytid = GetCurrentThreadId();
 	pl("Work thread starts running, WorkThread-tid=%d", mytid);
 
 	SThreadParam *ptp = (SThreadParam*)param;
 	IStream* pStream = ptp->pStream;
 
-	HRESULT hr = CoInitialize(NULL);
-	if(FAILED(hr)) {
-		pl("Work thread CoInitialize() failed.");
+	if(!MyCoInit("Work thread", ptp->is_work_STA))
 		return 4;
-	}
-	else {
-		pl("Work thread CoInitialize() success.");
-	}
 
 	//
 	// Create COM object in worker thread. 
@@ -138,7 +149,7 @@ int MyThread(void *param)
 	return 0;
 }
 
-void MainThreadCallObject(bool is_coinit, IStream *pStream, char quit_early)
+void MainThreadCallObject(bool is_coinit, bool isSTA, IStream *pStream, char quit_early)
 {
 	if(quit_early=='X')
 	{
@@ -149,14 +160,8 @@ void MainThreadCallObject(bool is_coinit, IStream *pStream, char quit_early)
 	HRESULT hr = 0;
 	if(is_coinit)
 	{
-		hr = CoInitialize(NULL);
-		if(FAILED(hr)) {
-			pl("Main thread CoInitialize() failed, hr=0x%X", hr);
+		if(!MyCoInit("Main thread", isSTA))
 			return;
-		}
-		else {
-			pl("Main thread ----------- CoInitialize() success.");
-		}
 	}
 
 	if(quit_early=='x')
@@ -200,6 +205,20 @@ bool AskForLateCoinit()
 	}
 }
 
+bool Choose_STA_MTA(const char *prefix)
+{
+	printf("%s-thread as STA or MTA? (1/0) ", prefix);
+	int key = _getch();
+	if(!(key=='0')) {
+		printf("STA\n");
+		return true;
+	}
+	else {
+		printf("MTA\n");
+		return false;
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	char quit_early = 0; // if true, let worker thread quit early
@@ -215,6 +234,9 @@ int main(int argc, char *argv[])
 	HRESULT hr = 0;
 	bool is_late_coinit = AskForLateCoinit();
 
+	bool is_main_STA = Choose_STA_MTA("Main");
+	bool is_work_STA = Choose_STA_MTA("Work");
+
 	pl_need_prefix("EXE", true, true, true);
 
 	DWORD mytid = GetCurrentThreadId();
@@ -222,14 +244,8 @@ int main(int argc, char *argv[])
 
 	if(!is_late_coinit)
 	{
-		hr = CoInitialize(NULL);
-		if(FAILED(hr)) {
-			pl("Main thread CoInitialize() failed, hr=0x%X", hr);
+		if(!MyCoInit("Main thread", is_main_STA))
 			return 4;
-		}
-		else {
-			pl("Main thread ----------- CoInitialize() success.");
-		}
 	}
 
 	//
@@ -238,6 +254,7 @@ int main(int argc, char *argv[])
 	char szregkey[1024] = {0}, szregvalue[1024] = {0}, szClsid[64] = {0};
 	CLSIDtochar(CLSID_InsideDCOM, szClsid, sizeof(szClsid));
 	_sntprintf_s(szregkey, sizeof(szregkey), _TRUNCATE, "CLSID\\%s\\InprocServer32", szClsid);
+	pl("Reading from regkey [%s]", szregkey);
 	bool succ = HKCR_GetValueSZ(szregkey, "ThreadingModel", szregvalue, sizeof(szregvalue));
 	if(!succ || szregvalue[0]=='\0')
 		pl("COM object registry-setting ThreadingModel Not-Exist (=Legacy Component)");
@@ -245,6 +262,7 @@ int main(int argc, char *argv[])
 		pl("COM object registry-setting ThreadingModel=%s", szregvalue);
 
 	SThreadParam tp = {};
+	tp.is_work_STA = is_work_STA;
 	tp.hEventObjReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 	tp.hEventQuit = CreateEvent(NULL, TRUE, FALSE, NULL);
 	tp.is_quit_early = quit_early ? true : false;
@@ -270,7 +288,7 @@ int main(int argc, char *argv[])
 				// We know that tp.EventObjReady has just been ready.
 				isObjReady = true;
 				
-				MainThreadCallObject(is_late_coinit, tp.pStream, quit_early);
+				MainThreadCallObject(is_late_coinit, is_main_STA, tp.pStream, quit_early);
 				SetEvent(tp.hEventQuit);
 			}
 			else
