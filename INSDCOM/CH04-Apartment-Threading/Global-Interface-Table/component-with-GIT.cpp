@@ -104,7 +104,7 @@ HRESULT CInsideDCOM::QueryInterface(REFIID riid, void** ppv)
 HRESULT CInsideDCOM::Sum(int x, int y, int* retval)
 {
 	// Call into second component
-	ISum* pSum;
+	ISum* pSum = NULL;
 	m_pGIT->GetInterfaceFromGlobal(m_cookie, IID_ISum, (void**)&pSum);
 
 	HRESULT hr = pSum->Sum(x, y, retval);

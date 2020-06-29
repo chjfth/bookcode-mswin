@@ -51,6 +51,8 @@ void main()
 	if(SUCCEEDED(hr))
 		cout << "Client: Calling Sum(2, 3) = " << sum << endl;
 
+	WaitForSingleObject(thread_handle, INFINITE);
+
 	Sleep(500); // To avoid thread console print intermix.
 	cout << endl;
 	cout << "Chj: == Press any key to go on doing final Release(). ==" << endl;
@@ -59,8 +61,6 @@ void main()
 
 	hr = pSum->Release();
 	cout << "Client: Calling pSum->Release() reference count = " << hr << endl;
-
-	WaitForSingleObject(thread_handle, INFINITE);
 
 	cout << "Client: Calling CoUninitialize()" << endl;
 	CoUninitialize();
