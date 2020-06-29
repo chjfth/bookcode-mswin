@@ -3,12 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcxproj", "{D52D84EC-28FC-9D17-2F32-0A9878CD338E}"
 	ProjectSection(ProjectDependencies) = postProject
+		{6EB39874-2FE8-AF73-46EB-2C728265E84D} = {6EB39874-2FE8-AF73-46EB-2C728265E84D}
 		{A7C4C9FA-B983-4F64-5601-61B52B0E8CFD} = {A7C4C9FA-B983-4F64-5601-61B52B0E8CFD}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Component-with-GIT", "Component-with-GIT\Component-with-GIT.vcxproj", "{A7C4C9FA-B983-4F64-5601-61B52B0E8CFD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FBCB6BB3-7964-E8B7-7D67-330F54C0837D} = {FBCB6BB3-7964-E8B7-7D67-330F54C0837D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Component-without-GIT", "Component-without-GIT\Component-without-GIT.vcxproj", "{6EB39874-2FE8-AF73-46EB-2C728265E84D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FBCB6BB3-7964-E8B7-7D67-330F54C0837D} = {FBCB6BB3-7964-E8B7-7D67-330F54C0837D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "comp", "comp\comp.vcxproj", "{FBCB6BB3-7964-E8B7-7D67-330F54C0837D}"
 EndProject
