@@ -1,0 +1,24 @@
+// component.idl
+import "unknwn.idl";
+
+[ object, uuid(10000001-0000-0000-0000-000000000001),
+  oleautomation ]
+interface ISum : IUnknown
+{
+	HRESULT Sum(int x, int y, [out, retval] int* retval);
+}
+
+[ uuid(10000013-0000-0000-0000-000000000001),
+  helpstring("Inside DCOM Component Type Library"),
+  version(1.0) ]
+library Comp
+{
+	importlib("stdole32.tlb");
+	interface ISum;
+
+	[ uuid(10000022-0000-0000-0000-000000000001) ]
+	coclass InsideDCOM2
+	{
+		interface ISum;
+	}
+};
