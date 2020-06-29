@@ -101,7 +101,7 @@
     <ClCompile Include="..\..\registry.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\comp.def" />
+    <CustomBuild Include="..\Component.def" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\comp.rc">
