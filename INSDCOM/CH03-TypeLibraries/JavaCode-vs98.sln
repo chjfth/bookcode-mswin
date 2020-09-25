@@ -1,0 +1,16 @@
+Microsoft Visual Studio Solution File, Format Version 1.00
+Project("{66355F20-A65B-11D0-BFB5-00A0C91EBFA0}") = "JavaSum", "JavaSum\JavaSum.vjp", "{A864FF28-563B-4F38-A216-81AF1D3B7BD4}"
+EndProject
+Project("{66355F20-A65B-11D0-BFB5-00A0C91EBFA0}") = "TestCOM", "TestCOM\TestCOM.vjp", "{B093647C-0F80-4AD4-81D7-BE58EB66C78B}"
+EndProject
+Global
+	GlobalSection(LocalDeployment) = postSolution
+		StartupProject = {B093647C-0F80-4AD4-81D7-BE58EB66C78B}
+	EndGlobalSection
+	GlobalSection(BuildOrder) = postSolution
+		0 = {A864FF28-563B-4F38-A216-81AF1D3B7BD4}
+		1 = {B093647C-0F80-4AD4-81D7-BE58EB66C78B}
+	EndGlobalSection
+	GlobalSection(DeploymentRoot) = postSolution
+	EndGlobalSection
+EndGlobal

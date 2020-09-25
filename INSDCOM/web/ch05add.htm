@@ -1,0 +1,139 @@
+<HTML>
+<HEAD>
+<TITLE>Chapter 5 Addendum</TITLE>
+<STYLE TYPE="text/css">
+<!--
+A:link {color: #0000FF;
+       text-decoration: none}
+A:visited {color: #FF0000;
+          text-decoration: none}
+-->
+</STYLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" LEFTMARGIN="15">
+<BASEFONT SIZE="2">
+<FONT FACE="Verdana, Arial, Helvetica">
+
+<CENTER>
+<FONT SIZE="4"><B>Chapter 5 Addendum</B></FONT>
+</CENTER>
+<BR><BR>
+This document contains two additions to Chapter 5, "Automation and
+Component Categories" of <I>Inside Distributed COM</I>. Because of
+time constraints, we were unable to include this material in the
+printed book; instead, it has been added to the companion CD. The
+page numbers given here in parentheses refer to the relevant
+material in Chapter 5.
+<BR><BR><BR>
+
+
+<B>Addition to the Section<BR>
+"The Automation Marshaler"<BR>
+(page 176)</B><BR>
+The BSTR Automation type deserves special mention. Most programming
+languages have their own notion of what a string is and how to
+store a string in memory. C++ stores strings as an array of ASCII
+or Unicode characters with a null terminator; Visual Basic stores
+strings as an array of ASCII characters and prefixes the string
+with a value indicating its length; Java stores strings as an array
+of Unicode characters with a null terminator. To enable components
+built in different languages to exchange strings, Microsoft
+invented a new type of stringknown as a <I>BSTR</I>. Fundamentally,
+a BSTR is a length-prefixed, null-terminated array of Unicode
+characters. The following figure shows the in-memory representation
+of a BSTR containing the string <I>HELLO</I>:
+<BR><BR>
+<IMG SRC="bstr.gif">
+<BR><BR>
+Because of the support built into the Visual Basic and Java Virtual
+Machines (VMs), BSTRs automatically map onto the native string
+formats of these languages. To aid C++ developers who use BSTRs,
+COM provides the functions listed in the following table.
+<BR><BR>
+<TABLE BORDER="1" WIDTH="100%">
+<TR>
+    <TD><FONT SIZE="2"><B>Function</B></FONT></TD>
+    <TD><FONT SIZE="2"><B>Description</B></FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>SysAllocString</I></FONT></TD>
+    <TD><FONT SIZE="2">Allocates a BSTR and copies a string into it</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>SysAllocStringByteLen</I></FONT></TD>
+    <TD><FONT SIZE="2">Takes an ANSI input string and returns a BSTR</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>SysAllocStringLen</I></FONT></TD>
+    <TD><FONT SIZE="2">Allocates a new BSTR, copies a specified number of
+        characters into it, and then appends a null character</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>SysFreeString</I></FONT></TD>
+    <TD><FONT SIZE="2">Frees a BSTR</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>SysReAllocString</I></FONT></TD>
+    <TD><FONT SIZE="2">Allocates a new BSTR, copies the passed string into
+        it, and then frees the old BSTR</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>SysReAllocStringLen</I></FONT></TD>
+    <TD><FONT SIZE="2">Creates a new BSTR containing a specified number of
+        characters from an old BSTR and then frees the old BSTR</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>SysStringByteLen</I></FONT></TD>
+    <TD><FONT SIZE="2">Returns the length (in bytes) of a BSTR</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>SysStringLen</I></FONT></TD>
+    <TD><FONT SIZE="2">Returns the length of a BSTR</FONT></TD>
+</TR>
+</TABLE>
+<BR><BR><BR>
+
+<B>Addition to the Section<BR>
+"Building an Automation Client in C++"<BR>
+(page 187)</B><BR>
+To make working with the VARIANT type easier, COM provides several helper
+functions, listed in the following table.
+<BR><BR>
+<TABLE BORDER="1" WIDTH="100%">
+<TR>
+    <TD><FONT SIZE="2"><B>Function</B></FONT></TD>
+    <TD><FONT SIZE="2"><B>Description</B></FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>VariantChangeType</I></FONT></TD>
+    <TD><FONT SIZE="2">Converts a variant from one type to another</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>VariantChangeTypeEx</I></FONT></TD>
+    <TD><FONT SIZE="2">Converts a variant from one type to another, using a
+        locale identifier (LCID)</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>VariantClear</I></FONT></TD>
+    <TD><FONT SIZE="2">Clears a variant</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>VariantCopy</I></FONT></TD>
+    <TD><FONT SIZE="2">Frees the destination variant and makes a copy of the
+        source variant</FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>VariantCopyInd</I></FONT></TD>
+    <TD><FONT SIZE="2">Frees the destination variant and makes a copy of the
+        source variant, performing the necessary indirection if the source is
+        specified to be <I>VT_BYREF</I></FONT></TD>
+</TR>
+<TR>
+    <TD><FONT SIZE="2"><I>VariantInit</I></FONT></TD>
+    <TD><FONT SIZE="2">Initializes a variant</FONT></TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>

@@ -30,7 +30,7 @@ wchar_t g_wszModuleName[MAX_PATH];
 LONG g_lComponentRefCounts = 0; // counts living objects and locks
 
 //-------------------------------------------------------------------
-// Component Level Reference count for the lifetime managment of 
+// Component Level Reference count for the lifetime management of 
 // the whole component.
 // These specific implementations are used for in-process servers
 // There are a pair of functions like these that are used for

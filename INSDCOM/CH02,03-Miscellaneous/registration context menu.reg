@@ -1,0 +1,19 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\.dll]
+@="dllfile"
+
+[HKEY_CLASSES_ROOT\dllfile\shell\Register Component\command]
+@="regsvr32 \"%1\""
+
+[HKEY_CLASSES_ROOT\dllfile\shell\Unregister Component\command]
+@="regsvr32 /u \"%1\""
+
+[HKEY_CLASSES_ROOT\.exe]
+@="exefile"
+
+[HKEY_CLASSES_ROOT\exefile\shell\Register Component\command]
+@="\"%1\" /regserver"
+
+[HKEY_CLASSES_ROOT\exefile\shell\Unregister Component\command]
+@="\"%1\" /unregserver"

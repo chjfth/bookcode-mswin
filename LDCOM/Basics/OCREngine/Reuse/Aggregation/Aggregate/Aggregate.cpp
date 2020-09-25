@@ -28,7 +28,7 @@
 HANDLE g_hExitEvent;
 
 //-------------------------------------------------------------------
-// Component Level Reference count for the lifetime managment of 
+// Component Level Reference count for the lifetime management of 
 // the whole component.
 // These specific implementations are used for out-of-process servers
 // There's a pair of functions like these that are used for

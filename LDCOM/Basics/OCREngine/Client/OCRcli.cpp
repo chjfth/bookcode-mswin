@@ -277,10 +277,14 @@ void main(int argc, char **argv)
 		csi.pwszName = wsz;
 		pcsi = &csi;
 		dwClsCtx = CLSCTX_LOCAL_SERVER|CLSCTX_REMOTE_SERVER;
+
+		// create an object on the remote machine
+		DisplayStatus(TEXT("Creating instance (outproc)..."), S_OK);
+	}
+	else {
+		DisplayStatus(TEXT("Creating instance (inproc)..."), S_OK);
 	}
 
-	// create an object on the remote machine
-	DisplayStatus(TEXT("Creating instance..."), S_OK);
 
 	MULTI_QI mqi[] = { {&IID_IOcr, NULL, S_OK}, {&IID_ISpell, NULL, S_OK} };
 

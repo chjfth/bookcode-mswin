@@ -1,0 +1,9 @@
+; component.def
+LIBRARY         component.dll
+; DESCRIPTION     '(c)1997 Guy Eddon'
+
+EXPORTS
+                DllGetClassObject   PRIVATE
+                DllCanUnloadNow     PRIVATE
+                DllRegisterServer   PRIVATE	; Add this
+                DllUnregisterServer PRIVATE	; Add this
