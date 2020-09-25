@@ -16,7 +16,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
-#include <time.h>
 #include "MtVerify.h"
 #include "dining.h"
 
@@ -29,7 +28,10 @@ extern HWND   	hWndMain;			// Main Window Handle
 extern BOOL bWaitMultiple;
 extern BOOL bFastFood;
 
-#define P_DELAY		bFastFood ? rand()/25 : ((rand()%5)+1)*1000
+//#define P_DELAY		bFastFood ? rand()/25 : ((rand()%5)+1)*1000
+#define P_DELAY		(bFastFood ? rand()/100 : ((rand()%5)+1)*1000) // chj
+
+#define P_DELAY_GAP (P_DELAY/2)
 
 int gDinerState[PHILOSOPHERS];
 int gChopstickState[PHILOSOPHERS];
@@ -46,12 +48,15 @@ DWORD WINAPI PhilosopherThread(LPVOID pVoid)
 	int iLeftChopstick = iPhilosopher;
 	int iRightChopstick = iLeftChopstick + 1;
 	DWORD result;
+//	DWORD msec;
+	char title[80]; 
+	static int s_count=0;
 
 	if (iRightChopstick > PHILOSOPHERS-1)
 		iRightChopstick = 0;
 
     //Randomize the random number generator
-	srand( (unsigned)time( NULL ) * (iPhilosopher + 1) );
+	srand( (unsigned)GetTickCount() * (iPhilosopher + 1) );
 
 	// remember handles for my chopsticks
 	myChopsticks[0] = gchopStick[iLeftChopstick];
@@ -63,6 +68,9 @@ DWORD WINAPI PhilosopherThread(LPVOID pVoid)
 
 	for(;;)
 	{
+        wsprintf(title, "(%d) eating...", ++s_count);
+        SetWindowText(hWndMain, title);
+
 		if (bWaitMultiple == FALSE)
 		{
 			// Wait until both of my chopsticks are available
@@ -71,7 +79,13 @@ DWORD WINAPI PhilosopherThread(LPVOID pVoid)
 			result = WaitForSingleObject(gchopStick[iLeftChopstick], INFINITE);
 			MTVERIFY(result == WAIT_OBJECT_0);
 			gChopstickState[iLeftChopstick] = iPhilosopher;
-			Sleep(P_DELAY/4);
+			
+			Sleep(P_DELAY_GAP);// Sleep(P_DELAY/4);
+			{
+				char text[100];
+				wsprintf(text, "Sleep(%d)...\n", P_DELAY_GAP);
+				OutputDebugString(text);
+			}
 
 			gDinerState[iPhilosopher] = WAITING;	//wants chopsticks
             PostMessage(hWndMain, WM_FORCE_REPAINT,0 ,0);
@@ -105,7 +119,7 @@ DWORD WINAPI PhilosopherThread(LPVOID pVoid)
 
 		// Philosopher can now meditate
         Sleep(P_DELAY);
-
+        
 	} // end for
 
 	return 0;
