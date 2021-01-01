@@ -1,5 +1,5 @@
 //------------------------------------------------
-// HollowFontWidened.cs © 2001 by Charles Petzold
+// HollowFontWidened.cs (R) 2001 by Charles Petzold
 //------------------------------------------------
 using System;
 using System.Drawing;

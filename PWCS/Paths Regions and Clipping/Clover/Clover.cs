@@ -1,5 +1,5 @@
 //-------------------------------------
-// Clover.cs © 2001 by Charles Petzold
+// Clover.cs (R) 2001 by Charles Petzold
 //-------------------------------------
 using System;
 using System.Drawing;

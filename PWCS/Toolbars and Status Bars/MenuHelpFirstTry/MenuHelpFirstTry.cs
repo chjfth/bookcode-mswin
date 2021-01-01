@@ -1,5 +1,5 @@
 //-----------------------------------------------
-// MenuHelpFirstTry.cs © 2001 by Charles Petzold
+// MenuHelpFirstTry.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------
 using System;
 using System.Drawing;

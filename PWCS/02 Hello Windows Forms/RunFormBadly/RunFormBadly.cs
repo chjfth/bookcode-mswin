@@ -1,5 +1,5 @@
 //-------------------------------------------
-// RunFormBadly.cs © 2001 by Charles Petzold
+// RunFormBadly.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System.Windows.Forms;
 

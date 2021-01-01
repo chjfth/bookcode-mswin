@@ -1,5 +1,5 @@
 //-----------------------------------------------
-// ShowFormAndSleep.cs © 2001 by Charles Petzold
+// ShowFormAndSleep.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------
 using System.Threading;
 using System.Windows.Forms;

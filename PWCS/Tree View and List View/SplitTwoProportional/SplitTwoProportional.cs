@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// SplitTwoProportional.cs © 2001 by Charles Petzold
+// SplitTwoProportional.cs (R) 2001 by Charles Petzold
 //---------------------------------------------------
 using System;
 using System.Drawing;

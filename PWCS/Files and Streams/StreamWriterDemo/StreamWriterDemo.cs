@@ -1,5 +1,5 @@
 //-----------------------------------------------
-// StreamWriterDemo.cs © 2001 by Charles Petzold
+// StreamWriterDemo.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------
 using System;
 using System.IO;

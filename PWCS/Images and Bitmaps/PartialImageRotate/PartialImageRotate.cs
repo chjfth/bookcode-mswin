@@ -1,5 +1,5 @@
 //-------------------------------------------------
-// PartialImageRotate.cs © 2001 by Charles Petzold
+// PartialImageRotate.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------
 using System;
 using System.Drawing;

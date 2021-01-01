@@ -1,5 +1,5 @@
 //-------------------------------------------
-// BezierManual.cs © 2001 by Charles Petzold
+// BezierManual.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

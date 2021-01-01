@@ -1,5 +1,5 @@
 //----------------------------------------------
-// SimpleStatusBar.cs © 2001 by Charles Petzold
+// SimpleStatusBar.cs (R) 2001 by Charles Petzold
 //----------------------------------------------
 using System;
 using System.Drawing;

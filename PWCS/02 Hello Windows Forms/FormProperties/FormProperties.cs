@@ -1,5 +1,5 @@
 //---------------------------------------------
-// FormProperties.cs © 2001 by Charles Petzold
+// FormProperties.cs (R) 2001 by Charles Petzold
 //---------------------------------------------
 using System.Drawing;
 using System.Windows.Forms;

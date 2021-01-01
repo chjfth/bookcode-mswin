@@ -1,5 +1,5 @@
 //---------------------------------------
-// WhatSize.cs © 2001 by Charles Petzold
+// WhatSize.cs (R) 2001 by Charles Petzold
 //---------------------------------------
 using System;
 using System.Drawing;

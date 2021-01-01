@@ -1,5 +1,5 @@
 //-------------------------------------------
-// ConsoleAdder.cs © 2001 by Charles Petzold
+// ConsoleAdder.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 

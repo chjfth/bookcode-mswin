@@ -1,5 +1,5 @@
 //-------------------------------------------------------
-// SysInfoReflectionStrings.cs © 2001 by Charles Petzold
+// SysInfoReflectionStrings.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------------
 using Microsoft.Win32;
 using System;

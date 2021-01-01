@@ -1,5 +1,5 @@
 //------------------------------------------
-// FourByFours.cs © 2001 by Charles Petzold
+// FourByFours.cs (R) 2001 by Charles Petzold
 //------------------------------------------
 using System;
 using System.Drawing;

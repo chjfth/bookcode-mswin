@@ -1,5 +1,5 @@
 //--------------------------------------------
-// ColorTrackBar.cs © 2001 by Charles Petzold
+// ColorTrackBar.cs (R) 2001 by Charles Petzold
 //--------------------------------------------
 using System;
 using System.Drawing;

@@ -1,5 +1,5 @@
 //-------------------------------------------
-// CheckBoxDemo.cs © 2001 by Charles Petzold
+// CheckBoxDemo.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

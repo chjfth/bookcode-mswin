@@ -1,5 +1,5 @@
 //-------------------------------------------------
-// PictureBoxPlusDemo.cs © 2001 by Charles Petzold
+// PictureBoxPlusDemo.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------
 using Petzold.ProgrammingWindowsWithCSharp;
 using System;

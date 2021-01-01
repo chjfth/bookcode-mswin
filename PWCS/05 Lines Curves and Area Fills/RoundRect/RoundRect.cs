@@ -1,5 +1,5 @@
 //----------------------------------------
-// RoundRect.cs © 2001 by Charles Petzold
+// RoundRect.cs (R) 2001 by Charles Petzold
 //----------------------------------------
 using System;
 using System.Drawing;

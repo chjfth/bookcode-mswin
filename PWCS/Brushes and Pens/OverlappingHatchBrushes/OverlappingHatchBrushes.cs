@@ -1,5 +1,5 @@
 //------------------------------------------------------
-// OverlappingHatchBrushes.cs © 2001 by Charles Petzold
+// OverlappingHatchBrushes.cs (R) 2001 by Charles Petzold
 //------------------------------------------------------
 using System;
 using System.Drawing;

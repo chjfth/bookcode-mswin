@@ -1,5 +1,5 @@
 //------------------------------------------
-// FourCorners.cs © 2001 by Charles Petzold
+// FourCorners.cs (R) 2001 by Charles Petzold
 //------------------------------------------
 using System;
 using System.Drawing;

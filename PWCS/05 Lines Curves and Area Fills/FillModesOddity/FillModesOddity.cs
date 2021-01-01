@@ -1,5 +1,5 @@
 //----------------------------------------------
-// FillModesOddity.cs © 2001 by Charles Petzold
+// FillModesOddity.cs (R) 2001 by Charles Petzold
 //----------------------------------------------
 using System;
 using System.Drawing;

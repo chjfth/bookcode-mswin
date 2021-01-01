@@ -1,5 +1,5 @@
 //----------------------------------------------
-// ImageReflection.cs © 2001 by Charles Petzold
+// ImageReflection.cs (R) 2001 by Charles Petzold
 //----------------------------------------------
 using System;
 using System.Drawing;

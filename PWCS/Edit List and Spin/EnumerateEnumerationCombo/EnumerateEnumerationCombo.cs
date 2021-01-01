@@ -1,5 +1,5 @@
 //--------------------------------------------------------
-// EnumerateEnumerationCombo.cs © 2001 by Charles Petzold
+// EnumerateEnumerationCombo.cs (R) 2001 by Charles Petzold
 //--------------------------------------------------------
 using Microsoft.Win32;
 using System;

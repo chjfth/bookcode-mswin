@@ -1,5 +1,5 @@
 //------------------------------------------------
-// CsDateInheritance.cs © 2001 by Charles Petzold
+// CsDateInheritance.cs (R) 2001 by Charles Petzold
 //------------------------------------------------
 using System;
 

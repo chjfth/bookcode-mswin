@@ -1,5 +1,5 @@
 //---------------------------------------
-// WarpText.cs © 2001 by Charles Petzold
+// WarpText.cs (R) 2001 by Charles Petzold
 //---------------------------------------
 using System;
 using System.Drawing;

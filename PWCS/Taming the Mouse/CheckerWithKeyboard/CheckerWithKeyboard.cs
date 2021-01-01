@@ -1,5 +1,5 @@
 //--------------------------------------------------
-// CheckerWithKeyboard.cs © 2001 by Charles Petzold
+// CheckerWithKeyboard.cs (R) 2001 by Charles Petzold
 //--------------------------------------------------
 using System;
 using System.Drawing;

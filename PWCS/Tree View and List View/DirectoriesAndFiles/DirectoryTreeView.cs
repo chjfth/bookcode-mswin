@@ -1,5 +1,5 @@
 //---------------------------------------------
-// DirectoryTreeView.cs © 2001 by Charles Petzold
+// DirectoryTreeView.cs (R) 2001 by Charles Petzold
 //---------------------------------------------
 using System;
 using System.Drawing;

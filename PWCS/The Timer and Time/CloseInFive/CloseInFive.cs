@@ -1,5 +1,5 @@
 //------------------------------------------
-// CloseInFive.cs © 2001 by Charles Petzold
+// CloseInFive.cs (R) 2001 by Charles Petzold
 //------------------------------------------
 using System;
 using System.Drawing;

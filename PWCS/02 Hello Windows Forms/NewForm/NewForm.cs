@@ -1,5 +1,5 @@
 //--------------------------------------
-// NewForm.cs © 2001 by Charles Petzold
+// NewForm.cs (R) 2001 by Charles Petzold
 //--------------------------------------
 class NewForm
 {

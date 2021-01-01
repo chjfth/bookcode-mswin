@@ -1,5 +1,5 @@
 //-----------------------------------------------
-// CsDateProperties.cs © 2001 by Charles Petzold
+// CsDateProperties.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------
 using System;
 

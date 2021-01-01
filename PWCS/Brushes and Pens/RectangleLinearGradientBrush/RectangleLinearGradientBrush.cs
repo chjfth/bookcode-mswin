@@ -1,5 +1,5 @@
 //-----------------------------------------------------------
-// RectangleLinearGradientBrush.cs © 2001 by Charles Petzold
+// RectangleLinearGradientBrush.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------------------
 using System;
 using System.Drawing;

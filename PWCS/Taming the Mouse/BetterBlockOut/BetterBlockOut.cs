@@ -1,5 +1,5 @@
 //---------------------------------------------
-// BetterBlockOut.cs © 2001 by Charles Petzold
+// BetterBlockOut.cs (R) 2001 by Charles Petzold
 //---------------------------------------------
 using System;
 using System.Drawing;

@@ -1,5 +1,5 @@
 //--------------------------------------------
-// ClientEllipse.cs © 2001 by Charles Petzold
+// ClientEllipse.cs (R) 2001 by Charles Petzold
 //--------------------------------------------
 using System;
 using System.Drawing;

@@ -1,5 +1,5 @@
 //----------------------------------------------------------
-// TwentyFourPointPrinterFonts.cs © 2001 by Charles Petzold
+// TwentyFourPointPrinterFonts.cs (R) 2001 by Charles Petzold
 //----------------------------------------------------------
 using System;
 using System.Drawing;

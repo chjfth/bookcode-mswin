@@ -1,5 +1,5 @@
 //-------------------------------------------
-// ProgramWithIcon © 2001 by Charles Petzold
+// ProgramWithIcon (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

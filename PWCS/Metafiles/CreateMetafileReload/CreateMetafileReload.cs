@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// CreateMetafileReload.cs © 2001 by Charles Petzold
+// CreateMetafileReload.cs (R) 2001 by Charles Petzold
 //---------------------------------------------------
 using System;
 using System.Drawing;

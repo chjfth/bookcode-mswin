@@ -1,5 +1,5 @@
 //---------------------------------------------
-// SimpleTreeView.cs © 2001 by Charles Petzold
+// SimpleTreeView.cs (R) 2001 by Charles Petzold
 //---------------------------------------------
 using System;
 using System.Drawing;

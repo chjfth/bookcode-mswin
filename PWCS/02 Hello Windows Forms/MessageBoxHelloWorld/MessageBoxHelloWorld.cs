@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// MessageBoxHelloWorld.cs © 2001 by Charles Petzold
+// MessageBoxHelloWorld.cs (R) 2001 by Charles Petzold
 //---------------------------------------------------
 class MessageBoxHelloWorld
 {

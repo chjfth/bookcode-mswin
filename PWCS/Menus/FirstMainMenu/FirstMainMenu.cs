@@ -1,5 +1,5 @@
 //--------------------------------------------
-// FirstMainMenu.cs © 2001 by Charles Petzold
+// FirstMainMenu.cs (R) 2001 by Charles Petzold
 //--------------------------------------------
 using System;
 using System.Drawing;
@@ -97,6 +97,6 @@ class FirstMainMenu: Form
      }
      void MenuHelpAboutOnClick(object obj, EventArgs ea)
      {
-          MessageBox.Show(Text + " © 2001 by Charles Petzold");
+          MessageBox.Show(Text + " (R) 2001 by Charles Petzold");
      }
 }

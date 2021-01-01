@@ -1,5 +1,5 @@
 //---------------------------------------
-// PieChart.cs © 2001 by Charles Petzold
+// PieChart.cs (R) 2001 by Charles Petzold
 //---------------------------------------
 using System;
 using System.Drawing;

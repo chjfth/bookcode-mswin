@@ -1,5 +1,5 @@
 //-----------------------------------------------
-// ScribbleWithPath.cs © 2001 by Charles Petzold
+// ScribbleWithPath.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------
 using System;
 using System.Drawing;

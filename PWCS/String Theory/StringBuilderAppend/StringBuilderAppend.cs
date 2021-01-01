@@ -1,5 +1,5 @@
 //--------------------------------------------------
-// StringBuilderAppend.cs © 2001 by Charles Petzold
+// StringBuilderAppend.cs (R) 2001 by Charles Petzold
 //--------------------------------------------------
 using System;
 using System.Text;

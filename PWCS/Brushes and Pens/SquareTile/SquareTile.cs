@@ -1,5 +1,5 @@
 //-----------------------------------------
-// SquareTile © 20.cs01 by Charles Petzold
+// SquareTile (R) 20.cs01 by Charles Petzold
 //-----------------------------------------
 using System;
 using System.Drawing;

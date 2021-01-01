@@ -1,5 +1,5 @@
 //-------------------------------------------
-// WidePolyline.cs © 2001 by Charles Petzold
+// WidePolyline.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

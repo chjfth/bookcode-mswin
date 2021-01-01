@@ -1,5 +1,5 @@
 //-------------------------------------------
-// ButtonStyles.cs © 2001 by Charles Petzold
+// ButtonStyles.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

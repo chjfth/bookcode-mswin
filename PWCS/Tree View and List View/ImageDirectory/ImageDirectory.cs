@@ -1,5 +1,5 @@
 //---------------------------------------------
-// ImageDirectory.cs © 2001 by Charles Petzold
+// ImageDirectory.cs (R) 2001 by Charles Petzold
 //---------------------------------------------
 using Petzold.ProgrammingWindowsWithCSharp;
 using System;

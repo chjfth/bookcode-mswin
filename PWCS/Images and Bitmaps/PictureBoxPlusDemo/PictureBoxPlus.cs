@@ -1,5 +1,5 @@
 //---------------------------------------------
-// PictureBoxPlus.cs © 2001 by Charles Petzold
+// PictureBoxPlus.cs (R) 2001 by Charles Petzold
 //---------------------------------------------
 using System;
 using System.Drawing;

@@ -1,5 +1,5 @@
 //-------------------------------------------------
-// StringWriterAppend.cs © 2001 by Charles Petzold
+// StringWriterAppend.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------
 using System;
 using System.IO;

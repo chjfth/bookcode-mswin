@@ -1,5 +1,5 @@
 //---------------------------------------
-// ShowForm.cs © 2001 by Charles Petzold
+// ShowForm.cs (R) 2001 by Charles Petzold
 //---------------------------------------
 using System.Windows.Forms;
 

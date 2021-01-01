@@ -1,5 +1,5 @@
 //-----------------------------------------
-// TwoButtons.cs © 2001 by Charles Petzold
+// TwoButtons.cs (R) 2001 by Charles Petzold
 //-----------------------------------------
 using System;
 using System.Drawing;

@@ -1,5 +1,5 @@
 //--------------------------------------------------
-// DirectoriesAndFiles.cs © 2001 by Charles Petzold
+// DirectoriesAndFiles.cs (R) 2001 by Charles Petzold
 //--------------------------------------------------
 using System;
 using System.Drawing;

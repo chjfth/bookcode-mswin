@@ -1,5 +1,5 @@
 //----------------------------------------------
-// WildCardHexDump.cs © 2001 by Charles Petzold
+// WildCardHexDump.cs (R) 2001 by Charles Petzold
 //----------------------------------------------
 using System;
 using System.IO;

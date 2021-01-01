@@ -1,5 +1,5 @@
 //---------------------------------------
-// ClipText.cs © 2001 by Charles Petzold
+// ClipText.cs (R) 2001 by Charles Petzold
 //---------------------------------------
 using System;
 using System.Drawing;

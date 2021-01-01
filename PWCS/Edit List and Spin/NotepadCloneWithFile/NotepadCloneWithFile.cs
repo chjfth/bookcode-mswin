@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// NotepadCloneWithFile.cs © 2001 by Charles Petzold
+// NotepadCloneWithFile.cs (R) 2001 by Charles Petzold
 //---------------------------------------------------
 using Microsoft.Win32;             // For registry classes
 using System;

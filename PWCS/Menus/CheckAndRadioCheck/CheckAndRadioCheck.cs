@@ -1,5 +1,5 @@
 //-------------------------------------------------
-// CheckAndRadioCheck.cs © 2001 by Charles Petzold
+// CheckAndRadioCheck.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------
 using System;
 using System.Drawing;

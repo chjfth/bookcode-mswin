@@ -1,5 +1,5 @@
 //------------------------------------------
-// CsDateClass.cs © 2001 by Charles Petzold
+// CsDateClass.cs (R) 2001 by Charles Petzold
 //------------------------------------------
 using System;
 

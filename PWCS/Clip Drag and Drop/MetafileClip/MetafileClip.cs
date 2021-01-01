@@ -1,5 +1,5 @@
 //-------------------------------------------
-// MetafileClip.cs © 2001 by Charles Petzold
+// MetafileClip.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

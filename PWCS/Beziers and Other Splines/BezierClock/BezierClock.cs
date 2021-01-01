@@ -1,5 +1,5 @@
 //------------------------------------------
-// BezierClock.cs © 2001 by Charles Petzold
+// BezierClock.cs (R) 2001 by Charles Petzold
 //------------------------------------------
 using Petzold.ProgrammingWindowsWithCSharp;
 using System;

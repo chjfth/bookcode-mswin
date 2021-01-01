@@ -1,5 +1,5 @@
 //------------------------------------------------ 
-// ConsoleHelloWorld.cs © 2001 by Charles Petzold
+// ConsoleHelloWorld.cs (R) 2001 by Charles Petzold
 //------------------------------------------------
 
 class ConsoleHelloWorld

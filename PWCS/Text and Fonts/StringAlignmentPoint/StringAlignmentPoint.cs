@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// StringAlignmentPoint.cs © 2001 by Charles Petzold
+// StringAlignmentPoint.cs (R) 2001 by Charles Petzold
 //---------------------------------------------------
 using System;
 using System.Drawing;

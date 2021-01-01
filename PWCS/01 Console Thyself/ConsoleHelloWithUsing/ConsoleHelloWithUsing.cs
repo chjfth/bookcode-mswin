@@ -1,5 +1,5 @@
 //---------------------------------------------------- 
-// ConsoleHelloWithUsing.cs © 2001 by Charles Petzold
+// ConsoleHelloWithUsing.cs (R) 2001 by Charles Petzold
 //----------------------------------------------------
 using System;
 

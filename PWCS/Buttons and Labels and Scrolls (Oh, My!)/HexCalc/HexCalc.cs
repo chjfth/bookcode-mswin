@@ -1,5 +1,5 @@
 //--------------------------------------
-// HexCalc.cs © 2001 by Charles Petzold
+// HexCalc.cs (R) 2001 by Charles Petzold
 //--------------------------------------
 using System;
 using System.Drawing;

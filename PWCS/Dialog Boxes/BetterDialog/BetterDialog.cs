@@ -1,5 +1,5 @@
 //-------------------------------------------
-// BetterDialog.cs © 2001 by Charles Petzold
+// BetterDialog.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

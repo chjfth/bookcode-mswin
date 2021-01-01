@@ -1,5 +1,5 @@
 //--------------------------------------------------
-// ImageScaleIsotropic.cs © 2001 by Charles Petzold
+// ImageScaleIsotropic.cs (R) 2001 by Charles Petzold
 //--------------------------------------------------
 using System;
 using System.Drawing;

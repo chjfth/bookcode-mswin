@@ -1,5 +1,5 @@
 //-------------------------------------------------------
-// StatusBarPrintController.cs © 2001 by Charles Petzold
+// StatusBarPrintController.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------------
 using System;
 using System.Drawing;

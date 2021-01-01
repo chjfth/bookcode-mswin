@@ -1,5 +1,5 @@
 //-------------------------------------------
-// StandardMenu.cs © 2001 by Charles Petzold
+// StandardMenu.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;
@@ -133,6 +133,6 @@ class StandardMenu: Form
      }
      void MenuHelpAboutOnClick(object obj, EventArgs ea)
      {
-          MessageBox.Show("StandardMenu © 2001 by Charles Petzold", Text);
+          MessageBox.Show("StandardMenu (R) 2001 by Charles Petzold", Text);
      }
 }          

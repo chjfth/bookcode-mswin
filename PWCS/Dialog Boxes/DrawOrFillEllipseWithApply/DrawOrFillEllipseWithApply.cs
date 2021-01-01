@@ -1,5 +1,5 @@
 //---------------------------------------------------------
-// DrawOrFillEllipseWithApply.cs © 2001 by Charles Petzold
+// DrawOrFillEllipseWithApply.cs (R) 2001 by Charles Petzold
 //---------------------------------------------------------
 using System;
 using System.Drawing;

@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// OnePanelWithSplitter.cs © 2001 by Charles Petzold
+// OnePanelWithSplitter.cs (R) 2001 by Charles Petzold
 //---------------------------------------------------
 using System;
 using System.Drawing;

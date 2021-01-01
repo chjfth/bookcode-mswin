@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------
-// AgeOfInnocence.cs © 2001 by Charles Petzold; text by Edith Wharton
+// AgeOfInnocence.cs (R) 2001 by Charles Petzold; text by Edith Wharton
 //--------------------------------------------------------------------
 class AgeOfInnocence
 {

@@ -1,5 +1,5 @@
 //------------------------------------------
-// ColorScroll.cs © 2001 by Charles Petzold
+// ColorScroll.cs (R) 2001 by Charles Petzold
 //------------------------------------------
 using System;
 using System.Drawing;

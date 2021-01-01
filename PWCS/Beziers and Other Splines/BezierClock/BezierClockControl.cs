@@ -1,5 +1,5 @@
 //-------------------------------------------------
-// BezierClockControl.cs © 2001 by Charles Petzold
+// BezierClockControl.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------
 using System;
 using System.Drawing;

@@ -1,5 +1,5 @@
 //-------------------------------------------
-// ImageFromWeb.cs © 2001 by Charles Petzold
+// ImageFromWeb.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

@@ -1,5 +1,5 @@
 //-------------------------------------------------
-// InstalledFontsList.cs © 2001 by Charles Petzold
+// InstalledFontsList.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------
 using System;
 using System.Drawing;

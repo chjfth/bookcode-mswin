@@ -1,5 +1,5 @@
 //-------------------------------------------------------
-// StringAlignmentRectangle.cs © 2001 by Charles Petzold
+// StringAlignmentRectangle.cs (R) 2001 by Charles Petzold
 //-------------------------------------------------------
 using System;
 using System.Drawing;

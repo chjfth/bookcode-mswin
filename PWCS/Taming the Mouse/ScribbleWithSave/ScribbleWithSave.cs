@@ -1,5 +1,5 @@
 //-----------------------------------------------
-// ScribbleWithSave.cs © 2001 by Charles Petzold
+// ScribbleWithSave.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------
 using System;
 using System.Collections;          // For ArrayList

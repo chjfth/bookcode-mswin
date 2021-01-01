@@ -1,5 +1,5 @@
 //------------------------------------------
-// JeuDeTaquin.cs © 2001 by Charles Petzold
+// JeuDeTaquin.cs (R) 2001 by Charles Petzold
 //------------------------------------------
 using System;
 using System.Drawing;

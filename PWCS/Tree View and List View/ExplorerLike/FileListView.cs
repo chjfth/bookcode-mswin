@@ -1,5 +1,5 @@
 //-------------------------------------------
-// FileListView.cs © 2001 by Charles Petzold
+// FileListView.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Diagnostics;          // For Process.Start

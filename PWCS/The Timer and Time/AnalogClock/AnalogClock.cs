@@ -1,5 +1,5 @@
 //-------------------------------------------
-// AnalogClock.cs © 2001 by Charles Petzold
+// AnalogClock.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

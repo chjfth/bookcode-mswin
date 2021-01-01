@@ -1,5 +1,5 @@
 //-----------------------------------------------
-// TextureBrushDemo.cs © 2001 by Charles Petzold
+// TextureBrushDemo.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------
 using System;
 using System.Drawing;

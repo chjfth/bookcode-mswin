@@ -1,5 +1,5 @@
 //------------------------------------------------
-// MyDocumentsFolder.cs © 2001 by Charles Petzold
+// MyDocumentsFolder.cs (R) 2001 by Charles Petzold
 //------------------------------------------------
 using System;
 using System.Windows.Forms;

@@ -1,5 +1,5 @@
 //-------------------------------------------
-// PartialImage.cs © 2001 by Charles Petzold
+// PartialImage.cs (R) 2001 by Charles Petzold
 //-------------------------------------------
 using System;
 using System.Drawing;

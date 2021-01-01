@@ -1,5 +1,5 @@
 //-----------------------------------------------
-// CsDateConstructors.cs © 2001 by Charles Petzold
+// CsDateConstructors.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------
 using System;
 

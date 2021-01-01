@@ -1,5 +1,5 @@
 //----------------------------------------
-// FontSizes.cs © 2001 by Charles Petzold
+// FontSizes.cs (R) 2001 by Charles Petzold
 //----------------------------------------
 using System;
 using System.Drawing;

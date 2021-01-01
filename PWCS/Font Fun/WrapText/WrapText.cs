@@ -1,5 +1,5 @@
 //---------------------------------------
-// WrapText.cs © 2001 by Charles Petzold
+// WrapText.cs (R) 2001 by Charles Petzold
 //---------------------------------------
 using System;
 using System.Drawing;

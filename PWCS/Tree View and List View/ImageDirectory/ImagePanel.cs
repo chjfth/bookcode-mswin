@@ -1,5 +1,5 @@
 //-----------------------------------------
-// ImagePanel.cs © 2001 by Charles Petzold
+// ImagePanel.cs (R) 2001 by Charles Petzold
 //-----------------------------------------
 using System;
 using System.Drawing;

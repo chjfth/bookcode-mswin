@@ -1,5 +1,5 @@
 //-----------------------------------------------------
-// NotepadCloneWithFormat.cs © 2001 by Charles Petzold
+// NotepadCloneWithFormat.cs (R) 2001 by Charles Petzold
 //-----------------------------------------------------
 using Microsoft.Win32;
 using System;
@@ -104,7 +104,7 @@ class NotepadCloneWithFormat: NotepadCloneWithEdit
 	}
 	void MenuHelpAboutOnClick(object obj, EventArgs ea)
 	{
-		MessageBox.Show(strProgName + " © 2001 by Charles Petzold", 
+		MessageBox.Show(strProgName + " (R) 2001 by Charles Petzold", 
 			strProgName);
 	}
 	protected override void LoadRegistryInfo(RegistryKey regkey)

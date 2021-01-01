@@ -1,5 +1,5 @@
 //-------------------------------------
-// Spiral.cs © 2001 by Charles Petzold
+// Spiral.cs (R) 2001 by Charles Petzold
 //-------------------------------------
 using System;
 using System.Drawing;

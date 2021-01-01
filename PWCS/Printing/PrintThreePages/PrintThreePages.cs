@@ -1,5 +1,5 @@
 //----------------------------------------------
-// PrintThreePages.cs © 2001 by Charles Petzold
+// PrintThreePages.cs (R) 2001 by Charles Petzold
 //----------------------------------------------
 using System;
 using System.Drawing;

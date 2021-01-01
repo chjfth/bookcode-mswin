@@ -1,5 +1,5 @@
 //----------------------------------------------------
-// CanonicalSplineManual.cs © 2001 by Charles Petzold
+// CanonicalSplineManual.cs (R) 2001 by Charles Petzold
 //----------------------------------------------------
 using System;
 using System.Drawing;

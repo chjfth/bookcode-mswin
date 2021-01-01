@@ -1,5 +1,5 @@
 //---------------------------------------------------
-// HexagonGradientBrush.cs © 2001 by Charles Petzold
+// HexagonGradientBrush.cs (R) 2001 by Charles Petzold
 //---------------------------------------------------
 using System;
 using System.Drawing;

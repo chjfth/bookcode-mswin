@@ -1,5 +1,5 @@
 //--------------------------------------------
-// AutoScaleDemo.cs © 2001 by Charles Petzold
+// AutoScaleDemo.cs (R) 2001 by Charles Petzold
 //--------------------------------------------
 using System;
 using System.Drawing;
