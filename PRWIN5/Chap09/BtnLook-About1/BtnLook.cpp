@@ -4,6 +4,7 @@
   ----------------------------------------*/
 
 #include <windows.h>
+#include "resource.h"
 
 struct
 {
@@ -27,6 +28,7 @@ button[] =
 #define NUM (sizeof button / sizeof button[0])
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
+INT_PTR CALLBACK AboutDlgProc(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
@@ -44,7 +46,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
 	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
-	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszMenuName  = TEXT("About1") ;
 	wndclass.lpszClassName = szAppName ;
 
 	if (!RegisterClass (&wndclass))
@@ -73,6 +75,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	static HINSTANCE s_hInstance;
+
 	static HWND  hwndButton[NUM] ;
 	static RECT  rect ;
 	static TCHAR szTop[]    = TEXT ("message            wParam       lParam"),
@@ -87,6 +91,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_CREATE :
+		s_hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+
 		cxChar = LOWORD (GetDialogBaseUnits ()) ;
 		cyChar = HIWORD (GetDialogBaseUnits ()) ;
 
@@ -122,6 +128,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_DRAWITEM :
 	case WM_COMMAND :
+
+		if(LOWORD(wParam)==IDM_APP_ABOUT)
+		{
+			DialogBox(s_hInstance, TEXT("AboutBox"), hwnd, AboutDlgProc);
+			return 0;
+		}
+
 		ScrollWindow (hwnd, 0, -cyChar, &rect, &rect) ;
 
 		hdc = GetDC (hwnd) ;
@@ -144,4 +157,30 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 	}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
+}
+
+//// From About1.cpp  ////
+INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message,
+	WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return TRUE;
+
+	case WM_LBUTTONDBLCLK:
+//		fy_DoPrintWindow(g_mainhwnd);
+		break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDOK:
+		case IDCANCEL:
+			EndDialog(hDlg, 0);
+			return TRUE;
+		}
+		break;
+	}
+	return FALSE;
 }

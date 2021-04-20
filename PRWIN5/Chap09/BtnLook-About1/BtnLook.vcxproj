@@ -17,6 +17,15 @@
   <ItemGroup>
     <ClCompile Include="BtnLook.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="About1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="About1.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <SccProjectName />
     <SccLocalPath />
