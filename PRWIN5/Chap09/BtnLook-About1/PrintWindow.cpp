@@ -6,18 +6,16 @@ void fengyuan_DoPrintWindow(HWND hWnd)
 	// Sample code from:
 	// http://www.fengyuan.com/article/wmprint.html
 
+	HDC hDC = GetDC(hWnd);
+
 	BOOL b = FALSE;
-	HDC hDCMem = CreateCompatibleDC(NULL);
+	HDC hDCMem = CreateCompatibleDC(NULL); // Pass hDC is ok as well.
 	// -- NULL : creates a memory DC compatible with the application's current screen
 	RECT rect;
-	GetWindowRect(hWnd, & rect);
+	GetWindowRect(hWnd, &rect);
 
-	HBITMAP hBmp = NULL;
-	{
-		HDC hDC = GetDC(hWnd);
-		hBmp = CreateCompatibleBitmap(hDC, rect.right - rect.left, rect.bottom - rect.top);
-		ReleaseDC(hWnd, hDC);
-	}
+	HBITMAP hBmp = CreateCompatibleBitmap(hDC, rect.right - rect.left, rect.bottom - rect.top);
+	b = ReleaseDC(hWnd, hDC);
 
 	HGDIOBJ hOld = SelectObject(hDCMem, hBmp);
 	SendMessage(hWnd, WM_PRINT, (WPARAM) hDCMem, 
@@ -38,5 +36,7 @@ void fengyuan_DoPrintWindow(HWND hWnd)
 	// -- Now, we can use Free Clipboard Viewer to view the bitmap in the clipboard.
 
 	b = CloseClipboard();
+
+	b = DeleteObject(hBmp); // should call this to free resource?
 }
 
