@@ -56,10 +56,10 @@ EXSTYLE WS_EX_TOOLWINDOW
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,66,81,50,14
-    ICON            "ABOUT1",IDC_STATIC,7,7,21,20
-    CTEXT           "About1",IDC_STATIC,40,12,100,8
-    CTEXT           "About Box Demo Program",IDC_STATIC,7,40,166,8
-    CTEXT           "(c) Charles Petzold, 1998",IDC_STATIC,7,52,166,8
+    ICON            "ABOUT1",IDC_STATIC,83,7,21,20
+    CTEXT           "Chj: Double click to WM_PRINT to clipboard.",IDC_STATIC,7,34,166,8
+    CTEXT           "About Box Demo Program",IDC_STATIC,7,52,166,8
+    CTEXT           "(c) Charles Petzold, 1998",IDC_STATIC,7,66,166,8
 END
 
 
@@ -72,7 +72,7 @@ ABOUT1 MENU
 BEGIN
     POPUP "&Help"
     BEGIN
-        MENUITEM "&About ...",            IDM_APP_ABOUT
+        MENUITEM "&About ...",                  IDM_APP_ABOUT
     END
 END
 

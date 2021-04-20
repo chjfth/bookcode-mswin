@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BtnLook.cpp" />
+    <ClCompile Include="PrintWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="About1.ico" />
@@ -24,6 +25,7 @@
     <ResourceCompile Include="About1.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PrintWindow.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

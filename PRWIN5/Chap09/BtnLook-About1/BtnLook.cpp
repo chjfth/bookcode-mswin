@@ -5,6 +5,7 @@
 
 #include <windows.h>
 #include "resource.h"
+#include "PrintWindow.h"
 
 struct
 {
@@ -30,6 +31,8 @@ button[] =
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 INT_PTR CALLBACK AboutDlgProc(HWND, UINT, WPARAM, LPARAM);
 
+HWND g_mainhwnd = NULL;
+
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
@@ -38,7 +41,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	MSG          msg ;
 	WNDCLASS     wndclass ;
 
-	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS ;
 	wndclass.lpfnWndProc   = WndProc ;
 	wndclass.cbClsExtra    = 0 ;
 	wndclass.cbWndExtra    = 0 ;
@@ -61,6 +64,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		540, 420,
 		NULL, NULL, hInstance, NULL) ;
+
+	g_mainhwnd = hwnd;
 
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
@@ -152,6 +157,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		ValidateRect (hwnd, &rect) ;
 		break ;
 
+	case WM_LBUTTONDBLCLK:
+		fengyuan_DoPrintWindow(g_mainhwnd);
+		return 0;
+
 	case WM_DESTROY :
 		PostQuitMessage (0) ;
 		return 0 ;
@@ -169,7 +178,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message,
 		return TRUE;
 
 	case WM_LBUTTONDBLCLK:
-//		fy_DoPrintWindow(g_mainhwnd);
+		fengyuan_DoPrintWindow(g_mainhwnd);
 		break;
 
 	case WM_COMMAND:
