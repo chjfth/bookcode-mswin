@@ -80,14 +80,33 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return msg.wParam ;
 }
 
+void OnPaint(HWND hWnd, HDC hdc)
+{
+	static int   cxChar, cyChar ;
+	cxChar = LOWORD (GetDialogBaseUnits ()) ;
+	cyChar = HIWORD (GetDialogBaseUnits ()) ;
+
+	static TCHAR szTop[]    = TEXT ("message            wParam       lParam"),
+		szUnd[]    = TEXT ("_______            ______       ______");
+
+	// >>> paint the header line
+	SelectObject (hdc, GetStockObject (SYSTEM_FIXED_FONT)) ;
+	SetBkMode (hdc, TRANSPARENT) ;
+
+	SetTextColor(hdc, RGB(0, 0, 192));
+	TextOut (hdc, 24 * cxChar, cyChar, szTop, lstrlen (szTop)) ;
+	TextOut (hdc, 24 * cxChar, cyChar, szUnd, lstrlen (szUnd)) ;
+	// <<<
+}
+
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HINSTANCE s_hInstance;
 
 	static HWND  hwndButton[NUM] ;
 	static RECT  rect ;
-	static TCHAR szTop[]    = TEXT ("message            wParam       lParam"),
-		szUnd[]    = TEXT ("_______            ______       ______"),
+	static TCHAR 
 		szFormat[] = TEXT ("%-16s%04X-%04X    %04X-%04X"),
 		szBuffer[50] ;
 	static int   cxChar, cyChar ;
@@ -124,14 +143,20 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InvalidateRect (hwnd, &rect, TRUE) ;
 
 		hdc = BeginPaint (hwnd, &ps) ;
-		SelectObject (hdc, GetStockObject (SYSTEM_FIXED_FONT)) ;
-		SetBkMode (hdc, TRANSPARENT) ;
 
-		TextOut (hdc, 24 * cxChar, cyChar, szTop, lstrlen (szTop)) ;
-		TextOut (hdc, 24 * cxChar, cyChar, szUnd, lstrlen (szUnd)) ;
+		OnPaint(hwnd, hdc);
 
 		EndPaint (hwnd, &ps) ;
 		return 0 ;
+
+	case WM_PRINTCLIENT:
+		OnPaint(hwnd, (HDC)wParam);
+		
+		// Notice a difference:
+		// * If return 0, those button's grey background is gone.
+		// * If break, those button's grey background is preserved.
+		// Why?
+		return 0;
 
 	case WM_DRAWITEM :
 	case WM_COMMAND :
