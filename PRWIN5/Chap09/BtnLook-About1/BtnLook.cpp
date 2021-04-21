@@ -113,6 +113,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HDC          hdc ;
 	PAINTSTRUCT  ps ;
 	int          i ;
+	static int si = 0;
 
 	switch (message)
 	{
@@ -150,13 +151,28 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_PRINTCLIENT:
-		OnPaint(hwnd, (HDC)wParam);
-		
-		// Notice a difference:
-		// * If return 0, those button's grey background is gone.
-		// * If break, those button's grey background is preserved.
-		// Why?
-		return 0;
+		{
+			TCHAR msg[200] = {};
+			wsprintf(msg, TEXT("[%d]WM_PRINTCLIENT: hdc=0x%08X\n"), ++si, (UINT)wParam);
+			OutputDebugString(msg);
+
+			OnPaint(hwnd, (HDC)wParam);
+			//
+			// Notice a difference:
+			// * If return 0, those button's grey background is gone.
+			// * If break, those button's grey background is preserved.
+			// Why?
+			return 0;
+		}
+
+	case WM_PRINT:
+		{
+			TCHAR msg[200] = {};
+			wsprintf(msg, TEXT("[%d]==== WM_PRINT ====: PRF_xxx=0x%08X\n"), ++si, (UINT)lParam);
+			OutputDebugString(msg);
+
+			break; // go on calling DefWindowProc()
+		}
 
 	case WM_DRAWITEM :
 	case WM_COMMAND :

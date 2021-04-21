@@ -18,6 +18,7 @@ void fengyuan_DoPrintWindow(HWND hWnd)
 	b = ReleaseDC(hWnd, hDC);
 
 	HGDIOBJ hOld = SelectObject(hDCMem, hBmp);
+
 	SendMessage(hWnd, WM_PRINT, (WPARAM) hDCMem, 
 		PRF_CHILDREN | 
 		PRF_CLIENT | 
@@ -25,6 +26,7 @@ void fengyuan_DoPrintWindow(HWND hWnd)
 		PRF_NONCLIENT | 
 		PRF_OWNED |
 		0);
+//	PrintWindow(hWnd, hDCMem, 0); // alternative. This will not trigger WM_PRINT, why?
 
 	SelectObject(hDCMem, hOld);
 	b = DeleteDC(hDCMem); // DeleteObject(hDCMem);
