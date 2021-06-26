@@ -5,7 +5,6 @@
 
 #include <windows.h>
 #include <shlwapi.h>
-#include <strsafe.h>
 #include "resource.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -72,7 +71,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PathStripPath(szTitle);
 	PathRemoveExtension(szTitle);
 
-	StringCchPrintf(szTitle, MAX_PATH, TEXT("%s (#%08X)"), szTitle, (UINT)hwnd);
+	wsprintf(szTitle, TEXT("%s (#%08X)"), szTitle, (UINT)hwnd);
 	SetWindowText(hwnd, szTitle);
 
 	// Set Alt+Tab icon
