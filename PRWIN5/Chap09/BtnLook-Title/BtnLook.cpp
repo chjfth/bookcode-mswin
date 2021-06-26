@@ -1,9 +1,10 @@
 /*----------------------------------------
-   BTNLOOK.C -- Button Look Program
+   Origin: BTNLOOK.C -- Button Look Program
                 (c) Charles Petzold, 1998
   ----------------------------------------*/
 
 #include <windows.h>
+#include <shlwapi.h>
 #include "resource.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -57,7 +58,12 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	hwnd = CreateWindow (szAppName, TEXT ("Button Look"),
+	TCHAR szFilenam[MAX_PATH] = {0};
+	GetModuleFileName(NULL, szFilenam, MAX_PATH);
+	PathStripPath(szFilenam);
+
+	hwnd = CreateWindow (szAppName, 
+		szFilenam, // show exe filename on window title
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		540, 420,
