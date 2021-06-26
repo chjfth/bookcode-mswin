@@ -5,6 +5,7 @@
 
 #include <windows.h>
 #include <shlwapi.h>
+#include <strsafe.h>
 #include "resource.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -58,17 +59,21 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	// Set window title.
-	TCHAR szFilenam[MAX_PATH] = {0};
-	GetModuleFileName(NULL, szFilenam, MAX_PATH);
-	PathStripPath(szFilenam);
-	//
 	hwnd = CreateWindow (szAppName, 
-		szFilenam, // show exe filename on window title
+		TEXT("BtnLook"), // will modify later
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		540, 420,
 		NULL, NULL, hInstance, NULL) ;
+
+	// Set window title to be EXE name and HWND value).
+	TCHAR szTitle[MAX_PATH] = {0};
+	GetModuleFileName(NULL, szTitle, MAX_PATH);
+	PathStripPath(szTitle);
+	PathRemoveExtension(szTitle);
+
+	StringCchPrintf(szTitle, MAX_PATH, TEXT("%s (#%08X)"), szTitle, (UINT)hwnd);
+	SetWindowText(hwnd, szTitle);
 
 	// Set Alt+Tab icon
 	SendMessage(hwnd, WM_SETICON, ICON_BIG,   (LPARAM)LoadIcon(hInstance,	MAKEINTRESOURCE(IDI_ICON1)));
