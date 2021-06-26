@@ -58,16 +58,21 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
+	// Set window title.
 	TCHAR szFilenam[MAX_PATH] = {0};
 	GetModuleFileName(NULL, szFilenam, MAX_PATH);
 	PathStripPath(szFilenam);
-
+	//
 	hwnd = CreateWindow (szAppName, 
 		szFilenam, // show exe filename on window title
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		540, 420,
 		NULL, NULL, hInstance, NULL) ;
+
+	// Set Alt+Tab icon
+	SendMessage(hwnd, WM_SETICON, ICON_BIG,   (LPARAM)LoadIcon(hInstance,	MAKEINTRESOURCE(IDI_ICON1)));
+	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)LoadIcon(hInstance,	MAKEINTRESOURCE(IDI_ICON1)));
 
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
