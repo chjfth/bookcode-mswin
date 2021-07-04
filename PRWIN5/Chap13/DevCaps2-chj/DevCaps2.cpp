@@ -49,7 +49,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hwnd = CreateWindow (szAppName, NULL,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		540, 500,
+		760, 520,
 		NULL, NULL, hInstance, NULL) ;
 
 	ShowWindow (hwnd, iCmdShow) ;
@@ -247,8 +247,10 @@ void DoBasicInfo (HDC hdc, HDC hdcInfo, int cxChar, int cyChar)
 	{
 		HORZSIZE,        TEXT ("HORZSIZE        Width in millimeters:"),
 		VERTSIZE,        TEXT ("VERTSIZE        Height in millimeters:"),
-		HORZRES,         TEXT ("HORZRES         Width in pixels:"),
-		VERTRES,         TEXT ("VERTRES         Height in raster lines:"),
+		DESKTOPHORZRES,  TEXT ("DESKTOPHORZRES  Physical width  pixels:"),
+		DESKTOPVERTRES,  TEXT ("DESKTOPVERTRES  Physical height pixels:"),
+		HORZRES,         TEXT ("HORZRES         Width  in pixels(virtual):"),
+		VERTRES,         TEXT ("VERTRES         Height in pixels(virtual):"),
 		LOGPIXELSX,      TEXT ("LOGPIXELSX      Horizontal dots per inch:"),
 		LOGPIXELSY,      TEXT ("LOGPIXELSY      Vertical dots per inch:"),
 		BITSPIXEL,       TEXT ("BITSPIXEL       Color bits per pixel:"),
