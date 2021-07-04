@@ -49,7 +49,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hwnd = CreateWindow (szAppName, NULL,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		540, 500,
 		NULL, NULL, hInstance, NULL) ;
 
 	ShowWindow (hwnd, iCmdShow) ;
@@ -87,7 +87,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		cxChar = tm.tmAveCharWidth ;
 		cyChar = tm.tmHeight + tm.tmExternalLeading ;
 		ReleaseDC (hwnd, hdc) ;
+		
 		// fall through
+
 	case WM_SETTINGCHANGE:
 		hMenu = GetSubMenu (GetMenu (hwnd), 0) ;
 
@@ -247,6 +249,8 @@ void DoBasicInfo (HDC hdc, HDC hdcInfo, int cxChar, int cyChar)
 		VERTSIZE,        TEXT ("VERTSIZE        Height in millimeters:"),
 		HORZRES,         TEXT ("HORZRES         Width in pixels:"),
 		VERTRES,         TEXT ("VERTRES         Height in raster lines:"),
+		LOGPIXELSX,      TEXT ("LOGPIXELSX      Horizontal dots per inch:"),
+		LOGPIXELSY,      TEXT ("LOGPIXELSY      Vertical dots per inch:"),
 		BITSPIXEL,       TEXT ("BITSPIXEL       Color bits per pixel:"),
 		PLANES,          TEXT ("PLANES          Number of color planes:"),
 		NUMBRUSHES,      TEXT ("NUMBRUSHES      Number of device brushes:"),
@@ -258,8 +262,6 @@ void DoBasicInfo (HDC hdc, HDC hdcInfo, int cxChar, int cyChar)
 		ASPECTX,         TEXT ("ASPECTX         Relative width of pixel:"),
 		ASPECTY,         TEXT ("ASPECTY         Relative height of pixel:"),
 		ASPECTXY,        TEXT ("ASPECTXY        Relative diagonal of pixel:"),
-		LOGPIXELSX,      TEXT ("LOGPIXELSX      Horizontal dots per inch:"),
-		LOGPIXELSY,      TEXT ("LOGPIXELSY      Vertical dots per inch:"),
 		SIZEPALETTE,     TEXT ("SIZEPALETTE     Number of palette entries:"),
 		NUMRESERVED,     TEXT ("NUMRESERVED     Reserved palette entries:"),
 		COLORRES,        TEXT ("COLORRES        Actual color resolution:"),
