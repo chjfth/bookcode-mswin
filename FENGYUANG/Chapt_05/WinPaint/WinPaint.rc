@@ -73,7 +73,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_GRAPH               ICON    DISCARDABLE     "..\\..\\Res\\graph.ico"
+IDI_GRAPH               ICON    DISCARDABLE     "..\..\Res\graph.ico"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

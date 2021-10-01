@@ -21,7 +21,7 @@
 #define JULAYOUT_IMPL
 #include "..\..\include\JULayout.h"
 
-#include "..\\..\\include\\property.h"
+#include "..\..\include\property.h"
 #include "DevPage.h"
 
 
@@ -52,7 +52,7 @@ public:
 		m_Device = new KDevicePage(hInst);
 		hPage[0] = m_Device->createPropertySheetPage(hInst, IDD_DEVICEPAGE);
 
-		propertySheet(hInst, NULL, 0, 1, hPage, "Device");
+		propertySheet(hInst, NULL, 0, 1, hPage, "Chapt_05 Device");
 	}
 };
 

@@ -22,8 +22,8 @@
 
 #include "resource.h"
 
-#include "..\\..\\include\\property.h"
-#include "..\\..\\include\\listview.h"
+#include "..\..\include\property.h"
+#include "..\..\include\listview.h"
 #include "..\..\include\JULayout.h"
 
 #include "DCAttr.h"
