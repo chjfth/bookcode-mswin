@@ -22,6 +22,7 @@
 
 #include "..\\..\\include\\property.h"
 #include "..\\..\\include\\listview.h"
+#include "..\..\include\JULayout.h"
 
 #include "DevCaps.h"
 
@@ -36,8 +37,10 @@ BOOL KDeviceCaps::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return OnInitDialog();
 
 		case WM_COMMAND:
-			if ( LOWORD(wParam)==IDOK )
+			if ( LOWORD(wParam)==IDOK || LOWORD(wParam)==IDCANCEL )
+			{
 				EndDialog(hWnd, TRUE);
+			}
 
 			return TRUE;
 	}

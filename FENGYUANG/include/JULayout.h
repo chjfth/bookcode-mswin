@@ -20,6 +20,7 @@ Purpose: This class manages child window positioning and sizing when a parent
 ///////////////////////////////////////////////////////////////////////////////
 
 #define JULAYOUT_STR _T("JULayout")
+	// User can use this string to SetProp()/GetProp
 
 #define JULAYOUT_MAX_CONTROLS 200 
 
@@ -34,6 +35,7 @@ public:
 	bool AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, bool fRedraw, ...);
 
 	BOOL AdjustControls(int cx, int cy);
+
 	void HandleMinMax(PMINMAXINFO pMinMax) 
 	{ 
 		pMinMax->ptMinTrackSize = m_ptMinParentDims; 
