@@ -10,6 +10,7 @@ Purpose: This class manages child window positioning and sizing when a parent
 #ifndef __JULayout_h_
 #define __JULayout_h_
 
+#include <assert.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -19,15 +20,21 @@ Purpose: This class manages child window positioning and sizing when a parent
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define JULAYOUT_STR _T("JULayout")
-	// User can use this string to SetProp()/GetProp
-
 #define JULAYOUT_MAX_CONTROLS 200 
 
 class JULayout 
 {
 public:
-	void Initialize(HWND hwndParent, int nMinWidth = 0, int nMinHeight = 0);
+	JULayout();
+
+	bool Initialize(HWND hwndParent, int nMinWidth = 0, int nMinHeight = 0);
+
+	static JULayout* EnableJULayout(HWND hwndParent);
+		// A new JULayout object is returned to caller, and the lifetime of this object
+		// is managed automatically, i.e. the JULayout object is destroyed when the
+		// window by HWND is destroyed by the system.
+
+	static JULayout* GetJULayout(HWND hwndParent);
    
 	// Anco: Anchor coefficient, this value should be a percent value 0~100, 
 	// 0 means left-most or top-most, 100 means right-most or bottom most.
@@ -54,17 +61,34 @@ private:
 		Ancofs_st pt2x, pt2y; // pt2 means the south-east corner of the control
 	}; 
 
-   static void PixelFromAnchorPoint(int cxParent, int cyParent, int xAnco, int yAnco, PPOINT ppt)
-   {
-	   ppt->x = cxParent*xAnco/100;
-	   ppt->y = cyParent*yAnco/100;
-   }
+	bool PatchWndProc()
+	{
+		// Patch WndProc so that we can handle WM_SIZE and WM_GETMINMAX automatically.
+
+		if(!IsWindow(m_hwndParent))
+			return false;
+
+		m_prevWndProc = (WNDPROC)SetWindowLongPtr(m_hwndParent, GWLP_WNDPROC, (LONG_PTR)JulWndProc);
+
+		return true;
+	}
+
+	static void PixelFromAnchorPoint(int cxParent, int cyParent, int xAnco, int yAnco, PPOINT ppt)
+	{
+		ppt->x = cxParent*xAnco/100;
+		ppt->y = cyParent*yAnco/100;
+	}
+
+private:
+	static LRESULT CALLBACK JulWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 private:    
-   CtrlInfo_st m_CtrlInfo[JULAYOUT_MAX_CONTROLS]; // Max controls allowed in a dialog template
-   int     m_nNumControls;
-   HWND    m_hwndParent;
-   POINT   m_ptMinParentDims; 
+	CtrlInfo_st m_CtrlInfo[JULAYOUT_MAX_CONTROLS]; // Max controls allowed in a dialog template
+	int     m_nNumControls;
+	HWND    m_hwndParent;
+	POINT   m_ptMinParentDims; 
+
+	WNDPROC m_prevWndProc;
 }; 
 
 
@@ -73,8 +97,26 @@ private:
 
 #ifdef JULAYOUT_IMPL
 
-void JULayout::Initialize(HWND hwndParent, int nMinWidth, int nMinHeight) 
+#define JULAYOUT_STR _T("JULayout")
+	// Will use this string to call SetProp()/GetProp(),
+	// to associate JULayout object with an HWND.
+
+JULayout::JULayout()
 {
+	ZeroMemory(m_CtrlInfo, sizeof(m_CtrlInfo));
+	m_nNumControls = 0;
+	m_hwndParent = NULL;
+	m_ptMinParentDims.x = m_ptMinParentDims.y = 0;
+	m_prevWndProc = NULL;
+}
+
+bool JULayout::Initialize(HWND hwndParent, int nMinWidth, int nMinHeight) 
+{
+	// User should call this from within WM_INITDIALOG.
+
+	if(!IsWindow(hwndParent))
+		return false;
+
 	m_hwndParent = hwndParent;
 	m_nNumControls = 0;
 
@@ -88,8 +130,70 @@ void JULayout::Initialize(HWND hwndParent, int nMinWidth, int nMinHeight)
 		m_ptMinParentDims.x = nMinWidth;
 	if (nMinHeight != 0) 
 		m_ptMinParentDims.y = nMinHeight; 
+
+	return true;
 }
 
+JULayout* JULayout::GetJULayout(HWND hwndParent)
+{
+	if(!IsWindow(hwndParent))
+		return NULL;
+
+	JULayout *jul = (JULayout*)GetProp(hwndParent, JULAYOUT_STR);
+	return jul;
+}
+
+JULayout* JULayout::EnableJULayout(HWND hwndParent)
+{
+	if(!IsWindow(hwndParent))
+		return NULL;
+
+	// First check whether a JULayout object has been associated with hwndParent.
+	// If so, just return that associated object.
+	JULayout *jul = GetJULayout(hwndParent);
+	if(jul)
+		return jul;
+
+	jul = new JULayout();
+	if(!jul)
+		return NULL;
+	
+	bool succ = jul->Initialize(hwndParent);
+	if(!succ)
+	{
+		delete jul;
+		return NULL;
+	}
+
+	SetProp(hwndParent, JULAYOUT_STR, (HANDLE)jul);
+
+	jul->PatchWndProc();
+
+	return jul;
+}
+
+LRESULT CALLBACK 
+JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	JULayout *jul = (JULayout*)GetProp(hwnd, JULAYOUT_STR);
+	assert(jul);
+
+	if(msg==WM_SIZE)
+	{
+		jul->AdjustControls(LOWORD(lParam), HIWORD(lParam));
+	}
+	else if(msg==WM_GETMINMAXINFO)
+	{
+		jul->HandleMinMax((MINMAXINFO*)lParam);
+	}
+	else if(msg==WM_DESTROY)
+	{
+		delete jul;
+	}
+
+	LRESULT ret = jul->m_prevWndProc(hwnd, msg, wParam, lParam);
+	return ret;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

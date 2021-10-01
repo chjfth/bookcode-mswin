@@ -32,6 +32,7 @@ BOOL KDeviceCaps::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch ( uMsg )
 	{
 		case WM_INITDIALOG:
+			m_hWnd = hWnd;
 			m_List.FromDlgItem(hWnd, IDC_CAPS);
 
 			return OnInitDialog();
@@ -116,6 +117,11 @@ BOOL KDeviceCaps::OnInitDialog(void)
 	OneCap(BLTALIGNMENT,    _T("BLTALIGNMENT"),		_T("%d pixels"));
 	OneCap(SHADEBLENDCAPS,  _T("SHADEBLENDCAPS"),	_T("%x"));
 	OneCap(COLORMGMTCAPS,   _T("COLORMGMTCAPS"),	_T("%x"));
+
+	//// 
+
+	JULayout *jul = JULayout::EnableJULayout(m_hWnd);
+	jul->AnchorControl(0,0, 100,100, IDC_CAPS);
 
 	return TRUE;
 }
