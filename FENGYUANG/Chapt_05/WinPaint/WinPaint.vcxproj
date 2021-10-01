@@ -103,7 +103,7 @@
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -132,6 +132,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Release\WinPaint.exe</OutputFile>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -142,6 +143,11 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="graph.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\include\wingraph\wingraph.vcxproj">
+      <Project>{227e3a6e-d602-241f-9c67-c45c9e248700}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
