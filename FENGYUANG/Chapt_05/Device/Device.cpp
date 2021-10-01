@@ -18,6 +18,9 @@
 #include <tchar.h>
 #include "resource.h"
 
+#define JULAYOUT_IMPL
+#include "..\..\include\JULayout.h"
+
 #include "..\\..\\include\\property.h"
 #include "DevPage.h"
 

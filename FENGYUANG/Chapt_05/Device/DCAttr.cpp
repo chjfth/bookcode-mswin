@@ -24,6 +24,7 @@
 
 #include "..\\..\\include\\property.h"
 #include "..\\..\\include\\listview.h"
+#include "..\..\include\JULayout.h"
 
 #include "DCAttr.h"
 
@@ -55,8 +56,14 @@ BOOL KDCAttributes::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch ( wParam )
 			{
 				case IDOK:
+				case IDCANCEL:
+				{
+					JULayout *jul = (JULayout*)GetProp(m_hWnd, JULAYOUT_STR);
+					delete jul;
+
 					EndDialog(hWnd, TRUE);
 					break;
+				}
 
 				case MAKELONG(IDC_CREATEDC, BN_SETFOCUS):
 					DumpDC(m_hDC);
@@ -143,6 +150,20 @@ BOOL KDCAttributes::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					return FALSE;
 			}
 			return TRUE;
+
+		case WM_SIZE:
+		{
+			JULayout *jul = (JULayout*)GetProp(m_hWnd, JULAYOUT_STR);
+			jul->AdjustControls(LOWORD(lParam), HIWORD(lParam));
+			return 0;
+		}
+
+		case WM_GETMINMAXINFO:
+		{
+			JULayout *jul = (JULayout*)GetProp(m_hWnd, JULAYOUT_STR);
+			jul->HandleMinMax((MINMAXINFO*)lParam);
+			return 0;
+		}
 	}
 		
 	return FALSE;
@@ -173,6 +194,14 @@ BOOL KDCAttributes::OnInitDialog(void)
 	SendDlgItemMessage(m_hWnd, IDC_CREATEDC, BM_SETCHECK, BST_CHECKED, 0);
 	
 	DumpDC(m_hDC);
+
+	////
+
+	JULayout *jul = new JULayout;
+	jul->Initialize(m_hWnd);
+	jul->AnchorControl(0,0, 100,100, IDC_DCATTRIBUTES);
+
+	SetProp(m_hWnd, JULAYOUT_STR, (HANDLE)jul);
 
 	return TRUE;
 }
