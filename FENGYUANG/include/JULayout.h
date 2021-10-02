@@ -101,10 +101,12 @@ private:
 
 #define JULAYOUT_STR _T("JULayout")
 #define JULAYOUT_PRSHT_STR _T("JULayout.Prsht")
+#define JULAYOUT_PRSHT2_STR _T("JULayout.Prsht2")
 	// Will use these strings to call SetProp()/GetProp(),
 	// to associate JULayout object with an HWND.
 
 UINT g_WM_JULAYOUT_DO_INIT = 0;
+UINT g_WM_JULAYOUT_DO_INIT_2 = 0;
 
 JULayout::JULayout()
 {
@@ -202,7 +204,8 @@ JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else if(msg==WM_GETMINMAXINFO)
 	{
-		jul->HandleMinMax((MINMAXINFO*)lParam);
+		MINMAXINFO *pMinMaxInfo = (MINMAXINFO*)lParam;
+		jul->HandleMinMax(pMinMaxInfo);
 	}
 	else if(msg==WM_DESTROY)
 	{
@@ -237,11 +240,6 @@ bool JULayout::EnableForPrsht(HWND hwndPrsht)
 
 	SetProp(hwndPrsht, JULAYOUT_PRSHT_STR, jprsht);
 
-	// Make Prsht dialog resizable (pending, not dragable yet, need AmHotkey Ctrl+Win+arrow)
-	//
-	UINT ostyle = GetWindowStyle(hwndPrsht);
-	SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle) | WS_THICKFRAME);
-
 	// Next, we'll call JULayout::EnableJULayout(), but, we have to postpone it
 	// with a PostMessage. If we call JULayout::EnableJULayout() here, there is
 	// at least two problems:
@@ -254,6 +252,7 @@ bool JULayout::EnableForPrsht(HWND hwndPrsht)
 	if(!g_WM_JULAYOUT_DO_INIT)
 	{
 		g_WM_JULAYOUT_DO_INIT = RegisterWindowMessage(JULAYOUT_PRSHT_STR);
+		g_WM_JULAYOUT_DO_INIT_2 = RegisterWindowMessage(JULAYOUT_PRSHT2_STR);
 	}
 	//
 	::PostMessage(hwndPrsht, g_WM_JULAYOUT_DO_INIT, 0, 0);
@@ -304,6 +303,20 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 			hwndPrevChild = hwndNowChild;
 		}
 
+		// Make Prsht dialog resizable (pending, not dragable yet, need AmHotkey Ctrl+Win+arrow)
+		//
+		UINT ostyle = GetWindowStyle(hwndPrsht);
+		//SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle) | WS_THICKFRAME);
+		SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle & ~WS_SYSMENU) | WS_THICKFRAME); // draggable, but title blank
+		//SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle & ~WS_POPUPWINDOW) | WS_OVERLAPPEDWINDOW); // NOT draggable
+		//SetWindowPos(hwndPrsht,0,0,0,0,0, SWP_NOZORDER|SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE|SWP_DRAWFRAME); // no effect
+		::PostMessage(hwndPrsht, g_WM_JULAYOUT_DO_INIT_2, 0, 0);
+	}
+	else if(msg==g_WM_JULAYOUT_DO_INIT_2)
+	{
+		// Bring back the WS_SYSMENU style bit. Sorry, that makes it un-draggable again.
+//		UINT ostyle = GetWindowStyle(hwndPrsht);
+//		SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle|WS_SYSMENU));
 	}
 	else if(msg==WM_SIZE)
 	{
