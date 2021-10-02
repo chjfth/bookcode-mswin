@@ -47,6 +47,8 @@ public:
 		pMinMax->ptMinTrackSize = m_ptMinParentDims; 
 	}
 
+	static bool EnableForPrsht(HWND hwndPrsht);
+
 private:
 	struct Ancofs_st {
 		int Anco; // Anchor coefficient, this value should be a percent value 0~100, 
@@ -91,8 +93,11 @@ private:
 #include <tchar.h>
 #include <assert.h>
 
+#include "dbgprint.h" // temp debug
+
 #define JULAYOUT_STR _T("JULayout")
-	// Will use this string to call SetProp()/GetProp(),
+#define JULAYOUT_PRSHT_STR _T("JULayout.Prsht")
+	// Will use these strings to call SetProp()/GetProp(),
 	// to associate JULayout object with an HWND.
 
 JULayout::JULayout()
@@ -200,6 +205,48 @@ JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	LRESULT ret = jul->m_prevWndProc(hwnd, msg, wParam, lParam);
 	return ret;
+}
+
+bool JULayout::EnableForPrsht(HWND hwndPrsht)
+{
+	// todo: Subclass hwndPrsht for WM_SIZE processing	
+
+	// Make Prsht dialog resizable
+	//
+	UINT ostyle = GetWindowStyle(hwndPrsht);
+	SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle) | WS_THICKFRAME);
+	
+	JULayout *jul = JULayout::EnableJULayout(hwndPrsht);
+
+	// Find child windows of the Prsht and anchor them.
+	HWND hwndPrevChild = NULL;
+	for(; ;)
+	{
+		HWND hwndNowChild = FindWindowEx(hwndPrsht, hwndPrevChild, NULL, NULL);
+
+		if(hwndNowChild==NULL)
+			break;
+
+		UINT id = GetWindowID(hwndNowChild);
+		TCHAR classname[100] = {};
+		GetClassName(hwndNowChild, classname, 100);
+		dbgprint("See id=0x08%X , class=%s", id, classname);
+
+		if(_tcsicmp(classname, _T("button"))==0)
+		{
+			// Meet the bottom-right buttons like OK, Cancel, Apply.
+			jul->AnchorControl(100,100, 100,100, id, true);
+		}
+		else
+		{
+			// The SysTabControl32 and those #32770 true dialogbox.
+			jul->AnchorControl(0,0, 100,100, id, false);
+		}
+
+		hwndPrevChild = hwndNowChild;
+	}
+
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

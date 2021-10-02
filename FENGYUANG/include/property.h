@@ -15,6 +15,8 @@
 
 #include <commctrl.h>
 
+#include "JULayout.h"
+
 #include "dialog.h"
 
 // Property Sheet Page
@@ -53,16 +55,27 @@ public:
         memset(& psh, 0, sizeof(PROPSHEETHEADER) );
         
         psh.dwSize      = sizeof(PROPSHEETHEADER);
-        psh.dwFlags     = PSH_USEICONID | PSH_NOAPPLYNOW;
+        psh.dwFlags     = PSH_USEICONID | PSH_NOAPPLYNOW 
+			| PSH_USECALLBACK
+			;
         psh.hInstance   = hInst;
         psh.hwndParent  = hWnd;
         psh.pszIcon     = MAKEINTRESOURCE(id_Icon);
         psh.nPages      = nPages;
         psh.phpage      = hPages;
         psh.pszCaption  = sCaption;
-        psh.pfnCallback = NULL;
+        psh.pfnCallback = PrshtProc;
 
         return PropertySheet(& psh);
     }
-};
 
+	static int CALLBACK PrshtProc(HWND hwndPrsht,	UINT uMsg, LPARAM lParam)
+	{
+		if(uMsg==PSCB_INITIALIZED)
+		{
+			JULayout::EnableForPrsht(hwndPrsht);
+		}
+		return 0;
+	}
+
+};
