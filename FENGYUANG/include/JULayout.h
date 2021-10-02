@@ -26,6 +26,7 @@ public:
 	JULayout();
 
 	bool Initialize(HWND hwndParent, int nMinWidth = 0, int nMinHeight = 0);
+	// -- old style
 
 	static JULayout* EnableJULayout(HWND hwndParent);
 		// A new JULayout object is returned to caller, and the lifetime of this object
@@ -59,17 +60,7 @@ private:
 		Ancofs_st pt2x, pt2y; // pt2 means the south-east corner of the control
 	}; 
 
-	bool PatchWndProc()
-	{
-		// Patch WndProc so that we can handle WM_SIZE and WM_GETMINMAX automatically.
-
-		if(!IsWindow(m_hwndParent))
-			return false;
-
-		m_prevWndProc = (WNDPROC)SetWindowLongPtr(m_hwndParent, GWLP_WNDPROC, (LONG_PTR)JulWndProc);
-
-		return true;
-	}
+	bool PatchWndProc();
 
 	static void PixelFromAnchorPoint(int cxParent, int cyParent, int xAnco, int yAnco, PPOINT ppt)
 	{
@@ -96,6 +87,7 @@ private:
 #ifdef JULAYOUT_IMPL
 
 #include <windows.h>
+#include <windowsx.h>
 #include <tchar.h>
 #include <assert.h>
 
@@ -174,6 +166,19 @@ JULayout* JULayout::EnableJULayout(HWND hwndParent)
 	return jul;
 }
 
+bool JULayout::PatchWndProc()
+{
+	// Patch WndProc so that we can handle WM_SIZE and WM_GETMINMAX automatically.
+
+	if(!IsWindow(m_hwndParent))
+		return false;
+
+	m_prevWndProc = SubclassWindow(m_hwndParent, JulWndProc);
+
+	return true;
+}
+
+
 LRESULT CALLBACK 
 JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -182,7 +187,7 @@ JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	if(msg==WM_SIZE)
 	{
-		jul->AdjustControls(LOWORD(lParam), HIWORD(lParam));
+		jul->AdjustControls(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 	}
 	else if(msg==WM_GETMINMAXINFO)
 	{
