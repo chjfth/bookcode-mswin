@@ -10,8 +10,6 @@ Purpose: This class manages child window positioning and sizing when a parent
 #ifndef __JULayout_h_
 #define __JULayout_h_
 
-#include <assert.h>
-
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -41,7 +39,7 @@ public:
 	bool AnchorControl(int x1Anco, int y1Anco, int x2Anco, int y2Anco, int nCtrlID, bool fRedraw=false);
 	bool AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, bool fRedraw, ...);
 
-	BOOL AdjustControls(int cx, int cy);
+	bool AdjustControls(int cx, int cy);
 
 	void HandleMinMax(PMINMAXINFO pMinMax) 
 	{ 
@@ -96,6 +94,10 @@ private:
 
 
 #ifdef JULAYOUT_IMPL
+
+#include <windows.h>
+#include <tchar.h>
+#include <assert.h>
 
 #define JULAYOUT_STR _T("JULayout")
 	// Will use this string to call SetProp()/GetProp(),
@@ -252,7 +254,7 @@ bool JULayout::AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, bo
 	return(fOk);
 }
 
-BOOL JULayout::AdjustControls(int cx, int cy) 
+bool JULayout::AdjustControls(int cx, int cy) 
 {
 	bool fOk = false;
 
