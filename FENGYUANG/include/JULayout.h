@@ -71,7 +71,9 @@ private:
 	}
 
 private:
-	static LRESULT CALLBACK JulWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	static LRESULT CALLBACK JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	static LRESULT CALLBACK PrshtWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:    
 	CtrlInfo_st m_CtrlInfo[JULAYOUT_MAX_CONTROLS]; // Max controls allowed in a dialog template
@@ -207,15 +209,35 @@ JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return ret;
 }
 
+struct JULPrsht_st
+{
+	WNDPROC orig_winproc;
+	HWND hwndSystab; // the HWND of the only SysTabControl32 in the Prsht
+};
+
 bool JULayout::EnableForPrsht(HWND hwndPrsht)
 {
-	// todo: Subclass hwndPrsht for WM_SIZE processing	
+	//
+	// Subclass hwndPrsht for WM_SIZE processing
+	//
 
-	// Make Prsht dialog resizable
+	JULPrsht_st *jprsht = (JULPrsht_st*)GetProp(hwndPrsht, JULAYOUT_PRSHT_STR);
+	if(jprsht)
+	{
+		// EnableForPrsht already called.
+		return false; 
+	}
+
+	jprsht = new JULPrsht_st;
+	jprsht->orig_winproc = SubclassWindow(hwndPrsht, PrshtWndProc);
+
+	SetProp(hwndPrsht, JULAYOUT_PRSHT_STR, jprsht);
+
+	// Make Prsht dialog resizable (pending, not dragable yet, need AmHotkey Ctrl+Win+arrow)
 	//
 	UINT ostyle = GetWindowStyle(hwndPrsht);
 	SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle) | WS_THICKFRAME);
-	
+
 	JULayout *jul = JULayout::EnableJULayout(hwndPrsht);
 
 	// Find child windows of the Prsht and anchor them.
@@ -237,6 +259,11 @@ bool JULayout::EnableForPrsht(HWND hwndPrsht)
 			// Meet the bottom-right buttons like OK, Cancel, Apply.
 			jul->AnchorControl(100,100, 100,100, id, true);
 		}
+		else if(_tcsicmp(classname, _T("SysTabControl32"))==0)
+		{
+			jprsht->hwndSystab = hwndNowChild;
+			jul->AnchorControl(0,0, 100,100, id, false);
+		}
 		else
 		{
 			// The SysTabControl32 and those #32770 true dialogbox.
@@ -247,6 +274,55 @@ bool JULayout::EnableForPrsht(HWND hwndPrsht)
 	}
 
 	return true;
+}
+
+LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	JULPrsht_st *jprsht = (JULPrsht_st*)GetProp(hwndPrsht, JULAYOUT_PRSHT_STR);
+	assert(jprsht);
+	assert(jprsht->hwndSystab);
+
+	if(msg==WM_SIZE)
+	{
+		dbgprint("Prsht sizing: %d * %d", GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+
+		RECT rcSystab;
+		GetClientRect(jprsht->hwndSystab, &rcSystab); 
+		// -- this RECT changes due to JULayout applied on Prsht.
+		
+		HWND hwndPrevChild = NULL;
+		for(; ;)
+		{
+			HWND hwndNowChild = FindWindowEx(hwndPrsht, hwndPrevChild, NULL, NULL);
+			if(hwndNowChild==NULL)
+				break;
+			
+			TCHAR classname[100] = {};
+			GetClassName(hwndNowChild, classname, 100);
+//			dbgprint("See id=0x08%X , class=%s", id, classname);
+
+			if(_tcsicmp(classname, _T("#32770"))==0)
+			{
+				RECT rc = {};
+				GetClientRect(hwndNowChild, &rc);
+				MapWindowPoints(hwndNowChild, hwndPrsht, (POINT*)&rc, 2);
+
+				MoveWindow(hwndNowChild, rc.left, rc.top, 
+					rcSystab.right -8, 
+					rcSystab.bottom-25, // TODO: make -8 & -25 accurate
+					TRUE);
+			}
+			
+			hwndPrevChild = hwndNowChild;
+		}
+	}
+	else if(msg==WM_DESTROY)
+	{
+		delete jprsht;
+	}
+
+	LRESULT ret = jprsht->orig_winproc(hwndPrsht, msg, wParam, lParam);
+	return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
