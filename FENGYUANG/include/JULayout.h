@@ -86,6 +86,8 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 
 #ifdef JULAYOUT_IMPL
@@ -101,6 +103,8 @@ private:
 #define JULAYOUT_PRSHT_STR _T("JULayout.Prsht")
 	// Will use these strings to call SetProp()/GetProp(),
 	// to associate JULayout object with an HWND.
+
+UINT g_WM_JULAYOUT_DO_INIT = 0;
 
 JULayout::JULayout()
 {
@@ -238,40 +242,21 @@ bool JULayout::EnableForPrsht(HWND hwndPrsht)
 	UINT ostyle = GetWindowStyle(hwndPrsht);
 	SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle) | WS_THICKFRAME);
 
-	JULayout *jul = JULayout::EnableJULayout(hwndPrsht);
+	// Next, we'll call JULayout::EnableJULayout(), but, we have to postpone it
+	// with a PostMessage. If we call JULayout::EnableJULayout() here, there is
+	// at least two problems:
+	// 1. The stock buttons of [OK], [Cancel], [Apply] etc has not been placed at their
+	//	  final position(=right-bottom corner), so JULayout would not place them correctly
+	//	  either.
+	// 2. The first *page* inside the Prsht has not been created(=cannot find it by 
+	//	  FindWindowEx), so we lack some coord params for auto-layout.
 
-	// Find child windows of the Prsht and anchor them.
-	HWND hwndPrevChild = NULL;
-	for(; ;)
+	if(!g_WM_JULAYOUT_DO_INIT)
 	{
-		HWND hwndNowChild = FindWindowEx(hwndPrsht, hwndPrevChild, NULL, NULL);
-
-		if(hwndNowChild==NULL)
-			break;
-
-		UINT id = GetWindowID(hwndNowChild);
-		TCHAR classname[100] = {};
-		GetClassName(hwndNowChild, classname, 100);
-		dbgprint("See id=0x08%X , class=%s", id, classname);
-
-		if(_tcsicmp(classname, _T("button"))==0)
-		{
-			// Meet the bottom-right buttons like OK, Cancel, Apply.
-			jul->AnchorControl(100,100, 100,100, id, true);
-		}
-		else if(_tcsicmp(classname, _T("SysTabControl32"))==0)
-		{
-			jprsht->hwndSystab = hwndNowChild;
-			jul->AnchorControl(0,0, 100,100, id, false);
-		}
-		else
-		{
-			// The SysTabControl32 and those #32770 true dialogbox.
-			jul->AnchorControl(0,0, 100,100, id, false);
-		}
-
-		hwndPrevChild = hwndNowChild;
+		g_WM_JULAYOUT_DO_INIT = RegisterWindowMessage(JULAYOUT_PRSHT_STR);
 	}
+	//
+	::PostMessage(hwndPrsht, g_WM_JULAYOUT_DO_INIT, 0, 0);
 
 	return true;
 }
@@ -282,7 +267,45 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 	assert(jprsht);
 	assert(jprsht->hwndSystab);
 
-	if(msg==WM_SIZE)
+	if(msg==g_WM_JULAYOUT_DO_INIT)
+	{
+		JULayout *jul = JULayout::EnableJULayout(hwndPrsht);
+
+		// Find child windows of the Prsht and anchor them.
+		HWND hwndPrevChild = NULL;
+		for(; ;)
+		{
+			HWND hwndNowChild = FindWindowEx(hwndPrsht, hwndPrevChild, NULL, NULL);
+
+			if(hwndNowChild==NULL)
+				break;
+
+			UINT id = GetWindowID(hwndNowChild);
+			TCHAR classname[100] = {};
+			GetClassName(hwndNowChild, classname, 100);
+			dbgprint("See id=0x08%X , class=%s", id, classname);
+
+			if(_tcsicmp(classname, _T("button"))==0)
+			{
+				// Meet the bottom-right buttons like OK, Cancel, Apply.
+				jul->AnchorControl(100,100, 100,100, id, true);
+			}
+			else if(_tcsicmp(classname, _T("SysTabControl32"))==0)
+			{
+				jprsht->hwndSystab = hwndNowChild;
+				jul->AnchorControl(0,0, 100,100, id, false);
+			}
+			else
+			{
+				// The SysTabControl32 and those #32770 true dialogbox.
+				jul->AnchorControl(0,0, 100,100, id, false);
+			}
+
+			hwndPrevChild = hwndNowChild;
+		}
+
+	}
+	else if(msg==WM_SIZE)
 	{
 		dbgprint("Prsht sizing: %d * %d", GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
