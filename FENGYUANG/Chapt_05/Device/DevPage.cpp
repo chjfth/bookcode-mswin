@@ -38,7 +38,12 @@ void AddDisplayDevices(HWND hList)
 	for (unsigned i=0; 
 	     EnumDisplayDevices(NULL, i, & Dev, 0);
 		 i++ )
+	{
+		// Dev.DeviceName is like:
+		//	\\.\DISPLAY1
+		//	\\.\DISPLAY2
 		SendMessage(hList, CB_ADDSTRING, 0, (LPARAM) Dev.DeviceName);
+	}
 
  	SendMessage(hList, CB_SETCURSEL, 0, 0);
 }
@@ -110,14 +115,25 @@ BOOL KDevicePage::OnDeviceChange(HWND hWnd)
 		Device.cb = sizeof(Device);
 
 		while ( EnumDisplayDevices(NULL, iDevNum, & Device, 0) )
+		{
+			// Dev.DeviceName is like:
+			//	\\.\DISPLAY1
+			//	\\.\DISPLAY2
+
 			if ( _tcscmp(szDeviceName, Device.DeviceName)==0 )
 				break;
 			else
 				iDevNum ++;
+		}
 
-		SetDlgItemText(hWnd, IDC_DEVICESTRING, Device.DeviceString);
-		SetDlgItemText(hWnd, IDC_DEVICEID,     Device.DeviceID);
-		SetDlgItemText(hWnd, IDC_DEVICEKEY,    Device.DeviceKey);
+		SetDlgItemText(hWnd, IDC_DEVICESTRING, Device.DeviceString); 
+		// -- e.g. "VirtualBox Graphics Adapter (WDDM)"
+		
+		SetDlgItemText(hWnd, IDC_DEVICEID,     Device.DeviceID); 
+		// -- e.g. "PCI\VEN_80EE&DEV_BEEF&SUBSYS_040515AD&REV_00"
+		
+		SetDlgItemText(hWnd, IDC_DEVICEKEY,    Device.DeviceKey); 
+		// -- e.g. "\Registry\Machine\System\CurrentControlSet\Control\Video\{F53FDD4F-2C23-4245-B138-B1667CB4F52F}\0000"
 
 		SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_RESETCONTENT, 0, 0);
 					
