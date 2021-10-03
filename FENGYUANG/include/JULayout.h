@@ -106,7 +106,6 @@ private:
 	// to associate JULayout object with an HWND.
 
 UINT g_WM_JULAYOUT_DO_INIT = 0;
-UINT g_WM_JULAYOUT_DO_INIT_2 = 0;
 
 JULayout::JULayout()
 {
@@ -252,7 +251,6 @@ bool JULayout::EnableForPrsht(HWND hwndPrsht)
 	if(!g_WM_JULAYOUT_DO_INIT)
 	{
 		g_WM_JULAYOUT_DO_INIT = RegisterWindowMessage(JULAYOUT_PRSHT_STR);
-		g_WM_JULAYOUT_DO_INIT_2 = RegisterWindowMessage(JULAYOUT_PRSHT2_STR);
 	}
 	//
 	::PostMessage(hwndPrsht, g_WM_JULAYOUT_DO_INIT, 0, 0);
@@ -287,7 +285,7 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 			if(_tcsicmp(classname, _T("button"))==0)
 			{
 				// Meet the bottom-right buttons like OK, Cancel, Apply.
-				jul->AnchorControl(100,100, 100,100, id, true);
+				jul->AnchorControl(100,100, 100,100, id, false);
 			}
 			else if(_tcsicmp(classname, _T("SysTabControl32"))==0)
 			{
@@ -310,13 +308,6 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 		SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle & ~WS_SYSMENU) | WS_THICKFRAME); // draggable, but title blank
 		//SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle & ~WS_POPUPWINDOW) | WS_OVERLAPPEDWINDOW); // NOT draggable
 		//SetWindowPos(hwndPrsht,0,0,0,0,0, SWP_NOZORDER|SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE|SWP_DRAWFRAME); // no effect
-		::PostMessage(hwndPrsht, g_WM_JULAYOUT_DO_INIT_2, 0, 0);
-	}
-	else if(msg==g_WM_JULAYOUT_DO_INIT_2)
-	{
-		// Bring back the WS_SYSMENU style bit. Sorry, that makes it un-draggable again.
-//		UINT ostyle = GetWindowStyle(hwndPrsht);
-//		SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle|WS_SYSMENU));
 	}
 	else if(msg==WM_SIZE)
 	{
