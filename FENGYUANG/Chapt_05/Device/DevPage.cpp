@@ -73,7 +73,7 @@ void AddDisplaySettings(HWND hList, LPCTSTR pszDeviceName)
 	{
 		TCHAR szTemp[MAX_PATH];
 
-		wsprintf(szTemp, _T("%d by %d, %d bits, %d Hz, %d Kb"), 
+		wsprintf(szTemp, _T("%d by %d, %d bits, %d Hz, %d KB"), 
 			dm.dmPelsWidth, 
 			dm.dmPelsHeight, 
 			dm.dmBitsPerPel,

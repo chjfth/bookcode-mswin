@@ -134,7 +134,7 @@ LRESULT KEditView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				0, 0, 0, 0, m_hWnd, NULL, m_hInstance, NULL);
 
 			SendMessage(m_hEdit, WM_SETFONT, (WPARAM) GetStockObject(ANSI_FIXED_FONT), 0);
-			SendMessage(m_hEdit, EM_LIMITTEXT, 512 * 1024, 0);	// 512 Kb limit
+			SendMessage(m_hEdit, EM_LIMITTEXT, 512 * 1024, 0);	// 512 KB limit
 
 //			m_pBackground = new CDDBBackground;
 //			if ( m_pBackground )
