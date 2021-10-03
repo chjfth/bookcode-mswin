@@ -218,7 +218,13 @@ JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 struct JULPrsht_st
 {
 	WNDPROC orig_winproc;
-	HWND hwndSystab; // the HWND of the only SysTabControl32 in the Prsht
+	UINT xdiff, ydiff; // width,height diff of the Prsht and its containing page
+
+	JULPrsht_st()
+	{
+		orig_winproc = NULL;
+		xdiff = ydiff = 0;
+	}
 };
 
 bool JULayout::EnableForPrsht(HWND hwndPrsht)
@@ -262,13 +268,13 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 {
 	JULPrsht_st *jprsht = (JULPrsht_st*)GetProp(hwndPrsht, JULAYOUT_PRSHT_STR);
 	assert(jprsht);
-	assert(jprsht->hwndSystab);
 
 	if(msg==g_WM_JULAYOUT_DO_INIT)
 	{
 		JULayout *jul = JULayout::EnableJULayout(hwndPrsht);
 
-		// Find child windows of the Prsht and anchor them.
+		// Find child windows of the Prsht and anchor them to JULayout.
+
 		HWND hwndPrevChild = NULL;
 		for(; ;)
 		{
@@ -287,21 +293,31 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 				// Meet the bottom-right buttons like OK, Cancel, Apply.
 				jul->AnchorControl(100,100, 100,100, id, false);
 			}
-			else if(_tcsicmp(classname, _T("SysTabControl32"))==0)
-			{
-				jprsht->hwndSystab = hwndNowChild;
-				jul->AnchorControl(0,0, 100,100, id, false);
-			}
 			else
 			{
-				// The SysTabControl32 and those #32770 true dialogbox.
+				// The SysTabControl32 and those #32770 substantial dlgbox.
+				// Anchor all these to top-left and bottom-right(fill their container)
+
 				jul->AnchorControl(0,0, 100,100, id, false);
+
+				if(_tcsicmp(classname, _T("#32770"))==0) // a page
+				{
+					RECT rcPrsht = {};
+					RECT rcPage = {}; 
+					GetClientRect(hwndPrsht, &rcPrsht);
+					GetClientRect(hwndNowChild, &rcPage);
+
+					jprsht->xdiff = rcPrsht.right - rcPage.right;
+					jprsht->ydiff = rcPrsht.bottom - rcPage.bottom;
+					assert(jprsht->xdiff>0); // e.g. 20 on Win7
+					assert(jprsht->ydiff>0); // e.g. 69 on Win7
+				}
 			}
 
 			hwndPrevChild = hwndNowChild;
 		}
 
-		// Make Prsht dialog resizable (pending, not dragable yet, need AmHotkey Ctrl+Win+arrow)
+		// Make Prsht dialog resizable (pending, not draggable yet, need AmHotkey Ctrl+Win+arrow)
 		//
 		UINT ostyle = GetWindowStyle(hwndPrsht);
 		//SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle) | WS_THICKFRAME);
@@ -311,11 +327,9 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 	}
 	else if(msg==WM_SIZE)
 	{
-		dbgprint("Prsht sizing: %d * %d", GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-
-		RECT rcSystab;
-		GetClientRect(jprsht->hwndSystab, &rcSystab); 
-		// -- this RECT changes due to JULayout applied on Prsht.
+//		dbgprint("Prsht sizing: %d * %d", GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		RECT rcPrsht = {};
+		GetClientRect(hwndPrsht, &rcPrsht); // we need only its width & height
 		
 		HWND hwndPrevChild = NULL;
 		for(; ;)
@@ -328,16 +342,23 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 			GetClassName(hwndNowChild, classname, 100);
 //			dbgprint("See id=0x08%X , class=%s", id, classname);
 
-			if(_tcsicmp(classname, _T("#32770"))==0)
+			if(_tcsicmp(classname, _T("#32770"))==0) 
 			{
+				// Now we meet a substantial dlgbox(=page), and we move it
+				// to fill all empty area of the Prsht(container).
+
 				RECT rc = {};
 				GetClientRect(hwndNowChild, &rc);
 				MapWindowPoints(hwndNowChild, hwndPrsht, (POINT*)&rc, 2);
 
+				// Now rc is relative to Prsht's client area.
+				// rc.left & rc.top are always ok, but rc.right & rc.bottom need to adjust.
+
 				MoveWindow(hwndNowChild, rc.left, rc.top, 
-					rcSystab.right -8, 
-					rcSystab.bottom-25, // TODO: make -8 & -25 accurate
-					TRUE);
+					rcPrsht.right - jprsht->xdiff,
+					rcPrsht.bottom - jprsht->ydiff,
+					FALSE // FALSE: no need to force repaint
+					);
 			}
 			
 			hwndPrevChild = hwndNowChild;
