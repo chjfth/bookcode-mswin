@@ -181,6 +181,7 @@ BOOL KDCAttributes::OnInitDialog(void)
 
 	JULayout *jul = JULayout::EnableJULayout(m_hWnd);
 	jul->AnchorControl(0,0, 100,100, IDC_DCATTRIBUTES);
+	jul->AnchorControl(50,100, 50,100, IDOK);
 
 	return TRUE;
 }
