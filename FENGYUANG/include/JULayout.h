@@ -57,7 +57,6 @@ private:
 
 	struct CtrlInfo_st {
 		int         m_nID; 
-		BOOL        m_fRedraw;
 		Ancofs_st pt1x, pt1y; // pt1 means the north-west corner of the control
 		Ancofs_st pt2x, pt2y; // pt2 means the south-east corner of the control
 	}; 
@@ -388,7 +387,6 @@ bool JULayout::AnchorControl(int x1Anco, int y1Anco, int x2Anco, int y2Anco, int
 	CtrlInfo_st &cinfo = m_CtrlInfo[m_nNumControls];
 
 	cinfo.m_nID = nID;
-	cinfo.m_fRedraw = fRedraw;
 
 	cinfo.pt1x.Anco = x1Anco; cinfo.pt1y.Anco = y1Anco;
 	cinfo.pt2x.Anco = x2Anco; cinfo.pt2y.Anco = y2Anco; 
@@ -432,11 +430,8 @@ bool JULayout::AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, bo
 
 bool JULayout::AdjustControls(int cx, int cy) 
 {
-	bool fOk = false;
-
-	// Create region consisting of all areas occupied by controls
-	HRGN hrgnPaint = CreateRectRgn(0, 0, 0, 0);
 	int i;
+/*
 	for(i=0; i<m_nNumControls; i++) 
 	{
 		HWND hwndControl = GetDlgItem(m_hwndParent, m_CtrlInfo[i].m_nID);
@@ -449,6 +444,9 @@ bool JULayout::AdjustControls(int cx, int cy)
 		CombineRgn(hrgnPaint, hrgnPaint, hrgnTemp, RGN_OR);
 		DeleteObject(hrgnTemp);
 	}
+*/
+
+	HDWP hdwp = ::BeginDeferWindowPos(m_nNumControls);
 
 	for(i=0; i<m_nNumControls; i++) 
 	{
@@ -467,10 +465,16 @@ bool JULayout::AdjustControls(int cx, int cy)
 
 		// Position/size the control
 		HWND hwndControl = GetDlgItem(m_hwndParent, cinfo.m_nID);
-		MoveWindow(hwndControl, rcControl.left, rcControl.top, 
+
+		DeferWindowPos(hdwp, hwndControl,
+			NULL, // insert-after
+			rcControl.left, 
+			rcControl.top, 
 			rcControl.right - rcControl.left, 
-			rcControl.bottom - rcControl.top, FALSE);
+			rcControl.bottom - rcControl.top, 
+			SWP_NOZORDER);
 		
+/*
 		if (m_CtrlInfo[i].m_fRedraw) {
 			InvalidateRect(hwndControl, NULL, FALSE);
 		} else {
@@ -483,8 +487,12 @@ bool JULayout::AdjustControls(int cx, int cy)
 			SendMessage(hwndControl, WM_NCPAINT, 1, 0);
 			UpdateWindow(hwndControl);
 		}
+*/
 	}
+	
+	::EndDeferWindowPos(hdwp);
 
+/*
 	// Paint the newly exposed portion of the dialog box's client area
 	HDC hdc = GetDC(m_hwndParent);
 	HBRUSH hbrColor = CreateSolidBrush(GetSysColor(COLOR_3DFACE));
@@ -493,6 +501,8 @@ bool JULayout::AdjustControls(int cx, int cy)
 	ReleaseDC(m_hwndParent, hdc);
 	DeleteObject(hrgnPaint);
 	return(fOk);
+*/
+	return true;
 }
 
 #endif   // JULAYOUT_IMPL
