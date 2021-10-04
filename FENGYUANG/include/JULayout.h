@@ -136,6 +136,10 @@ bool JULayout::Initialize(HWND hwndParent, int nMinWidth, int nMinHeight)
 	if (nMinHeight != 0) 
 		m_ptMinParentDims.y = nMinHeight; 
 
+	// Force WS_CLIPCHILDEN on hwndParent(the dlgbox) to reduce repaint flickering.
+	UINT ostyle = GetWindowStyle(hwndParent);
+	SetWindowLong(hwndParent, GWL_STYLE, ostyle | WS_CLIPCHILDREN);
+
 	return true;
 }
 
