@@ -93,10 +93,10 @@ BOOL KDevicePage::OnInitDialog(HWND hWnd)
 	OnDeviceChange(hWnd);
 
 	JULayout *jul = JULayout::EnableJULayout(hWnd);
-	jul->AnchorControls(0,0, 100,0, false, 
+	jul->AnchorControls(0,0, 100,0,  
 		IDC_DEVICE, IDC_DEVICESTRING, IDC_DEVICEID, IDC_DEVICEKEY, IDC_STATEFLAGS);
 
-	jul->AnchorControls(0,0, 100,100, false, IDC_MODES);
+	jul->AnchorControls(0,0, 100,100, IDC_MODES);
 
     return TRUE;
 }

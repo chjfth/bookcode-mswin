@@ -37,8 +37,8 @@ public:
    
 	// Anco: Anchor coefficient, this value should be a percent value 0~100, 
 	// 0 means left-most or top-most, 100 means right-most or bottom most.
-	bool AnchorControl(int x1Anco, int y1Anco, int x2Anco, int y2Anco, int nCtrlID, bool fRedraw=false);
-	bool AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, bool fRedraw, ...);
+	bool AnchorControl(int x1Anco, int y1Anco, int x2Anco, int y2Anco, int nCtrlID);
+	bool AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, ...);
 
 	bool AdjustControls(int cx, int cy);
 
@@ -294,14 +294,14 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 			if(_tcsicmp(classname, _T("button"))==0)
 			{
 				// Meet the bottom-right buttons like OK, Cancel, Apply.
-				jul->AnchorControl(100,100, 100,100, id, false);
+				jul->AnchorControl(100,100, 100,100, id);
 			}
 			else
 			{
 				// The SysTabControl32 and those #32770 substantial dlgbox.
 				// Anchor all these to top-left and bottom-right(fill their container)
 
-				jul->AnchorControl(0,0, 100,100, id, false);
+				jul->AnchorControl(0,0, 100,100, id);
 
 				if(_tcsicmp(classname, _T("#32770"))==0) // a page
 				{
@@ -379,7 +379,7 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 ///////////////////////////////////////////////////////////////////////////////
 
 
-bool JULayout::AnchorControl(int x1Anco, int y1Anco, int x2Anco, int y2Anco, int nID, bool fRedraw) 
+bool JULayout::AnchorControl(int x1Anco, int y1Anco, int x2Anco, int y2Anco, int nID) 
 {
 	if(m_nNumControls>=JULAYOUT_MAX_CONTROLS)
 		return false;
@@ -416,16 +416,16 @@ bool JULayout::AnchorControl(int x1Anco, int y1Anco, int x2Anco, int y2Anco, int
 	return true;
 }
 
-bool JULayout::AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, bool fRedraw, ...) 
+bool JULayout::AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, ...) 
 {
 	bool fOk = true;
 
 	va_list arglist;
-	va_start(arglist, fRedraw);
+	va_start(arglist, y2Anco);
 	int nID = va_arg(arglist, int);
 	while (fOk && (nID != -1)) 
 	{
-		fOk = fOk && AnchorControl(x1Anco, y1Anco, x2Anco, y2Anco, nID, fRedraw);
+		fOk = fOk && AnchorControl(x1Anco, y1Anco, x2Anco, y2Anco, nID);
 		nID = va_arg(arglist, int);
 	}           
 	va_end(arglist);
@@ -435,21 +435,6 @@ bool JULayout::AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, bo
 bool JULayout::AdjustControls(int cx, int cy) 
 {
 	int i;
-/*
-	for(i=0; i<m_nNumControls; i++) 
-	{
-		HWND hwndControl = GetDlgItem(m_hwndParent, m_CtrlInfo[i].m_nID);
-		RECT rcControl; 
-		GetWindowRect(hwndControl, &rcControl);  // Screen coords of control
-		// Convert coords to parent-relative coordinates
-		MapWindowPoints(HWND_DESKTOP, m_hwndParent, (PPOINT) &rcControl, 2);
-
-		HRGN hrgnTemp = CreateRectRgnIndirect(&rcControl);
-		CombineRgn(hrgnPaint, hrgnPaint, hrgnTemp, RGN_OR);
-		DeleteObject(hrgnTemp);
-	}
-*/
-
 	HDWP hdwp = ::BeginDeferWindowPos(m_nNumControls);
 
 	for(i=0; i<m_nNumControls; i++) 
@@ -476,36 +461,11 @@ bool JULayout::AdjustControls(int cx, int cy)
 			rcControl.top, 
 			rcControl.right - rcControl.left, 
 			rcControl.bottom - rcControl.top, 
-			SWP_NOZORDER);
-		
-/*
-		if (m_CtrlInfo[i].m_fRedraw) {
-			InvalidateRect(hwndControl, NULL, FALSE);
-		} else {
-			// Remove the regions occupied by the control's new position
-			HRGN hrgnTemp = CreateRectRgnIndirect(&rcControl);
-			CombineRgn(hrgnPaint, hrgnPaint, hrgnTemp, RGN_DIFF);
-			DeleteObject(hrgnTemp);
-			// Make the control repaint itself
-			InvalidateRect(hwndControl, NULL, TRUE);
-			SendMessage(hwndControl, WM_NCPAINT, 1, 0);
-			UpdateWindow(hwndControl);
-		}
-*/
+			SWP_NOZORDER);		
 	}
 	
 	::EndDeferWindowPos(hdwp);
 
-/*
-	// Paint the newly exposed portion of the dialog box's client area
-	HDC hdc = GetDC(m_hwndParent);
-	HBRUSH hbrColor = CreateSolidBrush(GetSysColor(COLOR_3DFACE));
-	FillRgn(hdc, hrgnPaint, hbrColor);
-	DeleteObject(hbrColor);
-	ReleaseDC(m_hwndParent, hdc);
-	DeleteObject(hrgnPaint);
-	return(fOk);
-*/
 	return true;
 }
 
