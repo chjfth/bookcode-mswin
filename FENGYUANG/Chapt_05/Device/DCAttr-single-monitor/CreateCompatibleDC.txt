@@ -1,0 +1,47 @@
+Technology	1
+width	1920
+height	1200
+DC Origin	{ 0, 0 }
+Window	0x0 ""
+Bitmap	0x185000F
+Graphics Mode	1
+Mapping Mode	1
+Viewport Extent	{ 1, 1 }
+Viewport Origin	{ 0, 0 }
+Window Extent	{ 1, 1 }
+Window Origin	{ 0, 0 }
+World transformation	{ 1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000 }
+Background Color	0xFFFFFF
+Text Color	0x0
+Palette	0x188000B
+Color Adjustment	{ 24, 0, 0, 10000, 10000, 10000, 0, 10000, 0, 0, 0, 0 }
+Color Space	0x189001F
+ICM Mode	1
+ICM Profile	C:\Windows\system32\spool\drivers\color\sRGB Color Space Profile.icm
+Current Position	{ 0, 0 }
+ROP2	13
+Background Mode	2
+Logical Pen	0x1B00017
+DC Pen Color	0x0
+Arc Direction	1
+Miter Limit	10.000000
+Logical Brush	0x1900010
+DC Brush Color	0xFFFFFF
+Brush Origin	{ 0, 0 }
+Polygon Filling Mode	1
+Bitmap Stretching Mode	1
+Logical Font	0x18A0038
+Inter-character spacing	0
+Font Mapper Flags	0x0
+Text Alignment	0x0
+Text Justification	write only
+Layout	0
+Path	-1 bytes
+Clipping	type 2 clip box { 0, 0, 1, 1 } size 48 bytes
+Meta Region	size 48 bytes, rgn box { 0, 0, 1, 1 }
+Random Region	NULL
+Random Region	NULL
+Random Region	NULL
+Random Region	size 48 bytes, rgn box { 0, 0, 1, 1 }
+Random Region	size 48 bytes, rgn box { 0, 0, 1, 1 }
+Bounds Rectangle	{ 0, 0, 0, 0 }
