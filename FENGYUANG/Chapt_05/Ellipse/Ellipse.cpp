@@ -53,7 +53,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 
 	HRGN hRgn = CreateEllipticRgn(0, 0, 200, 100);
 	SetWindowRgn(hWnd, hRgn, TRUE);
-	DeleteObject(hRgn);
+	
+	// DeleteObject(hRgn);
+	// -- According to MSDN, the system will manage hRgn's lifetime after SetWindowRgn call.
 
 	SetWindowText(hWnd, szEptcWin);
 	MyMessageBox(NULL, szEptcWin, szProgram, MB_OK);
