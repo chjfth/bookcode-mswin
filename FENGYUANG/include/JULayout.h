@@ -25,13 +25,10 @@ class JULayout
 public:
 	JULayout();
 
-	bool Initialize(HWND hwndParent, int nMinWidth = 0, int nMinHeight = 0);
-	// -- old style
-
 	static JULayout* EnableJULayout(HWND hwndParent);
-		// A new JULayout object is returned to caller, and the lifetime of this object
-		// is managed automatically, i.e. the JULayout object is destroyed when the
-		// window by HWND is destroyed by the system.
+	// -- A new JULayout object is returned to caller, and the lifetime of this object
+	// is managed automatically, i.e. the JULayout object is destroyed when the
+	// window by HWND is destroyed by the system.
 
 	static JULayout* GetJULayout(HWND hwndParent);
    
@@ -40,14 +37,18 @@ public:
 	bool AnchorControl(int x1Anco, int y1Anco, int x2Anco, int y2Anco, int nCtrlID);
 	bool AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, ...);
 
-	bool AdjustControls(int cx, int cy);
+public:
+	static bool EnableForPrsht(HWND hwndPrsht);
+	// -- Make PropertySheet() dialog resizable.
+	// User calls this once in PropertySheet()'s PSCB_INITIALIZED callback, just that simple.
 
+public: // old-style public below
+	bool Initialize(HWND hwndParent, int nMinWidth = 0, int nMinHeight = 0);
+	bool AdjustControls(int cx, int cy);
 	void HandleMinMax(PMINMAXINFO pMinMax) 
 	{ 
 		pMinMax->ptMinTrackSize = m_ptMinParentDims; 
 	}
-
-	static bool EnableForPrsht(HWND hwndPrsht);
 
 private:
 	struct Ancofs_st {
