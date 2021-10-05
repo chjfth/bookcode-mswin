@@ -113,7 +113,7 @@ BOOL KDCAttributes::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					{
 						HDC hDC = CreateCompatibleDC(NULL);
 
-						HBITMAP hBmp = CreateCompatibleBitmap(NULL, 100, 100);
+						HBITMAP hBmp = CreateCompatibleBitmap(hDC, 100, 100);
 						
 						SelectObject(hDC, hBmp);
 						DumpDC(hDC);
