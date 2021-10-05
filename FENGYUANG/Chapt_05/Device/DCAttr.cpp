@@ -38,10 +38,14 @@ BOOL KDCAttributes::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{ 
 				HWND hOK = GetDlgItem(hWnd, IDOK);
 
+				// [2021-10-05] Chj: A mysterious SetWindowRgn() experiment from original author. 
+				// I find some very weird behavior from Windows: 
+				// * Even if the OK button gets SetWindowRgn, the non-window-region area(the
+				//   button's four corners) can still be painted on screen.
+				// * If we drag to enlarge the dlgbox, we see that Elliptic window-region
+				//   takes effect, but in a very strange way. See it yourself.
 				RECT rect;
-
 				GetWindowRect(hOK, & rect);
-
 				HRGN hRgn = CreateEllipticRgn(0, 0, (rect.right - rect.left), (rect.bottom - rect.top));
 
 				SetWindowRgn(hOK, hRgn, TRUE);
