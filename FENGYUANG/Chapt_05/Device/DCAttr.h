@@ -21,7 +21,10 @@ class KDCAttributes : public KDialog
 	BOOL OnInitDialog(void);
 
 	BOOL DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	
 	void Add(LPCTSTR pszAttribute, LPCTSTR pszFormat, ...);
+	void Add(BOOL is_succ, LPCTSTR pszAttribute, LPCTSTR pszFormat, ...); // CS: check success
+	void AddWinError(LPCTSTR pszAttribute); // report current GetLastError()
 
 	void DumpDC(HDC hDC);
 

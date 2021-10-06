@@ -164,11 +164,50 @@ void KDCAttributes::Add(LPCTSTR pszAttribute, LPCTSTR pszFormat, ...)
 
 	va_start(ap, pszFormat);
 	
-	vsprintf(temp, pszFormat, ap);
+	_vstprintf_s(temp, MAX_PATH, pszFormat, ap);
 	
 	va_end(ap);
 
 	m_List.AddItem(0, pszAttribute);
+	m_List.AddItem(1, temp);
+}
+
+void KDCAttributes::Add(BOOL is_succ, LPCTSTR pszAttribute, LPCTSTR pszFormat, ...)
+{
+	if(!is_succ)
+	{
+		AddWinError(pszAttribute);
+		return;
+	}
+
+	va_list ap;
+	TCHAR temp[MAX_PATH];
+
+	va_start(ap, pszFormat);
+
+	_vstprintf_s(temp, MAX_PATH, pszFormat, ap);
+
+	va_end(ap);
+
+	m_List.AddItem(0, pszAttribute);
+	m_List.AddItem(1, temp);
+}
+
+void KDCAttributes::AddWinError(LPCTSTR pszAttribute)
+{
+	DWORD winerr = GetLastError();
+
+	m_List.AddItem(0, pszAttribute);
+	
+	TCHAR temp[MAX_PATH]={}, errstr[MAX_PATH]={};
+
+	DWORD retchars = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, winerr, 
+		0, // LANGID
+		errstr, MAX_PATH,
+		NULL); // A trailing \r\n has been filled.
+
+	_sntprintf_s(temp, MAX_PATH, _TRUNCATE, _T("Error. WinErr=%d, %s"), winerr, errstr);
+
 	m_List.AddItem(1, temp);
 }
 
@@ -196,6 +235,7 @@ void KDCAttributes::DumpDC(HDC hDC)
 {
 	POINT pnt;
 	SIZE  size;
+	BOOL succ;
 
 	m_List.DeleteAll();
 
@@ -203,8 +243,14 @@ void KDCAttributes::DumpDC(HDC hDC)
 	Add(_T("width (HORZRES)"),	   _T("%d"), GetDeviceCaps(hDC, HORZRES));
 	Add(_T("height (VERTRES)"),	   _T("%d"), GetDeviceCaps(hDC, VERTRES));
 
-	GetDCOrgEx(hDC, & pnt); 
-	Add(_T("GetDCOrgEx"), _T("{ %d, %d }"), pnt.x, pnt.y);
+	succ = GetDCOrgEx(hDC, & pnt); 
+	if(succ) {
+		Add(_T("GetDCOrgEx"), _T("{ %d, %d }"), pnt.x, pnt.y);
+	}
+	else {
+		// For metafile, we'll get ERROR_INVALID_HANDLE(6)
+		AddWinError(_T("GetDCOrgEx"));
+	}
 
 	TCHAR szTitle[MAX_PATH];
 
@@ -218,35 +264,35 @@ void KDCAttributes::DumpDC(HDC hDC)
 	Add(_T("GetGraphicsMode"), _T("%d"), GetGraphicsMode(hDC));
 	Add(_T("GetMapMode (Mapping Mode)"),  _T("%d"), GetMapMode(hDC));
 
-	GetViewportExtEx(hDC, & size);
-	Add(_T("GetViewportExtEx"), _T("{ %d, %d }"), size.cx, size.cy);
+	succ = GetViewportExtEx(hDC, & size);
+	Add(succ, _T("GetViewportExtEx"), _T("{ %d, %d }"), size.cx, size.cy);
 	
-	GetViewportOrgEx(hDC, & pnt);
-	Add(_T("GetViewportOrgEx"), _T("{ %d, %d }"), pnt.x, pnt.y);
+	succ = GetViewportOrgEx(hDC, & pnt);
+	Add(succ, _T("GetViewportOrgEx"), _T("{ %d, %d }"), pnt.x, pnt.y);
 
-	GetWindowExtEx(hDC, & size);
-	Add(_T("GetWindowExtEx"), _T("{ %d, %d }"), size.cx, size.cy);
+	succ = GetWindowExtEx(hDC, & size);
+	Add(succ, _T("GetWindowExtEx"), _T("{ %d, %d }"), size.cx, size.cy);
 	
-	GetWindowOrgEx(hDC, & pnt);
-	Add(_T("GetWindowOrgEx"), _T("{ %d, %d }"), pnt.x, pnt.y);
+	succ = GetWindowOrgEx(hDC, & pnt);
+	Add(succ, _T("GetWindowOrgEx"), _T("{ %d, %d }"), pnt.x, pnt.y);
 
 	XFORM xform;
-	GetWorldTransform(hDC, & xform);
+	succ = GetWorldTransform(hDC, & xform);
 
-	Add(_T("GetWorldTransform"), _T("{ %f, %f, %f, %f, %f, %f }"),
+	Add(succ, _T("GetWorldTransform"), _T("{ %f, %f, %f, %f, %f, %f }"),
 		xform.eM11, xform.eM12, xform.eM21, xform.eM22, xform.eDx, xform.eDy);
 
 	// transformation
 
 	Add(_T("GetBkColor"), _T("0x%X"), GetBkColor(hDC));
-	Add(_T("GetTextColor"),     _T("0x%X"), GetTextColor(hDC));
+	Add(_T("GetTextColor"), _T("0x%X"), GetTextColor(hDC));
 	Add(_T("GetCurrentObject(OBJ_PAL) (Palette)"), _T("0x%X"), GetCurrentObject(hDC, OBJ_PAL));
 
 	{
 		COLORADJUSTMENT ca;
-		GetColorAdjustment(hDC, & ca);
+		succ = GetColorAdjustment(hDC, & ca);
 	
-		Add(_T("GetColorAdjustment"), _T("{ %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }"), 
+		Add(succ, _T("GetColorAdjustment"), _T("{ %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d }"), 
 			ca.caSize, ca.caFlags, ca.caIlluminantIndex,
 			ca.caRedGamma, ca.caGreenGamma, ca.caBlueGamma, 
 			ca.caReferenceBlack, ca.caReferenceWhite,
@@ -261,37 +307,40 @@ void KDCAttributes::DumpDC(HDC hDC)
 		DWORD dwSize = MAX_PATH;
 
 		szProfile[0] = 0;
-		GetICMProfile(hDC, & dwSize, szProfile);
+		succ = GetICMProfile(hDC, & dwSize, szProfile);
 
-		Add(_T("GetICMProfile"), _T("%s"), szProfile);
+		Add(succ, _T("GetICMProfile"), _T("%s"), szProfile);
 	}
 
-	GetCurrentPositionEx(hDC, & pnt);
-	Add(_T("GetCurrentPositionEx"), _T("{ %d, %d }"), pnt.x, pnt.y);
+	succ = GetCurrentPositionEx(hDC, & pnt);
+	Add(succ, _T("GetCurrentPositionEx"), _T("{ %d, %d }"), pnt.x, pnt.y);
 
-	Add(_T("GetROP2"),				_T("%d"),	GetROP2(hDC));
+	Add(_T("GetROP2"),	_T("%d"),	GetROP2(hDC));
 	Add(_T("GetBkMode (Background Mode)"),	_T("%d"),	GetBkMode(hDC));
-	Add(_T("GetCurrentObject(OBJ_PEN) (Logical Pen)"),		_T("0x%X"), GetCurrentObject(hDC, OBJ_PEN));
-	Add(_T("GetDCPenColor"),     _T("0x%X"), GetDCPenColor(hDC));
+	Add(_T("GetCurrentObject(OBJ_PEN) (Logical Pen)"),	_T("0x%X"), GetCurrentObject(hDC, OBJ_PEN));
+	Add(_T("GetDCPenColor"),    _T("0x%X"), GetDCPenColor(hDC));
 	Add(_T("GetArcDirection"),	_T("%d"),	GetArcDirection(hDC));
 
 	FLOAT miter;
-	GetMiterLimit(hDC, & miter);
-
-	Add(_T("GetMiterLimit"),		_T("%f"),	miter);
+	succ = GetMiterLimit(hDC, & miter);
+	Add(succ, _T("GetMiterLimit"),		_T("%f"),	miter);
 	
 	Add(_T("GetCurrentObject(OBJ_BRUSH) (Logical Brush)"),    _T("0x%X"), GetCurrentObject(hDC, OBJ_BRUSH));
 	Add(_T("GetDCBrushColor"),   _T("0x%X"), GetDCBrushColor(hDC));
 
-	GetBrushOrgEx(hDC, & pnt);
-	Add(_T("GetBrushOrgEx"),     _T("{ %d, %d }"), pnt.x, pnt.y);
+	succ = GetBrushOrgEx(hDC, & pnt);
+	Add(succ, _T("GetBrushOrgEx"),     _T("{ %d, %d }"), pnt.x, pnt.y);
 
 	Add(_T("GetPolyFillMode"),   _T("%d"), GetPolyFillMode(hDC));
 	Add(_T("GetStretchBltMode"), _T("%d"), GetStretchBltMode(hDC));
 	Add(_T("GetCurrentObject(OBJ_FONT) (Logical Font)"),
 		_T("0x%X"), GetCurrentObject(hDC, OBJ_FONT));
-	Add(_T("GetTextCharacterExtra (Inter-character spacing)"), 
-		_T("%d"), GetTextCharacterExtra(hDC));
+	
+	int iret = GetTextCharacterExtra(hDC);
+	if(iret>=0)
+		Add(_T("GetTextCharacterExtra (Inter-character spacing)"), _T("%d"), iret);
+	else
+		AddWinError(_T("GetTextCharacterExtra"));
 
 	DWORD flag = SetMapperFlags(hDC, 0);
 	SetMapperFlags(hDC, flag);
@@ -299,22 +348,22 @@ void KDCAttributes::DumpDC(HDC hDC)
 
 	Add(_T("GetTextAlign"),		   _T("0x%X"), GetTextAlign(hDC));
 
-	Add(_T("Text Justification"),      _T("write only"), 0);
+	Add(_T("Text Justification"),  _T("write only"), 0);
 
-	Add(_T("GetLayout"),                  _T("%d"), GetLayout(hDC));
+	Add(_T("GetLayout"),           _T("%d"), GetLayout(hDC));
 
-	Add(_T("GetPath"),					   _T("%d points"), GetPath(hDC, NULL, NULL, 0));
+	Add(_T("GetPath"),			   _T("%d points"), GetPath(hDC, NULL, NULL, 0));
 
 	RECT rect;
 	int typ = GetClipBox(hDC, & rect);
 
-	Add(_T("GetClipBox"),	_T("type %d clip box { %d, %d, %d, %d }"), 
+	Add(typ, _T("GetClipBox"),	_T("type %d clip box { %d, %d, %d, %d }"), 
 		typ, rect.left, rect.top, rect.right, rect.bottom);
 
 	HRGN hRgn = CreateRectRgn(0, 0, 1, 1);
 	DWORD reqbytes = GetRegionData(hRgn, 0, NULL); // always 48 bytes
 
-	int iret = GetClipRgn(hDC, hRgn);
+	iret = GetClipRgn(hDC, hRgn);
 	// -- If the function succeeds and there is no clipping region for the given device context, the return value is 0. 
 	// -- If the function succeeds and there is a clipping region for the given device context, the return value is 1. 
 	//
