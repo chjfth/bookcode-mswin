@@ -239,6 +239,12 @@ void KDCAttributes::DumpDC(HDC hDC)
 
 	m_List.DeleteAll();
 
+	if(!hDC)
+	{
+		Add(_T("N/A"), _T("Because passed in HDC is NULL."));
+		return;
+	}
+
 	Add(_T("Technology"),  _T("%d"), GetDeviceCaps(hDC, TECHNOLOGY));
 	Add(_T("width (HORZRES)"),	   _T("%d"), GetDeviceCaps(hDC, HORZRES));
 	Add(_T("height (VERTRES)"),	   _T("%d"), GetDeviceCaps(hDC, VERTRES));
@@ -382,31 +388,48 @@ void KDCAttributes::DumpDC(HDC hDC)
 		Add(_T("GetRegionData"), _T("Invalid operation on this DC."));
 	}
 	
-	GetMetaRgn(hDC, hRgn);
+	succ = GetMetaRgn(hDC, hRgn);
+	if(succ)
+	{
+		succ = GetRgnBox(hRgn, & rect);
 
-	GetRgnBox(hRgn, & rect);
-	Add(_T("Meta Region"), _T("size %d bytes, rgn box { %d, %d, %d, %d }"), 
-		GetRegionData(hRgn, 0, NULL), rect.left, rect.top, rect.right, rect.bottom);
+		Add(succ, _T("GetMetaRgn and GetRgnBox"), 
+			_T("GetRegionData()=%d bytes, rgn box { %d, %d, %d, %d }"), 
+			GetRegionData(hRgn, 0, NULL), 
+			rect.left, rect.top, rect.right, rect.bottom);
+	}
+	else
+	{
+		AddWinError(_T("GetMetaRgn"));
+	}
 
+	// Chj: MSDN 2008 says GetRandomRgn()'s iNum param must be SYSRGN(4).
+	//
 	for (int i=1; i<=5; i++)
 	{
+		TCHAR strApicall[40];
+		_sntprintf_s(strApicall, ARRAYSIZE(strApicall), _TRUNCATE, _T("GetRandomRgn(%d)"), i);
+
 		int rslt = GetRandomRgn(hDC, hRgn, i);
 
 		if ( rslt==1 )
 		{
 			GetRgnBox(hRgn, & rect);
-			Add(_T("Random Region"), _T("size %d bytes, rgn box { %d, %d, %d, %d }"), 
-			GetRegionData(hRgn, 0, NULL), rect.left, rect.top, rect.right, rect.bottom);
+			
+			Add(strApicall,
+				_T("GetRegionData()=%d bytes, rgn box { %d, %d, %d, %d }"), 
+				GetRegionData(hRgn, 0, NULL), 
+				rect.left, rect.top, rect.right, rect.bottom);
 		}
 		else if ( rslt==0 )
-			Add(_T("Random Region"), _T("NULL"), 0);
+			Add(strApicall, _T("NULL"), 0);
 		else
-			Add(_T("Random Region"), _T("FAIL"), 0);
+			AddWinError(strApicall);
 	}
 	DeleteObject(hRgn);
 
-	GetBoundsRect(hDC, & rect, 0);
-
-	Add(_T("Bounds Rectangle"),		_T("{ %d, %d, %d, %d }"), 
+	iret = GetBoundsRect(hDC, & rect, 0);
+	Add(iret, _T("GetBoundsRect()"), 
+		_T("{ %d, %d, %d, %d }"), 
 		rect.left, rect.top, rect.right, rect.bottom);
 }
