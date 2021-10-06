@@ -257,12 +257,24 @@ struct JULPrsht_st
 	}
 };
 
+struct DLGTEMPLATEEX_msdn  {
+	WORD dlgVer;
+	WORD signature;
+	DWORD helpID;
+	DWORD exStyle;
+	DWORD style;
+	WORD cDlgItems;
+	// remaining members omitted
+};
+
 bool JULayout::PropSheetProc(HWND hwndPrsht, UINT uMsg, LPARAM lParam)
 {
 	if (uMsg == PSCB_PRECREATE) 
 	{
 		DLGTEMPLATE& dt = *(DLGTEMPLATE*)lParam;
-		auto& style = dt.style;
+		DLGTEMPLATEEX_msdn& dtex = *(DLGTEMPLATEEX_msdn*)lParam;
+
+		auto& style = dtex.signature==0xFF ? dtex.style : dt.style;
 
 		// Enable WS_OVERLAPPEDWINDOW(implies WS_THICKFRAME), so to make it resizable.
 		// Note: We have to turn on WS_THIKFRAME *here*. If we do it when processing
