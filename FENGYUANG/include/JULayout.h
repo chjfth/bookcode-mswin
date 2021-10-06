@@ -111,6 +111,8 @@ private:
 	// Will use these strings to call SetProp()/GetProp(),
 	// to associate JULayout object with an HWND.
 
+#define ADD_PREV_WINPROC_SUFFIX(stem) stem _T(".PrevWndProc")
+
 UINT g_WM_JULAYOUT_DO_INIT = 0;
 
 JULayout::JULayout()
@@ -205,7 +207,17 @@ LRESULT CALLBACK
 JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	JULayout *jul = (JULayout*)GetProp(hwnd, JULAYOUT_STR);
-	assert(jul);
+	if(!jul)
+	{
+		// This implies we had got WM_DESTROY sometime ago.
+		// We have no "user data" now, so just fetch and call orig-WndProc.
+		//
+		// memo: I can see msg==WM_NOTIFY, wParam==1 multiple times here.
+
+		WNDPROC orig = (WNDPROC)GetProp(hwnd, ADD_PREV_WINPROC_SUFFIX(JULAYOUT_STR));
+		assert(orig);
+		return orig(hwnd, msg, wParam, lParam);
+	}
 
 	if(msg==WM_SIZE)
 	{
@@ -216,23 +228,31 @@ JULayout::JulWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		MINMAXINFO *pMinMaxInfo = (MINMAXINFO*)lParam;
 		jul->HandleMinMax(pMinMaxInfo);
 	}
-	else if(msg==WM_DESTROY)
+
+	LRESULT ret = jul->m_prevWndProc(hwnd, msg, wParam, lParam);
+
+	if(msg==WM_DESTROY)
 	{
+		// Delete our "user data" but preserve orig-WndProc at a specific place.
+
+		RemoveProp(hwnd, JULAYOUT_STR);
+
+		SetProp(hwnd, ADD_PREV_WINPROC_SUFFIX(JULAYOUT_STR), jul->m_prevWndProc);
+
 		delete jul;
 	}
 
-	LRESULT ret = jul->m_prevWndProc(hwnd, msg, wParam, lParam);
 	return ret;
 }
 
 struct JULPrsht_st
 {
-	WNDPROC orig_winproc;
+	WNDPROC prev_winproc;
 	UINT xdiff, ydiff; // width,height diff of the Prsht and its containing page
 
 	JULPrsht_st()
 	{
-		orig_winproc = NULL;
+		prev_winproc = NULL;
 		xdiff = ydiff = 0;
 	}
 };
@@ -278,7 +298,7 @@ bool JULayout::in_PropSheetPrepare(HWND hwndPrsht)
 	}
 
 	jprsht = new JULPrsht_st;
-	jprsht->orig_winproc = SubclassWindow(hwndPrsht, PrshtWndProc);
+	jprsht->prev_winproc = SubclassWindow(hwndPrsht, PrshtWndProc);
 
 	SetProp(hwndPrsht, JULAYOUT_PRSHT_STR, jprsht);
 
@@ -304,7 +324,15 @@ bool JULayout::in_PropSheetPrepare(HWND hwndPrsht)
 LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	JULPrsht_st *jprsht = (JULPrsht_st*)GetProp(hwndPrsht, JULAYOUT_PRSHT_STR);
-	assert(jprsht);
+	if(!jprsht)
+	{
+		// This implies we had got WM_DESTROY sometime ago.
+		// We have no "user data" now, so just fetch and call orig-WndProc.
+
+		WNDPROC orig = (WNDPROC)GetProp(hwndPrsht, ADD_PREV_WINPROC_SUFFIX(JULAYOUT_PRSHT_STR));
+		assert(orig);
+		return orig(hwndPrsht, msg, wParam, lParam);
+	}
 
 	if(msg==g_WM_JULAYOUT_DO_INIT)
 	{
@@ -393,12 +421,18 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 			hwndPrevChild = hwndNowChild;
 		}
 	}
-	else if(msg==WM_DESTROY)
+
+	LRESULT ret = jprsht->prev_winproc(hwndPrsht, msg, wParam, lParam);
+
+	if(msg==WM_DESTROY)
 	{
+		RemoveProp(hwndPrsht, JULAYOUT_PRSHT_STR);
+
+		SetProp(hwndPrsht, ADD_PREV_WINPROC_SUFFIX(JULAYOUT_PRSHT_STR), jprsht->prev_winproc);
+		
 		delete jprsht;
 	}
 
-	LRESULT ret = jprsht->orig_winproc(hwndPrsht, msg, wParam, lParam);
 	return ret;
 }
 

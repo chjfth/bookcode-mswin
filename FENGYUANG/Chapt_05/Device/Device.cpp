@@ -83,5 +83,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
 	main.Run(hInstance);
 
-	return TRUE;
+	return 0;
 }	
