@@ -69,12 +69,9 @@ public:
         return PropertySheet(& psh);
     }
 
-	static int CALLBACK PrshtProc(HWND hwndPrsht,	UINT uMsg, LPARAM lParam)
+	static int CALLBACK PrshtProc(HWND hwndPrsht, UINT uMsg, LPARAM lParam)
 	{
-		if(uMsg==PSCB_INITIALIZED)
-		{
-			JULayout::EnableForPrsht(hwndPrsht);
-		}
+		JULayout::PropSheetProc(hwndPrsht, uMsg, lParam);
 		return 0;
 	}
 

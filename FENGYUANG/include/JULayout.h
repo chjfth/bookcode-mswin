@@ -38,9 +38,12 @@ public:
 	bool AnchorControls(int x1Anco, int y1Anco, int x2Anco, int y2Anco, ...);
 
 public:
-	static bool EnableForPrsht(HWND hwndPrsht);
-	// -- Make PropertySheet() dialog resizable.
-	// User calls this once in PropertySheet()'s PSCB_INITIALIZED callback, just that simple.
+	static bool PropSheetProc(HWND hwndPrsht, UINT uMsg, LPARAM lParam);
+	// -- In order to make PropertySheet() dialog resizable, user should call
+	// JULayout::PropSheetProc() once in PropertySheet()'s vanilla PropSheetProc callback, 
+	// relay the three params from Windows, and this function prepares everything 
+	// to make it work. Just that simple.
+	// Return false on fail, probably due to system running out of resource.
 
 public: // old-style public below
 	bool Initialize(HWND hwndParent, int nMinWidth = 0, int nMinHeight = 0);
@@ -49,6 +52,9 @@ public: // old-style public below
 	{ 
 		pMinMax->ptMinTrackSize = m_ptMinParentDims; 
 	}
+
+private:
+	static bool in_PropSheetPrepare(HWND hwndPrsht);
 
 private:
 	struct Ancofs_st {
@@ -97,7 +103,7 @@ private:
 #include <tchar.h>
 #include <assert.h>
 
-#include "dbgprint.h" // temp debug
+//#include "dbgprint.h" // temp debug
 
 #define JULAYOUT_STR _T("JULayout")
 #define JULAYOUT_PRSHT_STR _T("JULayout.Prsht")
@@ -231,7 +237,34 @@ struct JULPrsht_st
 	}
 };
 
-bool JULayout::EnableForPrsht(HWND hwndPrsht)
+bool JULayout::PropSheetProc(HWND hwndPrsht, UINT uMsg, LPARAM lParam)
+{
+	if (uMsg == PSCB_PRECREATE) 
+	{
+		DLGTEMPLATE& dt = *(DLGTEMPLATE*)lParam;
+		auto& style = dt.style;
+
+		// Enable WS_THICKFRAME, so to make it resizable.
+		// Note: We have to turn on WS_THIKFRAME *here*. If we do it when processing
+		// g_WM_JULAYOUT_DO_INIT message, that WS_THICKFRAME bit is set, however, 
+		// the Prsht frame is still not draggable. Can't explain why yet.
+		//
+		// WS_CLIPCHILDREN is to make the Tab-header less flickering.
+		//
+		style |= WS_THICKFRAME | WS_CLIPCHILDREN | WS_CLIPSIBLINGS ;
+
+		return 0;
+	}
+	else if(uMsg==PSCB_INITIALIZED)
+	{
+		bool succ = JULayout::in_PropSheetPrepare(hwndPrsht);
+		return succ;
+	}
+	
+	return true;
+}
+
+bool JULayout::in_PropSheetPrepare(HWND hwndPrsht)
 {
 	//
 	// Subclass hwndPrsht for WM_SIZE processing
@@ -290,7 +323,7 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 			UINT id = GetWindowID(hwndNowChild);
 			TCHAR classname[100] = {};
 			GetClassName(hwndNowChild, classname, 100);
-			dbgprint("See id=0x08%X , class=%s", id, classname);
+//			dbgprint("See id=0x08%X , class=%s", id, classname);
 
 			if(_tcsicmp(classname, _T("button"))==0)
 			{
@@ -320,14 +353,6 @@ LRESULT CALLBACK JULayout::PrshtWndProc(HWND hwndPrsht, UINT msg, WPARAM wParam,
 
 			hwndPrevChild = hwndNowChild;
 		}
-
-		// Make Prsht dialog resizable (pending, not draggable yet, need AmHotkey Ctrl+Win+arrow)
-		//
-		UINT ostyle = GetWindowStyle(hwndPrsht);
-		//SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle) | WS_THICKFRAME);
-		SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle & ~WS_SYSMENU) | WS_THICKFRAME); // draggable, but title blank
-		//SetWindowLong(hwndPrsht, GWL_STYLE, (ostyle & ~WS_POPUPWINDOW) | WS_OVERLAPPEDWINDOW); // NOT draggable
-		//SetWindowPos(hwndPrsht,0,0,0,0,0, SWP_NOZORDER|SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE|SWP_DRAWFRAME); // no effect
 	}
 	else if(msg==WM_SIZE)
 	{
