@@ -45,7 +45,7 @@ public:
 	// to make it work. Just that simple.
 	// Return false on fail, probably due to system running out of resource.
 
-public: // old-style public below
+private: // was public, now they are private
 	bool Initialize(HWND hwndParent, int nMinWidth = 0, int nMinHeight = 0);
 	bool AdjustControls(int cx, int cy);
 	void HandleMinMax(PMINMAXINFO pMinMax) 
@@ -269,7 +269,7 @@ struct DLGTEMPLATEEX_msdn  {
 
 bool JULayout::PropSheetProc(HWND hwndPrsht, UINT uMsg, LPARAM lParam)
 {
-	if (uMsg == PSCB_PRECREATE) 
+	if (uMsg==PSCB_PRECREATE) 
 	{
 		DLGTEMPLATE& dt = *(DLGTEMPLATE*)lParam;
 		DLGTEMPLATEEX_msdn& dtex = *(DLGTEMPLATEEX_msdn*)lParam;
