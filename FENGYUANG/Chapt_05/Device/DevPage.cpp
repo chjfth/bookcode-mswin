@@ -117,7 +117,7 @@ BOOL KDevicePage::OnDeviceChange(HWND hWnd)
 
 		Device.cb = sizeof(Device);
 
-		while ( EnumDisplayDevices(NULL, iDevNum, & Device, 0) )
+		while ( EnumDisplayDevices(NULL, iDevNum, &Device, 0) )
 		{
 			// Dev.DeviceName is like:
 			//	\\.\DISPLAY1
@@ -136,9 +136,11 @@ BOOL KDevicePage::OnDeviceChange(HWND hWnd)
 		
 		SetDlgItemText(hWnd, IDC_DEVICEID,     Device.DeviceID); 
 		// -- e.g. "PCI\VEN_80EE&DEV_BEEF&SUBSYS_040515AD&REV_00"
+		// For an RDP screen, this is empty string.
 		
 		SetDlgItemText(hWnd, IDC_DEVICEKEY,    Device.DeviceKey); 
 		// -- e.g. "\Registry\Machine\System\CurrentControlSet\Control\Video\{F53FDD4F-2C23-4245-B138-B1667CB4F52F}\0000"
+		// For an RDP screen, "\REGISTRY\Machine\System\CurrentControlSet\Services\RDPDD\Device0" 
 
 		vaSetDlgItemText(hWnd, IDC_TEXT_StateFlags, "StateFlags = 0x%08X", Device.StateFlags);
 
