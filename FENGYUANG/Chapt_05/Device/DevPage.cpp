@@ -22,6 +22,7 @@
 
 #include "..\..\include\property.h"
 #include "..\..\include\listview.h"
+#include "..\..\include\utils.h"
 
 #include "DevPage.h"
 #include "DevCaps.h"
@@ -36,10 +37,10 @@ void AddDisplayDevices(HWND hList)
 	SendMessage(hList, CB_RESETCONTENT, 0, 0);
 
 	for (unsigned i=0; 
-	     EnumDisplayDevices(NULL, i, & Dev, 0);
+	     EnumDisplayDevices(NULL, i, &Dev, 0);
 		 i++ )
 	{
-		// Dev.DeviceName is like:
+		// [output] Dev.DeviceName is like:
 		//	\\.\DISPLAY1
 		//	\\.\DISPLAY2
 		SendMessage(hList, CB_ADDSTRING, 0, (LPARAM) Dev.DeviceName);
@@ -94,7 +95,9 @@ BOOL KDevicePage::OnInitDialog(HWND hWnd)
 
 	JULayout *jul = JULayout::EnableJULayout(hWnd);
 	jul->AnchorControls(0,0, 100,0,  
-		IDC_DEVICE, IDC_DEVICESTRING, IDC_DEVICEID, IDC_DEVICEKEY, IDC_STATEFLAGS);
+		IDC_DEVICE, IDC_DEVICESTRING, IDC_DEVICEID, IDC_DEVICEKEY, IDC_STATEFLAGS,
+		IDC_TEXT_iDevNum, IDC_TEXT_StateFlags
+		);
 
 	jul->AnchorControls(0,0, 100,100, IDC_MODES);
 
@@ -126,6 +129,8 @@ BOOL KDevicePage::OnDeviceChange(HWND hWnd)
 				iDevNum ++;
 		}
 
+		vaSetDlgItemText(hWnd, IDC_TEXT_iDevNum, _T("iDevNum = %d"), iDevNum);
+
 		SetDlgItemText(hWnd, IDC_DEVICESTRING, Device.DeviceString); 
 		// -- e.g. "VirtualBox Graphics Adapter (WDDM)"
 		
@@ -134,6 +139,8 @@ BOOL KDevicePage::OnDeviceChange(HWND hWnd)
 		
 		SetDlgItemText(hWnd, IDC_DEVICEKEY,    Device.DeviceKey); 
 		// -- e.g. "\Registry\Machine\System\CurrentControlSet\Control\Video\{F53FDD4F-2C23-4245-B138-B1667CB4F52F}\0000"
+
+		vaSetDlgItemText(hWnd, IDC_TEXT_StateFlags, "StateFlags = 0x%08X", Device.StateFlags);
 
 		SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_RESETCONTENT, 0, 0);
 					
@@ -151,6 +158,15 @@ BOOL KDevicePage::OnDeviceChange(HWND hWnd)
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_VGA_COMPATIBLE )
 			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "VGA_COMPATIBLE");
+
+		if ( Device.StateFlags & DISPLAY_DEVICE_REMOTE )
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "REMOTE");
+
+		if ( Device.StateFlags & DISPLAY_DEVICE_DISCONNECT )
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "DISCONNECT");
+
+		if ( Device.StateFlags & DISPLAY_DEVICE_TS_COMPATIBLE )
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "TS_COMPATIBLE");
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_MODESPRUNED )
 			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "MODESPRUNED");

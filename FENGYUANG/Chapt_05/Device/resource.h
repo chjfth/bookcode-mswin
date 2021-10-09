@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by Device.rc
 //
 #define IDD_DEVICEPAGE                  101
@@ -24,6 +24,8 @@
 #define IDC_MEMDC2                      1017
 #define IDC_WMF                         1018
 #define IDC_EMF                         1019
+#define IDC_TEXT_StateFlags             1020
+#define IDC_TEXT_iDevNum                1021
 
 // Next default values for new objects
 // 
@@ -31,7 +33,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1020
+#define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
