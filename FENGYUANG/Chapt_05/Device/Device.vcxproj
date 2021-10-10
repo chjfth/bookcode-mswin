@@ -137,6 +137,8 @@
     <ResourceCompile Include="Device.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\JULayout.h" />
+    <ClInclude Include="..\..\include\utils.h" />
     <ClInclude Include="DCAttr.h" />
     <ClInclude Include="DevCaps.h" />
     <ClInclude Include="DevPage.h" />
