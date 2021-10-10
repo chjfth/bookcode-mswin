@@ -31,7 +31,7 @@ void KLogWindow::Create(HINSTANCE hInst, const TCHAR * pTitle, HICON hIcon)
 	m_hIcon = hIcon;
 
 	CreateEx(0, _T("LOGWINDOW"), pTitle, WS_VISIBLE | WS_OVERLAPPEDWINDOW, 
-		0, 0, 240, 600, NULL, NULL, hInst);
+		0, 0, 420, 600, NULL, NULL, hInst);
 }
 
 
@@ -47,7 +47,7 @@ LRESULT KLogWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				GetClientRect(m_hWnd, & rect);
 
 				m_hEditWnd = CreateWindow(_T("EDIT"), NULL,  
-					WS_VISIBLE | WS_CHILD | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL, 
+					WS_VISIBLE | WS_CHILD | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL |WS_VSCROLL, 
 					0, 0, rect.right, rect.bottom, m_hWnd, NULL, m_hInst, NULL);
 
 				SendMessage(m_hEditWnd, WM_SETFONT, (LPARAM) GetStockObject(SYSTEM_FIXED_FONT), 0);
