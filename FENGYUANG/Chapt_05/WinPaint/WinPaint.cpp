@@ -15,6 +15,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#include <windowsx.h>
 #include <assert.h>
 #include <tchar.h>
 
@@ -65,22 +66,20 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 			{
 				HMENU hMenu = GetMenu(GetParent(m_hWnd));
 
-				MENUITEMINFO mii;
-				
-				memset(& mii, 0, sizeof(mii));
-				mii.cbSize = sizeof(mii);
+				MENUITEMINFO mii = { sizeof(mii) };
 				mii.fMask  = MIIM_STATE;
 				
-				if ( GetMenuState(hMenu, LOWORD(wParam), MF_BYCOMMAND) & MF_CHECKED )
+				if ( GetMenuState(hMenu, GET_WM_COMMAND_ID(wParam, lParam), MF_BYCOMMAND) & MF_CHECKED )
 					mii.fState = MF_UNCHECKED;
 				else
 					mii.fState = MF_CHECKED;
-				SetMenuItemInfo(hMenu, LOWORD(wParam), FALSE, & mii);
 				
-				if ( LOWORD(wParam)==IDM_VIEW_HREDRAW )
-					m_Redraw ^= WVR_HREDRAW;
+				SetMenuItemInfo(hMenu, GET_WM_COMMAND_ID(wParam, lParam), FALSE, &mii);
+				
+				if ( GET_WM_COMMAND_ID(wParam, lParam)==IDM_VIEW_HREDRAW )
+					m_Redraw ^= WVR_HREDRAW; // toggle WVR_HREDRAW bit
 				else
-					m_Redraw ^= WVR_VREDRAW;
+					m_Redraw ^= WVR_VREDRAW; // toggle WVR_VREDRAW bit
 			}
 			return TRUE;
 
@@ -107,7 +106,9 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case WM_NCCALCSIZE:
 			m_Log.Log(_T("WM_NCCALCSIZE\r\n"));
+			
 			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
+			
 			m_Log.Log("WM_NCCALCSIZE returns %x\r\n", lr);
 
 			if ( wParam )
