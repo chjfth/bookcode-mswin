@@ -105,35 +105,60 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 
 		case WM_NCCALCSIZE:
+		{
+
 			m_Log.Log(_T("WM_NCCALCSIZE\r\n"));
 			
-			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
+			NCCALCSIZE_PARAMS *pNccs = (NCCALCSIZE_PARAMS*)lParam;
+			(void)pNccs;
 			
-			m_Log.Log("WM_NCCALCSIZE returns %x\r\n", lr);
+			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
+			LRESULT lrDef = lr;
+			
+			m_Log.Log("WM_NCCALCSIZE.Def returns 0x%x\r\n", lr);
 
 			if ( wParam )
 			{
 				lr &= ~ (WVR_HREDRAW | WVR_VREDRAW);
 				lr |= m_Redraw;
 			}
-			break;
 
-		case WM_NCPAINT:
-			m_Log.Log("WM_NCPAINT HRGN %0x\r\n", (HRGN) wParam);
-			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
-			m_Log.Log("WN_NCPAINT returns\r\n");
+			if(lr!=lrDef)
+			{
+				m_Log.Log("WM_NCCALCSIZE.Override returns 0x%x", lr);
+			}
+
 			break;
+		}
+		case WM_NCPAINT:
+		{
+			m_Log.Log("WM_NCPAINT HRGN %0x\r\n", (HRGN) wParam);
+			
+			HRGN hUpdateRgn = (HRGN)wParam;
+			(void)hUpdateRgn;
+
+			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
+			
+			m_Log.Log("WN_NCPAINT.Def returns\r\n");
+			break;
+		}
 
 		case WM_ERASEBKGND:
+		{
 			m_Log.Log("WM_ERASEBKGND HDC %0x\r\n", (HDC) wParam);
+			
 			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
-			m_Log.Log("WM_ERASEBKGND returns\r\n");
+			
+			m_Log.Log("WM_ERASEBKGND.Def returns\r\n");
 			break;
+		}
 
 		case WM_SIZE:
 			m_Log.Log("WM_SIZE type %d, width %d, height %d\r\n", wParam, LOWORD(lParam), HIWORD(lParam));
+			
 			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
-			m_Log.Log("WM_SIZE returns\r\n");
+			
+			m_Log.Log("WM_SIZE.Def returns\r\n");
 			break;
 
 		case WM_PAINT:
@@ -141,15 +166,17 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				PAINTSTRUCT ps; 
 
 				m_Log.Log("WM_PAINT\r\n");
+				
 				m_Log.Log("BeginPaint\r\n");
 				HDC hDC = BeginPaint(m_hWnd, &ps);
-				m_Log.Log("BeginPaint returns HDC %8x\r\n", hDC);
+				m_Log.Log("BeginPaint returns HDC 0x%08x\r\n", hDC);
 
 				OnDraw(hDC, &ps.rcPaint);
 
 				m_Log.Log("EndPaint\r\n");
 				EndPaint(m_hWnd, &ps);
-				m_Log.Log("EndPaint returns GetObjectType(%08x)=%d\r\n", hDC, GetObjectType(hDC));
+				m_Log.Log("EndPaint returns GetObjectType(0x%08x)=%d\r\n", hDC, GetObjectType(hDC));
+				
 				m_Log.Log("WM_PAINT returns\r\n");
 			}
 			return 0;
