@@ -1,32 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{d44cc1f3-e88c-48fe-a0cc-fd0a6ec0aa98}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{0a4faf61-83c4-4bf2-98ed-ad84c051fccc}</UniqueIdentifier>
-      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{13312da0-4af1-4500-9185-3ad150a647e4}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl</Extensions>
-    </Filter>
+    <ClCompile Include="WinPaint.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="WinPaint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="WinPaint.rc">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="graph.ico">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
+    <ResourceCompile Include="WinPaint.rc" />
   </ItemGroup>
 </Project>
