@@ -140,6 +140,12 @@
   <ItemGroup>
     <ResourceCompile Include="WindowDC.rc" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <VSPG_FeedbackFile>.\WindowDC.cpp</VSPG_FeedbackFile>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)_VSPG.props" />
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
