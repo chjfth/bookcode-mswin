@@ -169,7 +169,8 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				
 				m_Log.Log("BeginPaint\r\n");
 				HDC hDC = BeginPaint(m_hWnd, &ps);
-				m_Log.Log("BeginPaint returns HDC 0x%08x\r\n", hDC);
+				DWORD objtype = GetObjectType(hDC);
+				m_Log.Log("BeginPaint returns HDC 0x%08x (objtype=%d)\r\n", hDC, objtype);
 
 				OnDraw(hDC, &ps.rcPaint);
 
@@ -201,7 +202,12 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 	GetDCOrgEx(hDC, & Origin);
 
 	if ( ((unsigned) hDC) & 0xFFFF0000 )
+	{
+		// [CH5.5] it is a 32-bit HDC, so we're running on WinNT.
+		// The m_hRegion on NT is expressed in screen coordinate,
+		// and we convert is to be client-area coordinate here.
 		OffsetRgn(m_hRegion, - Origin.x, - Origin.y);
+	}
 
 	m_nRepaint ++;
 
@@ -251,7 +257,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 		delete [] (char *) pRegion;
 	}
 
-	wsprintf(mess, _T("WM_PAINT message %d, %d rects in sysrgn"), m_nRepaint, rectcount);
+	wsprintf(mess, _T("WM_PAINT message #%d: %d rects in sysrgn"), m_nRepaint, rectcount);
 	if ( m_pStatus )
 		m_pStatus->SetText(pane_2, mess);
 
