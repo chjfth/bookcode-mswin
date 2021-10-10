@@ -61,7 +61,12 @@ LRESULT KLogWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 
 		case WM_NCDESTROY:
-			delete this; // deallocate itself
+			
+			// delete this; // deallocate itself
+			// -- [2021-10-10] Chj: We should NOT do this, bcz in many example codes,
+			// the user defines a KLogWindow class instance directly(instead of 
+			// `new` an instance).
+
 			return 0;
 
 		default:
@@ -102,9 +107,16 @@ void KLogWindow::Log(const TCHAR * format, ...)
 	{
 		_tcscat_s(buffer, ARRAYSIZE(buffer), _T("\r\n"));
 	}
-	
-	SendMessage(m_hEditWnd, EM_SETSEL, 0xFFFFFF, 0xFFFFFF);
-	SendMessage(m_hEditWnd, EM_REPLACESEL, 0, (LPARAM) buffer);
+
+	if(IsWindow(m_hEditWnd))
+	{
+		SendMessage(m_hEditWnd, EM_SETSEL, 0xFFFFFF, 0xFFFFFF);
+		SendMessage(m_hEditWnd, EM_REPLACESEL, 0, (LPARAM) buffer);
+	}
+	else
+	{
+		// The KLogWindow window may have been destroyed, nothing to do.
+	}
 
 	va_end(ap);
 

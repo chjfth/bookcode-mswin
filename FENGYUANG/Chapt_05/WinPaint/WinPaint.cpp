@@ -36,7 +36,7 @@ class KMyCanvas : public KCanvas
 	
 	int				m_Red, m_Green, m_Blue;
 	HRGN			m_hRegion;
-	KLogWindow		m_Log;
+	KLogWindow		m_Log;   // define a KLogWindow instance directly
 	DWORD			m_Redraw;
 
 public:
