@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <ItemDefinitionGroup>
+
+    <PreBuildEvent>
+      <Command>$(SolutionDir)_VSPG\VSPG-Start9.bat $(SolutionDir)_VSPG\VSPG-PreBuild7.bat $(ProjectDir)WinPaint.cpp $(SolutionDir) $(ProjectDir) $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName) $(TargetName)</Command>
+    </PreBuildEvent>
+
+    <PostBuildEvent>
+      <Command>$(SolutionDir)_VSPG\VSPG-Start9.bat $(SolutionDir)_VSPG\VSPG-PostBuild7.bat $(ProjectDir)WinPaint.cpp $(SolutionDir) $(ProjectDir) $(Configuration) $(PlatformName) $(TargetDir) $(TargetFileName) $(TargetName)</Command>
+    </PostBuildEvent>
+
+  </ItemDefinitionGroup>
+
+</Project>
+
