@@ -19,4 +19,22 @@ void vaSetDlgItemText(HWND hwnd, UINT ctrlid, const TCHAR *fmt, ...)
 	va_end(args);
 }
 
+TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false)
+{
+	SYSTEMTIME st = {0};
+	GetLocalTime(&st);
+	buf[0]=_T('['); buf[1]=_T('\0'); buf[bufchars-1] = _T('\0');
+	if(ymd) {
+		_sntprintf_s(buf, bufchars-1, _TRUNCATE, _T("%s%04d-%02d-%02d "), buf, 
+			st.wYear, st.wMonth, st.wDay);
+	}
+
+	_sntprintf_s(buf, bufchars-1, _TRUNCATE, _T("%s%02d:%02d:%02d.%03d]"), buf,
+		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+	return buf;
+}
+
+
+
 #endif

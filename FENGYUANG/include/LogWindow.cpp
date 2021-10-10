@@ -21,6 +21,7 @@
 #include <stdarg.h>
 
 #include "win.h"
+#include "utils.h" // chj
 #include "logwindow.h"
 
 
@@ -69,18 +70,45 @@ LRESULT KLogWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-void KLogWindow::Log(const char * format, ...)
+
+void KLogWindow::Log(const TCHAR * format, ...)
 {
-    char buffer[1024];
+	const int bufsize = 1024;
+	TCHAR buffer[bufsize+4] = {};
+
+	static DWORD s_prev_msec = GetTickCount();
+	DWORD now_msec = GetTickCount();
+
+	if(now_msec-s_prev_msec < 1000) // less than 1 second from previous log
+	{
+		now_timestr(buffer, bufsize);
+	}
+	else
+	{	// Add an extra dot line
+		_tcscat_s(buffer, ARRAYSIZE(buffer), _T(".\r\n"));
+		now_timestr(buffer+3, bufsize-3);
+	}
+
+	int pfxlen = _tcslen(buffer);
 
     va_list ap;
 
 	va_start(ap, format);
-	vsprintf(buffer, format, ap);
+	
+	_vsntprintf_s(buffer+pfxlen, bufsize-pfxlen, _TRUNCATE, format, ap);
+
+	int totlen = _tcslen(buffer);
+	if(buffer[totlen-1]!=_T('\n'))
+	{
+		_tcscat_s(buffer, ARRAYSIZE(buffer), _T("\r\n"));
+	}
+	
 	SendMessage(m_hEditWnd, EM_SETSEL, 0xFFFFFF, 0xFFFFFF);
 	SendMessage(m_hEditWnd, EM_REPLACESEL, 0, (LPARAM) buffer);
 
 	va_end(ap);
+
+	s_prev_msec = now_msec;
 }
 
 

@@ -5,7 +5,7 @@
 
 #define COUNT(ar) (sizeof(ar)/sizeof(ar[0]))
 
-inline void dbgprint(const TCHAR *fmt, ...)
+inline void vaDbg(const TCHAR *fmt, ...)
 {
     static int count = 0;
     TCHAR buf[1000] = {0};
