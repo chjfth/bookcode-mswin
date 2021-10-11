@@ -30,6 +30,7 @@ IDR_MAIN MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
+    	MENUITEM "Invalidate a Circle &Region"  IDM_FILE_INVALIDATE_RGN
         MENUITEM "E&xit",                       IDM_FILE_EXIT
     END
     POPUP "&View"

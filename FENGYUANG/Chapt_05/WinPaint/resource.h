@@ -7,6 +7,7 @@
 #define IDM_FILE_EXIT                   40001
 #define IDM_VIEW_HREDRAW                40002
 #define IDM_VIEW_VREDRAW                40003
+#define IDM_FILE_INVALIDATE_RGN         40004
 
 // Next default values for new objects
 // 

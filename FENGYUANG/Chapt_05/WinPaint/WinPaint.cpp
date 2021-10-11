@@ -63,25 +63,37 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 		case IDM_VIEW_HREDRAW:
 		case IDM_VIEW_VREDRAW:
-			{
-				HMENU hMenu = GetMenu(GetParent(m_hWnd));
+		{
+			HMENU hMenu = GetMenu(GetParent(m_hWnd));
 
-				MENUITEMINFO mii = { sizeof(mii) };
-				mii.fMask  = MIIM_STATE;
+			MENUITEMINFO mii = { sizeof(mii) };
+			mii.fMask  = MIIM_STATE;
 				
-				if ( GetMenuState(hMenu, GET_WM_COMMAND_ID(wParam, lParam), MF_BYCOMMAND) & MF_CHECKED )
-					mii.fState = MF_UNCHECKED;
-				else
-					mii.fState = MF_CHECKED;
+			if ( GetMenuState(hMenu, GET_WM_COMMAND_ID(wParam, lParam), MF_BYCOMMAND) & MF_CHECKED )
+				mii.fState = MF_UNCHECKED;
+			else
+				mii.fState = MF_CHECKED;
 				
-				SetMenuItemInfo(hMenu, GET_WM_COMMAND_ID(wParam, lParam), FALSE, &mii);
+			SetMenuItemInfo(hMenu, GET_WM_COMMAND_ID(wParam, lParam), FALSE, &mii);
 				
-				if ( GET_WM_COMMAND_ID(wParam, lParam)==IDM_VIEW_HREDRAW )
-					m_Redraw ^= WVR_HREDRAW; // toggle WVR_HREDRAW bit
-				else
-					m_Redraw ^= WVR_VREDRAW; // toggle WVR_VREDRAW bit
-			}
+			if ( GET_WM_COMMAND_ID(wParam, lParam)==IDM_VIEW_HREDRAW )
+				m_Redraw ^= WVR_HREDRAW; // toggle WVR_HREDRAW bit
+			else
+				m_Redraw ^= WVR_VREDRAW; // toggle WVR_VREDRAW bit
+
 			return TRUE;
+		}
+
+		case IDM_FILE_INVALIDATE_RGN:
+		{
+			// Invalidate a circle region, and we'll see that GetRegionData()
+			// represents this as a lot of scan-lines(thin rectangles).
+
+			HRGN hrgnCircle = CreateEllipticRgn(0,0, 100,100);
+			InvalidateRgn(m_hWnd, hrgnCircle, FALSE);
+			DeleteObject(hrgnCircle);
+			return 0;
+		}
 
 		case IDM_FILE_EXIT:
 			DestroyWindow(GetParent(m_hWnd));
@@ -162,25 +174,25 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case WM_PAINT:
-			{
-				PAINTSTRUCT ps; 
+		{
+			PAINTSTRUCT ps; 
 
-				m_Log.Log("WM_PAINT\r\n");
+			m_Log.Log("WM_PAINT\r\n");
 				
-				m_Log.Log("BeginPaint\r\n");
-				HDC hDC = BeginPaint(m_hWnd, &ps);
-				DWORD objtype = GetObjectType(hDC);
-				m_Log.Log("BeginPaint returns HDC 0x%08x (objtype=%d)\r\n", hDC, objtype);
+			m_Log.Log("BeginPaint\r\n");
+			HDC hDC = BeginPaint(m_hWnd, &ps);
+			DWORD objtype = GetObjectType(hDC);
+			m_Log.Log("BeginPaint returns HDC 0x%08x (objtype=%d)\r\n", hDC, objtype);
 
-				OnDraw(hDC, &ps.rcPaint);
+			OnDraw(hDC, &ps.rcPaint);
 
-				m_Log.Log("EndPaint\r\n");
-				EndPaint(m_hWnd, &ps);
-				m_Log.Log("EndPaint returns GetObjectType(0x%08x)=%d\r\n", hDC, GetObjectType(hDC));
+			m_Log.Log("EndPaint\r\n");
+			EndPaint(m_hWnd, &ps);
+			m_Log.Log("EndPaint returns GetObjectType(0x%08x)=%d\r\n", hDC, GetObjectType(hDC));
 				
-				m_Log.Log("WM_PAINT returns\r\n");
-			}
+			m_Log.Log("WM_PAINT returns\r\n");
 			return 0;
+		}
 
 		default:
 			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -242,7 +254,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 		GetTextMetrics(hDC, & tm);
 		int lineheight = tm.tmHeight + tm.tmExternalLeading; 
 
-		for (unsigned i=0; i<pRegion->rdh.nCount; i++)
+		for (unsigned i=0; i<rectcount; i++)
 		{
 			int x = (pRect[i].left + pRect[i].right)/2;
 			int y = (pRect[i].top + pRect[i].bottom)/2;
@@ -253,6 +265,8 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 			wsprintf(mess, "(%d, %d, %d, %d)", pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 			::TextOut(hDC, x, y, mess, _tcslen(mess));
 
+			m_Log.Log(_T("Rgn-rect#%d (%d,%d, %d,%d)"), i+1,
+				pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 		}
 
 		delete [] (char *) pRegion;
