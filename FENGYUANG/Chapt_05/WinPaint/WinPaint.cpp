@@ -205,7 +205,8 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 	{
 		// [CH5.5] it is a 32-bit HDC, so we're running on WinNT.
 		// The m_hRegion on NT is expressed in screen coordinate,
-		// and we convert is to be client-area coordinate here.
+		// and we convert it to be client-area coordinate here.
+		// Verified, it is a must on Windows 7.
 		OffsetRgn(m_hRegion, - Origin.x, - Origin.y);
 	}
 
