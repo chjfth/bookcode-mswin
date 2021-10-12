@@ -193,14 +193,14 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				//  Give names to these things
 				RECT ircWndPosNow = pNccs->rgrc[0]; // input naming, rela-to hWnd's parent
 				RECT ircWndPosWas = pNccs->rgrc[1]; // input naming, rela-to hWnd's parent
-				RECT ircClientAreasWas = pNccs->rgrc[2]; // input naming, rela-to hWnd's parent
+				RECT ircClientAreaWas = pNccs->rgrc[2]; // input naming, rela-to hWnd's parent
 				//
 				RECT &orcClientNew = pNccs->rgrc[0]; // output naming, rela-to hWnd's parent
 				RECT &orcValidDst  = pNccs->rgrc[1]; // output naming, rela-to hWnd's parent
 				RECT &orcValidSrc  = pNccs->rgrc[2]; // output naming, rela-to hWnd's parent
 
-				int oldcliw = ircClientAreasWas.right - ircClientAreasWas.left; // old client-area width
-				int oldclih = ircClientAreasWas.bottom - ircClientAreasWas.top; // old client-area height
+				int oldcliw = ircClientAreaWas.right - ircClientAreaWas.left; // old client-area width
+				int oldclih = ircClientAreaWas.bottom - ircClientAreaWas.top; // old client-area height
 
 				int newcliw = ircWndPosNow.right - ircWndPosNow.left - m_ncborder*2; // new client-area width
 				int newclih = ircWndPosNow.bottom - ircWndPosNow.top - m_ncborder*2; // new client-area height
@@ -216,7 +216,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				if(m_is_nccenter)
 				{
-					POINT oldcenter = GetRectCenter(ircClientAreasWas);
+					POINT oldcenter = GetRectCenter(ircClientAreaWas);
 					POINT newcenter = GetRectCenter(ircWndPosNow);
 
 					int copycliw = min(oldcliw, newcliw);
