@@ -17,6 +17,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <assert.h>
+#include <stdio.h>
 #include <tchar.h>
 
 #include "..\..\include\win.h"
@@ -146,10 +147,22 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch( uMsg )
 	{
 		case WM_CREATE:
+		{
 			m_hWnd = hWnd;
 			m_Log.Create(m_hInst, _T("WinPaint"), LoadIcon(m_hInst, MAKEINTRESOURCE(IDI_GRAPH)));
 			m_Log.Log(_T("WM_CREATE\r\n"));
+
+			// Set a dynamic menu-item text.
+			//
+			HMENU hMenu = GetMenu(GetParent(m_hWnd));
+			TCHAR mitext[100];
+			_sntprintf_s(mitext, ARRAYSIZE(mitext), _TRUNCATE, _T("Canvas add non-client border (%d px)"), NCBORDER_SIZE);
+			BOOL succ = ModifyMenu(hMenu, IDM_CANVAS_ADD_NONCLIENT_BORDER, 
+				MF_BYCOMMAND, IDM_CANVAS_ADD_NONCLIENT_BORDER, mitext);
+			assert(succ);
+
 			return 0;
+		}
 
 		case WM_NCCALCSIZE:
 		{
@@ -343,7 +356,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 			int x = (pRect[i].left + pRect[i].right)/2;
 			int y = (pRect[i].top + pRect[i].bottom)/2;
 
-			wsprintf(mess, "WM_PAINT %d, rect %d", m_nRepaint, i+1);
+			wsprintf(mess, "WM_PAINT #%d, rect %d", m_nRepaint, i+1);
 			::TextOut(hDC, x, y - lineheight, mess, _tcslen(mess));
 
 			wsprintf(mess, "(%d, %d, %d, %d)", pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
