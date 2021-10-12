@@ -103,10 +103,9 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 	return FALSE;	// not processed
 }
 
-
 LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	LRESULT lr;
+	LRESULT lr = 0;
 
 	switch( uMsg )
 	{
@@ -118,16 +117,56 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case WM_NCCALCSIZE:
 		{
-
 			m_Log.Log(_T("WM_NCCALCSIZE\r\n"));
-			
+
+////////
 			NCCALCSIZE_PARAMS *pNccs = (NCCALCSIZE_PARAMS*)lParam;
 			(void)pNccs;
 			
-			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
+			//lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
 			LRESULT lrDef = lr;
-			
-			m_Log.Log("WM_NCCALCSIZE.Def returns 0x%x\r\n", lr);
+			//m_Log.Log("WM_NCCALCSIZE.Def returns 0x%x\r\n", lr);
+
+			const int ncboarder = 20;
+			if(wParam==1)
+			{
+				//  Give names to these things
+				RECT &ircWndPosNow = pNccs->rgrc[0]; // input naming, rela-to hWnd's parent
+				RECT &ircWndPosWas = pNccs->rgrc[1]; // input naming, rela-to hWnd's parent
+				RECT &ircClientAreasWas = pNccs->rgrc[2]; // input naming, rela-to hWnd itself
+				//
+				RECT &orcClientNew = pNccs->rgrc[0]; // output naming, rela-to hWnd itself
+				RECT &orcValidDst  = pNccs->rgrc[1]; // output naming, rela-to hWnd itself?
+				RECT &orcValidSrc  = pNccs->rgrc[2]; // output naming, rela-to hWnd itself?
+
+				int oldw = ircWndPosWas.right - ircWndPosWas.left; // hWnd old width
+				int oldh = ircWndPosWas.bottom - ircWndPosWas.top; // hWnd old height
+
+				int neww = ircWndPosNow.right - ircWndPosNow.left; // hWnd new width
+				int newh = ircWndPosNow.bottom - ircWndPosNow.top; // hWnd new height
+
+				// Now we change rgrc[0] to be the coordinate of hWnd's client area location.
+				// Note: this "output rgrc[0]" is relative to hWnd itself.
+				//
+				SetRect(&orcClientNew, 
+					ncboarder, ncboarder, 
+					neww-ncboarder, newh-ncboarder);
+
+				// Tell Windows to move old client area content to *center* of new client area.
+				//
+				SetRect(&orcValidDst, 
+					ncboarder+(neww-oldw)/2, ncboarder+(newh-oldh)/2,
+					neww-ncboarder-(neww-oldw)/2, newh-ncboarder-(newh-oldh)/2);
+
+				//SetRectEmpty(pNccs->rgrc+1); SetRectEmpty(pNccs->rgrc+2);
+				//				SetRect(pNccs->rgrc+1, 0,0,120,120); pNccs->rgrc[2]=pNccs->rgrc[1];
+				m_Log.Log(_T("Apply new client area."));
+			}
+			else if(wParam==0) // started first move
+			{
+				InflateRect(pNccs->rgrc+0, -ncboarder, -ncboarder); // this is screen coord
+				m_Log.Log(_T("Init new client area."));
+			}
 
 			if ( wParam )
 			{
@@ -139,6 +178,9 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				m_Log.Log("WM_NCCALCSIZE.Override returns 0x%x", lr);
 			}
+// lr|=WVR_ALIGNBOTTOM;
+// lr|=WVR_ALIGNRIGHT;
+lr|= WVR_VALIDRECTS;
 
 			break;
 		}
@@ -175,6 +217,15 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case WM_PAINT:
 		{
+			m_nRepaint ++;
+			switch ( m_nRepaint % 3 )
+			{
+			case 0: m_Red  = (m_Red   + 0x52) & 0xFF; break;
+			case 1: m_Green= (m_Green + 0x52) & 0xFF; break;
+			case 2: m_Blue = (m_Blue  + 0x52) & 0xFF; break;
+			}
+
+
 			PAINTSTRUCT ps; 
 
 			m_Log.Log("WM_PAINT\r\n");
@@ -222,20 +273,11 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 		OffsetRgn(m_hRegion, - Origin.x, - Origin.y);
 	}
 
-	m_nRepaint ++;
-
 	TCHAR mess[64];
 
 	wsprintf(mess, _T("HDC 0x%X, Org(%d, %d)"), hDC, Origin.x, Origin.y); 
 	if ( m_pStatus )
 		m_pStatus->SetText(pane_1, mess);
-
-	switch ( m_nRepaint % 3 )
-	{
-		case 0: m_Red  = (m_Red   + 0x31) & 0xFF; break;
-		case 1: m_Green= (m_Green + 0x31) & 0xFF; break;
-		case 2: m_Blue = (m_Blue  + 0x31) & 0xFF; break;
-	}
 
 	SetTextAlign(hDC, TA_TOP | TA_CENTER);
 
@@ -254,7 +296,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 		GetTextMetrics(hDC, & tm);
 		int lineheight = tm.tmHeight + tm.tmExternalLeading; 
 
-		for (unsigned i=0; i<rectcount; i++)
+		for (int i=0; i<rectcount; i++)
 		{
 			int x = (pRect[i].left + pRect[i].right)/2;
 			int y = (pRect[i].top + pRect[i].bottom)/2;
@@ -313,7 +355,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	frame.CreateEx(0, _T("ClassName"), _T("WinPaint"),
 		WS_OVERLAPPEDWINDOW,
-	    CW_USEDEFAULT, CW_USEDEFAULT, 600, 400, 
+	    CW_USEDEFAULT, CW_USEDEFAULT, 
+		400+16, 200+80, // Win7: x-boarder+16, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
 
     frame.ShowWindow(nShow);
