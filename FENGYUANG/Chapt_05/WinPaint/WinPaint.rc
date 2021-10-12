@@ -81,6 +81,16 @@ IDI_GRAPH               ICON    DISCARDABLE     "..\..\Res\graph.ico"
 /////////////////////////////////////////////////////////////////////////////
 
 
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_EXIT             "Exit program"
+    IDS_DO_INVALIDATE_RGN           "Invalidate a circle region"
+END
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

@@ -21,6 +21,7 @@
 #include <tchar.h>
 
 #include "..\..\include\win.h"
+#include "..\..\include\Toolbar.h"
 #include "..\..\include\Canvas.h"
 #include "..\..\include\Status.h"
 #include "..\..\include\FrameWnd.h"
@@ -140,6 +141,12 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 	return FALSE;	// not processed
 }
 
+static POINT GetRectCenter(RECT &r)
+{
+	POINT pt = {(r.left+r.right)/2, (r.top+r.bottom)/2};
+	return pt;
+}
+
 LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT lr = 0;
@@ -180,36 +187,46 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				//  Give names to these things
 				RECT &ircWndPosNow = pNccs->rgrc[0]; // input naming, rela-to hWnd's parent
 				RECT &ircWndPosWas = pNccs->rgrc[1]; // input naming, rela-to hWnd's parent
-				RECT &ircClientAreasWas = pNccs->rgrc[2]; // input naming, rela-to hWnd itself
+				RECT &ircClientAreasWas = pNccs->rgrc[2]; // input naming, rela-to hWnd's parent
 				//
-				RECT &orcClientNew = pNccs->rgrc[0]; // output naming, rela-to hWnd itself
-				RECT &orcValidDst  = pNccs->rgrc[1]; // output naming, rela-to hWnd itself
-				RECT &orcValidSrc  = pNccs->rgrc[2]; // output naming, rela-to hWnd itself
+				RECT &orcClientNew = pNccs->rgrc[0]; // output naming, rela-to hWnd's parent
+				RECT &orcValidDst  = pNccs->rgrc[1]; // output naming, rela-to hWnd's parent
+				RECT &orcValidSrc  = pNccs->rgrc[2]; // output naming, rela-to hWnd's parent
 
-				int oldw = ircWndPosWas.right - ircWndPosWas.left; // hWnd old width
-				int oldh = ircWndPosWas.bottom - ircWndPosWas.top; // hWnd old height
+				int oldcliw = ircClientAreasWas.right - ircClientAreasWas.left; // old client-area width
+				int oldclih = ircClientAreasWas.bottom - ircClientAreasWas.top; // old client-area height
 
-				int neww = ircWndPosNow.right - ircWndPosNow.left; // hWnd new width
-				int newh = ircWndPosNow.bottom - ircWndPosNow.top; // hWnd new height
+				int newcliw = ircWndPosNow.right - ircWndPosNow.left - m_ncborder*2; // new client-area width
+				int newclih = ircWndPosNow.bottom - ircWndPosNow.top - m_ncborder*2; // new client-area height
 
 				if(m_ncborder>0)
 				{
 					// Now we change rgrc[0] to be the coordinate of hWnd's client area location.
-					// Note: this "output rgrc[0]" is relative to hWnd itself.
 					//
 					SetRect(&orcClientNew, 
-						m_ncborder, m_ncborder, 
-						neww-m_ncborder, newh-m_ncborder);
+						ircWndPosNow.left + m_ncborder, ircWndPosNow.top + m_ncborder, 
+						ircWndPosNow.right - m_ncborder, ircWndPosNow.bottom - m_ncborder);
 				}
 
 				if(m_is_nccenter)
 				{
+					POINT oldcenter = GetRectCenter(ircClientAreasWas);
+					POINT newcenter = GetRectCenter(ircWndPosNow);
+
+					int copycliw = min(oldcliw, newcliw);
+					int copyclih = min(oldclih, newclih);
+
 					// Tell Windows to move old client area content to *center* of new client area.
 					//
+					SetRect(&orcValidSrc,
+						oldcenter.x - copycliw/2, oldcenter.y - copyclih/2, 
+						oldcenter.x + copycliw/2, oldcenter.y + copyclih/2
+						);
+					//
 					SetRect(&orcValidDst, 
-						m_ncborder+(neww-oldw)/2, m_ncborder+(newh-oldh)/2,
-						neww-m_ncborder-(neww-oldw)/2, newh-m_ncborder-(newh-oldh)/2);
-
+						newcenter.x - copycliw/2, newcenter.y - copyclih/2, 
+						newcenter.x + copycliw/2, newcenter.y + copyclih/2
+						);
 					lr |= WVR_VALIDRECTS;
 					// -- MSDN: This flag cannot be combined with any other flags. 
 				}
@@ -408,18 +425,26 @@ public:
 
 };
 
+const TBBUTTON tbButtons[] =
+{
+	{ STD_FILENEW,	 IDM_FILE_EXIT,   TBSTATE_ENABLED, TBSTYLE_BUTTON, { 0, 0 }, IDS_EXIT,   0 },
+	{ STD_CUT, IDM_FILE_INVALIDATE_RGN,  TBSTATE_ENABLED, TBSTYLE_BUTTON, { 0, 0 }, IDS_DO_INVALIDATE_RGN, 0 }
+	// -- BUG: iBitmap value STD_xxx is inconsistent with actual display.
+};
+
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 {
+	KToolbar      toolbar;
 	KMyCanvas     canvas;
 	KStatusWindow status;
 
-	KMyFrame frame(hInst, NULL, 0, NULL, & canvas, & status);
+	KMyFrame frame(hInst, tbButtons, 2, &toolbar, &canvas, &status);
 
 	frame.CreateEx(0, _T("ClassName"), _T("WinPaint (chjmod)"),
 		WS_OVERLAPPEDWINDOW,
 	    CW_USEDEFAULT, CW_USEDEFAULT, 
-		400+16, 200+80, // Win7: x-border+16, 
+		400+16, 200+80+37, // [Win7] 16 left+right frame thick; 37: toolbar height 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
 
     frame.ShowWindow(nShow);

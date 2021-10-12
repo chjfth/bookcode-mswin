@@ -12,6 +12,9 @@
 #define IDM_CENTER_CLIENT_AREA          40005
 #define IDM_CANVAS_ADD_NONCLIENT_BORDER 40006
 
+#define IDS_EXIT                   40010
+#define IDS_DO_INVALIDATE_RGN      40011
+
 
 // Next default values for new objects
 // 
