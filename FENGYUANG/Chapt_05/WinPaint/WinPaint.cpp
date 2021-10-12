@@ -127,7 +127,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			LRESULT lrDef = lr;
 			//m_Log.Log("WM_NCCALCSIZE.Def returns 0x%x\r\n", lr);
 
-			const int ncboarder = 20;
+			const int ncborder = 20;
 			if(wParam==1)
 			{
 				//  Give names to these things
@@ -149,14 +149,14 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// Note: this "output rgrc[0]" is relative to hWnd itself.
 				//
 				SetRect(&orcClientNew, 
-					ncboarder, ncboarder, 
-					neww-ncboarder, newh-ncboarder);
+					ncborder, ncborder, 
+					neww-ncborder, newh-ncborder);
 
 				// Tell Windows to move old client area content to *center* of new client area.
 				//
 				SetRect(&orcValidDst, 
-					ncboarder+(neww-oldw)/2, ncboarder+(newh-oldh)/2,
-					neww-ncboarder-(neww-oldw)/2, newh-ncboarder-(newh-oldh)/2);
+					ncborder+(neww-oldw)/2, ncborder+(newh-oldh)/2,
+					neww-ncborder-(neww-oldw)/2, newh-ncborder-(newh-oldh)/2);
 
 				//SetRectEmpty(pNccs->rgrc+1); SetRectEmpty(pNccs->rgrc+2);
 				//				SetRect(pNccs->rgrc+1, 0,0,120,120); pNccs->rgrc[2]=pNccs->rgrc[1];
@@ -164,7 +164,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			else if(wParam==0) // started first move
 			{
-				InflateRect(pNccs->rgrc+0, -ncboarder, -ncboarder); // this is screen coord
+				InflateRect(pNccs->rgrc+0, -ncborder, -ncborder); // this is screen coord
 				m_Log.Log(_T("Init new client area."));
 			}
 
@@ -307,6 +307,14 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 			wsprintf(mess, "(%d, %d, %d, %d)", pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 			::TextOut(hDC, x, y, mess, _tcslen(mess));
 
+			// >>> Chj: draw dotted border around each rect, for better teaching purpose
+			HBRUSH oldbrush = SelectBrush(hDC, GetStockObject(HOLLOW_BRUSH));
+			HPEN oldpen = SelectPen(hDC, CreatePen(PS_DOT, 1, RGB(m_Red, m_Green, m_Blue)));
+			Rectangle(hDC, pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
+			DeleteObject(SelectPen(hDC, oldpen));
+			SelectBrush(hDC, oldbrush);
+			// <<<
+
 			m_Log.Log(_T("Rgn-rect#%d (%d,%d, %d,%d)"), i+1,
 				pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 		}
@@ -353,10 +361,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	KMyFrame frame(hInst, NULL, 0, NULL, & canvas, & status);
 
-	frame.CreateEx(0, _T("ClassName"), _T("WinPaint"),
+	frame.CreateEx(0, _T("ClassName"), _T("WinPaint (chjmod)"),
 		WS_OVERLAPPEDWINDOW,
 	    CW_USEDEFAULT, CW_USEDEFAULT, 
-		400+16, 200+80, // Win7: x-boarder+16, 
+		400+16, 200+80, // Win7: x-border+16, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
 
     frame.ShowWindow(nShow);
