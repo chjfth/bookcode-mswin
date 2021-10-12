@@ -27,6 +27,7 @@
 
 #include "Resource.h"
 
+#define NCBORDER_SIZE 20
 
 class KMyCanvas : public KCanvas
 {
@@ -39,6 +40,9 @@ class KMyCanvas : public KCanvas
 	HRGN			m_hRegion;
 	KLogWindow		m_Log;   // define a KLogWindow instance directly
 	DWORD			m_Redraw;
+
+	int m_ncborder; // canvas non-client border pixels(just like a top-level windows's frame)
+	bool m_is_nccenter; // in WM_NCCALCSIZE, whether center client-area to new window pos.
 
 public:
 
@@ -53,33 +57,61 @@ public:
 		m_Green    = 0x8F;
 		m_Blue     = 0xCF;
 		m_Redraw   = 0;
+
+		m_ncborder = 0; // no border, this is most common for a child window
+		m_is_nccenter = false;
 	}
 };
 
 
 BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	switch ( LOWORD(wParam) )
+	UINT cmdid = GET_WM_COMMAND_ID(wParam, lParam);
+
+	switch ( cmdid )
 	{
 		case IDM_VIEW_HREDRAW:
 		case IDM_VIEW_VREDRAW:
+		case IDM_CENTER_CLIENT_AREA:
+		case IDM_CANVAS_ADD_NONCLIENT_BORDER:
 		{
+			// Check for conflict
+			if( cmdid==IDM_CENTER_CLIENT_AREA && (m_Redraw & (WVR_HREDRAW|WVR_VREDRAW))!=0 )
+			{
+				MessageBox(m_hWnd, _T("With WVR_HREDRAW or WVR_VREDRAW turn on, we cannot enable center-client feature."), _T("Error"), MB_OK);
+				return 0;
+			}
+			if( (cmdid==IDM_VIEW_HREDRAW || cmdid==IDM_VIEW_VREDRAW) && m_is_nccenter )
+			{
+				MessageBox(m_hWnd, _T("With center-client feature on, we cannot enable WVR_VREDRAW or WVR_VREDRAW."), _T("Error"), MB_OK);
+				return 0;
+			}
+
 			HMENU hMenu = GetMenu(GetParent(m_hWnd));
 
 			MENUITEMINFO mii = { sizeof(mii) };
 			mii.fMask  = MIIM_STATE;
-				
-			if ( GetMenuState(hMenu, GET_WM_COMMAND_ID(wParam, lParam), MF_BYCOMMAND) & MF_CHECKED )
+			
+			// toggle menu-item check-state.
+			if ( GetMenuState(hMenu, cmdid, MF_BYCOMMAND) & MF_CHECKED )
 				mii.fState = MF_UNCHECKED;
 			else
 				mii.fState = MF_CHECKED;
 				
-			SetMenuItemInfo(hMenu, GET_WM_COMMAND_ID(wParam, lParam), FALSE, &mii);
+			SetMenuItemInfo(hMenu, cmdid, FALSE, &mii);
 				
-			if ( GET_WM_COMMAND_ID(wParam, lParam)==IDM_VIEW_HREDRAW )
+			if ( cmdid==IDM_VIEW_HREDRAW )
 				m_Redraw ^= WVR_HREDRAW; // toggle WVR_HREDRAW bit
-			else
+			else if(cmdid==IDM_VIEW_VREDRAW)
 				m_Redraw ^= WVR_VREDRAW; // toggle WVR_VREDRAW bit
+			else if(cmdid==IDM_CENTER_CLIENT_AREA)
+				m_is_nccenter = !m_is_nccenter;
+			else if(cmdid==IDM_CANVAS_ADD_NONCLIENT_BORDER)
+			{
+				m_ncborder = m_ncborder==0 ? NCBORDER_SIZE : 0;
+				
+				InvalidateRect(m_hWnd, NULL, TRUE); // TODO: How to force whole m_hWnd repaint? including its NC area?
+			}
 
 			return TRUE;
 		}
@@ -119,7 +151,6 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			m_Log.Log(_T("WM_NCCALCSIZE\r\n"));
 
-////////
 			NCCALCSIZE_PARAMS *pNccs = (NCCALCSIZE_PARAMS*)lParam;
 			(void)pNccs;
 			
@@ -127,7 +158,6 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			LRESULT lrDef = lr;
 			//m_Log.Log("WM_NCCALCSIZE.Def returns 0x%x\r\n", lr);
 
-			const int ncborder = 20;
 			if(wParam==1)
 			{
 				//  Give names to these things
@@ -145,30 +175,41 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				int neww = ircWndPosNow.right - ircWndPosNow.left; // hWnd new width
 				int newh = ircWndPosNow.bottom - ircWndPosNow.top; // hWnd new height
 
-				// Now we change rgrc[0] to be the coordinate of hWnd's client area location.
-				// Note: this "output rgrc[0]" is relative to hWnd itself.
-				//
-				SetRect(&orcClientNew, 
-					ncborder, ncborder, 
-					neww-ncborder, newh-ncborder);
+				if(m_ncborder>0)
+				{
+					// Now we change rgrc[0] to be the coordinate of hWnd's client area location.
+					// Note: this "output rgrc[0]" is relative to hWnd itself.
+					//
+					SetRect(&orcClientNew, 
+						m_ncborder, m_ncborder, 
+						neww-m_ncborder, newh-m_ncborder);
+				}
 
-				// Tell Windows to move old client area content to *center* of new client area.
-				//
-				SetRect(&orcValidDst, 
-					ncborder+(neww-oldw)/2, ncborder+(newh-oldh)/2,
-					neww-ncborder-(neww-oldw)/2, newh-ncborder-(newh-oldh)/2);
+				if(m_is_nccenter)
+				{
+					// Tell Windows to move old client area content to *center* of new client area.
+					//
+					SetRect(&orcValidDst, 
+						m_ncborder+(neww-oldw)/2, m_ncborder+(newh-oldh)/2,
+						neww-m_ncborder-(neww-oldw)/2, newh-m_ncborder-(newh-oldh)/2);
 
-				//SetRectEmpty(pNccs->rgrc+1); SetRectEmpty(pNccs->rgrc+2);
-				//				SetRect(pNccs->rgrc+1, 0,0,120,120); pNccs->rgrc[2]=pNccs->rgrc[1];
-				m_Log.Log(_T("Apply new client area."));
+					lr |= WVR_VALIDRECTS;
+					// -- MSDN: This flag cannot be combined with any other flags. 
+				}
+
+				//m_Log.Log(_T("Apply new client area."));
 			}
-			else if(wParam==0) // started first move
+			else 
 			{
-				InflateRect(pNccs->rgrc+0, -ncborder, -ncborder); // this is screen coord
-				m_Log.Log(_T("Init new client area."));
+				// This is first WM_NCCALCSIZE callback, no window-moving yet.
+				assert(wParam==0);
+
+				InflateRect(pNccs->rgrc+0, -m_ncborder, -m_ncborder); // this is screen coord
+				
+				//m_Log.Log(_T("Init new client area."));
 			}
 
-			if ( wParam )
+			if ( wParam && (lr & WVR_VALIDRECTS)==0 )
 			{
 				lr &= ~ (WVR_HREDRAW | WVR_VREDRAW);
 				lr |= m_Redraw;
@@ -178,9 +219,6 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				m_Log.Log("WM_NCCALCSIZE.Override returns 0x%x", lr);
 			}
-// lr|=WVR_ALIGNBOTTOM;
-// lr|=WVR_ALIGNRIGHT;
-lr|= WVR_VALIDRECTS;
 
 			break;
 		}
@@ -224,6 +262,9 @@ lr|= WVR_VALIDRECTS;
 			case 1: m_Green= (m_Green + 0x52) & 0xFF; break;
 			case 2: m_Blue = (m_Blue  + 0x52) & 0xFF; break;
 			}
+
+			int tmp = m_Red; m_Red=m_Green; m_Green=m_Blue; m_Blue=tmp;
+			// -- Chj: to make adjacent colors distinct
 
 
 			PAINTSTRUCT ps; 

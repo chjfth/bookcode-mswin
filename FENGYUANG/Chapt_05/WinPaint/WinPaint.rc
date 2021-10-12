@@ -37,6 +37,8 @@ BEGIN
     BEGIN
         MENUITEM "CS_HREDRAW",                  IDM_VIEW_HREDRAW
         MENUITEM "CS_VREDRAW",                  IDM_VIEW_VREDRAW
+    	MENUITEM "WM_NCCALCSIZE: Move old client-area to center of new client-area" IDM_CENTER_CLIENT_AREA
+    	MENUITEM "WM_NCCALCSIZE: Canvas add non-client border" IDM_CANVAS_ADD_NONCLIENT_BORDER
     END
 END
 

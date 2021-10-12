@@ -9,6 +9,10 @@
 #define IDM_VIEW_VREDRAW                40003
 #define IDM_FILE_INVALIDATE_RGN         40004
 
+#define IDM_CENTER_CLIENT_AREA          40005
+#define IDM_CANVAS_ADD_NONCLIENT_BORDER 40006
+
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
