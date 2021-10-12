@@ -175,19 +175,25 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			m_Log.Log(_T("WM_NCCALCSIZE\r\n"));
 
-			NCCALCSIZE_PARAMS *pNccs = (NCCALCSIZE_PARAMS*)lParam;
-			(void)pNccs;
-			
-			//lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
-			// LRESULT lrDef = lr;
-			//m_Log.Log("WM_NCCALCSIZE.Def returns 0x%x\r\n", lrDef);
-
-			if(wParam==1)
+			if(wParam==0)
 			{
+				// This is first WM_NCCALCSIZE callback, no window-moving yet.
+				// Here, we determine client-area position for current HWND.
+
+				RECT ircClient = *(RECT*)lParam;  // this is *screen* coord
+				RECT &orcClient = *(RECT*)lParam; // also *screen* coord
+
+				InflateRect(&orcClient, -m_ncborder, -m_ncborder); 
+				lr = 0; // placeholder to set breakpoint
+			}
+			else
+			{
+				NCCALCSIZE_PARAMS *pNccs = (NCCALCSIZE_PARAMS*)lParam;
+
 				//  Give names to these things
-				RECT &ircWndPosNow = pNccs->rgrc[0]; // input naming, rela-to hWnd's parent
-				RECT &ircWndPosWas = pNccs->rgrc[1]; // input naming, rela-to hWnd's parent
-				RECT &ircClientAreasWas = pNccs->rgrc[2]; // input naming, rela-to hWnd's parent
+				RECT ircWndPosNow = pNccs->rgrc[0]; // input naming, rela-to hWnd's parent
+				RECT ircWndPosWas = pNccs->rgrc[1]; // input naming, rela-to hWnd's parent
+				RECT ircClientAreasWas = pNccs->rgrc[2]; // input naming, rela-to hWnd's parent
 				//
 				RECT &orcClientNew = pNccs->rgrc[0]; // output naming, rela-to hWnd's parent
 				RECT &orcValidDst  = pNccs->rgrc[1]; // output naming, rela-to hWnd's parent
@@ -230,18 +236,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					lr |= WVR_VALIDRECTS;
 					// -- MSDN: This flag cannot be combined with any other flags. 
 				}
-
-				//m_Log.Log(_T("Apply new client area."));
-			}
-			else 
-			{
-				// This is first WM_NCCALCSIZE callback, no window-moving yet.
-				assert(wParam==0);
-
-				InflateRect(pNccs->rgrc+0, -m_ncborder, -m_ncborder); // this is screen coord
-				
-				//m_Log.Log(_T("Init new client area."));
-			}
+			} // wParam==1
 
 			if ( wParam && (lr & WVR_VALIDRECTS)==0 )
 			{
