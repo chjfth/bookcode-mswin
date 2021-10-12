@@ -109,8 +109,12 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 			else if(cmdid==IDM_CANVAS_ADD_NONCLIENT_BORDER)
 			{
 				m_ncborder = m_ncborder==0 ? NCBORDER_SIZE : 0;
-				
-				InvalidateRect(m_hWnd, NULL, TRUE); // TODO: How to force whole m_hWnd repaint? including its NC area?
+		
+				SetWindowPos(m_hWnd, NULL, 0,0,0,0, 
+					SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+				// -- MSDN: SWP_FRAMECHANGED causes the system to send WM_NCCALCSIZE
+				// to our m_hWnd, which is what we desire.
+				InvalidateRect(m_hWnd, NULL, TRUE);
 			}
 
 			return TRUE;
@@ -155,8 +159,8 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			(void)pNccs;
 			
 			//lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
-			LRESULT lrDef = lr;
-			//m_Log.Log("WM_NCCALCSIZE.Def returns 0x%x\r\n", lr);
+			// LRESULT lrDef = lr;
+			//m_Log.Log("WM_NCCALCSIZE.Def returns 0x%x\r\n", lrDef);
 
 			if(wParam==1)
 			{
@@ -166,8 +170,8 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				RECT &ircClientAreasWas = pNccs->rgrc[2]; // input naming, rela-to hWnd itself
 				//
 				RECT &orcClientNew = pNccs->rgrc[0]; // output naming, rela-to hWnd itself
-				RECT &orcValidDst  = pNccs->rgrc[1]; // output naming, rela-to hWnd itself?
-				RECT &orcValidSrc  = pNccs->rgrc[2]; // output naming, rela-to hWnd itself?
+				RECT &orcValidDst  = pNccs->rgrc[1]; // output naming, rela-to hWnd itself
+				RECT &orcValidSrc  = pNccs->rgrc[2]; // output naming, rela-to hWnd itself
 
 				int oldw = ircWndPosWas.right - ircWndPosWas.left; // hWnd old width
 				int oldh = ircWndPosWas.bottom - ircWndPosWas.top; // hWnd old height
@@ -215,10 +219,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				lr |= m_Redraw;
 			}
 
-			if(lr!=lrDef)
-			{
-				m_Log.Log("WM_NCCALCSIZE.Override returns 0x%x", lr);
-			}
+			m_Log.Log("WM_NCCALCSIZE returns 0x%x", lr);
 
 			break;
 		}
