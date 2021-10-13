@@ -6,9 +6,11 @@
 //  Copyright (c) 2000 by  Hewlett-Packard Company                www.hp.com         //
 //  Published          by  Prentice Hall PTR, Prentice-Hall, Inc. www.phptr.com      //
 //                                                                                   //
-//  FileName   : winpaint.cpp			                                             //
+//  FileName   : winpaint.cpp         	                                             //
 //  Description: Visualize WM_PAINT message                                          //
 //  Version    : 1.00.000, May 31, 2000                                              //
+//
+//  [2021-10-12] Chj: Add code to demonstrate child-window WM_NCCALCSIZE processing.
 //-----------------------------------------------------------------------------------//
 
 #define STRICT
@@ -115,7 +117,7 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 				SetWindowPos(m_hWnd, NULL, 0,0,0,0, 
 					SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 				// -- MSDN: SWP_FRAMECHANGED causes the system to send WM_NCCALCSIZE
-				// to our m_hWnd, which is what we desire.
+				// to our m_hWnd, which is what we need to refresh the display.
 				InvalidateRect(m_hWnd, NULL, TRUE);
 			}
 
@@ -333,7 +335,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 
 	if ( ((unsigned) hDC) & 0xFFFF0000 )
 	{
-		// [CH5.5] it is a 32-bit HDC, so we're running on WinNT.
+		// [CH5.5] It is a 32-bit HDC, so we're running on WinNT.
 		// The m_hRegion on NT is expressed in screen coordinate,
 		// and we convert it to be client-area coordinate here.
 		// Verified, it is a must on Windows 7.
@@ -424,7 +426,7 @@ const TBBUTTON tbButtons[] =
 {
 	{ STD_FILENEW,	 IDM_FILE_EXIT,   TBSTATE_ENABLED, TBSTYLE_BUTTON, { 0, 0 }, IDS_EXIT,   0 },
 	{ STD_CUT, IDM_FILE_INVALIDATE_RGN,  TBSTATE_ENABLED, TBSTYLE_BUTTON, { 0, 0 }, IDS_DO_INVALIDATE_RGN, 0 }
-	// -- BUG: iBitmap value STD_xxx is inconsistent with actual display.
+	// -- BUG: iBitmap value STD_xxx is inconsistent with actual display. (to investigate)
 };
 
 
@@ -439,7 +441,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 	frame.CreateEx(0, _T("ClassName"), _T("WinPaint (chjmod)"),
 		WS_OVERLAPPEDWINDOW,
 	    CW_USEDEFAULT, CW_USEDEFAULT, 
-		400+16, 200+80+37, // [Win7] 16 left+right frame thick; 37: toolbar height 
+		400+16, 200+80+37, // [Win7] 16: left+right window frame; 37: toolbar height 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
 
     frame.ShowWindow(nShow);
