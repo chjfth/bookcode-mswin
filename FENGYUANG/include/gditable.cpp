@@ -30,13 +30,17 @@ KGDITable::KGDITable()
     assert(pGdiQueryTable);
 
 	if ( pGdiQueryTable )
+	{
 		pGDITable = (GDITableCell *) pGdiQueryTable();
-	else
+	}
+	
+	if(!pGdiQueryTable || !pGDITable)
 	{
 		pGDITable = NULL;
 	
 		MessageBox(NULL, "Unable to locate handle table", "KGDITable", MB_OK | MB_ICONSTOP);
-		PostQuitMessage(-1);
+		
+		PostQuitMessage(-1); // Chj: This will not quit the application immediately
 	}
 
 	DWORD dwVersion = GetVersion();

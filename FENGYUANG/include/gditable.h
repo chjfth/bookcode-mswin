@@ -16,7 +16,7 @@
 typedef struct
 {
 	void          *  pKernel;
-	unsigned short  _nProcess; // NT/200 switch order for _nProcess, _nCount
+	unsigned short  _nProcess; // NT/2000 switch order for _nProcess, _nCount
 	unsigned short  _nCount;
 	unsigned short   nUpper;
 	unsigned short   nType;
