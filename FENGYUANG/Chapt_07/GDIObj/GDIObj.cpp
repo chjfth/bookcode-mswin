@@ -224,6 +224,15 @@ void KGDIObjectTable::UpdateTable(void)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
+	DWORD dwVersion = GetVersion();
+	if(LOBYTE(LOWORD(dwVersion))>=6)
+	{
+		MessageBox(NULL, 
+			"This program runs correctly only on Windows XP(NT 5.x), not Vista or Win7+.",
+			"KGDITable", MB_OK|MB_ICONSTOP);
+		return 4;
+	}
+
 	KGDIObjectTable gdiobj;
 
 	return gdiobj.Dialogbox(hInstance, MAKEINTRESOURCE(IDD_GDIOBJ));
