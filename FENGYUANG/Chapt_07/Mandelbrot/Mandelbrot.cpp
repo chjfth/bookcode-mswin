@@ -96,6 +96,7 @@ public:
 
 void KMyCanvas::ClearBuffer(int width, int height, int x0, int y0)
 {
+	int i=0, x=0, y=0;
 	if ( (width!=m_lastwidth) || (height!=m_lastheight) )	
 	{
 		for (int i=0; i<sizeof(Buffer)/sizeof(Buffer[0]); i++)
@@ -123,7 +124,7 @@ void KMyCanvas::ClearBuffer(int width, int height, int x0, int y0)
 	{
 		int n = y0 - m_lasty0;
 
-		for (int y=0; y<height - n; y++)
+		for (y=0; y<height - n; y++)
 			memcpy(Buffer[y], Buffer[y+n], width * sizeof(short));
 
 		for (; y<height; y++)

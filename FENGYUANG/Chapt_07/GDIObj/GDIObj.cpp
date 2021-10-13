@@ -146,8 +146,9 @@ const int MAXGDIHANDLE = 16384;
 
 void KGDIObjectTable::UpdateTable(void)
 {
+	int i=0;
 	// clear nNew array for an updating
-	for (int i=0; i<m_info.size(); i++)
+	for (i=0; i<m_info.size(); i++)
 		memset(m_info[i].nNew, 0, sizeof(m_info[i].nNew));
 
 	for (i=0; i<MAXGDIHANDLE; i++) // all GDI handles

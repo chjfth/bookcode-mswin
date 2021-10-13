@@ -308,7 +308,7 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 {
 	/////////////////////////////////
 	// Play with clip and meta region
-	HRGN hRgn;
+	HRGN hRgn = NULL;
 
 	switch ( m_test )
 	{
@@ -336,7 +336,9 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 			SelectClipRgn(hDC, hRgn);
 			break;
 	}
-	DeleteObject(hRgn);
+	
+	if(hRgn)
+		DeleteObject(hRgn);
 
 	// with meta and clip region selected, only the
 	// intersection of system region, meta region, clip region can be painted
