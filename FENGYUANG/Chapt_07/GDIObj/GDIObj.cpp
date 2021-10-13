@@ -182,11 +182,13 @@ void KGDIObjectTable::UpdateTable(void)
 		int k = -1;
 		
 		for (int j=0; j<m_info.size(); j++)
+		{
 			if ( m_info[j].processid == cell._nProcess )
 			{
 				k = j;
 				break;
 			}
+		}
 
 		if ( k==-1) 
 		{
