@@ -45,6 +45,9 @@ void GetProcessName(DWORD processID, TCHAR szProcessName[])
 #include "..\..\include\ListView.h"
 #include "..\..\include\GDITable.h"
 
+#define JULAYOUT_IMPL
+#include "..\..\include\JULayout.h"
+
 #include "resource.h"
 
 typedef struct
@@ -70,6 +73,7 @@ class KGDIObjectTable : public KDialog
     	switch (uMsg)
 	    {
 		    case WM_INITDIALOG:
+			{
 			    m_hWnd = hWnd;
 
 				m_process.FromDlgItem(hWnd, IDC_PROCESS);
@@ -88,18 +92,31 @@ class KGDIObjectTable : public KDialog
 
 				UpdateTable();
 				SetTimer(hWnd, 101, 1000, NULL);
+
+				JULayout *jul = JULayout::EnableJULayout(hWnd);
+				jul->AnchorControl(0,0, 100,100, IDC_PROCESS);
+				jul->AnchorControl(100,100, 100,100, IDI_MYICON);
+				jul->AnchorControls(50,100, 50,100, IDOK);
+
 				return TRUE;
+			}
 
 		    case WM_COMMAND:
+			{
 				switch ( LOWORD(wParam) )
 				{
 					case IDOK:
+					case IDCANCEL:
 						EndDialog(hWnd, 1);
 						return TRUE;
 				}
+			}
 
 			case WM_TIMER:
+			{
 				UpdateTable();
+			}
+
 	    }
 
 	    return FALSE;
@@ -201,6 +218,7 @@ void KGDIObjectTable::UpdateTable(void)
 
 	// update any changed process
 	for (i=0; i<m_info.size(); i++)
+	{
 		// if changed
 		if ( memcmp(m_info[i].nObject, m_info[i].nNew, sizeof(m_info[i].nNew)) )
 		{
@@ -211,7 +229,7 @@ void KGDIObjectTable::UpdateTable(void)
 				m_info[i].nObject[2] + m_info[i].nObject[3] +
 				m_info[i].nObject[4] + m_info[i].nObject[5] +
 				m_info[i].nObject[6]);
-		
+
 			m_process.SetItem(i, 3, m_info[i].nObject[0]);
 			m_process.SetItem(i, 4, m_info[i].nObject[1]);
 			m_process.SetItem(i, 5, m_info[i].nObject[2]);
@@ -220,6 +238,7 @@ void KGDIObjectTable::UpdateTable(void)
 			m_process.SetItem(i, 8, m_info[i].nObject[5]);
 			m_process.SetItem(i, 9, m_info[i].nObject[6]);
 		}
+	}
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)

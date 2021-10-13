@@ -5,6 +5,7 @@
 #define IDD_GDIOBJ                      101
 #define IDI_HANDLE                      103
 #define IDC_PROCESS                     1000
+#define IDI_MYICON                      1001
 
 // Next default values for new objects
 // 
