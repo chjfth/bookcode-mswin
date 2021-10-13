@@ -165,7 +165,9 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			//
 			HMENU hMenu = GetMenu(GetParent(m_hWnd));
 			TCHAR mitext[100];
-			_sntprintf_s(mitext, ARRAYSIZE(mitext), _TRUNCATE, _T("Canvas add non-client border (%d px)"), NCBORDER_SIZE);
+			_sntprintf_s(mitext, ARRAYSIZE(mitext), _TRUNCATE, 
+				_T("WM_NCCALCSIZE: Canvas add non-client border (%d px)"), 
+				NCBORDER_SIZE);
 			BOOL succ = ModifyMenu(hMenu, IDM_CANVAS_ADD_NONCLIENT_BORDER, 
 				MF_BYCOMMAND, IDM_CANVAS_ADD_NONCLIENT_BORDER, mitext);
 			assert(succ);
@@ -214,6 +216,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					SetRect(&orcClientNew, 
 						ircWndPosNow.left + m_ncborder, ircWndPosNow.top + m_ncborder, 
 						ircWndPosNow.right - m_ncborder, ircWndPosNow.bottom - m_ncborder);
+					lr = 0; // placeholder to set breakpoint
 				}
 
 				if(m_is_nccenter)
@@ -235,8 +238,9 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						newcenter.x - copycliw/2, newcenter.y - copyclih/2, 
 						newcenter.x + copycliw/2, newcenter.y + copyclih/2
 						);
-					lr |= WVR_VALIDRECTS;
+					lr = WVR_VALIDRECTS;
 					// -- MSDN: This flag cannot be combined with any other flags. 
+					break;
 				}
 			} // wParam==1
 
