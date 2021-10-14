@@ -145,11 +145,15 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="graph.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\Res\graph.ico" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <VSPG_BatDir_NoTBS>$(SolutionDir)..\_VSPG</VSPG_BatDir_NoTBS>
+    <VSPG_FeedbackFile>$(ProjectDir)Device.rc</VSPG_FeedbackFile>
+  </PropertyGroup>
+  <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
