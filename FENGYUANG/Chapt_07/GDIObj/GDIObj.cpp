@@ -98,6 +98,10 @@ class KGDIObjectTable : public KDialog
 				jul->AnchorControl(100,100, 100,100, IDI_MYICON);
 				jul->AnchorControls(50,100, 50,100, IDOK);
 
+				ListView_SetExtendedListViewStyleEx(
+					GetDlgItem(hWnd, IDC_PROCESS),
+					LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
+
 				return TRUE;
 			}
 
