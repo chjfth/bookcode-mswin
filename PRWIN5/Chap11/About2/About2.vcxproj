@@ -155,6 +155,13 @@
   <ItemGroup>
     <ResourceCompile Include="About2.rc" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <VSPG_BatDir_NoTBS>$(SolutionDir)..\_VSPG</VSPG_BatDir_NoTBS>
+    <VSPG_FeedbackFile>$(ProjectDir)About2.cpp</VSPG_FeedbackFile>
+  </PropertyGroup>
+  <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
