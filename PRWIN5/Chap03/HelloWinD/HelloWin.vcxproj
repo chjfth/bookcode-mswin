@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{640D687D-8C8D-400A-BA60-700A119176A1}</ProjectGuid>
+    <ProjectGuid>{640D687D-8C8D-400A-BA60-202110150001}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>HelloWin</RootNamespace>
   </PropertyGroup>
