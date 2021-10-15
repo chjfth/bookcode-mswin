@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Clover", "Clover\Clover.vcxproj", "{640D687D-8C8D-400A-BA60-202110160001}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RandRect", "RandRect\RandRect.vcxproj", "{640D687D-8C8D-400A-BA60-202110160002}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,14 @@ Global
 		{640D687D-8C8D-400A-BA60-202110160001}.Release|Win32.Build.0 = Release|Win32
 		{640D687D-8C8D-400A-BA60-202110160001}.Release|x64.ActiveCfg = Release|x64
 		{640D687D-8C8D-400A-BA60-202110160001}.Release|x64.Build.0 = Release|x64
+		{640D687D-8C8D-400A-BA60-202110160002}.Debug|Win32.ActiveCfg = Debug|Win32
+		{640D687D-8C8D-400A-BA60-202110160002}.Debug|Win32.Build.0 = Debug|Win32
+		{640D687D-8C8D-400A-BA60-202110160002}.Debug|x64.ActiveCfg = Debug|x64
+		{640D687D-8C8D-400A-BA60-202110160002}.Debug|x64.Build.0 = Debug|x64
+		{640D687D-8C8D-400A-BA60-202110160002}.Release|Win32.ActiveCfg = Release|Win32
+		{640D687D-8C8D-400A-BA60-202110160002}.Release|Win32.Build.0 = Release|Win32
+		{640D687D-8C8D-400A-BA60-202110160002}.Release|x64.ActiveCfg = Release|x64
+		{640D687D-8C8D-400A-BA60-202110160002}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
