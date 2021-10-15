@@ -11,6 +11,7 @@ cl HelloWin.cpp /Od /MT /Zi /D_DEBUG /D_UNICODE /DUNICODE /link /debug kernel32.
    Then we can load it into Visual C++ debugger.
   ------------------------------------------------------------*/
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <tchar.h>
