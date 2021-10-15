@@ -63,7 +63,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	RegisterClass (&wndclass);
 	 
-	hwnd = CreateWindow (szAppName,                  // window class name
+	hwnd = CreateWindow (szAppName, // window class name
 		TEXT ("The Hello Program"), // window caption
 		WS_OVERLAPPEDWINDOW,        // window style
 		20,              // initial x position
@@ -75,6 +75,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		hInstance,       // program instance handle
 		NULL) ;          // creation parameters
 	 
+	SendMessage(hwnd, WM_SETICON, TRUE, (LPARAM)LoadIcon(hInstance,	TEXT("MYPROGRAM")));
+
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
 	
