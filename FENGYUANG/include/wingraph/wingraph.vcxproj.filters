@@ -223,5 +223,11 @@
     <ClInclude Include="..\win.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\dbgprint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

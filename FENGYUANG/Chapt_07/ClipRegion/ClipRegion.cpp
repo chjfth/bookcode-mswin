@@ -24,8 +24,15 @@
 #include "..\..\include\Status.h"
 #include "..\..\include\FrameWnd.h"
 #include "..\..\include\LogWindow.h"
+#include "..\..\include\utils.h"
 
 #include "Resource.h"
+
+#ifndef SYSRGN
+#define SYSRGN 4
+__declspec(dllimport) extern "C" BOOL WINAPI GetRandomRgn(HDC hDC, HRGN hRgn, int which);
+#endif
+
 
 enum Rgntype_et {
 	RgnNone = ERROR,
@@ -84,14 +91,6 @@ public:
 	}
 };
 
-
-#ifndef SYSRGN
-
-#define SYSRGN 4
-
-__declspec(dllimport) extern "C" BOOL WINAPI GetRandomRgn(HDC hDC, HRGN hRgn, int which);
-
-#endif
 
 BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 {
@@ -263,7 +262,6 @@ void KMyCanvas::DrawRegions(HDC hDC)
 		FillRgn(hDC, m_hRandomRgn[2], hBrush);
 		DeleteObject(hBrush);
 	}
-
 }
 
 
@@ -325,8 +323,9 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 			wsprintf(mess, "(%d, %d, %d, %d)", pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 			::TextOut(hDC, x, y, mess, _tcslen(mess));
 
-			m_Log.Log(_T("SYSRGN-rect#%d (%d,%d, %d,%d)"), i+1,
-				pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
+			m_Log.Log(_T("SYSRGN-rect#%d (%d,%d, %d,%d) [%dx%d]"), i+1,
+				pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom,
+				RectW(pRect[i]), RectH(pRect[i]));
 		}
 
 		delete [] (char *) pRegion;

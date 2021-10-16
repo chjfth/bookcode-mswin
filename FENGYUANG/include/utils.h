@@ -6,7 +6,11 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-void vaSetDlgItemText(HWND hwnd, UINT ctrlid, const TCHAR *fmt, ...)
+inline int RectW(const RECT &r){ return r.right - r.left; }
+inline int RectH(const RECT &r){ return r.bottom - r.top; }
+
+
+inline void vaSetDlgItemText(HWND hwnd, UINT ctrlid, const TCHAR *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
@@ -19,7 +23,7 @@ void vaSetDlgItemText(HWND hwnd, UINT ctrlid, const TCHAR *fmt, ...)
 	va_end(args);
 }
 
-TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false)
+inline TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false)
 {
 	SYSTEMTIME st = {0};
 	GetLocalTime(&st);
