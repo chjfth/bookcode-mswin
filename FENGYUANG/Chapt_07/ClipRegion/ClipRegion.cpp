@@ -27,6 +27,20 @@
 
 #include "Resource.h"
 
+enum Rgntype_et {
+	RgnNone = ERROR,
+	RgnEmpty = NULLREGION,
+	RgnOneRect = SIMPLEREGION,
+	RgnMultiRect = COMPLEXREGION,
+};
+
+enum RandomRgnIndex {
+	Rgi_CLIPRGN = 1,
+	Rgi_METARGN = 2,
+	Rgi_APIRGN = 3,
+	Rgi_SYSRGN = SYSRGN,
+};
+
 
 class KMyCanvas : public KCanvas
 {
@@ -39,8 +53,8 @@ class KMyCanvas : public KCanvas
 	HRGN			m_hRegion;
 	KLogWindow		m_Log;
 	DWORD			m_Redraw;
-	bool            m_bValid[5];
-	HRGN            m_hRandomRgn[5];
+	bool            m_bValid[SYSRGN+1]; // [5]
+	HRGN            m_hRandomRgn[SYSRGN+1];
 	int				m_test;
 
 public:
@@ -222,30 +236,34 @@ void KMyCanvas::DumpRegions(HDC hDC)
 
 void KMyCanvas::DrawRegions(HDC hDC)
 {
+	// Chj: This is better named: MarkRandomRegionsLocation()
+
 	HBRUSH hBrush;
 
 	SetBkMode(hDC, TRANSPARENT);
 
-	if ( m_bValid[1] )
+	if ( m_bValid[Rgi_APIRGN] )
 	{
-		hBrush = CreateHatchBrush(HS_VERTICAL, RGB(0xFF, 0, 0));
+		// Chj: we'll draw HS_DIAGCROSS before HS_VERTICAL/HS_HORIZONTAL for better visual effect
+		hBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(0xFF, 0, 0));
+		FillRgn(hDC, m_hRandomRgn[3], hBrush);
+		DeleteObject(hBrush);
+	}
+
+	if ( m_bValid[Rgi_CLIPRGN] )
+	{
+		hBrush = CreateHatchBrush(HS_VERTICAL, RGB(0xFF, 0xE2, 0x66));
 		FillRgn(hDC, m_hRandomRgn[1], hBrush);
 		DeleteObject(hBrush);
 	}
 
-	if ( m_bValid[2] )
+	if ( m_bValid[Rgi_METARGN] )
 	{
-		hBrush = CreateHatchBrush(HS_HORIZONTAL, RGB(0, 0xFF, 0));
+		hBrush = CreateHatchBrush(HS_HORIZONTAL, RGB(0, 0xFF, 0xFF));
 		FillRgn(hDC, m_hRandomRgn[2], hBrush);
 		DeleteObject(hBrush);
 	}
 
-//	if ( m_bValid[3] )
-//	{
-//		hBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(0, 0, 0xFF));
-//		FillRgn(hDC, m_hRandomRgn[3], hBrush);
-//		DeleteObject(hBrush);
-//	}
 }
 
 
@@ -370,25 +388,25 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 	DumpRegions(hDC);
 
 	char mess[64] = {};
-
+	//
 	strcat_s(mess, ARRAYSIZE(mess), "Clip: ");
 	if ( m_bValid[1] ) 
 		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
 	else 
 		strcat_s(mess, ARRAYSIZE(mess), "N");
-		
+	//	
 	strcat_s(mess, ARRAYSIZE(mess), ",  Meta: ");
 	if ( m_bValid[2] ) 
 		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
 	else 
 		strcat_s(mess, ARRAYSIZE(mess), "N");
-
+	//
 	strcat_s(mess, ARRAYSIZE(mess), ", API: ");
 	if ( m_bValid[3] ) 
 		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
 	else 
 		strcat_s(mess, ARRAYSIZE(mess), "N");
-
+	//
 	m_pStatus->SetText(0, mess);
 }
 
@@ -417,7 +435,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	KLogoFrame frame(hInst, NULL, 0, NULL, & canvas, & status);
 
-	frame.CreateEx(0, _T("ClassName"), _T("Regions in a Device Context: System/Meta/Clip Regions"),
+	frame.CreateEx(0, _T("ClipRegion"), _T("Regions in a Device Context: System/Meta/Clip Regions"),
 		WS_OVERLAPPEDWINDOW,
 	    200, 200, 
 		600, 400, 
