@@ -152,7 +152,7 @@ void KLogWindow::DumpRegion(const char * mess, HRGN hRgn, bool detail, int p1)
 				Log(" Error "); break;
 		}
 
-		Log(" RgnBox=[%d, %d, %d, %d) ", rect.left, rect.top, rect.right, rect.bottom);
+		Log(" RgnBox=[%d,%d, %d,%d) ", rect.left, rect.top, rect.right, rect.bottom);
 
 		int size = GetRegionData(hRgn, 0, NULL);
 		int rectcount = 0;

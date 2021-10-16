@@ -262,7 +262,13 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 	GetDCOrgEx(hDC, & Origin);
 
 	if ( ((unsigned) hDC) & 0xFFFF0000 )
+	{
+		// [CH5.5] It is a 32-bit HDC, so we're running on WinNT.
+		// The m_hRegion on NT is expressed in screen coordinate,
+		// and we convert it to be client-area coordinate here.
+		// Verified, it is a must on Windows 7.
 		OffsetRgn(m_hRegion, - Origin.x, - Origin.y);
+	}
 
 	m_nRepaint ++;
 
@@ -290,20 +296,22 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 		GetTextMetrics(hDC, & tm);
 		int lineheight = tm.tmHeight + tm.tmExternalLeading; 
 
-		for (unsigned i=0; i<pRegion->rdh.nCount; i++)
+		for (int i=0; i<rectcount; i++)
 		{
 			int x = (pRect[i].left + pRect[i].right)/2;
 			int y = (pRect[i].top + pRect[i].bottom)/2;
 
-			wsprintf(mess, "sysrgn rect %d", i+1);
+			wsprintf(mess, "WM_PAINT #%d, rects=%d", m_nRepaint, i+1);
 			::TextOut(hDC, x, y - lineheight, mess, _tcslen(mess));
 
 			wsprintf(mess, "(%d, %d, %d, %d)", pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 			::TextOut(hDC, x, y, mess, _tcslen(mess));
+
+			m_Log.Log(_T("SYSRGN-rect#%d (%d,%d, %d,%d)"), i+1,
+				pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 		}
 
 		delete [] (char *) pRegion;
-
 	}
 
 	HBRUSH hBrush = CreateSolidBrush(RGB(m_Red, m_Green, m_Blue));
@@ -361,9 +369,7 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 
 	DumpRegions(hDC);
 
-	char mess[64];
-
-	mess[0] = 0;
+	char mess[64] = {};
 
 	strcat_s(mess, ARRAYSIZE(mess), "Clip: ");
 	if ( m_bValid[1] ) 
@@ -413,7 +419,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	frame.CreateEx(0, _T("ClassName"), _T("Regions in a Device Context: System/Meta/Clip Regions"),
 		WS_OVERLAPPEDWINDOW,
-	    CW_USEDEFAULT, CW_USEDEFAULT, 
+	    200, 200, 
 		600, 400, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
 
