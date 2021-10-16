@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{640D687D-8C8D-400A-BA60-202110160002}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>RandRect</RootNamespace>
   </PropertyGroup>
