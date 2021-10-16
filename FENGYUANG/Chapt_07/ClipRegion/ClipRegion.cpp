@@ -17,6 +17,7 @@
 #include <windows.h>
 #include <assert.h>
 #include <tchar.h>
+#include <stdio.h>
 
 #include "..\..\include\win.h"
 #include "..\..\include\Canvas.h"
@@ -80,7 +81,9 @@ __declspec(dllimport) extern "C" BOOL WINAPI GetRandomRgn(HDC hDC, HRGN hRgn, in
 
 BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	switch ( LOWORD(wParam) )
+	UINT cmdid = LOWORD(wParam);
+
+	switch ( cmdid )
 	{
 		case IDM_VIEW_HREDRAW:
 		case IDM_VIEW_VREDRAW:
@@ -93,14 +96,14 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 				mii.cbSize = sizeof(mii);
 				mii.fMask  = MIIM_STATE;
 				
-				if ( GetMenuState(hMenu, LOWORD(wParam), MF_BYCOMMAND) & MF_CHECKED )
+				if ( GetMenuState(hMenu, cmdid, MF_BYCOMMAND) & MF_CHECKED )
 					mii.fState = MF_UNCHECKED;
 				else
 					mii.fState = MF_CHECKED;
 				
-				SetMenuItemInfo(hMenu, LOWORD(wParam), FALSE, & mii);
+				SetMenuItemInfo(hMenu, cmdid, FALSE, & mii);
 				
-				if ( LOWORD(wParam)==IDM_VIEW_HREDRAW )
+				if ( cmdid==IDM_VIEW_HREDRAW )
 					m_Redraw ^= WVR_HREDRAW;
 				else
 					m_Redraw ^= WVR_VREDRAW;
@@ -111,7 +114,7 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDM_TEST_SETCLIP:
 		case IDM_TEST_SETMETA:
 		case IDM_TEST_SETMETACLIP:
-			m_test = LOWORD(wParam);
+			m_test = cmdid;
 			InvalidateRect(m_hWnd, NULL, TRUE);
 			::UpdateWindow(m_hWnd);
 			break;
@@ -177,9 +180,18 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return lr;
 }
 
+static const TCHAR *rgi2text(int iNum)
+{
+	if(iNum==1) return _T("CLIPRGN");
+	else if(iNum==2) return _T("METARGN");
+	else if(iNum==3) return _T("APIRGN");
+	else if(iNum==4) return _T("SYSRGN");
+	else return _T("Bad num");
+}
 
 void KMyCanvas::DumpRegions(HDC hDC)
 {
+	TCHAR tmpstr[200] = {};
 	for (int i=1; i<=4; i++)
 	{
 		m_bValid[i] = false;
@@ -188,16 +200,17 @@ void KMyCanvas::DumpRegions(HDC hDC)
 		switch ( rslt )
 		{
 			case 1:
+				_sntprintf_s(tmpstr, ARRAYSIZE(tmpstr), _T("RandomRgn(%d=%s)"), i, rgi2text(i));
 				m_bValid[i] = true;
-				m_Log.DumpRegion("RandomRgn(%d)", m_hRandomRgn[i], false, i);
+				m_Log.DumpRegion(tmpstr, m_hRandomRgn[i], false);
 				break;
 
 			case -1:
-				m_Log.Log("RandomRgn(%d) Error\r\n", i);
+				m_Log.Log("RandomRgn(%d=%s) Error\r\n", i, rgi2text(i));
 				break;
 
 			case 0:
-				m_Log.Log("RandomRgn(%d) no region\r\n", i);
+				m_Log.Log("RandomRgn(%d=%s) no region\r\n", i, rgi2text(i));
 				break;
 
 			default:
@@ -352,17 +365,25 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 
 	mess[0] = 0;
 
-	strcat(mess, "Clip: ");
-	if ( m_bValid[1] ) strcat(mess, "Y"); else strcat(mess, "N");
+	strcat_s(mess, ARRAYSIZE(mess), "Clip: ");
+	if ( m_bValid[1] ) 
+		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+	else 
+		strcat_s(mess, ARRAYSIZE(mess), "N");
 		
-	strcat(mess, ", Meta: ");
-	if ( m_bValid[2] ) strcat(mess, "Y"); else strcat(mess, "N");
+	strcat_s(mess, ARRAYSIZE(mess), ",  Meta: ");
+	if ( m_bValid[2] ) 
+		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+	else 
+		strcat_s(mess, ARRAYSIZE(mess), "N");
 
-	strcat(mess, ", API: ");
-	if ( m_bValid[3] ) strcat(mess, "Y"); else strcat(mess, "N");
+	strcat_s(mess, ARRAYSIZE(mess), ", API: ");
+	if ( m_bValid[3] ) 
+		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+	else 
+		strcat_s(mess, ARRAYSIZE(mess), "N");
 
 	m_pStatus->SetText(0, mess);
-
 }
 
 class KLogoFrame : public KFrame
@@ -392,7 +413,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	frame.CreateEx(0, _T("ClassName"), _T("Regions in a Device Context: System/Meta/Clip Regions"),
 		WS_OVERLAPPEDWINDOW,
-	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
+	    CW_USEDEFAULT, CW_USEDEFAULT, 
+		600, 400, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
 
     frame.ShowWindow(nShow);
