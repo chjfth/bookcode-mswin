@@ -181,6 +181,8 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				hDC = GetDC(m_hWnd);
 				
 				DrawRegions(hDC);
+				// -- implicit input is those RGNs in m_hRandomRgn[], which was filled
+				// a few lines above from OnDraw() -> TestClipMeta() -> DumpRegions() .
 
 				ReleaseDC(m_hWnd, hDC);
 			}
@@ -235,7 +237,7 @@ void KMyCanvas::DumpRegions(HDC hDC)
 
 void KMyCanvas::DrawRegions(HDC hDC)
 {
-	// Chj: This is better named: MarkRandomRegionsLocation()
+	// Chj: This is better named: HighlightRandomRegionsLocation()
 
 	HBRUSH hBrush;
 
@@ -245,21 +247,21 @@ void KMyCanvas::DrawRegions(HDC hDC)
 	{
 		// Chj: we'll draw HS_DIAGCROSS before HS_VERTICAL/HS_HORIZONTAL for better visual effect
 		hBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(0xFF, 0, 0));
-		FillRgn(hDC, m_hRandomRgn[3], hBrush);
+		FillRgn(hDC, m_hRandomRgn[Rgi_APIRGN], hBrush);
 		DeleteObject(hBrush);
 	}
 
 	if ( m_bValid[Rgi_CLIPRGN] )
 	{
 		hBrush = CreateHatchBrush(HS_VERTICAL, RGB(0xFF, 0xE2, 0x66));
-		FillRgn(hDC, m_hRandomRgn[1], hBrush);
+		FillRgn(hDC, m_hRandomRgn[Rgi_CLIPRGN], hBrush);
 		DeleteObject(hBrush);
 	}
 
 	if ( m_bValid[Rgi_METARGN] )
 	{
 		hBrush = CreateHatchBrush(HS_HORIZONTAL, RGB(0, 0xFF, 0xFF));
-		FillRgn(hDC, m_hRandomRgn[2], hBrush);
+		FillRgn(hDC, m_hRandomRgn[Rgi_METARGN], hBrush);
 		DeleteObject(hBrush);
 	}
 }
@@ -269,7 +271,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 {
 	RECT rect;
 	TCHAR mess[64];
-	
+
 	GetClientRect(m_hWnd, & rect);
 	
 	GetRandomRgn(hDC, m_hRegion, SYSRGN);
@@ -339,6 +341,9 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 	DeleteObject(hBrush);
 
 	TestClipMeta(hDC, rect);
+
+	// Chj: Well, we do NOT delete m_hRegion here even if we've done using it in TestClipMeta(),
+	// bcz we'll reuse it(as a initial dumb region) on next WM_PAINT.
 }
 
 
@@ -378,30 +383,34 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 	if(hRgn)
 		DeleteObject(hRgn);
 
-	// with meta and clip region selected, only the
+	// Chj: Wield our big brush trying to paint the whole client area,
+	// and see which parts actually get painted.
+	//
+	// BOOK AUTHOR: with meta and clip region selected, only the
 	// intersection of system region, meta region, clip region can be painted
 	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0xFF));
 	FillRect(hDC, & rect, hBrush);
 	DeleteObject(hBrush);
 
 	DumpRegions(hDC);
+	// -- The implicit input to DumpRegions(), is the region we've "selected" into hDC.
 
 	char mess[64] = {};
 	//
 	strcat_s(mess, ARRAYSIZE(mess), "Clip: ");
-	if ( m_bValid[1] ) 
+	if ( m_bValid[Rgi_CLIPRGN] ) 
 		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
 	else 
 		strcat_s(mess, ARRAYSIZE(mess), "N");
 	//	
 	strcat_s(mess, ARRAYSIZE(mess), ",  Meta: ");
-	if ( m_bValid[2] ) 
+	if ( m_bValid[Rgi_METARGN] ) 
 		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
 	else 
 		strcat_s(mess, ARRAYSIZE(mess), "N");
 	//
 	strcat_s(mess, ARRAYSIZE(mess), ", API: ");
-	if ( m_bValid[3] ) 
+	if ( m_bValid[Rgi_APIRGN] ) 
 		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
 	else 
 		strcat_s(mess, ARRAYSIZE(mess), "N");
@@ -439,6 +448,14 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 	    200, 200, 
 		600, 400, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
+
+#if 0 
+	// We may want to try SetWindowRgn() on this program.
+	// If we do, we'll find that SYSRGN's boundary is squeezed by that of window-rgn.
+
+	HRGN rgnCanvas = CreateEllipticRgn(0,0, 400,400);
+	SetWindowRgn(frame.m_hWnd, rgnCanvas, TRUE);
+#endif
 
     frame.ShowWindow(nShow);
     frame.UpdateWindow();
