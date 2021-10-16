@@ -34,21 +34,6 @@ __declspec(dllimport) extern "C" BOOL WINAPI GetRandomRgn(HDC hDC, HRGN hRgn, in
 #endif
 
 
-enum Rgntype_et {
-	RgnNone = ERROR,
-	RgnEmpty = NULLREGION,
-	RgnOneRect = SIMPLEREGION,
-	RgnMultiRect = COMPLEXREGION,
-};
-
-enum RandomRgnIndex {
-	Rgi_CLIPRGN = 1,
-	Rgi_METARGN = 2,
-	Rgi_APIRGN = 3,
-	Rgi_SYSRGN = SYSRGN,
-};
-
-
 class KMyCanvas : public KCanvas
 {
 	virtual void    OnDraw(HDC hDC, const RECT * rcPaint);
@@ -210,7 +195,8 @@ void KMyCanvas::DumpRegions(HDC hDC)
 	for (int i=1; i<=4; i++)
 	{
 		m_bValid[i] = false;
-		int rslt = GetRandomRgn(hDC, m_hRandomRgn[i], i);
+		
+		int rslt = GetRandomRgn_refdc(hDC, m_hRandomRgn[i], i);
 
 		switch ( rslt )
 		{
@@ -273,20 +259,8 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 	TCHAR mess[64];
 
 	GetClientRect(m_hWnd, & rect);
-	
-	GetRandomRgn(hDC, m_hRegion, SYSRGN);
 
-	POINT Origin;
-	GetDCOrgEx(hDC, & Origin);
-
-	if ( ((unsigned) hDC) & 0xFFFF0000 )
-	{
-		// [CH5.5] It is a 32-bit HDC, so we're running on WinNT.
-		// The m_hRegion on NT is expressed in screen coordinate,
-		// and we convert it to be client-area coordinate here.
-		// Verified, it is a must on Windows 7.
-		OffsetRgn(m_hRegion, - Origin.x, - Origin.y);
-	}
+	GetRandomRgn_refdc(hDC, m_hRegion);
 
 	m_nRepaint ++;
 

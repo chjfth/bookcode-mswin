@@ -28,6 +28,7 @@
 #include "..\..\include\Status.h"
 #include "..\..\include\FrameWnd.h"
 #include "..\..\include\LogWindow.h"
+#include "..\..\include\utils.h"
 
 #include "Resource.h"
 
@@ -329,25 +330,13 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 {
 	RECT rect;
-
 	GetClientRect(m_hWnd, & rect);
 	
-	GetRandomRgn(hDC, m_hRegion, SYSRGN);
-	
+	GetRandomRgn_refdc(hDC, m_hRegion, SYSRGN);
+
 	POINT Origin;
 	GetDCOrgEx(hDC, & Origin);
-
-	if ( ((unsigned) hDC) & 0xFFFF0000 )
-	{
-		// [CH5.5] It is a 32-bit HDC, so we're running on WinNT.
-		// The m_hRegion on NT is expressed in screen coordinate,
-		// and we convert it to be client-area coordinate here.
-		// Verified, it is a must on Windows 7.
-		OffsetRgn(m_hRegion, - Origin.x, - Origin.y);
-	}
-
 	TCHAR mess[64];
-
 	wsprintf(mess, _T("HDC 0x%X, Org(%d, %d)"), (UINT)hDC, Origin.x, Origin.y); 
 	if ( m_pStatus )
 		m_pStatus->SetText(pane_1, mess);
