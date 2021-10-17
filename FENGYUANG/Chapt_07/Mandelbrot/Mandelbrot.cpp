@@ -15,6 +15,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#include <windowsx.h>
 #include <assert.h>
 #include <tchar.h>
 #include <stdio.h>
@@ -170,10 +171,11 @@ void KMyCanvas::ClearBuffer(int width, int height, int x0, int y0)
 	m_lasty0 = y0;
 }
 
-// positive reach fixed point after n iteration
-// negative too big           after n iteration
-// 0		don't know after        limit number of iterations
-
+// Return:
+// positive : reach fixed point after n iteration
+// negative : too big           after n iteration
+// 0		: don't know after        limit number of iterations
+//
 int KMyCanvas::MandelCount(HDC hDC, int xi, int yi, int limit)
 {
 	const double thresh  = 4.0;
@@ -241,7 +243,7 @@ int KMyCanvas::MandelCount(HDC hDC, int xi, int yi, int limit)
 }
 
 
-COLORREF inline Between(COLORREF from, COLORREF to, int val, int limit)
+COLORREF inline Between(COLORREF from, COLORREF to, int val, int limit) // Chj: no use here
 {
 	return RGB( ( GetRValue(from) * (limit-val) + GetRValue(to) * val ) / limit,
 				( GetGValue(from) * (limit-val) + GetGValue(to) * val ) / limit,
@@ -340,7 +342,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 				else if ( count< -3 )
 					c = Out[-count]; 
 
-				//				Buffer[y][x] = count;
+//				Buffer[y][x] = count;
 
 				if ( c )
 					SetPixel(hDC, x+x0, y+y0, c);
@@ -350,7 +352,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 
 	tick = GetTickCount() - tick;
 
-	wsprintf(title, "tick %d", tick);
+	_sntprintf_s(title, ARRAYSIZE(title), "millisec used: %d", tick);
 	m_pStatus->SetText(1, title);
 }
 
@@ -379,7 +381,7 @@ void KMyCanvas::OnTimer(WPARAM wParam, LPARAM lParam)
 void KMyCanvas::OnMouseMove(WPARAM wParam, LPARAM lParam)
 {
 	TCHAR temp[MAX_PATH];
-				
+
 	int x = GetScrollPos(m_hWnd, SB_HORZ) + LOWORD(lParam);
 	int y = GetScrollPos(m_hWnd, SB_VERT) + HIWORD(lParam);
 				
