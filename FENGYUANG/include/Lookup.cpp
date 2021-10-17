@@ -17,24 +17,25 @@
 
 #include <windows.h>
 #include <string.h>
+#include <stdio.h>
 #include <tchar.h>
 
 #include "Lookup.h"
 
 
-bool Lookup(unsigned index, const DicItem *dic, TCHAR * szResult)
+bool Lookup(unsigned index, const DicItem *dic, TCHAR * szResult, int bufchars)
 {
     while (dic->name!=NULL)
     {
         if (dic->key==index)
 		{
-			_tcscpy(szResult, dic->name);
+			_tcscpy_s(szResult, bufchars, dic->name);
 			return true;
 		}
         dic++;            
     }            
     
-    wsprintf(szResult, TEXT("Unknown(%lx)"), index);    
+    _sntprintf_s(szResult, bufchars, _TRUNCATE, TEXT("Unknown(%lx)"), index);    
     
     return false;
 }

@@ -46,18 +46,18 @@ UINT KDIBSection::SetColorTable(void)
 }
 
 
-void KDIBSection::DecodeDIBSectionFormat(TCHAR desp[])
+void KDIBSection::DecodeDIBSectionFormat(TCHAR desp[], int bufchars)
 {
 	DIBSECTION dibsec;
 
 	if ( GetObject(m_hBitmap, sizeof(DIBSECTION), & dibsec) )
 	{
-		KDIB::DecodeDIBFormat(desp);
-		_tcscat(desp, _T("   "));
-		DecodeDDB(GetBitmap(), desp + _tcslen(desp));
+		KDIB::DecodeDIBFormat(desp, bufchars);
+		_tcscat_s(desp, bufchars, _T("   "));
+		DecodeDDB(GetBitmap(), desp+_tcslen(desp), bufchars-_tcslen(desp));
 	}
 	else
-		_tcscpy(desp, _T("Invalid DIB Section"));
+		_tcscpy_s(desp, bufchars, _T("Invalid DIB Section"));
 }
 
 
@@ -245,7 +245,7 @@ KTarga24::~KTarga24()
 
 BOOL KTarga24::Create(int width, int height, const TCHAR * pFileName)
 {
-	if ( width & 3 )	// avoid compatiblity problem with TGA
+	if ( width & 3 )	// avoid compatibility problem with TGA
 		return FALSE;
 
 	ImageHeader tgaheader;
@@ -256,7 +256,7 @@ BOOL KTarga24::Create(int width, int height, const TCHAR * pFileName)
 	tgaheader.Width     = width;
 	tgaheader.Height    = height;
 	tgaheader.PixelSize = 24;
-	strcpy(tgaheader.ID, "BitmapShop");
+	strcpy_s(tgaheader.ID, ARRAYSIZE(tgaheader.ID), "BitmapShop");
 
 	m_hFile = CreateFile(pFileName, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 
 		NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);

@@ -60,9 +60,9 @@ void GetEMFDimension(HDC hDC, HENHMETAFILE hEmf, int & width, int & height);
 BOOL DisplayEMF(HDC hDC, HENHMETAFILE hEmf, int x, int y, int scalex, int scaley, 
 				KEnumEMF * enumerator, bool showxform=false);
 
-HDC QuerySaveEMFFile(const TCHAR * description, const RECT * rcFrame, TCHAR szFileName[]);
+HDC QuerySaveEMFFile(const TCHAR * description, const RECT * rcFrame, TCHAR szFileName[], int bufchars);
 
-HENHMETAFILE QueryOpenEMFFile(TCHAR szFileName[]);
+HENHMETAFILE QueryOpenEMFFile(TCHAR szFileName[], int bufchars);
 
 HENHMETAFILE PasteFromClipboard(HWND hWnd);
 void CopyToClipboard(HWND hWnd, HENHMETAFILE hEmf);

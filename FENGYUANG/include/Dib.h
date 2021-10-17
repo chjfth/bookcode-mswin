@@ -128,7 +128,7 @@ public:
 					m_pBMI, DIB_RGB_COLORS);
 	}
 
-	void DecodeDIBFormat(TCHAR mess[]);
+	void DecodeDIBFormat(TCHAR mess[], int bufchars);
 	BOOL SaveFile(const TCHAR * pFileName);
 
 	// Pixel accessing

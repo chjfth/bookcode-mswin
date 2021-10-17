@@ -27,7 +27,7 @@ typedef struct
 #define tripod(name, mask)  { name, mask,       TEXT(#name) }
 #define dummyitem           { 0,    0xffffffff, NULL        }
 
-bool         Lookup(unsigned index, const DicItem *dic, TCHAR * szResult);
+bool         Lookup(unsigned index, const DicItem *dic, TCHAR * szResult, int bufchars);
 const TCHAR *Lookup(unsigned index, const DicItem *dic);
 
 unsigned     Decode(const TCHAR *item, const DicItem *dic);
