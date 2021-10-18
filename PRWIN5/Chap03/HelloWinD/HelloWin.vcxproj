@@ -18,11 +18,14 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+
+  <!-- Modify RootNamespace's value in your NEW copy of this vcxproj. 
+    RootNamespace' value is referenced later in cpp file list and VSPG. 
+    -->
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{640D687D-8C8D-400A-BA60-202110150001}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
     <RootNamespace>HelloWin</RootNamespace>
   </PropertyGroup>
+
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -84,7 +87,7 @@
     <None Include="1.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="HelloWin.cpp" />
+    <ClCompile Include="$(RootNamespace).cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc" />
@@ -92,7 +95,7 @@
 
   <PropertyGroup>
     <VSPG_BatDir_NoTBS>..\..\_VSPG</VSPG_BatDir_NoTBS>
-    <VSPG_FeedbackFile>App.rc</VSPG_FeedbackFile>
+    <VSPG_FeedbackFile>$(RootNamespace).cpp</VSPG_FeedbackFile>
   </PropertyGroup>
   <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
 
