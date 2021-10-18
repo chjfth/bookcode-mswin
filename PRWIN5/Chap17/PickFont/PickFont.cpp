@@ -32,10 +32,12 @@ DLGPARAMS ;
 HWND  hdlg ;
 TCHAR szAppName[] = TEXT ("PickFont") ;
 
+TCHAR g_params[100] = {};
+
 // Forward declarations of functions
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
-BOOL    CALLBACK DlgProc (HWND, UINT, WPARAM, LPARAM) ;
+INT_PTR    CALLBACK DlgProc (HWND, UINT, WPARAM, LPARAM) ;
 void SetLogFontFromFields    (HWND hdlg, DLGPARAMS * pdp) ;
 void SetFieldsFromTextMetric (HWND hdlg, DLGPARAMS * pdp) ;
 void MySetMapMode (HDC hdc, int iMapMode) ;
@@ -58,6 +60,11 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.lpszMenuName  = szAppName ; 
 	wndclass.lpszClassName = szAppName ;
 
+#ifdef _UNICODE
+	if(szCmdLine && szCmdLine[0])
+		MultiByteToWideChar(CP_ACP, 0, szCmdLine, -1, g_params, ARRAYSIZE(g_params));
+#endif
+
 	if (!RegisterClass (&wndclass))
 	{
 		MessageBox (NULL, TEXT ("This program requires Windows NT!"),
@@ -65,7 +72,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	hwnd = CreateWindow (szAppName, TEXT ("PickFont: Create Logical Font"),
+	hwnd = CreateWindow (szAppName, 
+		TEXT ("(Unicode)") TEXT ("PickFont: Create Logical Font (Pass cmdline params to customize text)"),
+		
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT,
@@ -82,7 +91,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			DispatchMessage (&msg) ;
 		}
 	}
-	return msg.wParam ;
+	return (int)msg.wParam ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -103,9 +112,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		TEXT ("\x5000\x5001\x5002\x5003\x5004") 
 #endif
 		;
+	const TCHAR *pszText = szText;
 	HDC              hdc ;
 	PAINTSTRUCT      ps ;
 	RECT             rect ;
+
+	if(g_params[0])
+		pszText = g_params;
 
 	switch (message)
 	{
@@ -154,7 +167,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Create and select the font; display the text
 
 		SelectObject (hdc, CreateFontIndirect (&dp.lf)) ;
-		TextOut (hdc, rect.left, rect.bottom, szText, lstrlen (szText)) ;
+		TextOut (hdc, rect.left, rect.bottom, pszText, lstrlen (pszText)) ;
 
 		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT))) ;
 		EndPaint (hwnd, &ps) ;
@@ -167,7 +180,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
-BOOL CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static DLGPARAMS * pdp ;
 	static PRINTDLG    pd = { sizeof (PRINTDLG) } ;
