@@ -109,7 +109,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		TEXT ("\x0410\x0411\x0412\x0413\x0414\x0415 ")
 		TEXT ("\x0430\x0431\x0432\x0433\x0434\x0435 ")
 
-		TEXT ("\x5000\x5001\x5002\x5003\x5004") 
+		TEXT ("\x7535\x8111\x771F\x6709\x8DA3") 
 #endif
 		;
 	const TCHAR *pszText = szText;
