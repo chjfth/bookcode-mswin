@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <tchar.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "DDB.h"
 
@@ -158,26 +159,28 @@ BOOL KDDB::Draw(HDC hDC, int x0, int y0, int w, int h, DWORD rop, int opt)
 }
 
 // Generate a text description of DDB format
-void DecodeDDB(HGDIOBJ hBmp, TCHAR mess[])
+void DecodeDDB(HGDIOBJ hBmp, TCHAR mess[], int bufchars)
 {
 	BITMAP  bmp;
 
 	if ( GetObject(hBmp, sizeof(bmp), & bmp) )
 	{
-		wsprintf(mess, _T("%dx%dx%dx%d w=%d, 0x%x"), bmp.bmWidth, bmp.bmHeight,
+		_sntprintf_s(mess, bufchars, _TRUNCATE, _T("%dx%dx%dx%d w=%d, 0x%x"), bmp.bmWidth, bmp.bmHeight,
 			bmp.bmPlanes, bmp.bmBitsPixel, bmp.bmWidthBytes, bmp.bmBits);
 
 		int size = bmp.bmWidthBytes * bmp.bmHeight;
 
+		int pfxlen = _tcslen(mess);
+
 		if ( size < 1024 )
-			wsprintf(mess+_tcslen(mess), _T(", %d b"), size);
+			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d b"), size);
 		else if ( size < 1024 * 1024 )
-			wsprintf(mess+_tcslen(mess), _T(", %d,%03d b"), size/1024, size%1024);
+			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d,%03d b"), size/1024, size%1024);
 		else
-			wsprintf(mess+_tcslen(mess), _T(", %d,%03d,%03d b"), size/1024/1024, size/1024%1024, size%1024);
+			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE,_T(", %d,%03d,%03d b"), size/1024/1024, size/1024%1024, size%1024);
 	}
 	else
-		_tcscpy(mess, _T("Failed"));
+		_tcscpy_s(mess, bufchars, _T("Failed"));
 }
 
 // Search for the largest DDB compatible with a DC

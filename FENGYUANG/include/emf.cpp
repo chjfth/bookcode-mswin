@@ -109,10 +109,10 @@ BOOL DisplayEMF(HDC hDC, HENHMETAFILE hEmf, int x, int y, int scalex, int scaley
 		{
 			TCHAR mess[128];
 
-			_stprintf(mess, _T("x' = x * %8.5f + y * %8.5f + %8.5f"), xform.eM11, xform.eM21, xform.eDx);
+			_sntprintf_s(mess, ARRAYSIZE(mess), _T("x' = x * %8.5f + y * %8.5f + %8.5f"), xform.eM11, xform.eM21, xform.eDx);
 			TextOut(hDC, x, rect.bottom + 10, mess, _tcslen(mess));
 
-			_stprintf(mess, _T("y' = x * %8.5f + y * %8.5f + %8.5f"), xform.eM12, xform.eM22, xform.eDy);
+			_sntprintf_s(mess, ARRAYSIZE(mess), _T("y' = x * %8.5f + y * %8.5f + %8.5f"), xform.eM12, xform.eM22, xform.eDy);
 			TextOut(hDC, x, rect.bottom + 40, mess, _tcslen(mess));
 		}
 	}
@@ -121,14 +121,14 @@ BOOL DisplayEMF(HDC hDC, HENHMETAFILE hEmf, int x, int y, int scalex, int scaley
 }
 
 
-HDC QuerySaveEMFFile(const TCHAR * description, const RECT * rcFrame, TCHAR szFileName[])
+HDC QuerySaveEMFFile(const TCHAR * description, const RECT * rcFrame, TCHAR szFileName[], int bufchars)
 {
 	KFileDialog fd;
 
 	if ( fd.GetSaveFileName(NULL, _T("emf"), _T("Enhanced Metafiles")) )
 	{
 		if ( szFileName )
-			_tcscpy(szFileName, fd.m_TitleName);
+			_tcsncpy_s(szFileName, bufchars, fd.m_TitleName, _TRUNCATE);
 
 		return CreateEnhMetaFile(NULL, fd.m_TitleName, rcFrame, description);
 	}
@@ -137,14 +137,14 @@ HDC QuerySaveEMFFile(const TCHAR * description, const RECT * rcFrame, TCHAR szFi
 }
 
 
-HENHMETAFILE QueryOpenEMFFile(TCHAR szFileName[])
+HENHMETAFILE QueryOpenEMFFile(TCHAR szFileName[], int bufchars)
 {
 	KFileDialog fd;
 
 	if ( fd.GetOpenFileName(NULL, _T("emf|spl"), _T("Enhanced Metafiles|Win NT/2000 EMF Spool Files")) )
 	{
 		if ( szFileName )
-			_tcscpy(szFileName, fd.m_TitleName);
+			_tcsncpy_s(szFileName, bufchars, fd.m_TitleName, _TRUNCATE);
 		
 		return  GetEnhMetaFile(fd.m_TitleName);
 	}

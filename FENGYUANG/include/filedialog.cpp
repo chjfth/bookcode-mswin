@@ -44,7 +44,7 @@ void KFileDialog::SetupOFN(OPENFILENAME & ofn, TCHAR Filter[], HWND hWnd, const 
 		TCHAR klass[MAX_PATH];
 		TCHAR ext  [MAX_PATH];
 
-		_tcscpy(klass, pClass);
+		_tcsncpy_s(klass, MAX_PATH, pClass, _TRUNCATE);
 		TCHAR * p = _tcschr(klass, '|');
 		if ( p ) 
 		{
@@ -54,7 +54,7 @@ void KFileDialog::SetupOFN(OPENFILENAME & ofn, TCHAR Filter[], HWND hWnd, const 
 		else 
 			pClass = NULL;
 
-		_tcscpy(ext, pExtension);
+		_tcsncpy_s(ext, MAX_PATH, pExtension, _TRUNCATE);
 		p = _tcschr(ext, '|');
 		if ( p ) 
 		{

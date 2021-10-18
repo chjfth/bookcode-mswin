@@ -102,7 +102,7 @@ void AppendHex(HWND hWnd, const BYTE * pBuffer, int size, int unit)
 				}
 		}
 
-		_tcscat(text + len, _T("\r\n")); len += 2;
+		_tcscat_s(text + len, ARRAYSIZE(text)-len, _T("\r\n")); len += 2;
 
 		if ( len + MAX_PATH >= sizeof(text)/sizeof(TCHAR) )
 		{
@@ -180,7 +180,7 @@ void KEditView::Decode(DWORD m_Data, DWORD m_Type)
 		HBITMAP hBmp = (HBITMAP) m_Data;
 
 		wsprintf(mess, _T("DDB %x "), m_Data);
-		DecodeDDB(hBmp, mess + _tcslen(mess));
+		DecodeDDB(hBmp, mess+_tcslen(mess), ARRAYSIZE(mess)-_tcslen(mess));
 
 		BITMAP bmp;
 		GetObject(hBmp, sizeof(bmp), & bmp);

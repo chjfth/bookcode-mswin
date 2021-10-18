@@ -55,7 +55,7 @@ public:
 		m_lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
 		if ( typeface )
-			_tcsncpy(m_lf.lfFaceName, typeface, LF_FACESIZE-1);
+			_tcsncpy_s(m_lf.lfFaceName, LF_FACESIZE, typeface, _TRUNCATE);
 		else
 			m_lf.lfFaceName[0] = 0;
 	}

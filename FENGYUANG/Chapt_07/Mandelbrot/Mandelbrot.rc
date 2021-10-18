@@ -32,7 +32,7 @@ BEGIN
     BEGIN
         MENUITEM "&Exit",                       ID_FILE_EXIT
     END
-    POPUP "&Viiew"
+    POPUP "&View"
     BEGIN
         MENUITEM "&Reset",                      ID_VIEW_RESET
     END

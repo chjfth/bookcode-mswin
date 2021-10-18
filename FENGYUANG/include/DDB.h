@@ -55,7 +55,7 @@ public:
 	HBITMAP CreateMask(COLORREF crBackGround, HDC hMaskDC);
 };
 
-void	DecodeDDB(HGDIOBJ hBmp, TCHAR mess[]);
+void	DecodeDDB(HGDIOBJ hBmp, TCHAR mess[], int bufchars);
 HBITMAP LargestDDB(HDC hDC);
 
 // class for simulating TransparentBlt

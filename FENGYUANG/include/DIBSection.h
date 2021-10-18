@@ -31,7 +31,7 @@ public:
 	UINT GetColorTable(void);
 	UINT SetColorTable(void);
 
-	void DecodeDIBSectionFormat(TCHAR desp[]);
+	void DecodeDIBSectionFormat(TCHAR desp[], int bufchars);
 };
 
 HBITMAP LargestDIBSection(BITMAPINFO * pBMI);

@@ -15,6 +15,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#include <windowsx.h>
 #include <assert.h>
 #include <tchar.h>
 #include <stdio.h>
@@ -27,6 +28,7 @@
 #include "..\..\include\FrameWnd.h"
 #include "..\..\include\GDIObject.h"
 #include "..\..\include\color.h"
+#include "..\..\include\utils.h"
 
 #include "resource.h"
 
@@ -99,7 +101,7 @@ void KMyCanvas::ClearBuffer(int width, int height, int x0, int y0)
 	int i=0, x=0, y=0;
 	if ( (width!=m_lastwidth) || (height!=m_lastheight) )	
 	{
-		for (int i=0; i<sizeof(Buffer)/sizeof(Buffer[0]); i++)
+		for (i=0; i<sizeof(Buffer)/sizeof(Buffer[0]); i++)
 			if ( Buffer[i] )
 			{
 				delete [] Buffer[i];
@@ -134,19 +136,20 @@ void KMyCanvas::ClearBuffer(int width, int height, int x0, int y0)
 	{
 		int n = m_lasty0 - y0;
 
-		for (int y=height-1; y>n; y--)
+		for (y=height-1; y>n; y--)
 			memcpy(Buffer[y], Buffer[y-n], width * sizeof(short));
 
 		for (; y>=0; y--)
 			memset(Buffer[y], 0, width * sizeof(short));
 	}
 
-	for (int y=0; y<height; y++)
+	for (y=0; y<height; y++)
+	{
 		if ( x0 > m_lastx0 )	// left
 		{
 			int n = x0 - m_lastx0;
 
-			for (int x=0; x<width - n; x++)
+			for (x=0; x<width - n; x++)
 				Buffer[y][x] = Buffer[y][x+n];
 
 			for (; x<width; x++)
@@ -156,21 +159,23 @@ void KMyCanvas::ClearBuffer(int width, int height, int x0, int y0)
 		{
 			int n = m_lastx0 - x0;
 
-			for (int x=width-1; x>n; x--)
+			for (x=width-1; x>n; x--)
 				Buffer[y][x] = Buffer[y][x-n];
 
 			for (; x>=0; x--)
 				Buffer[y][x] = 0;
 		}
+	}
 
 	m_lastx0 = x0;
 	m_lasty0 = y0;
 }
 
-// positive reach fixed point after n iteration
-// negative too big           after n iternation
-// 0		don't know after        limit number of iterations
-
+// Return:
+// positive : reach fixed point after n iteration
+// negative : too big           after n iteration
+// 0		: don't know after        limit number of iterations
+//
 int KMyCanvas::MandelCount(HDC hDC, int xi, int yi, int limit)
 {
 	const double thresh  = 4.0;
@@ -237,21 +242,14 @@ int KMyCanvas::MandelCount(HDC hDC, int xi, int yi, int limit)
 	return 0;
 }
 
-// #define SYSRGN 4
 
-// extern "C" BOOL WINAPI GetRandomRgn(HDC hDC, HRGN hRgn, int which);
-
-
-
-
-COLORREF inline Between(COLORREF from, COLORREF to, int val, int limit)
+COLORREF inline Between(COLORREF from, COLORREF to, int val, int limit) // Chj: no use here
 {
 	return RGB( ( GetRValue(from) * (limit-val) + GetRValue(to) * val ) / limit,
 				( GetGValue(from) * (limit-val) + GetGValue(to) * val ) / limit,
 				( GetBValue(from) * (limit-val) + GetBValue(to) * val ) / limit
 			  );
 }
-
 
 void KMyCanvas::SetLimit(int limit, BOOL bRedraw)
 {
@@ -300,7 +298,9 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 
 	TCHAR title [MAX_PATH];
 
-	sprintf(title, "Mandelbrot Set (%f %f) zoom %d:%d unit %f", m_x, m_y, m_zoommul, m_zoomdiv, m_unit);
+	_sntprintf_s(title, ARRAYSIZE(title), 
+		"Mandelbrot Set (%f %f) zoom %d:%d unit %f", 
+		m_x, m_y, m_zoommul, m_zoomdiv, m_unit);
 	SetWindowText(GetParent(m_hWnd), title);
 
 	int tick = GetTickCount();
@@ -318,16 +318,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 //	ClearBuffer(rect.right, rect.bottom, x0, y0);
 	
 	HRGN hRgn = CreateRectRgn(0, 0, 1, 1);
-
-	{
-		GetRandomRgn(hDC, hRgn, SYSRGN);
-		POINT p0;
-		GetDCOrgEx(hDC, & p0);
-	
-		// change region to be relative to DC, NT only
-//		if ( HIWORD(hDC) )
-			OffsetRgn(hRgn, - p0.x, - p0.y);
-	}
+	GetRandomRgn_refdc(hDC, hRgn, SYSRGN);
 
 	m_lastlimit += 16;
 
@@ -337,6 +328,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 		int		 count = 0;
 
 		for (int x=0; x<rect.right;  x++)
+		{
 //			if ( Buffer[y][x]==0 )
 			if ( PtInRegion(hRgn, x, y) )
 			{
@@ -355,11 +347,12 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 				if ( c )
 					SetPixel(hDC, x+x0, y+y0, c);
 			}
+		}
 	}
 
 	tick = GetTickCount() - tick;
 
-	wsprintf(title, "tick %d", tick);
+	_sntprintf_s(title, ARRAYSIZE(title), "millisec used: %d", tick);
 	m_pStatus->SetText(1, title);
 }
 
@@ -388,11 +381,11 @@ void KMyCanvas::OnTimer(WPARAM wParam, LPARAM lParam)
 void KMyCanvas::OnMouseMove(WPARAM wParam, LPARAM lParam)
 {
 	TCHAR temp[MAX_PATH];
-				
+
 	int x = GetScrollPos(m_hWnd, SB_HORZ) + LOWORD(lParam);
 	int y = GetScrollPos(m_hWnd, SB_VERT) + HIWORD(lParam);
 				
-	sprintf(temp, "(%f, %f) %d", m_x + x * m_unit,
+	_sntprintf_s(temp, MAX_PATH, "(%f, %f) %d", m_x + x * m_unit,
 		                         m_y + y * m_unit,
 								 MandelCount(NULL, x, y, m_limit));
 
@@ -474,7 +467,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCmd, int nShow)
 */
 	frame.CreateEx(0, _T("Mandelbrot"), _T("Mandelbrot Set"),
 		WS_OVERLAPPEDWINDOW,
-	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
+	    CW_USEDEFAULT, CW_USEDEFAULT, 
+		900, 600, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
 
     frame.ShowWindow(nShow);

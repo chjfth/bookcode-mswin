@@ -356,7 +356,7 @@ BOOL KDIB::SaveFile(const TCHAR * pFileName)
 		return FALSE;
 }
 
-void KDIB::DecodeDIBFormat(TCHAR mess[])
+void KDIB::DecodeDIBFormat(TCHAR mess[], int bufchars)
 {
 	wsprintf(mess, _T("DIB %dx%dx%dx%d "), m_nWidth, m_nHeight, 
 		m_nPlanes, m_nBitCount);
@@ -369,8 +369,8 @@ void KDIB::DecodeDIBFormat(TCHAR mess[])
 		wsprintf(mess+_tcslen(mess), _T(", %d,%03d,%03d b"), m_nImageSize/1024/1024, m_nImageSize/1024%1024, 
 			m_nImageSize%1024);
 
-	_tcscat(mess, PixelFormatName(m_nImageFormat));
-	_tcscat(mess, _T(" "));
+	_tcscat_s(mess, bufchars, PixelFormatName(m_nImageFormat));
+	_tcscat_s(mess, bufchars, _T(" "));
 }
 
 
