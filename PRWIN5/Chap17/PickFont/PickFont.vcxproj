@@ -44,12 +44,14 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <CharacterSet Condition="$(Configuration.Contains('ANSI')">MultiByte</CharacterSet>
+    <CharacterSet Condition="$(Configuration.Contains('ANSI'))">MultiByte</CharacterSet>
+    <TargetName>StokFontU</TargetName>
+    <TargetName Condition="$(Configuration.Contains('ANSI'))">StokFontA</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Debug'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration.Substring(0,7))'=='Release'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Relea'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -63,7 +65,7 @@
   <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Debug'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration.Substring(0,7))'=='Release'">
+  <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Relea'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration.Substring(0,5))'=='Debug'">
@@ -80,7 +82,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration.Substring(0,7))'=='Release'">
+  <ItemDefinitionGroup Condition="'$(Configuration.Substring(0,5))'=='Relea'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
