@@ -45,8 +45,8 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <CharacterSet Condition="$(Configuration.Contains('ANSI'))">MultiByte</CharacterSet>
-    <TargetName>StokFontU</TargetName>
-    <TargetName Condition="$(Configuration.Contains('ANSI'))">StokFontA</TargetName>
+    <TargetName>$(ProjectName)U</TargetName>
+    <TargetName Condition="$(Configuration.Contains('ANSI'))">$(ProjectName)A</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Debug'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
