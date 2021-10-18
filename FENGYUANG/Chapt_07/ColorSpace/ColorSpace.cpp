@@ -120,14 +120,18 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void ColorRect(HDC hDC, COLORREF c0, COLORREF dx, COLORREF dy, bool drawline=false)
 {
 	for (int x=0; x<256; x++)
-	for (int y=0; y<256; y++)
-		SetPixelV(hDC, x, y, c0 | (x * dx) | (y * dy));
-
-	if ( drawline )
 	{
-		MoveToEx(hDC, 0, 0, NULL); LineTo(hDC, 0, 255); LineTo(hDC, 255, 255);
-		MoveToEx(hDC, 0, 0, NULL); LineTo(hDC, 255, 0); LineTo(hDC, 255, 255);
-//		LineTo(hDC, 0, 0);
+		for (int y=0; y<256; y++)
+		{
+			SetPixelV(hDC, x, y, c0 | (x * dx) | (y * dy));
+		}
+
+		if ( drawline )
+		{
+			MoveToEx(hDC, 0, 0, NULL); LineTo(hDC, 0, 255); LineTo(hDC, 255, 255);
+			MoveToEx(hDC, 0, 0, NULL); LineTo(hDC, 255, 0); LineTo(hDC, 255, 255);
+//			LineTo(hDC, 0, 0);
+		}
 	}
 }
 
