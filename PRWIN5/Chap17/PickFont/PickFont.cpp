@@ -60,7 +60,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.lpszMenuName  = szAppName ; 
 	wndclass.lpszClassName = szAppName ;
 
-#ifdef _UNICODE
+#ifdef UNICODE
 	if(szCmdLine && szCmdLine[0])
 		MultiByteToWideChar(CP_ACP, 0, szCmdLine, -1, g_params, ARRAYSIZE(g_params));
 #endif
@@ -72,9 +72,16 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
+	const TCHAR *wintitle =
+#ifdef UNICODE
+	TEXT ("(Unicode) ") 
+#else
+	TEXT ("(ANSI) ") 
+#endif
+	TEXT ("PickFont: Create Logical Font (Pass cmdline params to customize text)");
+
 	hwnd = CreateWindow (szAppName, 
-		TEXT ("(Unicode)") TEXT ("PickFont: Create Logical Font (Pass cmdline params to customize text)"),
-		
+		wintitle,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT,
