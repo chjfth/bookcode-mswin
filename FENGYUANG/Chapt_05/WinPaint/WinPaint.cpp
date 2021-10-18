@@ -28,6 +28,7 @@
 #include "..\..\include\Status.h"
 #include "..\..\include\FrameWnd.h"
 #include "..\..\include\LogWindow.h"
+#include "..\..\include\utils.h"
 
 #include "Resource.h"
 
@@ -301,7 +302,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			PAINTSTRUCT ps; 
 
-			m_Log.Log("WM_PAINT\r\n");
+			m_Log.Log("WM_PAINT #%d\r\n", m_nRepaint);
 				
 			m_Log.Log("BeginPaint\r\n");
 			HDC hDC = BeginPaint(m_hWnd, &ps);
@@ -314,7 +315,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			EndPaint(m_hWnd, &ps);
 			m_Log.Log("EndPaint returns GetObjectType(0x%08x)=%d\r\n", hDC, GetObjectType(hDC));
 				
-			m_Log.Log("WM_PAINT returns\r\n");
+			m_Log.Log("WM_PAINT #%d returns\r\n", m_nRepaint);
 			return 0;
 		}
 
@@ -329,26 +330,14 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 {
 	RECT rect;
-
 	GetClientRect(m_hWnd, & rect);
 	
-	GetRandomRgn(hDC, m_hRegion, SYSRGN);
-	
+	GetRandomRgn_refdc(hDC, m_hRegion, SYSRGN);
+
 	POINT Origin;
 	GetDCOrgEx(hDC, & Origin);
-
-	if ( ((unsigned) hDC) & 0xFFFF0000 )
-	{
-		// [CH5.5] It is a 32-bit HDC, so we're running on WinNT.
-		// The m_hRegion on NT is expressed in screen coordinate,
-		// and we convert it to be client-area coordinate here.
-		// Verified, it is a must on Windows 7.
-		OffsetRgn(m_hRegion, - Origin.x, - Origin.y);
-	}
-
 	TCHAR mess[64];
-
-	wsprintf(mess, _T("HDC 0x%X, Org(%d, %d)"), hDC, Origin.x, Origin.y); 
+	wsprintf(mess, _T("HDC 0x%X, Org(%d, %d)"), (UINT)hDC, Origin.x, Origin.y); 
 	if ( m_pStatus )
 		m_pStatus->SetText(pane_1, mess);
 
@@ -388,7 +377,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 			SelectBrush(hDC, oldbrush);
 			// <<<
 
-			m_Log.Log(_T("Rgn-rect#%d (%d,%d, %d,%d)"), i+1,
+			m_Log.Log(_T("SYSRGN-rect#%d (%d,%d, %d,%d)"), i+1,
 				pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 		}
 

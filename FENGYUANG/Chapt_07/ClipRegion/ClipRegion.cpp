@@ -17,14 +17,21 @@
 #include <windows.h>
 #include <assert.h>
 #include <tchar.h>
+#include <stdio.h>
 
 #include "..\..\include\win.h"
 #include "..\..\include\Canvas.h"
 #include "..\..\include\Status.h"
 #include "..\..\include\FrameWnd.h"
 #include "..\..\include\LogWindow.h"
+#include "..\..\include\utils.h"
 
 #include "Resource.h"
+
+#ifndef SYSRGN
+#define SYSRGN 4
+__declspec(dllimport) extern "C" BOOL WINAPI GetRandomRgn(HDC hDC, HRGN hRgn, int which);
+#endif
 
 
 class KMyCanvas : public KCanvas
@@ -38,8 +45,8 @@ class KMyCanvas : public KCanvas
 	HRGN			m_hRegion;
 	KLogWindow		m_Log;
 	DWORD			m_Redraw;
-	bool            m_bValid[5];
-	HRGN            m_hRandomRgn[5];
+	bool            m_bValid[SYSRGN+1]; // [5]
+	HRGN            m_hRandomRgn[SYSRGN+1];
 	int				m_test;
 
 public:
@@ -70,17 +77,11 @@ public:
 };
 
 
-#ifndef SYSRGN
-
-#define SYSRGN 4
-
-__declspec(dllimport) extern "C" BOOL WINAPI GetRandomRgn(HDC hDC, HRGN hRgn, int which);
-
-#endif
-
 BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	switch ( LOWORD(wParam) )
+	UINT cmdid = LOWORD(wParam);
+
+	switch ( cmdid )
 	{
 		case IDM_VIEW_HREDRAW:
 		case IDM_VIEW_VREDRAW:
@@ -93,14 +94,14 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 				mii.cbSize = sizeof(mii);
 				mii.fMask  = MIIM_STATE;
 				
-				if ( GetMenuState(hMenu, LOWORD(wParam), MF_BYCOMMAND) & MF_CHECKED )
+				if ( GetMenuState(hMenu, cmdid, MF_BYCOMMAND) & MF_CHECKED )
 					mii.fState = MF_UNCHECKED;
 				else
 					mii.fState = MF_CHECKED;
 				
-				SetMenuItemInfo(hMenu, LOWORD(wParam), FALSE, & mii);
+				SetMenuItemInfo(hMenu, cmdid, FALSE, & mii);
 				
-				if ( LOWORD(wParam)==IDM_VIEW_HREDRAW )
+				if ( cmdid==IDM_VIEW_HREDRAW )
 					m_Redraw ^= WVR_HREDRAW;
 				else
 					m_Redraw ^= WVR_VREDRAW;
@@ -111,7 +112,7 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDM_TEST_SETCLIP:
 		case IDM_TEST_SETMETA:
 		case IDM_TEST_SETMETACLIP:
-			m_test = LOWORD(wParam);
+			m_test = cmdid;
 			InvalidateRect(m_hWnd, NULL, TRUE);
 			::UpdateWindow(m_hWnd);
 			break;
@@ -165,6 +166,8 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				hDC = GetDC(m_hWnd);
 				
 				DrawRegions(hDC);
+				// -- implicit input is those RGNs in m_hRandomRgn[], which was filled
+				// a few lines above from OnDraw() -> TestClipMeta() -> DumpRegions() .
 
 				ReleaseDC(m_hWnd, hDC);
 			}
@@ -177,27 +180,38 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return lr;
 }
 
+static const TCHAR *rgi2text(int iNum)
+{
+	if(iNum==1) return _T("CLIPRGN");
+	else if(iNum==2) return _T("METARGN");
+	else if(iNum==3) return _T("APIRGN");
+	else if(iNum==4) return _T("SYSRGN");
+	else return _T("Bad num");
+}
 
 void KMyCanvas::DumpRegions(HDC hDC)
 {
+	TCHAR tmpstr[200] = {};
 	for (int i=1; i<=4; i++)
 	{
 		m_bValid[i] = false;
-		int rslt = GetRandomRgn(hDC, m_hRandomRgn[i], i);
+		
+		int rslt = GetRandomRgn_refdc(hDC, m_hRandomRgn[i], i);
 
 		switch ( rslt )
 		{
 			case 1:
+				_sntprintf_s(tmpstr, ARRAYSIZE(tmpstr), _T("RandomRgn(%d=%s)"), i, rgi2text(i));
 				m_bValid[i] = true;
-				m_Log.DumpRegion("RandomRgn(%d)", m_hRandomRgn[i], false, i);
+				m_Log.DumpRegion(tmpstr, m_hRandomRgn[i], false);
 				break;
 
 			case -1:
-				m_Log.Log("RandomRgn(%d) Error\r\n", i);
+				m_Log.Log("RandomRgn(%d=%s) Error\r\n", i, rgi2text(i));
 				break;
 
 			case 0:
-				m_Log.Log("RandomRgn(%d) no region\r\n", i);
+				m_Log.Log("RandomRgn(%d=%s) no region\r\n", i, rgi2text(i));
 				break;
 
 			default:
@@ -209,30 +223,33 @@ void KMyCanvas::DumpRegions(HDC hDC)
 
 void KMyCanvas::DrawRegions(HDC hDC)
 {
+	// Chj: This is better named: HighlightRandomRegionsLocation()
+
 	HBRUSH hBrush;
 
 	SetBkMode(hDC, TRANSPARENT);
 
-	if ( m_bValid[1] )
+	if ( m_bValid[Rgi_APIRGN] )
 	{
-		hBrush = CreateHatchBrush(HS_VERTICAL, RGB(0xFF, 0, 0));
-		FillRgn(hDC, m_hRandomRgn[1], hBrush);
+		// Chj: we'll draw HS_DIAGCROSS before HS_VERTICAL/HS_HORIZONTAL for better visual effect
+		hBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(0xFF, 0, 0));
+		FillRgn(hDC, m_hRandomRgn[Rgi_APIRGN], hBrush);
 		DeleteObject(hBrush);
 	}
 
-	if ( m_bValid[2] )
+	if ( m_bValid[Rgi_CLIPRGN] )
 	{
-		hBrush = CreateHatchBrush(HS_HORIZONTAL, RGB(0, 0xFF, 0));
-		FillRgn(hDC, m_hRandomRgn[2], hBrush);
+		hBrush = CreateHatchBrush(HS_VERTICAL, RGB(0xFF, 0xE2, 0x66));
+		FillRgn(hDC, m_hRandomRgn[Rgi_CLIPRGN], hBrush);
 		DeleteObject(hBrush);
 	}
 
-//	if ( m_bValid[3] )
-//	{
-//		hBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(0, 0, 0xFF));
-//		FillRgn(hDC, m_hRandomRgn[3], hBrush);
-//		DeleteObject(hBrush);
-//	}
+	if ( m_bValid[Rgi_METARGN] )
+	{
+		hBrush = CreateHatchBrush(HS_HORIZONTAL, RGB(0, 0xFF, 0xFF));
+		FillRgn(hDC, m_hRandomRgn[Rgi_METARGN], hBrush);
+		DeleteObject(hBrush);
+	}
 }
 
 
@@ -240,16 +257,10 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 {
 	RECT rect;
 	TCHAR mess[64];
-	
+
 	GetClientRect(m_hWnd, & rect);
-	
-	GetRandomRgn(hDC, m_hRegion, SYSRGN);
 
-	POINT Origin;
-	GetDCOrgEx(hDC, & Origin);
-
-	if ( ((unsigned) hDC) & 0xFFFF0000 )
-		OffsetRgn(m_hRegion, - Origin.x, - Origin.y);
+	GetRandomRgn_refdc(hDC, m_hRegion);
 
 	m_nRepaint ++;
 
@@ -277,20 +288,23 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 		GetTextMetrics(hDC, & tm);
 		int lineheight = tm.tmHeight + tm.tmExternalLeading; 
 
-		for (unsigned i=0; i<pRegion->rdh.nCount; i++)
+		for (int i=0; i<rectcount; i++)
 		{
 			int x = (pRect[i].left + pRect[i].right)/2;
 			int y = (pRect[i].top + pRect[i].bottom)/2;
 
-			wsprintf(mess, "sysrgn rect %d", i+1);
+			wsprintf(mess, "WM_PAINT #%d, rects=%d", m_nRepaint, i+1);
 			::TextOut(hDC, x, y - lineheight, mess, _tcslen(mess));
 
 			wsprintf(mess, "(%d, %d, %d, %d)", pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 			::TextOut(hDC, x, y, mess, _tcslen(mess));
+
+			m_Log.Log(_T("SYSRGN-rect#%d (%d,%d, %d,%d) [%dx%d]"), i+1,
+				pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom,
+				RectW(pRect[i]), RectH(pRect[i]));
 		}
 
 		delete [] (char *) pRegion;
-
 	}
 
 	HBRUSH hBrush = CreateSolidBrush(RGB(m_Red, m_Green, m_Blue));
@@ -301,6 +315,9 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 	DeleteObject(hBrush);
 
 	TestClipMeta(hDC, rect);
+
+	// Chj: Well, we do NOT delete m_hRegion here even if we've done using it in TestClipMeta(),
+	// bcz we'll reuse it(as a initial dumb region) on next WM_PAINT.
 }
 
 
@@ -340,29 +357,39 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 	if(hRgn)
 		DeleteObject(hRgn);
 
-	// with meta and clip region selected, only the
+	// Chj: Wield our big brush trying to paint the whole client area,
+	// and see which parts actually get painted.
+	//
+	// BOOK AUTHOR: with meta and clip region selected, only the
 	// intersection of system region, meta region, clip region can be painted
 	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0xFF));
 	FillRect(hDC, & rect, hBrush);
 	DeleteObject(hBrush);
 
 	DumpRegions(hDC);
+	// -- The implicit input to DumpRegions(), is the region we've "selected" into hDC.
 
-	char mess[64];
-
-	mess[0] = 0;
-
-	strcat(mess, "Clip: ");
-	if ( m_bValid[1] ) strcat(mess, "Y"); else strcat(mess, "N");
-		
-	strcat(mess, ", Meta: ");
-	if ( m_bValid[2] ) strcat(mess, "Y"); else strcat(mess, "N");
-
-	strcat(mess, ", API: ");
-	if ( m_bValid[3] ) strcat(mess, "Y"); else strcat(mess, "N");
-
+	char mess[64] = {};
+	//
+	strcat_s(mess, ARRAYSIZE(mess), "Clip: ");
+	if ( m_bValid[Rgi_CLIPRGN] ) 
+		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+	else 
+		strcat_s(mess, ARRAYSIZE(mess), "N");
+	//	
+	strcat_s(mess, ARRAYSIZE(mess), ",  Meta: ");
+	if ( m_bValid[Rgi_METARGN] ) 
+		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+	else 
+		strcat_s(mess, ARRAYSIZE(mess), "N");
+	//
+	strcat_s(mess, ARRAYSIZE(mess), ", API: ");
+	if ( m_bValid[Rgi_APIRGN] ) 
+		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+	else 
+		strcat_s(mess, ARRAYSIZE(mess), "N");
+	//
 	m_pStatus->SetText(0, mess);
-
 }
 
 class KLogoFrame : public KFrame
@@ -390,10 +417,19 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	KLogoFrame frame(hInst, NULL, 0, NULL, & canvas, & status);
 
-	frame.CreateEx(0, _T("ClassName"), _T("Regions in a Device Context: System/Meta/Clip Regions"),
+	frame.CreateEx(0, _T("ClipRegion"), _T("Regions in a Device Context: System/Meta/Clip Regions"),
 		WS_OVERLAPPEDWINDOW,
-	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
+	    200, 200, 
+		600, 400, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
+
+#if 0 
+	// We may want to try SetWindowRgn() on this program.
+	// If we do, we'll find that SYSRGN's boundary is squeezed by that of window-rgn.
+
+	HRGN rgnCanvas = CreateEllipticRgn(0,0, 400,400);
+	SetWindowRgn(frame.m_hWnd, rgnCanvas, TRUE);
+#endif
 
     frame.ShowWindow(nShow);
     frame.UpdateWindow();

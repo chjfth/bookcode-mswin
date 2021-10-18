@@ -134,9 +134,11 @@
   </ItemGroup>
   
   <PropertyGroup>
-    <VSPG_FeedbackFile>.\WinPaint.cpp</VSPG_FeedbackFile>
+    <VSPG_BatDir_NoTBS>$(SolutionDir)..\_VSPG</VSPG_BatDir_NoTBS>
+    <VSPG_FeedbackFile>$(ProjectDir)WinPaint.rc</VSPG_FeedbackFile>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)_VSPG.props" />
+  <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+
   
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

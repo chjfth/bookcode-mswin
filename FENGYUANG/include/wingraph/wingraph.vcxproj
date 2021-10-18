@@ -242,6 +242,7 @@
     <ClInclude Include="..\CheckMark.h" />
     <ClInclude Include="..\Color.h" />
     <ClInclude Include="..\curve.h" />
+    <ClInclude Include="..\dbgprint.h" />
     <ClInclude Include="..\DDB.h" />
     <ClInclude Include="..\dialog.h" />
     <ClInclude Include="..\Dib.h" />
@@ -267,6 +268,7 @@
     <ClInclude Include="..\Status.h" />
     <ClInclude Include="..\Toolbar.h" />
     <ClInclude Include="..\treeview.h" />
+    <ClInclude Include="..\utils.h" />
     <ClInclude Include="..\win.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

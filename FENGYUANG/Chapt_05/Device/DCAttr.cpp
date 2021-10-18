@@ -404,6 +404,8 @@ void KDCAttributes::DumpDC(HDC hDC)
 	}
 
 	// Chj: MSDN 2008 says GetRandomRgn()'s iNum param must be SYSRGN(4).
+	// But: CH7.2 reveals the meaning of 1~3.
+	// CLIPRGN(1), METARGN(2), APIRGN(3), SYSRGN(4)
 	//
 	for (int i=1; i<=5; i++)
 	{
