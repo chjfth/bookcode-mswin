@@ -36,7 +36,8 @@ BEGIN
     BEGIN
         MENUITEM "CS_HREDRAW",                  IDM_VIEW_HREDRAW
         MENUITEM "CS_VREDRAW",                  IDM_VIEW_VREDRAW
-        MENUITEM "Log GetClipBox() call",           IDM_VIEW_GetClipBox
+        MENUITEM "Log GetClipBox() call",       IDM_VIEW_GetClipBox
+        MENUITEM "SetWindowRgn(400, 400)",      IDM_VIEW_SetWindowRgn
     END
     POPUP "&Test"
     BEGIN

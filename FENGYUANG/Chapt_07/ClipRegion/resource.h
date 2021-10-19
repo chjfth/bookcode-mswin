@@ -13,6 +13,7 @@
 #define IDM_TEST_SETMETA                40007
 
 #define IDM_VIEW_GetClipBox             40008
+#define IDM_VIEW_SetWindowRgn           40009
 
 // Next default values for new objects
 // 

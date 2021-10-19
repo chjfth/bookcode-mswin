@@ -49,6 +49,7 @@ class KMyCanvas : public KCanvas
 	HRGN            m_hRandomRgn[SYSRGN+1];
 	int				m_test;
 	bool  m_isLogClipbox;
+	bool  m_isSetWindowRgn;
 
 public:
 
@@ -70,6 +71,7 @@ public:
 		m_test     = IDM_TEST_DEFAULT;
 
 		m_isLogClipbox = false;
+		m_isSetWindowRgn = false;
 
 		for (int i=1; i<=4; i++)
 		{
@@ -92,7 +94,9 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 		case IDM_VIEW_HREDRAW:
 		case IDM_VIEW_VREDRAW:
 		case IDM_VIEW_GetClipBox:
+		case IDM_VIEW_SetWindowRgn:
 			{
+				// toggle menu item state >>>
 				HMENU hMenu = GetMenu(GetParent(m_hWnd));
 
 				MENUITEMINFO mii = {sizeof(mii)};				
@@ -104,13 +108,35 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 					mii.fState = MF_CHECKED;
 				
 				SetMenuItemInfo(hMenu, cmdid, FALSE, & mii);
+				// toggle menu item state <<<
 				
+				// take action below
+
 				if ( cmdid==IDM_VIEW_HREDRAW )
 					m_Redraw ^= WVR_HREDRAW;
 				else if(cmdid==IDM_VIEW_VREDRAW)
 					m_Redraw ^= WVR_VREDRAW;
 				else if(cmdid==IDM_VIEW_GetClipBox)
 					m_isLogClipbox = !m_isLogClipbox;
+				else if(cmdid==IDM_VIEW_SetWindowRgn)
+				{
+					// If we do SetWindowRgn() on this window, we'll find that 
+					// SYSRGN's boundary is squeezed by that of window-rgn.
+
+					m_isSetWindowRgn = !m_isSetWindowRgn;
+
+					HWND hwndToplevel = GetAncestor(m_hWnd, GA_ROOT);
+					if(m_isSetWindowRgn)
+					{
+
+						HRGN rgnCanvas = CreateEllipticRgn(0,0, 400,400);
+						SetWindowRgn(hwndToplevel, rgnCanvas, TRUE);
+					}
+					else
+					{
+						SetWindowRgn(hwndToplevel, NULL, TRUE);
+					}
+				}
 			}
 			return TRUE;
 
@@ -479,14 +505,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 	    200, 200, 
 		600, 400, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
-
-#if 0 
-	// We may want to try SetWindowRgn() on this program.
-	// If we do, we'll find that SYSRGN's boundary is squeezed by that of window-rgn.
-
-	HRGN rgnCanvas = CreateEllipticRgn(0,0, 400,400);
-	SetWindowRgn(frame.m_hWnd, rgnCanvas, TRUE);
-#endif
 
     frame.ShowWindow(nShow);
     frame.UpdateWindow();
