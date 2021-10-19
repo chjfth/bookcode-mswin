@@ -39,7 +39,7 @@ inline TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false)
 	return buf;
 }
 
-enum Rgntype_et {
+enum RgnShape_et {
 	RgnNone = ERROR,
 	RgnEmpty = NULLREGION,
 	RgnOneRect = SIMPLEREGION,
@@ -58,6 +58,18 @@ enum RgnExist_et {
 	RgnExist_No = 0,
 	RgnExist_Fail = -1,
 }; // As return value for GetRandomRgn, GetClipRgn
+
+inline const TCHAR *RgnShapeStr(RgnShape_et shape)
+{
+	switch(shape)
+	{
+	case RgnEmpty: return _T("EmptyRgn");
+	case RgnOneRect: return _T("SimpleRgn");
+	case RgnMultiRect: return _T("ComplexRgn");
+	}
+	return _T("NoneRgn");
+}
+
 
 inline RgnExist_et GetRandomRgn_refdc(HDC hDC, HRGN hrgn, int iNum=SYSRGN)
 {

@@ -74,6 +74,9 @@ public:
 			m_bValid[i]     = false;
 		}
 	}
+
+private:
+	void LogClipBox(HDC hdc, const TCHAR *pfx=NULL);
 };
 
 
@@ -125,10 +128,31 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 	return FALSE;	// not processed
 }
 
+void KMyCanvas::LogClipBox(HDC hdc, const TCHAR *pfx)
+{
+	if(pfx==NULL)
+		pfx = _T("");
+
+	RECT rc = {};
+	RgnShape_et shape = (RgnShape_et)GetClipBox(hdc, &rc);
+
+	const TCHAR *s = RgnShapeStr(shape);
+	if(shape!=RgnNone)
+	{
+		m_Log.Log(_T("%sClipbox[%s] (%d,%d, %d,%d)"), pfx, s,
+			rc.left, rc.top, rc.right, rc.bottom);
+	}
+	else
+	{
+		m_Log.Log(_T("Clipbox None."));
+	}
+
+}
  
 LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	LRESULT lr;
+	LRESULT lr = 0;
+	HDC hDC = NULL;
 
 	switch( uMsg )
 	{
@@ -149,9 +173,14 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case WM_PAINT:
 			{
+				// Chj: Peek GetClipBox() before BeginPaint
+				hDC = GetDC(hWnd);
+				LogClipBox(hDC, ">>>");
+				ReleaseDC(hWnd, hDC);
+
 				PAINTSTRUCT ps; 
 
-				HDC hDC = BeginPaint(m_hWnd, &ps);
+				hDC = BeginPaint(m_hWnd, &ps);
 
 			//	HRGN hRgn1 = CreateRectRgn(0, 0, 100, 100);
 			//	HRGN hRgn2 = CreateRectRgn(50, 50, 300, 300);
@@ -164,6 +193,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				EndPaint(m_hWnd, &ps);
 
 				hDC = GetDC(m_hWnd);
+				LogClipBox(hDC, "<<<");
 				
 				DrawRegions(hDC);
 				// -- implicit input is those RGNs in m_hRandomRgn[], which was filled
