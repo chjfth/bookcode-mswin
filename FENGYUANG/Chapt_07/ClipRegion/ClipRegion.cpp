@@ -139,8 +139,8 @@ void KMyCanvas::LogClipBox(HDC hdc, const TCHAR *pfx)
 	const TCHAR *s = RgnShapeStr(shape);
 	if(shape!=RgnNone)
 	{
-		m_Log.Log(_T("%sClipbox[%s] (%d,%d, %d,%d)"), pfx, s,
-			rc.left, rc.top, rc.right, rc.bottom);
+		m_Log.Log(_T("%sClipbox[%s] (%d,%d, %d,%d) [%dx%d]"), pfx, s,
+			rc.left, rc.top, rc.right, rc.bottom, RectW(rc), RectH(rc));
 	}
 	else
 	{
