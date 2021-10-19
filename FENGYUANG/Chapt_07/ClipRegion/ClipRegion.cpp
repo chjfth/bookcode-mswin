@@ -48,6 +48,7 @@ class KMyCanvas : public KCanvas
 	bool            m_bValid[SYSRGN+1]; // [5]
 	HRGN            m_hRandomRgn[SYSRGN+1];
 	int				m_test;
+	bool  m_isLogClipbox;
 
 public:
 
@@ -67,6 +68,8 @@ public:
 		m_Blue     = 0xCF;
 		m_Redraw   = 0;
 		m_test     = IDM_TEST_DEFAULT;
+
+		m_isLogClipbox = false;
 
 		for (int i=1; i<=4; i++)
 		{
@@ -88,13 +91,11 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 	{
 		case IDM_VIEW_HREDRAW:
 		case IDM_VIEW_VREDRAW:
+		case IDM_VIEW_GetClipBox:
 			{
 				HMENU hMenu = GetMenu(GetParent(m_hWnd));
 
-				MENUITEMINFO mii;
-				
-				memset(& mii, 0, sizeof(mii));
-				mii.cbSize = sizeof(mii);
+				MENUITEMINFO mii = {sizeof(mii)};				
 				mii.fMask  = MIIM_STATE;
 				
 				if ( GetMenuState(hMenu, cmdid, MF_BYCOMMAND) & MF_CHECKED )
@@ -106,8 +107,10 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 				
 				if ( cmdid==IDM_VIEW_HREDRAW )
 					m_Redraw ^= WVR_HREDRAW;
-				else
+				else if(cmdid==IDM_VIEW_VREDRAW)
 					m_Redraw ^= WVR_VREDRAW;
+				else if(cmdid==IDM_VIEW_GetClipBox)
+					m_isLogClipbox = !m_isLogClipbox;
 			}
 			return TRUE;
 
@@ -173,14 +176,25 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case WM_PAINT:
 			{
+				assert(hWnd==m_hWnd);
+
 				// Chj: Peek GetClipBox() before BeginPaint
-				hDC = GetDC(hWnd);
-				LogClipBox(hDC, ">>>");
-				ReleaseDC(hWnd, hDC);
+				if(m_isLogClipbox)
+				{
+					hDC = GetDC(hWnd);
+					LogClipBox(hDC, ">>>");
+					ReleaseDC(hWnd, hDC);
+					hDC = NULL;
+				}
 
 				PAINTSTRUCT ps; 
 
 				hDC = BeginPaint(m_hWnd, &ps);
+
+				if(m_isLogClipbox)
+				{
+					LogClipBox(hDC, "!!!");
+				}
 
 			//	HRGN hRgn1 = CreateRectRgn(0, 0, 100, 100);
 			//	HRGN hRgn2 = CreateRectRgn(50, 50, 300, 300);
@@ -191,9 +205,14 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				OnDraw(hDC, &ps.rcPaint);
 
 				EndPaint(m_hWnd, &ps);
+				hDC = NULL;
 
 				hDC = GetDC(m_hWnd);
-				LogClipBox(hDC, "<<<");
+
+				if(m_isLogClipbox)
+				{
+					LogClipBox(hDC, "<<<");
+				}
 				
 				DrawRegions(hDC);
 				// -- implicit input is those RGNs in m_hRandomRgn[], which was filled
@@ -357,6 +376,9 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 	// Play with clip and meta region
 	HRGN hRgn = NULL;
 
+	if(m_test!=IDM_TEST_DEFAULT)
+		m_Log.Log("Apply DC user-clipping");
+
 	switch ( m_test )
 	{
 		case IDM_TEST_DEFAULT:
@@ -386,6 +408,11 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 	
 	if(hRgn)
 		DeleteObject(hRgn);
+
+	if(m_isLogClipbox)
+	{
+		LogClipBox(hDC, "###");
+	}
 
 	// Chj: Wield our big brush trying to paint the whole client area,
 	// and see which parts actually get painted.

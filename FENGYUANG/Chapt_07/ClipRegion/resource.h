@@ -12,6 +12,8 @@
 #define IDM_TEST_SETMETACLIP            40006
 #define IDM_TEST_SETMETA                40007
 
+#define IDM_VIEW_GetClipBox             40008
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

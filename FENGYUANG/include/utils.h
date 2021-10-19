@@ -63,9 +63,9 @@ inline const TCHAR *RgnShapeStr(RgnShape_et shape)
 {
 	switch(shape)
 	{
-	case RgnEmpty: return _T("EmptyRgn");
-	case RgnOneRect: return _T("SimpleRgn");
-	case RgnMultiRect: return _T("ComplexRgn");
+	case RgnEmpty:     return _T("EmptyRgn");
+	case RgnOneRect:   return _T("SimplRgn");
+	case RgnMultiRect: return _T("CmplxRgn");
 	}
 	return _T("NoneRgn");
 }
