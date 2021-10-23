@@ -235,16 +235,18 @@ void HLSColorPalette(HDC hDC, int scale, KColor & selection)
 	KColor c;
 
 	for (int hue=0; hue<360; hue++)
-	for (int sat=0; sat<=scale; sat++)
 	{
-		c.hue        = hue;
-		c.lightness  = 0.5 ; 
-		c.saturation = ((double) sat)/scale;
-		c.ToRGB();
+		for (int sat=0; sat<=scale; sat++)
+		{
+			c.hue        = hue;
+			c.lightness  = 0.5 ; 
+			c.saturation = ((double) sat)/scale;
+			c.ToRGB();
 
-		SetPixelV(hDC, hue, sat, PALETTERGB(c.red, c.green, c.blue));
+			SetPixelV(hDC, hue, sat, PALETTERGB(c.red, c.green, c.blue));
 
-	//	SetPixel(hDC, hue+400, sat, PALETTERGB(0,0,0) | GetPixel(hDC, hue, sat));
+			//	SetPixel(hDC, hue+400, sat, PALETTERGB(0,0,0) | GetPixel(hDC, hue, sat));
+		}
 	}
 
 	for (int l=0; l<=scale; l++)
@@ -277,14 +279,22 @@ void ShowHalftonePalette(HDC hDC, bool bHalftone)
 	HPALETTE hOld = SelectPalette(hDC, hPalette, FALSE);
 
 	if ( GetDeviceCaps(hDC, RASTERCAPS) & RC_PALETTE )
+	{
+		// We reach here only on a 256-color display mode
 		RealizePalette(hDC);
+	}
 
 	for (int j=0; j<(num+15)/16; j++)
-	for (int i=0; i<16; i++)
 	{
-		for (int y=0; y<24; y++)
-		for (int x=0; x<24; x++)
-			SetPixelV(hDC, i*25+x, j*25+y, PALETTEINDEX(j*16+i));
+		for (int i=0; i<16; i++)
+		{
+			// draw a small cell of current palette-color
+			for (int y=0; y<24; y++)
+			{
+				for (int x=0; x<24; x++)
+					SetPixelV(hDC, i*25+x, j*25+y, PALETTEINDEX(j*16+i));
+			}
+		}
 	}
 
 	SelectPalette(hDC, hOld, FALSE);
