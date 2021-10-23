@@ -16,14 +16,14 @@
 typedef enum 
 {
 	DIB_1BPP,			//   2 color image, palette-based
-	DIB_2BPP,			//   4 color image, palttte-based
+	DIB_2BPP,			//   4 color image, palette-based
 	DIB_4BPP,			//  16 color image, palette-based
 	DIB_4BPPRLE,		//  16 color image, palette-based, RLE compressed
 	DIB_8BPP,			// 256 color image, palette-based 
 	DIB_8BPPRLE,		// 256 color image, palette-based, RLE compressed
 
-	DIB_16RGB555,		// 15 bit RGB color image, 5-5-5
-	DIB_16RGB565,		// 16 bit RGB color image, 5-6-5, 1 bit unused
+	DIB_16RGB555,		// 15 bit RGB color image, 5-5-5, 1 bit unused
+	DIB_16RGB565,		// 16 bit RGB color image, 5-6-5
 	DIB_24RGB888,		// 24 bit RGB color image, 8-8-8
 	DIB_32RGB888,		// 32 bit RGB color image, 8-8-8, 8 bit unused
 
