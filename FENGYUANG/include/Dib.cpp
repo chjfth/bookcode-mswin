@@ -107,6 +107,10 @@ KDIB::~KDIB()
 
 bool KDIB::AttachDIB(BITMAPINFO * pDIB, BYTE * pBits, int flags)
 {
+	// Chj memo:
+	// [2021-10-24] On return, the caller will relinquish the ownership of `pDIB`.
+	// pDIB[]'s life is managed by KDIB.
+
 	if ( IsBadReadPtr(pDIB, sizeof(BITMAPCOREHEADER)) )
 		return false;
 

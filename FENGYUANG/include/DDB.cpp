@@ -165,19 +165,20 @@ void DecodeDDB(HGDIOBJ hBmp, TCHAR mess[], int bufchars)
 
 	if ( GetObject(hBmp, sizeof(bmp), & bmp) )
 	{
-		_sntprintf_s(mess, bufchars, _TRUNCATE, _T("%dx%dx%dx%d w=%d, 0x%x"), bmp.bmWidth, bmp.bmHeight,
-			bmp.bmPlanes, bmp.bmBitsPixel, bmp.bmWidthBytes, bmp.bmBits);
+		_sntprintf_s(mess, bufchars, _TRUNCATE, _T("%dx%dx%dx%d w=%d, @0x%x"), 
+			bmp.bmWidth, bmp.bmHeight, bmp.bmPlanes, bmp.bmBitsPixel, 
+			bmp.bmWidthBytes, bmp.bmBits);
 
 		int size = bmp.bmWidthBytes * bmp.bmHeight;
 
 		int pfxlen = _tcslen(mess);
 
 		if ( size < 1024 )
-			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d b"), size);
+			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d bytes"), size);
 		else if ( size < 1024 * 1024 )
-			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d,%03d b"), size/1024, size%1024);
+			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d,%03d bytes"), size/1024, size%1024);
 		else
-			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE,_T(", %d,%03d,%03d b"), size/1024/1024, size/1024%1024, size%1024);
+			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE,_T(", %d,%03d,%03d bytes"), size/1024/1024, size/1024%1024, size%1024);
 	}
 	else
 		_tcscpy_s(mess, bufchars, _T("Failed"));
@@ -199,12 +200,15 @@ HBITMAP LargestDDB(HDC hDC)
 
 		if ( hBmp )
 		{
-			HBITMAP h = CreateCompatibleBitmap(hDC, mid+1, mid+1);
+			// [2021-10-24] Chj: Something unprecise here. If we first DeleteObject(hBmp),
+			// h1more may probably succeed.
 
-			if ( h==NULL )
+			HBITMAP h1more = CreateCompatibleBitmap(hDC, mid+1, mid+1);
+
+			if ( h1more==NULL )
 				return hBmp;
 
-			DeleteObject(h);
+			DeleteObject(h1more);
 			DeleteObject(hBmp);
 
 			mins = mid+1;

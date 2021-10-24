@@ -62,8 +62,11 @@ public:
 	RGBQUAD    * m_pRGBQUAD;		// V3,4,5 DIB color table within m_pBMI
 	int			 m_nClrUsed;		// No of color in color table
 	int			 m_nClrImpt;		// Real color used
-	DWORD	   * m_pBitFields;		// 16, 32-bpp masks within m_pBMI
-	
+	union {
+		DWORD  * m_pBitFields;		// 16, 32-bpp masks within m_pBMI
+		DWORD  * m_pBitMasks3;		// according to book, this is called Bit-mask(3-DWORDs)
+	};
+
 	int			 m_nWidth;			// image pixel width
 	int			 m_nHeight;			// image pixel height, positive
 	int			 m_nPlanes;			// plane count

@@ -494,18 +494,18 @@ void KDDBView::Test_CreateBitmap(HDC hDC, const RECT * rcPaint)
 
 void KDDBView::Test_LargestDDB(HDC hDC, const RECT * rcPaint)
 {
-	HDC hMemDC = CreateCompatibleDC(hDC);
-		
-	// Calculate largest DDB size
-	TCHAR mess[128];
-	HDC DC[2] = { hMemDC, hDC };
-
-	int y, x;
-	for (y=0; y<2; y++)
-	{
-		const TCHAR * desp[] = { "Largest monochrome",
+	const TCHAR * desp[] = { "Largest monochrome",
 		"Largest screen compatible bitmap" };
 
+	HDC hMemDC = CreateCompatibleDC(hDC);
+
+	// Calculate largest DDB size
+	TCHAR mess[128];
+	HDC DC[ARRAYSIZE(desp)] = { hMemDC, hDC };
+
+	int y, x;
+	for (y=0; y<ARRAYSIZE(desp); y++)
+	{
 		HBITMAP hBmp = LargestDDB(DC[y]);
 
 		TextOut(hDC, 20, 10+y*20, desp[y], _tcslen(desp[y]));
@@ -517,7 +517,7 @@ void KDDBView::Test_LargestDDB(HDC hDC, const RECT * rcPaint)
 	}
 
 	// test maximum number of DDB that can be created
-	for (y=0; y<2; y++)
+	for (y=0; y<ARRAYSIZE(desp); y++)
 	{
 		HBITMAP hBmp[1024];
 
