@@ -406,14 +406,19 @@ BITMAPINFO * BitmapToDIB(HPALETTE hPal,	// palette for color conversion
 				   HBITMAP  hBmp,							// DDB for convert
 				   int		nBitCount, int nCompression)	// format wanted
 {
-	typedef struct
+	// Chj: This function returns a "packed DIB", 
+	// and the caller is responsible for C++-delete the returned memblock.
+	//
+	// Feature: The caller do not need to provide a BITMAPINFOHEADER struct explicitly,
+	// which is prepared internally by this function.
+
+	struct DIBINFO
 	{
 		BITMAPINFOHEADER bmiHeader;
 		RGBQUAD	 	     bmiColors[256+3];
-	}	DIBINFO;
+	} dibinfo = { };
 
-	BITMAP  ddbinfo;
-	DIBINFO dibinfo;
+	BITMAP  ddbinfo = {};
 
 	// retrieve DDB information
 	if ( GetObject(hBmp, sizeof(BITMAP), & ddbinfo)==0 )
@@ -437,7 +442,8 @@ BITMAPINFO * BitmapToDIB(HPALETTE hPal,	// palette for color conversion
 	else
 		hpalOld = NULL;
 
-	// query GDI for image size
+	// query GDI for image size(5th arg is NULL).
+	// dibinfo.bmiHeader.biSizeImage will be filled, this will be used later by GetDIBPixelSize().
 	GetDIBits(hDC, hBmp, 0, ddbinfo.bmHeight, NULL, (BITMAPINFO *) & dibinfo, DIB_RGB_COLORS);
 
 	int nInfoSize  = sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * GetDIBColorCount(dibinfo.bmiHeader);
@@ -447,9 +453,14 @@ BITMAPINFO * BitmapToDIB(HPALETTE hPal,	// palette for color conversion
 
 	if ( pDIB )
 	{
+		assert(nInfoSize<=sizeof(dibinfo));
 		memcpy(pDIB, & dibinfo, nInfoSize);
 		
-		if ( ddbinfo.bmHeight != GetDIBits(hDC, hBmp, 0, ddbinfo.bmHeight, pDIB + nInfoSize, (BITMAPINFO *) pDIB, DIB_RGB_COLORS) )
+		int retheight = GetDIBits(hDC, hBmp, 0, ddbinfo.bmHeight, pDIB+nInfoSize, (BITMAPINFO*)pDIB, DIB_RGB_COLORS);
+		// -- Chj: The only usage of hDC here, is to provide a palette, so that 4bpp and 8bpp
+		// output BMP can fill correct color-index values into lpvBits.
+
+		if ( ddbinfo.bmHeight != retheight )
 		{
 			delete [] pDIB;
 			pDIB = NULL;
