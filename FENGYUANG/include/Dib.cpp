@@ -487,13 +487,13 @@ int PixelFormat(HDC hdc)
     // 1st call to get hdc biBitCount.
     GetDIBits(hdc, hBmp, 0, 1, NULL, (BITMAPINFO*) & dibinfo, DIB_RGB_COLORS);
        
-    // 2nd calls to get color table or bitfields
+    // 2nd calls to get color table or bitfields, .bmiColors[] will be filled
     GetDIBits(hdc, hBmp, 0, 1, NULL, (BITMAPINFO*) & dibinfo, DIB_RGB_COLORS);
        
     DeleteObject(hBmp);
 
 	// try to understand bit fields
-	if ( dibinfo.bmiHeader.biBitCount==BI_BITFIELDS )
+	if ( dibinfo.bmiHeader.biCompression==BI_BITFIELDS ) // [2021-10-25] Chj fixed.
 	{
 		DWORD * pBitFields = (DWORD *) dibinfo.bmiColors;
 		DWORD red   = pBitFields[0];
@@ -502,7 +502,7 @@ int PixelFormat(HDC hdc)
 
 		if (      (blue==0x001F) && (green==0x03E0) && (red==0x7C00) )
 			return DIB_16RGB555;
-		else if ( (blue==0x001F) && (green==0x007E) && (red==0xF800) )
+		else if ( (blue==0x001F) && (green==0x07E0) && (red==0xF800) )
 			return DIB_16RGB565;
 		else if ( (blue==0x00FF) && (green==0xFF00) && (red==0xFF0000) )
 			return DIB_32RGB888;

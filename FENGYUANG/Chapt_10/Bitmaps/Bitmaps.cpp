@@ -18,6 +18,7 @@
 
 #include <windows.h>
 #include <assert.h>
+#include <stdio.h>
 #include <tchar.h>
 #include <math.h>
 
@@ -458,13 +459,15 @@ void KDDBView::Test_CreateBitmap(HDC hDC, const RECT * rcPaint)
 
 	TextOut(hDC, 100, 10, "Supported DDB Formats", 21);
 
-	for (int i=0; i<sizeof(format)/sizeof(format[0]); i++)
+	for (int i=0; i<ARRAYSIZE(format); i++)
 	{
 		TCHAR mess[128];
 	
 		HBITMAP hBmp = CreateBitmap(16, 16, format[i].cx, format[i].cy, NULL);
 
-		wsprintf(mess, "CreateBitmap(16, 16, %d, %d, NULL) ", format[i].cx, format[i].cy);
+		_sntprintf_s(mess, ARRAYSIZE(mess), "CreateBitmap(16, 16, %d, %d, NULL) ", 
+			format[i].cx, format[i].cy);
+	
 		TextOut(hDC, 10, 30+i*17, mess, _tcslen(mess));
 
 		DecodeDDB(hBmp, mess, ARRAYSIZE(mess));
