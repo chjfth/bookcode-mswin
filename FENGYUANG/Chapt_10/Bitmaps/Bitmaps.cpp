@@ -137,17 +137,19 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		case WM_COMMAND:
-			switch ( LOWORD(wParam) )
+		{{
+			WORD cmdid = LOWORD(wParam);
+			switch ( cmdid )
 			{
 				case IDM_VIEW_STRETCHDIBITS:
 				case IDM_VIEW_STRETCHDIBITS4:
 				case IDM_VIEW_SETDIBITSTODEVICE:
 				case IDM_VIEW_FITWINDOW:
-					if ( LOWORD(wParam)!= m_nViewOpt )
+					if ( cmdid != m_nViewOpt )
 					{
-						m_nViewOpt = LOWORD(wParam);
+						m_nViewOpt = cmdid;
 
-						switch ( LOWORD(wParam) )
+						switch ( cmdid )
 						{
 							case IDM_VIEW_STRETCHDIBITS:
 							case IDM_VIEW_SETDIBITSTODEVICE:
@@ -168,18 +170,20 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case IDM_FILE_SAVEDIB8BPP:	SaveWindowToDIB(hWnd,  8, BI_RGB); return 0;
 				case IDM_FILE_SAVEDIB8RLE:	SaveWindowToDIB(hWnd,  8, BI_RLE8); return 0;
 				case IDM_FILE_SAVEDIB16BPP: SaveWindowToDIB(hWnd, 16, BI_RGB); return 0;
-		  case IDM_FILE_SAVEDIB16BITFIELDS: SaveWindowToDIB(hWnd, 16, BI_BITFIELDS); return 0;
+			
+				case IDM_FILE_SAVEDIB16BITFIELDS: SaveWindowToDIB(hWnd, 16, BI_BITFIELDS); return 0;
 				case IDM_FILE_SAVEDIB24BPP: SaveWindowToDIB(hWnd, 24, BI_RGB); return 0;
 				case IDM_FILE_SAVEDIB32BPP: SaveWindowToDIB(hWnd, 32, BI_RGB); return 0;
-		  case IDM_FILE_SAVEDIB32BITFIELDS: SaveWindowToDIB(hWnd, 32, BI_BITFIELDS); return 0;
+			
+				case IDM_FILE_SAVEDIB32BITFIELDS: SaveWindowToDIB(hWnd, 32, BI_BITFIELDS); return 0;
 
-			case IDM_FILE_SAVEDIBSECTION:  SaveWindow(hWnd, true, 25, RGB(209, 177, 80)); return 0;
+				case IDM_FILE_SAVEDIBSECTION:  SaveWindow(hWnd, true, 25, RGB(209, 177, 80)); return 0;
 
 				case IDM_VIEW_DIBHEXDUMP:
 					SendMessage(GetParent(GetParent(hWnd)), WM_USER+1, (WPARAM) & m_DIB, 0);	
 			}
 			return 0;
-
+		}}
 		default:
 			return CommonMDIChildProc(hWnd, uMsg, wParam, lParam, m_hViewMenu, 3);
 	}

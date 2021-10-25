@@ -24,7 +24,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, PSTR, int)
 	int width  = GetSystemMetrics(SM_CXSCREEN);
 	int height = GetSystemMetrics(SM_CYSCREEN);
 
-	for (int i=0; i<2000; i++)
+	for (int i=0; i<500; i++)
 	{
 		HBRUSH hBrush = CreateSolidBrush(RGB(rand()%256, rand()%256, rand()%256));
 		SelectObject(hDC, hBrush);
