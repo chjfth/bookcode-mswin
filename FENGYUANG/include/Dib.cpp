@@ -565,7 +565,9 @@ BOOL SaveDIBToFile(const TCHAR * pFileName, const BITMAPINFO * pBMI, const void 
 	}
 
 	HANDLE handle = CreateFile(pFileName, GENERIC_WRITE, FILE_SHARE_READ, 
-		NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+		NULL, 
+		CREATE_ALWAYS, // Chj fixed, was CREATE_NEW 
+		FILE_ATTRIBUTE_NORMAL, NULL);
 	
 	if ( handle == INVALID_HANDLE_VALUE )
 		return FALSE;
