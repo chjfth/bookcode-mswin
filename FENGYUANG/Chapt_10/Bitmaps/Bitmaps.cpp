@@ -387,7 +387,10 @@ LRESULT KDDBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		case WM_COMMAND:
-			switch ( LOWORD(wParam) )
+		{{
+			WORD cmdid = LOWORD(wParam);
+
+			switch ( cmdid )
 			{
 				case IDM_VIEW_CREATEBITMAP:
 				case IDM_VIEW_LARGESTDDB:
@@ -403,22 +406,23 @@ LRESULT KDDBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case IDM_VIEW_BLT_STRETCHPROP:
 				case IDM_VIEW_BITBLT_COLOR:
 				case IDM_VIEW_GENMASK:
-					if ( LOWORD(wParam)!= m_nViewOpt )
+					if ( cmdid != m_nViewOpt )
 					{
-						m_nViewOpt = LOWORD(wParam);
+						m_nViewOpt = cmdid;
 
 						InvalidateRect(hWnd, NULL, TRUE);
 					}
 					return 0;
 				
 				default:
-					switch ( m_texture.OnCommand(LOWORD(wParam)) )
+					switch ( m_texture.OnCommand(cmdid) )
 					{
 						case 1: return 0;
 						case 2: InvalidateRect(hWnd, NULL, TRUE); return 0;
 					}
 					break;
 			}
+		}}
 	}
 
 	return CommonMDIChildProc(hWnd, uMsg, wParam, lParam, m_hViewMenu, 3);

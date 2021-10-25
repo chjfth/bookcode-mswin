@@ -25,7 +25,13 @@ public:
 	HDC		m_hMemDC;
 	bool Prepare(int & width, int & height);
 
-	typedef enum { draw_normal, draw_center, draw_tile, draw_stretch, draw_stretchprop };
+	enum Draw_et { 
+		draw_normal, 
+		draw_center, 
+		draw_tile, 
+		draw_stretch, 
+		draw_stretchprop 
+	};
 
 	HBITMAP GetBitmap(void) const
 	{
@@ -51,7 +57,8 @@ public:
 		return Attach ( ::LoadBitmap(hInst, MAKEINTRESOURCE(id)) );
 	}
 
-	BOOL Draw(HDC hDC, int x0, int y0, int w, int h, DWORD rop, int opt=draw_normal);
+	BOOL Draw(HDC hDC, int x0, int y0, int w, int h, DWORD rop, Draw_et opt=draw_normal);
+
 	HBITMAP CreateMask(COLORREF crBackGround, HDC hMaskDC);
 };
 

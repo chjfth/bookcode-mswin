@@ -30,7 +30,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, PSTR, int)
 		SelectObject(hDC, hBrush);
 
 		BOOL rslt = StretchBlt(hDC, rand() % width, rand() % height, -64, -64, 
-							   hDC, rand() % width, rand() % height, 32, 32, (rand() % 256) << 16);
+							   hDC, rand() % width, rand() % height, 32, 32, 
+							   (rand() % 256) << 16
+							   );
 		SelectObject(hDC, GetStockObject(WHITE_BRUSH));
 		DeleteObject(hBrush);
 		Sleep(1);

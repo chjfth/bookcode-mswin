@@ -40,8 +40,8 @@ public:
 // concrete class for overwriting background drawing using DDB
 class KDDBBackground : public KBackground
 {
-	KDDB	m_DDB;
-	int		m_nStyle;
+	KDDB          m_DDB;
+	KDDB::Draw_et m_nStyle;
 
 	virtual LRESULT EraseBackground(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -51,7 +51,7 @@ public:
 		m_nStyle = KDDB::draw_tile;
 	}
 
-	void SetStyle(int style)
+	void SetStyle(KDDB::Draw_et style)
 	{
 		m_nStyle = style;
 	}

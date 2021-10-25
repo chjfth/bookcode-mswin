@@ -22,7 +22,7 @@
 
 #include "DDB.h"
 
-// quey size, prepare memory DC, select bitmap into memory DC
+// query size, prepare memory DC, select bitmap into memory DC
 bool KDDB::Prepare(int & width, int & height)
 {
 	BITMAP bmp;
@@ -108,7 +108,7 @@ BOOL KDDB::Attach(HBITMAP hBmp)
 }
 
 
-BOOL KDDB::Draw(HDC hDC, int x0, int y0, int w, int h, DWORD rop, int opt)
+BOOL KDDB::Draw(HDC hDC, int x0, int y0, int w, int h, DWORD rop, Draw_et opt)
 {
 	int bmpwidth, bmpheight;
 
@@ -144,12 +144,12 @@ BOOL KDDB::Draw(HDC hDC, int x0, int y0, int w, int h, DWORD rop, int opt)
 			int ww = w;
 			int hh = h;
 
-			if ( w * bmpheight < h * bmpwidth )	// w/bmWidth is the mimimum scale
+			if ( w * bmpheight < h * bmpwidth )	// w/bmWidth is the minimum scale
 				hh = bmpheight * w / bmpwidth;
 			else
 				ww = bmpwidth  * h / bmpheight;
 
-			// propertional scaling and centering
+			// proportional scaling and centering
 			return StretchBlt(hDC, x0 + (w-ww)/2, y0 + (h-hh)/2, ww, hh, m_hMemDC, 0, 0, bmpwidth, bmpheight, rop);
 		}
 
