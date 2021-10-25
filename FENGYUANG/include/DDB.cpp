@@ -173,12 +173,14 @@ void DecodeDDB(HGDIOBJ hBmp, TCHAR mess[], int bufchars)
 
 		int pfxlen = _tcslen(mess);
 
-		if ( size < 1024 )
+		const int thou = 1000; // thousand
+
+		if ( size < thou )
 			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d bytes"), size);
-		else if ( size < 1024 * 1024 )
-			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d,%03d bytes"), size/1024, size%1024);
+		else if ( size < thou * thou )
+			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE, _T(", %d,%03d bytes"), size/thou, size%thou);
 		else
-			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE,_T(", %d,%03d,%03d bytes"), size/1024/1024, size/1024%1024, size%1024);
+			_sntprintf_s(mess+pfxlen, bufchars-pfxlen, _TRUNCATE,_T(", %d,%03d,%03d bytes"), size/thou/thou, size/thou%thou, size%thou);
 	}
 	else
 		_tcscpy_s(mess, bufchars, _T("Failed"));

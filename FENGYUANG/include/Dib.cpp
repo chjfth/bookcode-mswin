@@ -365,13 +365,15 @@ void KDIB::DecodeDIBFormat(TCHAR mess[], int bufchars)
 	wsprintf(mess, _T("DIB %dx%dx%dx%d "), m_nWidth, m_nHeight, 
 		m_nPlanes, m_nBitCount);
 
-	if ( m_nImageSize < 1024 )
-		wsprintf(mess+_tcslen(mess), _T(", %d b"), m_nImageSize);
-	else if ( m_nImageSize < 1024 * 1024 )
-		wsprintf(mess+_tcslen(mess), _T(", %d,%03d b"), m_nImageSize/1024, m_nImageSize%1024);
+	const int thou = 1000;
+
+	if ( m_nImageSize < thou )
+		wsprintf(mess+_tcslen(mess), _T(", %d bytes"), m_nImageSize);
+	else if ( m_nImageSize < thou * thou )
+		wsprintf(mess+_tcslen(mess), _T(", %d,%03d bytes"), m_nImageSize/thou, m_nImageSize%thou);
 	else
-		wsprintf(mess+_tcslen(mess), _T(", %d,%03d,%03d b"), m_nImageSize/1024/1024, m_nImageSize/1024%1024, 
-			m_nImageSize%1024);
+		wsprintf(mess+_tcslen(mess), _T(", %d,%03d,%03d bytes"), 
+			m_nImageSize/thou/thou, m_nImageSize/thou%thou, m_nImageSize%thou);
 
 	_tcscat_s(mess, bufchars, PixelFormatName(m_nImageFormat));
 	_tcscat_s(mess, bufchars, _T(" "));

@@ -202,7 +202,7 @@ BOOL SaveWindow(HWND hWnd, bool bClient, int nFrame, COLORREF crFrame)
 			Frame(dibsec.m_hMemDC, nFrame, crFrame, 0, 0, width, height); 
 
 			TCHAR Title[128];
-			GetWindowText(hWnd, Title, sizeof(Title)/sizeof(Title[0]));
+			GetWindowText(hWnd, Title, ARRAYSIZE(Title));
 			SetBkMode(dibsec.m_hMemDC, TRANSPARENT);
 			SetTextColor(dibsec.m_hMemDC, RGB(0xFF, 0xFF, 0xFF));
 			TextOut(dibsec.m_hMemDC, nFrame, (nFrame-20)/2, Title, _tcslen(Title));
@@ -214,7 +214,10 @@ BOOL SaveWindow(HWND hWnd, bool bClient, int nFrame, COLORREF crFrame)
 		else
 			hDC = GetWindowDC(hWnd);
 		
-		BitBlt(dibsec.m_hMemDC, nFrame, nFrame, width - nFrame * 2, height - nFrame * 2, hDC, 0, 0, SRCCOPY);
+		BitBlt(dibsec.m_hMemDC, 
+			nFrame, nFrame, 
+			width-nFrame*2, height-nFrame*2, 
+			hDC, 0, 0, SRCCOPY);
 		ReleaseDC(hWnd, hDC);
 
 		return dibsec.SaveFile(NULL);
