@@ -447,6 +447,9 @@ void TestDDB88(HDC hDC, int x, int y, HBITMAP hBmp, const TCHAR * desp)
 
 void KDDBView::Test_CreateBitmap(HDC hDC, const RECT * rcPaint)
 {
+	SetBkColor(hDC, RGB(225, 224, 176)); // dark orange bg
+	SetTextColor(hDC, RGB(255, 0, 0));   // red text color
+
 	// Test supported DDB format	
 	const SIZE format[] = { 
 			{ 1, 0 }, { 1, 1 }, { 1, 2 }, { 1, 4 }, { 1, 8 }, 
@@ -470,7 +473,7 @@ void KDDBView::Test_CreateBitmap(HDC hDC, const RECT * rcPaint)
 	}
 
 	
-	SetViewportOrgEx(hDC, 150, 0, NULL);
+	SetViewportOrgEx(hDC, 200, 0, NULL);
 
 	// Initialized 1 bpp
 	const WORD Chess44_WORD [] = { 0xCC, 0xCC, 0x33, 0x33, 0xCC, 0xCC, 0x33, 0x33 };
