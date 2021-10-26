@@ -72,10 +72,10 @@ LRESULT CALLBACK KWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		pWindow = (KWindow *) (pMDIC->lParam);
 
 		assert( ! IsBadReadPtr(pWindow, sizeof(KWindow)) );
-		SetWindowLong(hWnd, GWL_USERDATA, (LONG) pWindow);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) pWindow);
 	}
 	else
-		pWindow=(KWindow *)GetWindowLong(hWnd, GWL_USERDATA);
+		pWindow = (KWindow *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	if ( pWindow )
 		return pWindow->WndProc(hWnd, uMsg, wParam, lParam);
@@ -178,7 +178,7 @@ HRESULT KWindow::CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	switch ( uMsg )
 	{
 		case WM_NCDESTROY:						   // should be the last message
-			SetWindowLong(hWnd, GWL_USERDATA, 0);  // make sure no more message through WindowProc
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, 0);  // make sure no more message through WindowProc
 			delete this;						   // MDI child are created using new operator, time to delete	
 			return 0;
 

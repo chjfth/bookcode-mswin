@@ -51,7 +51,7 @@ protected:
         KDialog * pDialog;
     } _DialogCreateRecord;
     
-    static BOOL CALLBACK DialogProc(HWND hWnd,  UINT uMsg, WPARAM wParam, LPARAM lParam);
+    static INT_PTR CALLBACK DialogProc(HWND hWnd,  UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 public:
 	
@@ -62,7 +62,7 @@ public:
 		m_hWnd = NULL;
 	}
 
-    int Dialogbox(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent = NULL)
+    INT_PTR Dialogbox(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent = NULL)
     {
         _DialogCreateRecord ccr;
 

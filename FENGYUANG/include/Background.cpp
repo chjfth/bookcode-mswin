@@ -49,7 +49,7 @@ LRESULT KBackground::BackGroundWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 BOOL KBackground::Attach(HWND hWnd)
 {
 	SetProp(hWnd, Prop_KBackground, this);
-	m_OldProc = (WNDPROC) SetWindowLong(hWnd, GWL_WNDPROC, (LONG) BackGroundWindowProc);
+	m_OldProc = (WNDPROC) SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)BackGroundWindowProc);
 
 	return m_OldProc!=NULL;
 }
@@ -60,7 +60,12 @@ BOOL KBackground::Detatch(HWND hWnd)
 	RemoveProp(hWnd, Prop_KBackground);
 
 	if ( m_OldProc )
-		return SetWindowLong(hWnd, GWL_WNDPROC, (LONG) m_OldProc) == (LONG) BackGroundWindowProc;
+	{
+		if( SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)m_OldProc) == (LONG_PTR)BackGroundWindowProc )
+			return TRUE;
+		else
+			return FALSE;
+	}
 	else
 		return FALSE;
 }

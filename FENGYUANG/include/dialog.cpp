@@ -23,7 +23,7 @@
 #include "dialog.h"
 
 
-BOOL CALLBACK KDialog::DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK KDialog::DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     KDialog * pDialog;
         
@@ -38,7 +38,7 @@ BOOL CALLBACK KDialog::DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
             pDialog = (KDialog *) pPSP->lParam;
 
             assert( ! IsBadReadPtr(pDialog, sizeof(KDialog)) );
-            SetWindowLong(hWnd, GWL_USERDATA, (LONG) pDialog);
+            SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) pDialog);
         }
 		// check fir our dialog box creation call, _DialogCreateRecord struct should be passed
         else if ( ! IsBadReadPtr(pDCR, sizeof(_DialogCreateRecord)) && (pDCR->marker==CDIALOG_MARKER) )
@@ -46,7 +46,7 @@ BOOL CALLBACK KDialog::DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
             pDialog = pDCR->pDialog;
 
             assert( ! IsBadReadPtr(pDialog, sizeof(KDialog)) );
-            SetWindowLong(hWnd, GWL_USERDATA, (LONG) pDialog);
+            SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) pDialog);
         }
 		else
 			assert(false);
@@ -70,7 +70,7 @@ BOOL CALLBACK KDialog::DialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 				return FALSE;
 		}
 
-        pDialog = (KDialog *) GetWindowLong(hWnd, GWL_USERDATA);
+        pDialog = (KDialog *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 		assert( ! IsBadReadPtr(pDialog, sizeof(KDialog)) );
 	}
