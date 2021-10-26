@@ -17,7 +17,7 @@ class KCRC
 {
     unsigned short crctab[256];
 
-    typedef enum
+    enum
     {
                                //    		    CITT	XMODEM	ARC  	
         poly     = 0xA001,     // the poly:	    0x1021	0x1021	A001	

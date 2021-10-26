@@ -57,7 +57,7 @@ public:
 };
 
 
-typedef enum
+enum
 {
 	Enum_FILE_CLOSE,
 	Enum_FILE_EXIT,

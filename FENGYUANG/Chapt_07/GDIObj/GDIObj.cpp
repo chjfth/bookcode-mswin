@@ -128,7 +128,7 @@ class KGDIObjectTable : public KDialog
 
 };
 
-typedef enum
+enum
 {
 	DEF_TYPE    = 0,
 	DC_TYPE     = 1,

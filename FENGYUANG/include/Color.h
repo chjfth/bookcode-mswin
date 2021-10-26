@@ -39,7 +39,7 @@ const COLORREF white	   = RGB(0xFF, 0xFF, 0xFF);
 
 class KColor
 {
-	typedef enum
+	enum
 	{
 		Red,
 		Green,
