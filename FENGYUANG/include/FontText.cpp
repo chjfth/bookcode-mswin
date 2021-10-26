@@ -14,9 +14,9 @@
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 
-#pragma pack(push, 4)
+//#pragma pack(push, 4)
 #include <windows.h>
-#pragma pack(pop)
+//#pragma pack(pop)
 
 #include <tchar.h>
 #include <assert.h>

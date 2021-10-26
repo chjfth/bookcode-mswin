@@ -172,7 +172,7 @@ WPARAM KWindow::MessageLoop(void)
 
 
 // Common message processing for MDI Child Window
-HRESULT KWindow::CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
+LRESULT KWindow::CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, 
 									HMENU hMenu, int nWindowMenu)
 {
 	switch ( uMsg )
