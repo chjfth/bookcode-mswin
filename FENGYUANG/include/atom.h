@@ -15,7 +15,7 @@
 
 class KAtomTable : public IAtomTable
 {
-	typedef enum 
+	enum
 	{
 		MAX_BUFFER = 32768,
 		MAX_NAMES  =  2048

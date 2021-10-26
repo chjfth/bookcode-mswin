@@ -23,7 +23,7 @@ class KToolbar;
 class KFrame : public KWindow
 {
 protected:
-	typedef enum { ID_STATUSWINDOW = 101,
+	enum { ID_STATUSWINDOW = 101,
 				   ID_TOOLBAR      = 102
 				};
 

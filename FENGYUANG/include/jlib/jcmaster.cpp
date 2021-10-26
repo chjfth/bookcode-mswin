@@ -27,7 +27,7 @@
 
 /* Private state */
 
-typedef enum {
+enum {
 	main_pass,		/* input data, also do first output step */
 	huff_opt_pass,		/* Huffman code optimization pass */
 	output_pass		/* data output pass */

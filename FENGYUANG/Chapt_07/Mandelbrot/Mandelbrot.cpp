@@ -34,7 +34,7 @@
 
 class KMyCanvas : public KScrollCanvas
 {
-	typedef enum { 
+	enum { 
 					MAX_LIMIT  = 16384,
 					MAX_HEIGHT = 16384,
 	};

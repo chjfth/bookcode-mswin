@@ -379,7 +379,7 @@ class KOutline : public KFilter
 };
 
 
-typedef enum
+enum
 {
 	FILTER_IDENTITY,
 

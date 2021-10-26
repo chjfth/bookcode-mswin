@@ -16,7 +16,7 @@
 class KCheckMark
 {
 protected:
-	typedef enum { MAXSUBIMAGES = 50 };
+	enum { MAXSUBIMAGES = 50 };
 
 	HBITMAP m_hBmp;
 	int		m_nSubImageId[MAXSUBIMAGES];

@@ -21,7 +21,7 @@ protected:
 
 public:
 
-	typedef enum { View_NoChange = 0, View_Redraw = 1, View_Resize = 2 };
+	enum { View_NoChange = 0, View_Redraw = 1, View_Resize = 2 };
 
 	KView(void)
 	{

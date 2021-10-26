@@ -212,7 +212,7 @@ struct jpeg_marker_struct {
 
 /* Known color spaces. */
 
-typedef enum {
+enum {
 	JCS_UNKNOWN,		/* error/unspecified */
 	JCS_GRAYSCALE,		/* monochrome */
 	JCS_RGB,		/* red/green/blue */
@@ -223,7 +223,7 @@ typedef enum {
 
 /* DCT/IDCT algorithm options. */
 
-typedef enum {
+enum {
 	JDCT_ISLOW,		/* slow but accurate integer algorithm */
 	JDCT_IFAST,		/* faster, less accurate integer method */
 	JDCT_FLOAT		/* floating-point: accurate, fast on fast HW */

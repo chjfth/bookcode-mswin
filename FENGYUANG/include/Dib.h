@@ -13,7 +13,7 @@
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
-typedef enum 
+enum DIBFormat
 {
 	DIB_1BPP,			//   2 color image, palette-based
 	DIB_2BPP,			//   4 color image, palette-based
@@ -34,12 +34,12 @@ typedef enum
 
 	DIB_JPEG,			// embedded JPEG image
 	DIB_PNG				// embedded PNG image
-}  DIBFormat;
+};
 
 
 const TCHAR * PixelFormatName(int id);
 
-typedef enum 
+enum
 {
 	DIB_BMI_NEEDFREE   = 1,
 	DIB_BMI_READONLY   = 2,
@@ -148,7 +148,7 @@ public:
 	// transformation using inline function + integer only operations
 	BOOL  PlgBlt24(const POINT * pPoint, KDIB * pSrc, int nXSrc, int nYSrc, int nWidth, int nHeight);
 
-	typedef enum { method_gdi, method_direct, method_24bpp };
+	enum { method_gdi, method_direct, method_24bpp };
 	HBITMAP TransformBitmap(XFORM * xm, COLORREF crBack, int method);
 };
 

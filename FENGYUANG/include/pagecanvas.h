@@ -21,15 +21,15 @@
 // 7200 = LCM(72, 96, 120, 360, 600)
 
 #ifdef NT_ONLY
-typedef enum { ONEINCH = 7200 };
+enum { ONEINCH = 7200 };
 #else
-typedef enum { ONEINCH = 1440 };
+enum { ONEINCH = 1440 };
 #endif
 
 class KSurface
 {
 public:
-	typedef enum { 	BASE_DPI   = ONEINCH,
+	enum { 	BASE_DPI   = ONEINCH,
 					MARGIN_X   = 16,
 					MARGIN_Y   = 16
 				};
@@ -104,7 +104,7 @@ public:
 class KPageCanvas : public KScrollCanvas, public KSurface
 {
 public:
-	typedef enum { View_NoChange = 0, View_Redraw = 1, View_Resize = 2 };
+	enum { View_NoChange = 0, View_Redraw = 1, View_Resize = 2 };
 
 protected:
 	HMENU		m_hViewMenu;

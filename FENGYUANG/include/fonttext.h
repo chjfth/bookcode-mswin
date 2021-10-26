@@ -339,7 +339,7 @@ BOOL OutlineTextOut(HDC hDC, int x, int y, const TCHAR * str, int count);
 
 class KTextFormator
 {
-	typedef enum { MaxCharNo = 256 };
+	enum { MaxCharNo = 256 };
 
 	float m_fCharWidth[MaxCharNo];
 	float m_fHeight;

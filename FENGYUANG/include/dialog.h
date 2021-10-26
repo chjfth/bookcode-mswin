@@ -43,7 +43,7 @@ class KDialog
 
 protected:	
     
-	typedef enum { CDIALOG_MARKER = 31415927 };
+	enum { CDIALOG_MARKER = 31415927 };
     
 	typedef struct
     {

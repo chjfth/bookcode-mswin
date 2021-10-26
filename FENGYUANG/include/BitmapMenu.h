@@ -15,7 +15,7 @@
 
 class KBitmapMenu
 {
-	typedef enum { MAX_BITMAP = 16 };
+	enum { MAX_BITMAP = 16 };
 
 	HBITMAP m_hBitmap[MAX_BITMAP];
 	int     m_nBitmap;

@@ -34,7 +34,7 @@ BOOL SaveWindow(HWND hWnd, bool bClient, int nFrame, COLORREF crFrame);
 
 class KDIBView : public KScrollCanvas
 {
-	typedef enum { GAP = 16 };
+	enum { GAP = 16 };
 
 	virtual void    OnDraw(HDC hDC, const RECT * rcPaint);
 	virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -280,7 +280,7 @@ const int TextureID[] =
 
 class KDDBView : public KScrollCanvas
 {
-	typedef enum { GAP = 16 };
+	enum { GAP = 16 };
 
 	virtual void    OnDraw(HDC hDC, const RECT * rcPaint);
 	virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -784,7 +784,7 @@ void KDDBView::OnDraw(HDC hDC, const RECT * rcPaint)
 
 class KDIBSectionView : public KScrollCanvas
 {
-	typedef enum { GAP = 16 };
+	enum { GAP = 16 };
 
 	virtual void    OnDraw(HDC hDC, const RECT * rcPaint);
 	virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

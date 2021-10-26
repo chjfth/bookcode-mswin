@@ -26,7 +26,7 @@
 #include "jpeglib.h"
 
 
-typedef enum {			/* JPEG marker codes */
+enum {			/* JPEG marker codes */
   M_SOF0  = 0xc0,
   M_SOF1  = 0xc1,
   M_SOF2  = 0xc2,
