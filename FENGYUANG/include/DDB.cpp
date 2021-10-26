@@ -165,7 +165,7 @@ void DecodeDDB(HGDIOBJ hBmp, TCHAR mess[], int bufchars)
 
 	if ( GetObject(hBmp, sizeof(bmp), & bmp) )
 	{
-		_sntprintf_s(mess, bufchars, _TRUNCATE, _T("%dx%dx%dx%d w=%d, @0x%x"), 
+		_sntprintf_s(mess, bufchars, _TRUNCATE, _T("%dx%dx%dx%d w=%d, @0x%p"), 
 			bmp.bmWidth, bmp.bmHeight, bmp.bmPlanes, bmp.bmBitsPixel, 
 			bmp.bmWidthBytes, bmp.bmBits);
 

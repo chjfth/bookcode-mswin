@@ -9,7 +9,7 @@
 //  Published          by  Prentice Hall PTR, Prentice-Hall, Inc. www.phptr.com      //
 //                                                                                   //
 //  FileName   : octree.h						                                     //
-//  Description: Octree color quantilization, color reduction                        //
+//  Description: Octree color quantization, color reduction                        //
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
@@ -42,7 +42,7 @@ public:
 
 class KOctree
 {
-	typedef enum { MAXMODE = 65536 };
+	enum { MAXMODE = 65536 };
 
 	KNode   * pRoot;
 	int		TotalNode;
