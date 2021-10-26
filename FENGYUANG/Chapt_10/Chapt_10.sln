@@ -11,7 +11,6 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
-		Template|Win32 = Template|Win32
 		Unicode Debug|Win32 = Unicode Debug|Win32
 		Unicode Release|Win32 = Unicode Release|Win32
 	EndGlobalSection
@@ -20,8 +19,6 @@ Global
 		{57ECF151-0602-FA75-45E3-A74DA0747EA9}.Debug|Win32.Build.0 = Debug|Win32
 		{57ECF151-0602-FA75-45E3-A74DA0747EA9}.Release|Win32.ActiveCfg = Release|Win32
 		{57ECF151-0602-FA75-45E3-A74DA0747EA9}.Release|Win32.Build.0 = Release|Win32
-		{57ECF151-0602-FA75-45E3-A74DA0747EA9}.Template|Win32.ActiveCfg = Release|Win32
-		{57ECF151-0602-FA75-45E3-A74DA0747EA9}.Template|Win32.Build.0 = Release|Win32
 		{57ECF151-0602-FA75-45E3-A74DA0747EA9}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
 		{57ECF151-0602-FA75-45E3-A74DA0747EA9}.Unicode Debug|Win32.Build.0 = Debug|Win32
 		{57ECF151-0602-FA75-45E3-A74DA0747EA9}.Unicode Release|Win32.ActiveCfg = Release|Win32
@@ -30,8 +27,6 @@ Global
 		{D6B2BDE5-000D-76FC-5E25-26F71BD40EDF}.Debug|Win32.Build.0 = Debug|Win32
 		{D6B2BDE5-000D-76FC-5E25-26F71BD40EDF}.Release|Win32.ActiveCfg = Release|Win32
 		{D6B2BDE5-000D-76FC-5E25-26F71BD40EDF}.Release|Win32.Build.0 = Release|Win32
-		{D6B2BDE5-000D-76FC-5E25-26F71BD40EDF}.Template|Win32.ActiveCfg = Template|Win32
-		{D6B2BDE5-000D-76FC-5E25-26F71BD40EDF}.Template|Win32.Build.0 = Template|Win32
 		{D6B2BDE5-000D-76FC-5E25-26F71BD40EDF}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
 		{D6B2BDE5-000D-76FC-5E25-26F71BD40EDF}.Unicode Debug|Win32.Build.0 = Debug|Win32
 		{D6B2BDE5-000D-76FC-5E25-26F71BD40EDF}.Unicode Release|Win32.ActiveCfg = Release|Win32
@@ -40,8 +35,6 @@ Global
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Debug|Win32.Build.0 = Debug|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Release|Win32.ActiveCfg = Release|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Release|Win32.Build.0 = Release|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Template|Win32.ActiveCfg = Unicode Release|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Template|Win32.Build.0 = Unicode Release|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
