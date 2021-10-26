@@ -18,7 +18,9 @@ class KCheckMark
 protected:
 	enum { MAXSUBIMAGES = 50 };
 
-	HBITMAP m_hBmp;
+	HBITMAP m_hBmp; // Chj: the image-ribbon that contains a line of tiles,
+	                // each tile is a tiny-image.
+
 	int		m_nSubImageId[MAXSUBIMAGES];
 	HBITMAP m_hSubImage  [MAXSUBIMAGES];
 	int     m_nUsed;

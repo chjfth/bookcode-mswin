@@ -33,6 +33,8 @@ void KCheckMark::AddBitmap(int id, HBITMAP hBmp)
 
 void KCheckMark::LoadToolbar(HMODULE hModule, int resid, bool transparent)
 {
+	// Chj: Load the ribbon image as a whole
+
 	m_hBmp = (HBITMAP) ::LoadImage(hModule, MAKEINTRESOURCE(resid), IMAGE_BITMAP, 0, 0, 
 		transparent ? LR_LOADTRANSPARENT : 0);
 	AddBitmap((int) hModule + resid, m_hBmp);	// not to be reused as subimage
@@ -55,12 +57,16 @@ HBITMAP KCheckMark::GetSubImage(int id)
 		if ( m_nSubImageId[i]==id )
 			return m_hSubImage[i];
 
+	int idx = id;
+
+	// Chj: Now we extract a tiny image(by idx, 0,1,2...) from the ribbon
+
 	BITMAP bmp;
 
 	if ( ! GetObject(m_hBmp, sizeof(bmp), & bmp) )
 		return NULL;
 
-	if ( id *bmp.bmHeight >= bmp.bmWidth )
+	if ( idx*bmp.bmHeight >= bmp.bmWidth )
 		return NULL;
 
 	HDC hMemDCS = CreateCompatibleDC(NULL);
@@ -71,20 +77,25 @@ HBITMAP KCheckMark::GetSubImage(int id)
 	int w = GetSystemMetrics(SM_CXMENUCHECK);
 	int h = GetSystemMetrics(SM_CYMENUCHECK);
 	
-	HBITMAP hRslt = CreateCompatibleBitmap(hMemDCS, w, h);
+	HBITMAP hbmpRslt = CreateCompatibleBitmap(hMemDCS, w, h);
 
-	if  ( hRslt )
+	if  ( hbmpRslt )
 	{
-		HGDIOBJ hOld = SelectObject(hMemDCD, hRslt);
-		StretchBlt(hMemDCD, 0, 0, w, h, hMemDCS, id*bmp.bmHeight, 0, bmp.bmHeight, bmp.bmHeight, SRCCOPY);
-		SelectObject(hMemDCD, hOld);
-		AddBitmap(id, hRslt);
+		HGDIOBJ hOld = SelectObject(hMemDCD, hbmpRslt);
+		StretchBlt(hMemDCD, 0, 0, w, h, 
+			hMemDCS, idx*bmp.bmHeight, 0, bmp.bmHeight, bmp.bmHeight, 
+			SRCCOPY);
+		SelectObject(hMemDCD, hOld); // Chj: just to *release* hbmpRslt from the DC, 
+		                             // so that deleting this DC will not destroy hbmpRslt?
+
+		AddBitmap(idx, hbmpRslt); // Chj: Cache the HBITMAP for faster re-use,
+		                          // and, we can delete this HBITMAP in dtor.
 	}
 
 	DeleteObject(hMemDCS);
 	DeleteObject(hMemDCD);
 
-	return hRslt;
+	return hbmpRslt;
 }
 
 

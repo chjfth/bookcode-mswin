@@ -480,7 +480,7 @@ void KDDBView::Test_CreateBitmap(HDC hDC, const RECT * rcPaint)
 	}
 
 	
-	SetViewportOrgEx(hDC, 200, 0, NULL);
+	SetViewportOrgEx(hDC, 260, 0, NULL);
 
 	// Initialized 1 bpp
 	const WORD Chess44_WORD [] = { 0xCC, 0xCC, 0x33, 0x33, 0xCC, 0xCC, 0x33, 0x33 };
