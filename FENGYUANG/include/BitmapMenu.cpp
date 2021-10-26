@@ -33,15 +33,17 @@ int KBitmapMenu::OnCommand(int nCmdId)
 	if ( n==m_nChecked )
 		return 1;
 
-	CheckMenuItem(m_hMenu, m_nFirstCommand + m_nChecked, MF_BYCOMMAND | MF_UNCHECKED);
+	CheckMenuItem(m_hMenu, m_nFirstCommand+m_nChecked, MF_BYCOMMAND|MF_UNCHECKED);
 	m_nChecked = n;
-	CheckMenuItem(m_hMenu, m_nFirstCommand + m_nChecked, MF_BYCOMMAND | MF_CHECKED);
+	CheckMenuItem(m_hMenu, m_nFirstCommand+m_nChecked, MF_BYCOMMAND|MF_CHECKED);
 
 	return 2;
 }
 
 
-void KBitmapMenu::AddToMenu(HMENU hMenu, int nCount, HMODULE hModule, const int nID[], int nFirstCommand)
+void KBitmapMenu::AddToMenu(HMENU hMenu, int nCount, 
+	HMODULE hModule, const int arBitmapResID[], 
+	int nFirstCommand)
 {
 	m_hMenu    = hMenu;
 	m_nBitmap  = nCount;
@@ -50,7 +52,7 @@ void KBitmapMenu::AddToMenu(HMENU hMenu, int nCount, HMODULE hModule, const int 
 
 	for (int i=0; i<nCount; i++)
 	{
-		m_hBitmap[i] = LoadBitmap(hModule, MAKEINTRESOURCE(nID[i]));
+		m_hBitmap[i] = LoadBitmap(hModule, MAKEINTRESOURCE(arBitmapResID[i]));
 
 		if ( m_hBitmap[i] )
 			AppendMenu(hMenu, MF_BITMAP, nFirstCommand + i, (LPCTSTR) m_hBitmap[i]);

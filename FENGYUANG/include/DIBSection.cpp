@@ -52,7 +52,7 @@ void KDIBSection::DecodeDIBSectionFormat(TCHAR desp[], int bufchars)
 
 	if ( GetObject(m_hBitmap, sizeof(DIBSECTION), & dibsec) )
 	{
-		KDIB::DecodeDIBFormat(desp, bufchars);
+		KDIB::DecodeDIBFormat(desp, bufchars); // KDIB is my parent class
 		_tcscat_s(desp, bufchars, _T("   "));
 		DecodeDDB(GetBitmap(), desp+_tcslen(desp), bufchars-_tcslen(desp));
 	}

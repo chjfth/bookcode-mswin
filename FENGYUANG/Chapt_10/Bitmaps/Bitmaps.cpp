@@ -836,14 +836,16 @@ void KDIBSectionView::Test_CreateDIBSection(HDC hDC, const RECT * rcPaint)
 {
 	TextOut(hDC, 10, 10, "CreateDIBSection", 10);
 
+	const int static bitcount   [] = 
+		{ 0,      1,      4,       4,      8,       8,      16,     16,           24,     32    , 32};
+	const int static compression[] = 
+		{ BI_PNG, BI_RGB, BI_RLE4, BI_RGB, BI_RLE8, BI_RGB, BI_RGB, BI_BITFIELDS, BI_RGB, BI_RGB, BI_BITFIELDS };
+
 	TCHAR temp[128];
-	KDIBSection dibsection[11];
+	KDIBSection dibsection[ARRAYSIZE(bitcount)];
 
-	for (int i=0; i<11; i++)
+	for (int i=0; i<ARRAYSIZE(bitcount); i++)
 	{
-		const int static bitcount   [] = { 0,      1,      4,       4,      8,       8,      16,     16,           24,     32    , 32};
-		const int static compression[] = { BI_PNG, BI_RGB, BI_RLE4, BI_RGB, BI_RLE8, BI_RGB, BI_RGB, BI_BITFIELDS, BI_RGB, BI_RGB, BI_BITFIELDS };
-
 		KBitmapInfo bmi;
 
 		bmi.SetFormat(125, 125, bitcount[i], compression[i]);

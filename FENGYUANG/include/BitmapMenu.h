@@ -35,7 +35,15 @@ public:
 			DeleteObject(m_hBitmap[i]);
 	}
 
-	void AddToMenu(HMENU hMenu, int nCount, HMODULE hModule, const int hID[], int nFirstCommand);
+	void AddToMenu(HMENU hMenu, int nCount, 
+		HMODULE hModule, const int arBitmapResID[], 
+		int nFirstCmdidOfMenuitem);
+	// -- Add some new menuitems to hMenu.
+	// Each of the menuitems is displayed as a bitmap from hModule's resource.
+	// nFirstCmdidOfMenuitem+0, nFirstCmdidOfMenuitem+1, nFirstCmdidOfMenuitem+2 ... 
+	// are these menuitem's cmdid.
+	// nFirstCmdidOfMenuitem+0 uses arBitmapResID[0] as display image,
+	// nFirstCmdidOfMenuitem+1 uses arBitmapResID[1] as display image...
 
 	int OnCommand(int nCmdId);
 
