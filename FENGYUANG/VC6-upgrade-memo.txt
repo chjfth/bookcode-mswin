@@ -1,0 +1,17 @@
+========================================================================
+Remove outdated /Gy- options
+========================================================================
+In Debug build, remove all instructions of:
+
+	<FunctionLevelLinking>false</FunctionLevelLinking>
+
+otherwise in VS2015+, we get error:
+
+	Command line error D8016: '/ZI' and '/Gy-' command-line options are incompatible
+
+
+========================================================================
+typedef enum { ... };
+========================================================================
+Should only write enum { ... };
+
