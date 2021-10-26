@@ -661,9 +661,11 @@ void KDDBView::Test_Blt(HDC hDC, const RECT * rcPaint)
 void KDDBView::Test_Blt_Color(HDC hDC, const RECT * rcPaint)
 {
 	KDDB ddb;
-
-	ddb.LoadBitmap(m_hInst, IDB_LION);
 	RECT rect;
+
+	ddb.LoadBitmap(m_hInst, IDB_LION); 
+	// -- Chj: this isa monochrome bmp. 
+	// We need a monochrome one to demonstrate 0=foreground color, 1=background color.
 
 	GetClientRect(m_hWnd, & rect);
 	int cwidth = rect.right;
@@ -695,18 +697,18 @@ void KDDBView::Test_Blt_Color(HDC hDC, const RECT * rcPaint)
 
 void KDDBView::Test_Blt_GenMask(HDC hDC, const RECT * rcPaint)
 {
-	KDDB ddb;
-
 	KGDIObject brush(hDC, CreateSolidBrush(RGB(0xFF, 0xFF, 0)));
-
 	
+	KDDB ddb;
 	ddb.LoadBitmap(m_hInst, IDB_CUBE);
+
 	BITMAP bmp;
 	GetObject(ddb.GetBitmap(), sizeof(bmp), & bmp); 
 
-	PatBlt(hDC, 0, 0, bmp.bmWidth * 5 + 70, bmp.bmHeight * 2 + 30, PATCOPY);
+	PatBlt(hDC, 0, 0, bmp.bmWidth * 5 + 70, bmp.bmHeight * 2 + 30, PATCOPY); // using brush
 
-	ddb.Draw(hDC, 10, 10, 0, 0, SRCCOPY, KDDB::draw_normal);
+	// Draw the original image at left-top corner
+	ddb.Draw(hDC, 10, 10, -1, -1, SRCCOPY, KDDB::draw_normal); // -1: no use
 
 	COLORREF ct[] = {
 		RGB(128, 128, 128), RGB(192, 192, 192), RGB(255, 255, 255),
@@ -718,10 +720,15 @@ void KDDBView::Test_Blt_GenMask(HDC hDC, const RECT * rcPaint)
 
 	for (int i=0; i<sizeof(ct)/sizeof(COLORREF); i++)
 	{
+		// Chj: hMemDC is used to receive the so-called masking bitmap.
+		// On return, the masking bitmap has been selected into hMemDC.
+
 		HBITMAP hOld = ddb.CreateMask(ct[i], hMemDC);
 
 		SetBkColor(hDC, RGB(0xFF, 0xFF, 0xFF));
 		SetTextColor(hDC, RGB(0, 0, 0));
+
+		// Now display the resulting masking bitmap on screen(onto hDC).
 
 		BitBlt(hDC, ((i+1)%5)* (bmp.bmWidth+10)+10, ((i+1)/5)* (bmp.bmHeight+10)+10, bmp.bmWidth, bmp.bmHeight,
 			hMemDC, 0, 0, SRCCOPY);
