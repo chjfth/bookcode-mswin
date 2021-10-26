@@ -101,6 +101,8 @@ HBITMAP KCheckMark::GetSubImage(int id)
 
 BOOL KCheckMark::SetCheckMarks(HMENU hMenu, UINT uPos, UINT uFlags, int unchecked, int checked)
 {
-	return SetMenuItemBitmaps(hMenu, uPos, uFlags, GetSubImage(unchecked), GetSubImage(checked));
+	HBITMAP hbmpUnchecked = GetSubImage(unchecked);
+	HBITMAP hbmpChecked = GetSubImage(checked);
+	return SetMenuItemBitmaps(hMenu, uPos, uFlags, hbmpUnchecked, hbmpChecked);
 }
 

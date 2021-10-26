@@ -331,7 +331,17 @@ void KDDBView::TouchMenu(HMENU hMainMenu)
 	for (int i=0; i<20; i++)
 		m_uibmp.SetCheckMarks(hMenu, i, MF_BYPOSITION, i, -1);
 
-	m_texture.AddToMenu(GetSubMenu(hMainMenu, 4), 7, m_hInst, TextureID, 10);
+	HMENU hsub4 = GetSubMenu(hMainMenu, 4);
+	RemoveMenu(hsub4, 0, MF_BYPOSITION); // Chj: Remove the empty 'MENUITEM SEPARATOR' in .rc
+	m_texture.AddToMenu(hsub4, 7, m_hInst, TextureID, 10);
+
+#if 1
+	// Chj: Without this code, on Win7+, the default check mark before a self-image menu-item
+	// (a small tick)will be displayed as blank. It seems that we have to attach our 
+	// image check mark as well.
+	for(int j=0; j<7; j++)
+		m_uibmp.SetCheckMarks(hsub4, j, MF_BYPOSITION, -1, 1); // 1 is the blue IE forward arrow
+#endif
 }
 
 
