@@ -60,9 +60,12 @@ HBITMAP KDDB::CreateMask(COLORREF crBackGround, HDC hMaskDC)
 	BitBlt(hMaskDC, 0, 0, width, height, m_hMemDC, 0, 0, SRCCOPY);
 
 	return hOld;
+	// -- Chj: The just created masking bitmap is returned implicitly via hMaskDC.
+	// On finish using the masking bitmap, the caller can Select hOld back into hMaskDC.
+	// I think this API design weird.
 }
 
-// Relase resource
+// Release resource
 void KDDB::ReleaseDDB(void)
 {
 	if ( m_hMemDC )
@@ -202,8 +205,8 @@ HBITMAP LargestDDB(HDC hDC)
 
 		if ( hBmp )
 		{
-			// [2021-10-24] Chj: Something unprecise here. If we first DeleteObject(hBmp),
-			// h1more may probably succeed.
+			// [2021-10-24] Chj: Something unprecise here. If we could 
+			// first DeleteObject(hBmp), h1more may probably succeed.
 
 			HBITMAP h1more = CreateCompatibleBitmap(hDC, mid+1, mid+1);
 
