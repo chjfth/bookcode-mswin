@@ -75,7 +75,7 @@ public:
 	int			 m_nImageSize;		// pixel array size
 
 									// Precalculated values
-	int			 m_nBPS;			// byte per scan line, per plane
+	int			 m_nBytesPerScanline;	// byte per scan line, per plane
 	BYTE *       m_pOrigin;			// point to logical origin
 	int			 m_nDelta;			// delta to next scan line
 
@@ -94,7 +94,10 @@ public:
 	int  GetDepth(void)		  const { return m_nColorDepth; }
 	BITMAPINFO * GetBMI(void) const { return m_pBMI; }
 	BYTE * GetBits(void)	  const { return m_pBits; }
-	int  GetBPS(void)		  const { return m_nBPS; }
+	BYTE * GetBitArray()      const { return m_pBits; }
+	
+	int GetBPS(void)		  const { return m_nBytesPerScanline; }
+	int BytesPerScanline()    const { return m_nBytesPerScanline; }
 
 	bool IsCompressed(void) const 
 	{

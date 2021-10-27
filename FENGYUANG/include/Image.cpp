@@ -36,23 +36,23 @@ bool KImage::Convolution(KFilter * pFilter)
 
 	for (int y=0; y<m_nHeight; y++)
 	{
-		unsigned char * pBuffer = (unsigned char *) m_pBits   + m_nBPS * y;
-		unsigned char * pDest   = (unsigned char *) pDestBits + m_nBPS * y;
+		unsigned char * pBuffer = (unsigned char *) m_pBits   + m_nBytesPerScanline * y;
+		unsigned char * pDest   = (unsigned char *) pDestBits + m_nBytesPerScanline * y;
 
 		if (  (y>=pFilter->GetHalf()) && (y<(m_nHeight- pFilter->GetHalf())) )
 			switch ( m_nImageFormat )
 			{
 				case DIB_8BPP:
-					pFilter->Filter8bpp(pDest, pBuffer, m_nWidth, m_nBPS);
+					pFilter->Filter8bpp(pDest, pBuffer, m_nWidth, m_nBytesPerScanline);
 					break;
 
 				case DIB_24RGB888:	// 24-bpp RGB
-					pFilter->Filter24bpp(pDest, pBuffer, m_nWidth, m_nBPS);
+					pFilter->Filter24bpp(pDest, pBuffer, m_nWidth, m_nBytesPerScanline);
 					break;
 
 				case DIB_32RGBA8888: // 32-bpp RGBA
 				case DIB_32RGB888:   // 32-bpp RGB
-					pFilter->Filter32bpp(pDest, pBuffer, m_nWidth, m_nBPS);
+					pFilter->Filter32bpp(pDest, pBuffer, m_nWidth, m_nBytesPerScanline);
 					break;
 
 				default:
@@ -60,7 +60,7 @@ bool KImage::Convolution(KFilter * pFilter)
 					return false;
 			}
 		else
-			memcpy(pDest, pBuffer, m_nBPS); // copy unprocessed scanlines
+			memcpy(pDest, pBuffer, m_nBytesPerScanline); // copy unprocessed scanlines
 	}
 	
 	memcpy(m_pBits, pDestBits, m_nImageSize); // overwrite source pixel array
@@ -92,7 +92,7 @@ bool KImage::PixelTransform(KPixelMapper & map)
 
 	for (int y=0; y<m_nHeight; y++)
 	{
-		unsigned char * pBuffer = (unsigned char *) m_pBits + m_nBPS * y;
+		unsigned char * pBuffer = (unsigned char *) m_pBits + m_nBytesPerScanline * y;
 	
 		if ( ! map.StartLine(y) )
 			break;
@@ -170,7 +170,7 @@ bool ColorTransform(KDIB * dib, Dummy map)
 	for (int y=0; y<dib->m_nHeight; y++)
 	{
 		int width = dib->m_nWidth;
-		unsigned char * pBuffer = (unsigned char *) dib->m_pBits + dib->m_nBPS * y;
+		unsigned char * pBuffer = (unsigned char *) dib->m_pBits + dib->m_nBytesPerScanline * y;
 		
 		switch ( dib->m_nImageFormat )
 		{

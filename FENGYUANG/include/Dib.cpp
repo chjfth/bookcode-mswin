@@ -206,22 +206,22 @@ bool KDIB::AttachDIB(BITMAPINFO * pDIB, BYTE * pBits, int flags)
 
 	// precalculate information DIB parameters
 	m_nColorDepth = m_nPlanes * m_nBitCount;
-	m_nBPS		  = (m_nWidth * m_nBitCount + 31) / 32 * 4;
+	m_nBytesPerScanline		  = (m_nWidth * m_nBitCount + 31) / 32 * 4;
 	
 	if (m_nHeight < 0 ) // top-down bitmap
 	{
 		m_nHeight = - m_nHeight;	// change to positive
-		m_nDelta  = m_nBPS;			// forward
+		m_nDelta  = m_nBytesPerScanline;			// forward
 		m_pOrigin = m_pBits;		// scan0 .. scanN-1
 	}
 	else
 	{
-		m_nDelta  = - m_nBPS;		// backward
-		m_pOrigin = m_pBits + (m_nHeight-1) * m_nBPS * m_nPlanes;	// scanN-1..scan0
+		m_nDelta  = - m_nBytesPerScanline;		// backward
+		m_pOrigin = m_pBits + (m_nHeight-1) * m_nBytesPerScanline * m_nPlanes;	// scanN-1..scan0
 	}
 
 	if ( m_nImageSize==0 )
-		m_nImageSize = m_nBPS * m_nPlanes * m_nHeight;
+		m_nImageSize = m_nBytesPerScanline * m_nPlanes * m_nHeight;
 
 	// convert compression mode to image format
 	switch ( m_nBitCount )
@@ -374,6 +374,8 @@ void KDIB::DecodeDIBFormat(TCHAR mess[], int bufchars)
 	else
 		wsprintf(mess+_tcslen(mess), _T(", %d,%03d,%03d bytes"), 
 			m_nImageSize/thou/thou, m_nImageSize/thou%thou, m_nImageSize%thou);
+
+	_tcscat_s(mess, bufchars, _T(" "));
 
 	_tcscat_s(mess, bufchars, PixelFormatName(m_nImageFormat));
 	_tcscat_s(mess, bufchars, _T(" "));
