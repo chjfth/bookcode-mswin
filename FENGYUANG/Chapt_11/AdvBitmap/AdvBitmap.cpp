@@ -1036,7 +1036,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	_tcscpy_s(title, MAX_PATH, "AdvBitmap");
 
-	frame.CreateEx(0, _T("ClassName"), title,
+	frame.CreateEx(0, _T("ClassName_AdvBitmap"), title,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);

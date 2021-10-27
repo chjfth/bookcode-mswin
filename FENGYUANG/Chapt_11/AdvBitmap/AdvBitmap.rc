@@ -79,7 +79,7 @@ BEGIN
     BEGIN
         MENUITEM "Rop3 Chart",                  IDM_VIEW_ROPCHART
         MENUITEM "Icons",                       IDM_VIEW_ICON
-        MENUITEM "Coloring Bitmap",             IDM_VIEW_COLORBITMAP
+        MENUITEM "Coloring Bitmap\t(use IDB_CONFUSE)",             IDM_VIEW_COLORBITMAP
         MENUITEM "LoadImage",                   IDM_VIEW_LOADIMAGE
         MENUITEM "Alpha Blending",              IDM_VIEW_ALPHABLEND
         MENUITEM "Palette",                     IDM_VIEW_PALETTE
