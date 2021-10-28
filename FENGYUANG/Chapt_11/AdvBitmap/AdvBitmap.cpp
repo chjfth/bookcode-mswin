@@ -173,6 +173,7 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case IDM_VIEW_SETDIBITSTODEVICE:
 				case IDM_VIEW_FITWINDOW:
 
+				case IDM_VIEW_MASKRED_SplitChannel:
 				case IDM_VIEW_MASKRED:
 				case IDM_VIEW_MASKGREEN:
 				case IDM_VIEW_MASKBLUE:
@@ -392,17 +393,21 @@ void KDIBView::OnDraw(HDC hDC, const RECT * rcPaint)
 			}
 			break;
 
-		case IDM_VIEW_MASKRED:
+		case IDM_VIEW_MASKRED_SplitChannel:
 			{
 				HDC     hMemDC = CreateCompatibleDC(NULL);
 				HBITMAP hBmp = ChannelSplit(m_DIB.GetBMI(), m_DIB.GetBits(), RGB(0xFF, 0, 0), hMemDC);
 
-				BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
+				BitBlt(hDC, GAP, GAP, w, h, hMemDC, 0, 0, SRCCOPY);
 				DeleteObject(hBmp);
 				DeleteObject(hMemDC);
+			}
+			break;
 
-			//	CGDIObject red(hDC, CreateSolidBrush(RGB(0xFF, 0, 0)));
-			//	m_DIB.DrawDIB(hDC, GAP,   GAP,    w, h, 0, 0,  w,  h, MERGECOPY);
+		case IDM_VIEW_MASKRED:
+			{
+				KGDIObject red(hDC, CreateSolidBrush(RGB(0xFF, 0, 0)));
+				m_DIB.DrawDIB(hDC, GAP,   GAP,    w, h, 0, 0,  w,  h, MERGECOPY);
 			}
 			break;
 
