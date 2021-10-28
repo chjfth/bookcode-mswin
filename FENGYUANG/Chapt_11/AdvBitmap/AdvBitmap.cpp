@@ -611,7 +611,9 @@ void ColorBitmap(HDC hDC, int x, int y, int w, int h, HDC hMemDC, HBRUSH hBrush)
 {
 	// P^(S&(P^D)), if (S) D else P
 	HGDIOBJ hOldBrush = SelectObject(hDC, hBrush);
-	BitBlt(hDC, x, y, w, h, hMemDC, 0, 0, 0xB8074A);
+	BitBlt(hDC, x, y, w, h, hMemDC, 0, 0, 
+		0xB8074A // Chj memo: Source is mono. If Source bitvalue=1 show D, if Source bitvalue=0, show brush.
+		);
 	SelectObject(hDC, hOldBrush);
 }
 

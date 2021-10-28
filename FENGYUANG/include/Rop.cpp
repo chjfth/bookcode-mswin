@@ -410,6 +410,7 @@ HBITMAP ChannelSplit(const BITMAPINFO * pBMI, const void * pBits, COLORREF Mask,
 }
 
 // Gradually display a DIB on a destination surface in 4 steps
+//
 void FadeIn(HDC hDC, int x, int y, int w, int h, const BITMAPINFO * pBMI, const void * pBits)
 {
 	const WORD Mask11[8] = { 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -426,17 +427,24 @@ void FadeIn(HDC hDC, int x, int y, int w, int h, const BITMAPINFO * pBMI, const 
 		DeleteObject(hMask);
 
 		HGDIOBJ hOld  = SelectObject(hDC, hBrush);
-		// D^(P&(S^D)), if P then S else D
-		StretchDIBits(hDC, x, y, w, h, 0, 0, w, h, pBits, pBMI, DIB_RGB_COLORS, 0xCA07A9);
-				
+
+		StretchDIBits(hDC, x, y, w, h, 
+			0, 0, w, h, 
+			pBits, pBMI, 
+			DIB_RGB_COLORS, 
+			0xCA07A9 // D^(P&(S^D)), if P then S else D
+			);
+
 		SelectObject(hDC, hOld);
 		DeleteObject(hBrush);
+
+		Sleep(125); // Chj: add a delay as visual clue
 	}
 }
 
 // dx, dy, dw, dh defines a destination rectangle
 // sw, sh is the dimension of source rectangle
-// sx, sy is the starting point winthin the source bitmap, which will be tiled to sw x sh in size
+// sx, sy is the starting point within the source bitmap, which will be tiled to sw x sh in size
 BOOL StretchTile(HDC      hDC, int dx, int dy, int dw, int dh, 
 				 HBITMAP hSrc, int sx, int sy, int sw, int sh, 
 				 DWORD rop)
