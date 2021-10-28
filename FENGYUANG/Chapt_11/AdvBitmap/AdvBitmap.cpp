@@ -536,10 +536,17 @@ void TestIcons(HDC hDC)
 		{
 			int x = (n%2)*420 + 20;
 			int y = (n/2)*60  + 20;
+			n++;
 
-			DrawIcon(hDC, x, y, hIcon); n++;
+			DrawIcon(hDC, x, y, hIcon); 
 			
+			// [2021-10-27] Chj memo: Here, we display an icon with transparent background
+			// 4 times side-by-side, each time with a different method.
+
+			// Method 1:
 			MaskBltDrawIcon(hDC, x+56*5, y, hIcon);
+
+			// Method 2:
 			TransparentBltDrawIcon(hDC, x+56*6, y, hIcon);
 			
 			ICONINFO iconinfo;
@@ -554,13 +561,14 @@ void TestIcons(HDC hDC)
 			SelectObject(hMemDC, iconinfo.hbmColor);
 			BitBlt(hDC, x+56*2, y, bmp.bmWidth, bmp.bmHeight, hMemDC, 0, 0, SRCCOPY);
 
+			// Method 3:
 			SelectObject(hMemDC, iconinfo.hbmMask);
 			BitBlt(hDC, x+56*3, y, bmp.bmWidth, bmp.bmHeight, hMemDC, 0, 0, SRCAND);
 			SelectObject(hMemDC, iconinfo.hbmColor);
 			BitBlt(hDC, x+56*3, y, bmp.bmWidth, bmp.bmHeight, hMemDC, 0, 0, SRCINVERT);
 			
+			// Method 4:
 			MaskBitmapNT(hDC, x+56*4, y, bmp.bmWidth, bmp.bmHeight, iconinfo.hbmMask, hMemDC);
-
 		
 			SelectObject(hMemDC, hOld);
 			DeleteObject(iconinfo.hbmMask);
@@ -817,6 +825,7 @@ class KTestView : public KScrollCanvas
 				return KScrollCanvas::WndProc(hWnd, uMsg, wParam, lParam);
 
 			case WM_COMMAND:
+			{{
 				switch ( LOWORD(wParam) )
 				{
 					case IDM_VIEW_ROPCHART:
@@ -834,7 +843,7 @@ class KTestView : public KScrollCanvas
 						return 0;
 				}
 				return 0;
-
+			}}
 			default:
 				return CommonMDIChildProc(hWnd, uMsg, wParam, lParam, m_hViewMenu, 3);
 		}

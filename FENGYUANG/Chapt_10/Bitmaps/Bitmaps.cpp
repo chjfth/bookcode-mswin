@@ -357,7 +357,7 @@ void KDDBView::GetWndClassEx(WNDCLASSEX & wc)
 	wc.hInstance      = NULL;
 	wc.hIcon          = LoadIcon(m_hInst, MAKEINTRESOURCE(IDI_IMAGE));
 	wc.hCursor        = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground  = (HBRUSH) GetStockObject(WHITE_BRUSH);
+	wc.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1); // GetStockObject(WHITE_BRUSH);
 	wc.lpszMenuName   = NULL;
 	wc.lpszClassName  = NULL;
 	wc.hIconSm        = NULL;
@@ -462,8 +462,8 @@ void TestDDB88(HDC hDC, int x, int y, HBITMAP hBmp, const TCHAR * desp)
 
 void KDDBView::Test_CreateBitmap(HDC hDC, const RECT * rcPaint)
 {
-	SetBkColor(hDC, RGB(225, 224, 176)); // dark orange bg
-	SetTextColor(hDC, RGB(255, 0, 0));   // red text color
+	SetBkColor(hDC, RGB(225, 224, 176)); // Chj: dark orange bg
+	SetTextColor(hDC, RGB(255, 0, 0));   // Chj: red text color
 
 	// Test supported DDB format	
 	const SIZE format[] = { 
@@ -489,8 +489,11 @@ void KDDBView::Test_CreateBitmap(HDC hDC, const RECT * rcPaint)
 		DeleteObject(hBmp);
 	}
 
-	
+
 	SetViewportOrgEx(hDC, 260, 0, NULL);
+
+	SetBkMode(hDC, TRANSPARENT); // Chj: try transparent bg for first two patterns
+	// -- [2021-10-28] Result: This does not affect TestDDB88()'s bg-pixel SRCCOPY behavior.
 
 	// Initialized 1 bpp
 	const WORD Chess44_WORD [] = { 0xCC, 0xCC, 0x33, 0x33, 0xCC, 0xCC, 0x33, 0x33 };
@@ -499,6 +502,8 @@ void KDDBView::Test_CreateBitmap(HDC hDC, const RECT * rcPaint)
 
 	// Uninitialized 1 bpp
 	TestDDB88(hDC, 300, 70, CreateBitmap(8, 8, 1, 1, NULL), _T("CreateBitmap(8, 8, 1, 1, NULL)"));
+
+	SetBkMode(hDC, OPAQUE);      // Chj: Restore to opaque bg
 
 	// CreateBitmapIndirect, 1 bpp, DWORD aligned pixel array
 	DWORD Chess44_DWORD [] = { 0xCC, 0xCC, 0x33, 0x33, 0xCC, 0xCC, 0x33, 0x33 };

@@ -824,8 +824,11 @@ void MaskBltDrawIcon(HDC hDC, int x, int y, HICON hIcon)
 	HDC hMemDC = CreateCompatibleDC(NULL);
 	HGDIOBJ hOld = SelectObject(hMemDC, iconinfo.hbmColor);
 
-	MaskBlt(hDC, x, y, bmp.bmWidth, bmp.bmHeight, hMemDC, 0, 0, 
-		iconinfo.hbmMask, 0, 0, MAKEROP4(SRCINVERT, SRCCOPY));
+	MaskBlt(hDC, x, y, bmp.bmWidth, bmp.bmHeight, 
+		hMemDC, 0, 0, 
+		iconinfo.hbmMask, 0, 0, 
+		MAKEROP4(SRCINVERT, SRCCOPY)
+		);
 
 	SelectObject(hMemDC, hOld);
 	DeleteObject(iconinfo.hbmMask);

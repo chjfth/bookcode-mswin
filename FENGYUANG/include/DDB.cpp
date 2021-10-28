@@ -251,14 +251,20 @@ BOOL KDDBMask::Create(HDC hDC, int nX, int nY, int nWidth, int nHeight, UINT crT
 
 BOOL KDDBMask::ApplyMask(HDC hDC, int nX, int nY, int nWidth, int nHeight, DWORD rop)
 {
+#define USELESS1
+	// [2021-10-27] Chj: It seems the code in USELESS1 is no necessary.
+
+#ifdef USELESS1
 	COLORREF oldFore = SetTextColor(hDC, RGB(0, 0, 0));			// Foreground Black
 	COLORREF oldBack = SetBkColor(hDC,   RGB(255, 255, 255));	// Background White
-
+#endif
+	
 	BOOL rslt = StretchBlt(hDC, nX, nY, nWidth, nHeight, m_hMemDC, 0, 0, m_nMaskWidth, m_nMaskHeight, rop);
 
+#ifdef USELESS1
 	SetTextColor(hDC, oldFore);
 	SetBkColor(hDC,   oldBack);
-
+#endif
 	return rslt;
 }
 
