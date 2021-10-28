@@ -767,7 +767,7 @@ BOOL G_MaskBlt(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
 			0xAA << 16);
 	
 	// both foreground and background depend on D
-	// either foregounr or background depends on S
+	// either foreground or background depends on S
 	HBITMAP hTemp  = CreateCompatibleBitmap(hdcDest, nWidth, nHeight);
 	HDC     hMemDC = CreateCompatibleDC(hdcDest);
 	SelectObject(hMemDC, hTemp);

@@ -292,17 +292,22 @@ BOOL OvalStretchDIBits(HDC hDC, int XDest, int YDest, int nDestWidth, int nDestH
 			  int XSrc, int YSrc, int nSrcWidth, int nSrcHeight,
 			  const void *pBits, const BITMAPINFO *pBMI, UINT iUsage)
 {
+	// Chj memo: This transparent-background drawing method cause flickering.
+
 	StretchDIBits(hDC, XDest, YDest, nDestWidth, nDestHeight, XSrc, YSrc, 
-		nSrcWidth, nSrcHeight, pBits, pBMI, iUsage, SRCINVERT);
+		nSrcWidth, nSrcHeight, pBits, pBMI, iUsage, SRCINVERT); // STEP 1
+	Sleep(100);
 
 	SaveDC(hDC);
 	SelectObject(hDC, GetStockObject(BLACK_BRUSH));
 	SelectObject(hDC, GetStockObject(BLACK_PEN));
-	Ellipse(hDC, XDest, YDest, XDest + nDestWidth, YDest + nDestHeight);
+	Ellipse(hDC, XDest, YDest, XDest + nDestWidth, YDest + nDestHeight); // STEP 2
 	RestoreDC(hDC, -1);
 
+	Sleep(100);
+
 	return StretchDIBits(hDC, XDest, YDest, nDestWidth, nDestHeight, XSrc, YSrc, 
-		nSrcWidth, nSrcHeight, pBits, pBMI, iUsage, SRCINVERT);
+		nSrcWidth, nSrcHeight, pBits, pBMI, iUsage, SRCINVERT); // STEP 3
 }
 
 
@@ -366,6 +371,8 @@ BOOL OvalStretchBlt(HDC hDC,    int XDest, int YDest, int nDestWidth, int nDestH
 	SelectObject(hDC, GetStockObject(BLACK_PEN));
 	Ellipse(hDC, XDest, YDest, XDest + nDestWidth, YDest + nDestHeight);
 	RestoreDC(hDC, -1);
+
+	Sleep(100); // Chj: Still flickering, hrr?
 
 	// Merge source surface to destination
 	return StretchBlt(hDC, XDest, YDest, nDestWidth, nDestHeight, hDCSrc, XSrc, YSrc, 
