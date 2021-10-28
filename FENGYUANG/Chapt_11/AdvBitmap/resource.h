@@ -45,13 +45,15 @@
 #define IDM_VIEW_PALETTE                40124
 #define IDM_VIEW_MASKRED                40125
 #define IDM_VIEW_MASKRED_SplitChannel   40126
+#define IDM_VIEW_MASKGREEN_SplitChannel 40127
+#define IDM_VIEW_MASKBLUE_SplitChannel  40128
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
-#define _APS_NEXT_COMMAND_VALUE         40127
+#define _APS_NEXT_COMMAND_VALUE         40129
 #define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

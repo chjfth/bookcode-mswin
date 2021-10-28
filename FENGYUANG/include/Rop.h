@@ -42,7 +42,7 @@ class KImage;
 
 DWORD GetRopCode(BYTE index);
 
-// ChennelSplit using CDIB class
+// ChannelSplit using CDIB class
 void ChannelSplit(KImage & dib, HDC hDC);
 
 // Create a grayscale image (DIBSection) from one of the RGB channels in a DIB
@@ -54,7 +54,7 @@ void FadeIn(HDC hDC, int x, int y, int w, int h, const BITMAPINFO * pBMI, const 
 
 // dx, dy, dw, dh defines a destination rectangle
 // sw, sh is the dimension of source rectangle
-// sx, sy is the starting point winthin the source bitmap, which will be tiled to sw x sh in size
+// sx, sy is the starting point within the source bitmap, which will be tiled to sw x sh in size
 BOOL StretchTile(HDC      hDC, int dx, int dy, int dw, int dh, 
 				 HBITMAP hSrc, int sx, int sy, int sw, int sh, 
 				 DWORD rop);

@@ -174,6 +174,8 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case IDM_VIEW_FITWINDOW:
 
 				case IDM_VIEW_MASKRED_SplitChannel:
+				case IDM_VIEW_MASKGREEN_SplitChannel:
+				case IDM_VIEW_MASKBLUE_SplitChannel:
 				case IDM_VIEW_MASKRED:
 				case IDM_VIEW_MASKGREEN:
 				case IDM_VIEW_MASKBLUE:
@@ -401,8 +403,28 @@ void KDIBView::OnDraw(HDC hDC, const RECT * rcPaint)
 				BitBlt(hDC, GAP, GAP, w, h, hMemDC, 0, 0, SRCCOPY);
 				DeleteObject(hBmp);
 				DeleteObject(hMemDC);
+				break;
 			}
-			break;
+		case IDM_VIEW_MASKGREEN_SplitChannel:
+			{
+				HDC     hMemDC = CreateCompatibleDC(NULL);
+				HBITMAP hBmp = ChannelSplit(m_DIB.GetBMI(), m_DIB.GetBits(), RGB(0, 0xFF, 0), hMemDC);
+
+				BitBlt(hDC, GAP, GAP, w, h, hMemDC, 0, 0, SRCCOPY);
+				DeleteObject(hBmp);
+				DeleteObject(hMemDC);
+				break;
+			}
+		case IDM_VIEW_MASKBLUE_SplitChannel:
+			{
+				HDC     hMemDC = CreateCompatibleDC(NULL);
+				HBITMAP hBmp = ChannelSplit(m_DIB.GetBMI(), m_DIB.GetBits(), RGB(0, 0, 0xFF), hMemDC);
+
+				BitBlt(hDC, GAP, GAP, w, h, hMemDC, 0, 0, SRCCOPY);
+				DeleteObject(hBmp);
+				DeleteObject(hMemDC);
+				break;
+			}			
 
 		case IDM_VIEW_MASKRED:
 			{

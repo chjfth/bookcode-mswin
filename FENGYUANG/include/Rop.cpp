@@ -345,9 +345,13 @@ void ChannelSplit(KDIB & dib, HDC hDC)
 
 
 // Create a grayscale image (DIBSection) from one of the RGB channels in a DIB
-// Mask should be RGB(255, 0, 0), RGB(0, 255, 0), or RGB(0, 0, 255)
+// Mask should be RGB(255, 0, 0), RGB(0, 255, 0), or RGB(0, 0, 255).
+// Return a DIB-section, and this DIB-section has been selected into user's hMemDC.
+//
 HBITMAP ChannelSplit(const BITMAPINFO * pBMI, const void * pBits, COLORREF Mask, HDC hMemDC)
 {
+	assert(Mask==RGB(255, 0, 0) || Mask==RGB(0, 255, 0) || Mask==RGB(0, 0, 255));
+
 	typedef struct { BITMAPINFOHEADER bmiHeader;
 				     RGBQUAD		  bmiColor[256];
 	} BMI8BPP;
@@ -381,10 +385,15 @@ HBITMAP ChannelSplit(const BITMAPINFO * pBMI, const void * pBits, COLORREF Mask,
 
 	SelectObject(hMemDC, hRslt);
 	
-	HBRUSH hBrush = CreateSolidBrush(Mask);			// solid red, green, or blue
+	HBRUSH hBrush = CreateSolidBrush(Mask);	// solid red, solid green, or solid blue
 	HGDIOBJ hOld  = SelectObject(hMemDC, hBrush);
 	
-	StretchDIBits(hMemDC, 0, 0, width, height, 0, 0, width, height, pBits, pBMI, DIB_RGB_COLORS, MERGECOPY);
+	StretchDIBits(hMemDC, 
+		0, 0, width, height, 
+		0, 0, width, height, 
+		pBits, pBMI, DIB_RGB_COLORS, 
+		MERGECOPY // key: Dest = Src AND brush
+		);
 
 	for (i=0; i<256; i++)	// convert to real grayscale color table
 	{

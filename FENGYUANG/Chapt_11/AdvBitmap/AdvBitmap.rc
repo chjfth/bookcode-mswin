@@ -54,11 +54,13 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "Mask Red\ChannelSplit",            IDM_VIEW_MASKRED_SplitChannel
+        MENUITEM "Mask Red\tChannelSplit - Grayscale",            IDM_VIEW_MASKRED_SplitChannel
+        MENUITEM "Mask Green\tChannelSplit - Grayscale",          IDM_VIEW_MASKGREEN_SplitChannel
+        MENUITEM "Mask Blue\tChannelSplit - Grayscale",           IDM_VIEW_MASKBLUE_SplitChannel
         MENUITEM "Mask Red\tMERGECOPY",            IDM_VIEW_MASKRED
         MENUITEM "Mask Green\tMERGECOPY",          IDM_VIEW_MASKGREEN
         MENUITEM "Mask Blue\tMERGECOPY",           IDM_VIEW_MASKBLUE
-        MENUITEM "StretchDIBits",               IDM_VIEW_STRETCHDIBITS
+        MENUITEM "StretchDIBits \t(Restore original)",            IDM_VIEW_STRETCHDIBITS
         MENUITEM "StretchDIBits\tEllipse Mask", IDM_VIEW_OVALMASK
         MENUITEM "StretchBlt\tEllipse Mask Source Modified", 
                                                 IDM_VIEW_STRETCHBLTOVAL
