@@ -678,8 +678,12 @@ void TestLoadImage(HDC hDC, HINSTANCE hInstance)
 
 	int i;
 	for (i=0; i<3; i++)
-		hBitmap[i] = (HBITMAP) LoadImage(hInstance, MAKEINTRESOURCE(nID[i]), IMAGE_BITMAP, 0, 0,
-							LR_LOADTRANSPARENT | LR_CREATEDIBSECTION );
+	{
+		hBitmap[i] = (HBITMAP) LoadImage(hInstance, 
+			MAKEINTRESOURCE(nID[i]), IMAGE_BITMAP, 
+			0, 0,
+			LR_LOADTRANSPARENT | LR_CREATEDIBSECTION );
+	}
 
 	BITMAP bmp;
 	GetObject(hBitmap[0], sizeof(bmp), & bmp);
@@ -702,14 +706,24 @@ void TestLoadImage(HDC hDC, HINSTANCE hInstance)
 		if ( lastx!=-1 )
 		{
 			SetRectRgn(hRgn, newx, newy, newx+bmp.bmWidth, newy + bmp.bmHeight);
-			ExtSelectClipRgn(hDC, hRgn, RGN_DIFF);
-			PatBlt(hDC, lastx, lasty, bmp.bmWidth, bmp.bmHeight, PATCOPY);
+			ExtSelectClipRgn(hDC, hRgn, RGN_DIFF); 
+			
+			// RGN_DIFF: new-rect has been excluded from the ensuing PatBlt.
+			
+			// PATCOPY: This PatBlt brushes the old-position bkgnd to COLOR_WINDOW.
+			PatBlt(hDC, lastx, lasty, bmp.bmWidth, bmp.bmHeight, PATCOPY); 
+
+			// Chj: Well, even we Sleep here, we will NOT see flickering.
+			Sleep(1);
+
+			// Remove all clipping region.
 			SelectClipRgn(hDC, NULL);
 		}
 		BitBlt(hDC, newx, newy, bmp.bmWidth, bmp.bmHeight, hMemDC, 0, 0, SRCCOPY);
 
 		lastx = newx; lasty = newy;
 	}
+
 	DeleteObject(hRgn);
 	DeleteObject(hMemDC);
 	DeleteObject(hBitmap[0]);
@@ -870,7 +884,7 @@ class KTestView : public KScrollCanvas
 					case IDM_VIEW_LOADIMAGE:
 					case IDM_VIEW_ALPHABLEND:
 					case IDM_VIEW_PALETTE:
-						if ( LOWORD(wParam)!= m_nViewOpt )
+						if ( LOWORD(wParam)!= m_nViewOpt ) // Chj: this check is boring
 						{
 							m_nViewOpt = LOWORD(wParam);
 							SetSize(700, 800, 5, 5, true);
