@@ -347,6 +347,8 @@ BOOL AlphaFade(HDC hDCDst, int XDst, int YDst, int nDstWidth, int nDstHeight,
 		AlphaBlend(hDCDst, XDst, YDst, nDstWidth, nDstHeight,
 			       hDCSrc, YSrc, YSrc, nSrcWidth, nSrcHeight,
 				   blend);
+
+		Sleep(100); // enable visual animation
 	}
 
 	return TRUE;
