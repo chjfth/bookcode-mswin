@@ -19,6 +19,8 @@
 #include <tchar.h>
 #include <math.h>
 
+#include "dbgprint.h"
+
 #include "DIBSection.h"
 #include "BitmapInfo.h"
 
@@ -366,10 +368,16 @@ void KAirBrush::Create(int width, int height, COLORREF color)
 
 		BYTE alpha = (BYTE) max(min(255-dis, 255), 0);
 
+		// MSDN - BLENDFUNCTION: red, green and blue channel values in the bitmap must be 
+		// pre-multiplied with the alpha channel value. so we have to change pPixel[0:3] here.
 		pPixel[0] = pPixel[0] * alpha / 255;
 		pPixel[1] = pPixel[1] * alpha / 255;
 		pPixel[2] = pPixel[2] * alpha / 255;
+
 		pPixel[3] = alpha;
+
+//		vaDbg("KAirBrush::Create(), [%d,%d] R,G,B(A)=[%d,%d,%d(%d)]", 
+//			x, y, pPixel[2], pPixel[1], pPixel[0], pPixel[3]); // For RGBQUAD, blue is at pPixel[0]
 	}
 }
 

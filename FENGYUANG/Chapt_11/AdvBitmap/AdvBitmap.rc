@@ -84,7 +84,7 @@ BEGIN
         MENUITEM "Icons",                       IDM_VIEW_ICON
         MENUITEM "Coloring Bitmap\t(use IDB_CONFUSE)",             IDM_VIEW_COLORBITMAP
         MENUITEM "LoadImage\t(Mosquito)",                   IDM_VIEW_LOADIMAGE
-        MENUITEM "Alpha Blending",              IDM_VIEW_ALPHABLEND
+        MENUITEM "Alpha Blending\t(R,G,B 3 squares)",              IDM_VIEW_ALPHABLEND
         MENUITEM "Palette",                     IDM_VIEW_PALETTE
     END
     POPUP "&Window"
