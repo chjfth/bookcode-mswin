@@ -163,7 +163,9 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		case WM_COMMAND:
-			switch ( LOWORD(wParam) )
+		{{
+			WORD cmdid = LOWORD(wParam);
+			switch ( cmdid )
 			{
 				case IDM_VIEW_OVALMASK:
 				case IDM_VIEW_STRETCHDIBCLIP:
@@ -184,11 +186,11 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case IDM_VIEW_CUBE:
 				case IDM_VIEW_CUBEPIXEL:
 				case IDM_VIEW_SIMUPLGBLT:
-					if ( LOWORD(wParam)!= m_nViewOpt )
+					if ( cmdid != m_nViewOpt )
 					{
-						m_nViewOpt = LOWORD(wParam);
+						m_nViewOpt = cmdid;
 
-						switch ( LOWORD(wParam) )
+						switch ( cmdid )
 						{
 							case IDM_VIEW_STRETCHDIBCLIP:
 							case IDM_VIEW_OVALMASK:
@@ -216,7 +218,7 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					SendMessage(GetParent(GetParent(hWnd)), WM_USER+1, (WPARAM) & m_DIB, 0);	
 			}
 			return 0;
-
+		}}
 		default:
 			return CommonMDIChildProc(hWnd, uMsg, wParam, lParam, m_hViewMenu, 3);
 	}
@@ -736,10 +738,15 @@ void TestAlphaBlending(HDC hDC, HINSTANCE hInstance)
 {
 	const int size = 100;
 
+	// Chj: Ensure the bkgnd is pure white
+	RECT rcCli = {};
+	GetClientRect(WindowFromDC(hDC), &rcCli);
+	FillRect(hDC, &rcCli, (HBRUSH)GetStockObject(WHITE_BRUSH));
+
 	// Solid block constant alpha blending
 	for (int i=0; i<3; i++)
 	{
-		RECT  rect    = { i*(size+10) + 20, 20+size/3, i*(size+10) + 20 + size, 20+size/3 + size };
+		RECT rect = { i*(size+10) + 20, 20+size/3, i*(size+10) + 20 + size, 20+size/3 + size };
 
 		const COLORREF Color[] = { RGB(0xFF, 0, 0), RGB(0, 0xFF, 0), RGB(0, 0, 0xFF)  };
 		
