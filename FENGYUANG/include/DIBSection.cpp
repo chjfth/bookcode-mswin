@@ -361,8 +361,8 @@ void KAirBrush::Create(int width, int height, COLORREF color)
 	for (int x=0; x<width;  x++, pPixel+=4)
 	{
 		int  dis   = (int) ( sqrt( (double)(
-			(x-width/2) * (x-width/2) + (y-height/2) * (y-height/2) ) * 255 / (max(width, height)/2) 
-			));
+			(x-width/2) * (x-width/2) + (y-height/2) * (y-height/2) )) * 255 / (max(width, height)/2) 
+			);
 
 		BYTE alpha = (BYTE) max(min(255-dis, 255), 0);
 
