@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wingraph", "..\include\wing
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvBitmap", "CH11-AdvBitmap\AdvBitmap.vcxproj", "{955B65E6-2859-3573-176B-225DBE90877D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Imaging", "CH12-Imaging\Imaging.vcxproj", "{E3A30E91-494B-3667-CC43-7BECB512CDDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -49,6 +51,14 @@ Global
 		{955B65E6-2859-3573-176B-225DBE90877D}.Unicode Debug|Win32.Build.0 = Debug|Win32
 		{955B65E6-2859-3573-176B-225DBE90877D}.Unicode Release|Win32.ActiveCfg = Release|Win32
 		{955B65E6-2859-3573-176B-225DBE90877D}.Unicode Release|Win32.Build.0 = Release|Win32
+		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Debug|Win32.Build.0 = Debug|Win32
+		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Release|Win32.ActiveCfg = Release|Win32
+		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Release|Win32.Build.0 = Release|Win32
+		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Unicode Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
