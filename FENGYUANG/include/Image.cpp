@@ -468,10 +468,18 @@ void KFilter::Filter8bpp(BYTE * pDest, BYTE * pSource, int nWidth, int dy)
 
 void KFilter::Filter24bpp(BYTE * pDest, BYTE * pSource, int nWidth, int dy)
 {
-	memcpy(pDest, pSource, m_nHalf * 3);
+	// Chj memo:
+	// Each call processes one scan-line.
+	// pDest, pSource must point to *start of* a scan-line.
+	// nWidth: Pixel count in one scan-line (not byte count).
+	// dy: offset of same-column next-scan-line pixel (byte count).
+
+	memcpy(pDest, pSource, m_nHalf * 3); // copy left-edge m_nHalf pixel(s) verbatim
 	pDest   += m_nHalf * 3;
 	pSource += m_nHalf * 3;
 
+	// Process nWidth-2*m_nHalf pixels in the middle.
+	//
 	for (int i=nWidth - 2 * m_nHalf; i>0; i--)
 	{
 		* pDest ++ = Kernel(pSource++, 3, dy);
@@ -479,7 +487,7 @@ void KFilter::Filter24bpp(BYTE * pDest, BYTE * pSource, int nWidth, int dy)
 		* pDest ++ = Kernel(pSource++, 3, dy);
 	}
 
-	memcpy(pDest, pSource, m_nHalf * 3);
+	memcpy(pDest, pSource, m_nHalf * 3); // copy right-edge m_nHalf pixel(s) verbatim
 }
 
 
