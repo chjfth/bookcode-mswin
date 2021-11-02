@@ -188,6 +188,10 @@ LRESULT KWindow::CommonMDIChildProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 			// send message to parent window to response to child window change
 			SendMessage(GetParent(GetParent(hWnd)), WM_USER, lParam!=(LPARAM) hWnd, 0);	
+
+			// -- Chj: It's bad to use WM_USER framework-wide.
+			// Better way is to get a dedicated message# via RegisterWindowMessage().
+
 			return 0;
 			
 		default:

@@ -24,6 +24,9 @@
 
 #include "Resource.h"
 
+#define WM_USER_CREATE_DIBVIEW ((WM_USER)+1)
+// -- Chj: So not to conflict with win.cpp's use of WM_USER.
+
 
 class KDIBView : public KScrollCanvas
 {
@@ -127,7 +130,7 @@ void KDIBView::GetWndClassEx(WNDCLASSEX & wc)
 void KDIBView::CreateNewView(BITMAPINFO * pDIB, TCHAR * pTitle)
 {
 	if ( pDIB )
-		SendMessage(m_hFrame, WM_USER, (WPARAM) pDIB, (LPARAM) pTitle);
+		SendMessage(m_hFrame, WM_USER_CREATE_DIBVIEW, (WPARAM) pDIB, (LPARAM) pTitle);
 }
 
 
@@ -504,7 +507,7 @@ class KMyMDIFRame : public KMDIFrame
 	{
 		LRESULT lr = KMDIFrame::WndProc(hWnd, uMsg, wParam, lParam);
 
-		if ( uMsg == WM_USER )
+		if ( uMsg == WM_USER_CREATE_DIBVIEW )
 		{
 			CreateDIBView((BITMAPINFO *) wParam, (const TCHAR *) lParam);
 		}
@@ -551,7 +554,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	TCHAR title[MAX_PATH];
 
-	_tcscpy(title, "Imaging");
+	_tcscpy_s(title, MAX_PATH, "Imaging");
 
 	frame.CreateEx(0, _T("ClassName"), title,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
