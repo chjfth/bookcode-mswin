@@ -244,6 +244,27 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 					return 0;
 
+				case IDM_COLOR_DILATION:
+					{
+						m_DIB.Convolution(StockFilters[FILTER_DILATION]);
+						InvalidateRect(hWnd, NULL, TRUE);
+					}
+					return 0;
+
+				case IDM_COLOR_EROSION:
+					{
+						m_DIB.Convolution(StockFilters[FILTER_EROSION]);
+						InvalidateRect(hWnd, NULL, TRUE);
+					}
+					return 0;
+
+				case IDM_COLOR_OUTLINE:
+					{
+						m_DIB.Convolution(StockFilters[FILTER_OUTLINE]);
+						InvalidateRect(hWnd, NULL, TRUE);
+					}
+					return 0;
+
 				case IDM_VIEW_STRETCHDIBITS:
 				case IDM_VIEW_MASKRED:
 				case IDM_VIEW_ROTATEGDI:

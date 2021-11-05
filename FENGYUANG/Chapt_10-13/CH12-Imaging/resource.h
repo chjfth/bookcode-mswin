@@ -30,6 +30,9 @@
 #define IDM_COLOR_LAPLACIAN             40119
 #define IDM_COLOR_EMBOSS135             40120
 #define IDM_COLOR_EMBOSS90              40121
+#define IDM_COLOR_DILATION              40130
+#define IDM_COLOR_EROSION              40131
+#define IDM_COLOR_OUTLINE              40132
 #define IDM_VIEW_FILTERS1               40123
 #define IDM_VIEW_ROTATE24               40125
 #define IDM_VIEW_ROTATEGDI              40126
@@ -41,7 +44,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
-#define _APS_NEXT_COMMAND_VALUE         40129
+#define _APS_NEXT_COMMAND_VALUE         40140
 #define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -63,7 +63,10 @@ BEGIN
         MENUITEM "Shaprening Filter",           IDM_COLOR_SHARPENING
         MENUITEM "Laplacian Filter",            IDM_COLOR_LAPLACIAN
         MENUITEM "Emboss Filter 135 degrees",   IDM_COLOR_EMBOSS135
-        MENUITEM "Emvoss Filter 90 Degrees",    IDM_COLOR_EMBOSS90
+        MENUITEM "Emboss Filter 90 Degrees",    IDM_COLOR_EMBOSS90
+        MENUITEM "Dilation",    IDM_COLOR_DILATION
+        MENUITEM "Erosion",    IDM_COLOR_EROSION
+        MENUITEM "Outline",    IDM_COLOR_OUTLINE
     END
     POPUP "&View"
     BEGIN
