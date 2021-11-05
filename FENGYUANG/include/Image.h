@@ -350,7 +350,7 @@ class KDilation : public KFilter
 };
 
 
-// Maximum to grow the light region, then substract
+// Maximum to grow the light region, then subtract
 class KOutline : public KFilter
 {
 	inline void bigger(BYTE &x, BYTE y)

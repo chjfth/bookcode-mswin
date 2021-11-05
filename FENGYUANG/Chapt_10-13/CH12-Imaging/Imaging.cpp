@@ -7,7 +7,7 @@
 //  Published          by  Prentice Hall PTR, Prentice-Hall, Inc. www.phptr.com      //
 //                                                                                   //
 //  FileName   : imaging.cpp					                                     //
-//  Description: Image Processing Demostration Program, Chapter 12                   //
+//  Description: Image Processing Demonstration Program, Chapter 12                   //
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
