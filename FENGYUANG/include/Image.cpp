@@ -561,6 +561,8 @@ K33Filter < 0, -1,  0,
 			0, -1,  0, 
 	5, 0, true,  szSharpening > filter33_sharpening;
 
+////
+
 K33Filter < -1, -1, -1, 
 			-1,  8, -1, 
 			-1, -1, -1, 
@@ -569,7 +571,7 @@ K33Filter < -1, -1, -1,
 K33Filter < 1,  0,  0,  
 			0,  0,  0,  
 			0,  0, -1, 
-	1, 128, true,  szEmboss135 > filter33_emboss135;
+	2, 128, true,  szEmboss135 > filter33_emboss135; // Chj: weight=2 is better than 1
 
 K33Filter < 0,  1,  0,  
 			0,  0,  0,  
@@ -581,6 +583,7 @@ KErosion  filter_erosion;
 KOutline  filter_outline;
 
 KFilter * StockFilters[] = {
+	// should match enums of FilterOp_et
 	NULL,
 	& filter33_smooth,
 	& filter33_guassiansmooth,

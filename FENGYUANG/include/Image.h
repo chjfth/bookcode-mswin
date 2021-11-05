@@ -381,7 +381,7 @@ class KOutline : public KFilter
 };
 
 
-enum
+enum FilterOp_et
 {
 	FILTER_IDENTITY,
 
