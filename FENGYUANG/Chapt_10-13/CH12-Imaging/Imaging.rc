@@ -59,9 +59,9 @@ BEGIN
         MENUITEM "Split HLS Channels",          IDM_COLOR_SPLITHLS
         MENUITEM SEPARATOR
         MENUITEM "Smooth Filter",               IDM_COLOR_SMOOTH
-        MENUITEM "Guasian Smooth Filter",       IDM_COLOR_GUASIANSMOOTH
+        MENUITEM "Guassian Smooth Filter",      IDM_COLOR_GUASSIANSMOOTH
         MENUITEM "Shaprening Filter",           IDM_COLOR_SHARPENING
-        MENUITEM "Laplasian Filter",            IDM_COLOR_LAPLASIAN
+        MENUITEM "Laplacian Filter",            IDM_COLOR_LAPLACIAN
         MENUITEM "Emboss Filter 135 degrees",   IDM_COLOR_EMBOSS135
         MENUITEM "Emvoss Filter 90 Degrees",    IDM_COLOR_EMBOSS90
     END

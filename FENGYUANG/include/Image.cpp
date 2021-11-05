@@ -540,18 +540,41 @@ void Describe33Filter(HDC hDC, int x, int y, const int * matrix, TCHAR * name, i
 	
 
 TCHAR szSmooth[]        = _T("Smooth");
-TCHAR szGuasianSmooth[] = _T("Guasian Smooth");
+TCHAR szGuassianSmooth[] = _T("Guassian Smooth");
 TCHAR szSharpening[]    = _T("Sharpening");
-TCHAR szLaplasian[]     = _T("Laplasian");
+TCHAR szLaplacian[]     = _T("Laplacian");
 TCHAR szEmboss135[]     = _T("Emboss 135 degree");
 TCHAR szEmboss90[]      = _T("Emboss 90 degree 50%");
 
-K33Filter< 1,  1,  1,  1,  1,  1,  1,  1,  1, 9,   0, false, szSmooth        > filter33_smooth;
-K33Filter< 0,  1,  0,  1,  4,  1,  0,  1,  0, 8,   0, false, szGuasianSmooth > filter33_guasiansmooth;
-K33Filter< 0, -1,  0, -1,  9, -1,  0, -1,  0, 5,   0, true,  szSharpening    > filter33_sharpening;
-K33Filter<-1, -1, -1, -1,  8, -1, -1, -1, -1, 1, 128, true,  szLaplasian     > filter33_laplasian;
-K33Filter< 1,  0,  0,  0,  0,  0,  0,  0, -1, 1, 128, true,  szEmboss135     > filter33_emboss135;
-K33Filter< 0,  1,  0,  0,  0,  0,  0, -1,  0, 2, 128, true,  szEmboss90      > filter33_emboss90;
+K33Filter < 1,  1,  1,  
+			1,  1,  1,  
+			1,  1,  1, 
+	9, 0, false, szSmooth > filter33_smooth;
+
+K33Filter < 0,  1,  0,  
+			1,  4,  1,  
+			0,  1,  0, 
+	8, 0, false, szGuassianSmooth > filter33_guassiansmooth;
+
+K33Filter < 0, -1,  0, 
+		   -1,  9, -1,  
+			0, -1,  0, 
+	5, 0, true,  szSharpening > filter33_sharpening;
+
+K33Filter < -1, -1, -1, 
+			-1,  8, -1, 
+			-1, -1, -1, 
+	1, 128, true,  szLaplacian > filter33_laplacian;
+
+K33Filter < 1,  0,  0,  
+			0,  0,  0,  
+			0,  0, -1, 
+	1, 128, true,  szEmboss135 > filter33_emboss135;
+
+K33Filter < 0,  1,  0,  
+			0,  0,  0,  
+			0, -1,  0, 
+	2, 128, true,  szEmboss90 > filter33_emboss90;
 
 KDilation filter_dilation;
 KErosion  filter_erosion;
@@ -560,9 +583,9 @@ KOutline  filter_outline;
 KFilter * StockFilters[] = {
 	NULL,
 	& filter33_smooth,
-	& filter33_guasiansmooth,
+	& filter33_guassiansmooth,
 	& filter33_sharpening,
-	& filter33_laplasian,
+	& filter33_laplacian,
 	& filter33_emboss135,
 	& filter33_emboss90,
 	& filter_dilation,

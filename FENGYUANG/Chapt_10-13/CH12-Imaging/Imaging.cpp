@@ -209,7 +209,7 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 					return 0;
 
-				case IDM_COLOR_GUASIANSMOOTH:
+				case IDM_COLOR_GUASSIANSMOOTH:
 					{
 						m_DIB.Convolution(StockFilters[FILTER_GUASSIANSMOOTH]);
 						InvalidateRect(hWnd, NULL, TRUE);
@@ -223,7 +223,7 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					}
 					return 0;
 
-				case IDM_COLOR_LAPLASIAN:
+				case IDM_COLOR_LAPLACIAN:
 					{
 						m_DIB.Convolution(StockFilters[FILTER_LAPLASION]);
 						InvalidateRect(hWnd, NULL, TRUE);
@@ -450,8 +450,8 @@ class KMyMDIFRame : public KMDIFrame
 		mdic.hOwner  = m_hInst;
 		mdic.x       = CW_USEDEFAULT;
 		mdic.y       = CW_USEDEFAULT;
-		mdic.cx      = CW_USEDEFAULT;
-		mdic.cy      = CW_USEDEFAULT;
+		mdic.cx      = 640; //CW_USEDEFAULT;
+		mdic.cy      = 400; //CW_USEDEFAULT; 
 		mdic.style   = WS_VISIBLE | WS_BORDER;
 		mdic.lParam  = (LPARAM) canvas;
 

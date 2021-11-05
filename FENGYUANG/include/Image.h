@@ -261,7 +261,9 @@ public:
 
 void Describe33Filter(HDC hDC, int x, int y, const int * matrix, TCHAR * name, int weight, int add);
 
-template <int k00, int k01, int k02, int k10, int k11, int k12, int k20, int k21, int k22, 
+template <int k00, int k01, int k02, 
+		  int k10, int k11, int k12, 
+		  int k20, int k21, int k22, 
 		  int weight, int add, bool checkbound, TCHAR * name>
 class K33Filter : public KFilter
 {
@@ -289,7 +291,7 @@ class K33Filter : public KFilter
 };
 
 
-// Mimimum to grow the darker region
+// Minimum to grow the darker region
 class KErosion : public KFilter
 {
 	inline void smaller(BYTE &x, BYTE y)

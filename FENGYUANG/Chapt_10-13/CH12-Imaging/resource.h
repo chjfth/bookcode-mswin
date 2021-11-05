@@ -25,9 +25,9 @@
 #define IDM_COLOR_SPLITKCMY             40114
 #define IDM_COLOR_SPLITHLS              40115
 #define IDM_COLOR_SMOOTH                40116
-#define IDM_COLOR_GUASIANSMOOTH         40117
+#define IDM_COLOR_GUASSIANSMOOTH         40117
 #define IDM_COLOR_SHARPENING            40118
-#define IDM_COLOR_LAPLASIAN             40119
+#define IDM_COLOR_LAPLACIAN             40119
 #define IDM_COLOR_EMBOSS135             40120
 #define IDM_COLOR_EMBOSS90              40121
 #define IDM_VIEW_FILTERS1               40123
