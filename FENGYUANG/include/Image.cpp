@@ -34,33 +34,40 @@ bool KImage::Convolution(KFilter * pFilter)
 	if ( pDestBits==NULL )
 		return false;
 
+	int dr1 = m_pBMI->bmiHeader.biHeight>0 ? -1 : 1;
+	// -- [2021-11-05] Chj: scanline direction matters when applying spatial filters below.
+
 	for (int y=0; y<m_nHeight; y++)
 	{
 		unsigned char * pBuffer = (unsigned char *) m_pBits   + m_nBytesPerScanline * y;
 		unsigned char * pDest   = (unsigned char *) pDestBits + m_nBytesPerScanline * y;
 
 		if (  (y>=pFilter->GetHalf()) && (y<(m_nHeight- pFilter->GetHalf())) )
+		{
 			switch ( m_nImageFormat )
 			{
-				case DIB_8BPP:
-					pFilter->Filter8bpp(pDest, pBuffer, m_nWidth, m_nBytesPerScanline);
-					break;
+			case DIB_8BPP:
+				pFilter->Filter8bpp(pDest, pBuffer, m_nWidth, dr1*m_nBytesPerScanline);
+				break;
 
-				case DIB_24RGB888:	// 24-bpp RGB
-					pFilter->Filter24bpp(pDest, pBuffer, m_nWidth, m_nBytesPerScanline);
-					break;
+			case DIB_24RGB888:	// 24-bpp RGB
+				pFilter->Filter24bpp(pDest, pBuffer, m_nWidth, dr1*m_nBytesPerScanline);
+				break;
 
-				case DIB_32RGBA8888: // 32-bpp RGBA
-				case DIB_32RGB888:   // 32-bpp RGB
-					pFilter->Filter32bpp(pDest, pBuffer, m_nWidth, m_nBytesPerScanline);
-					break;
+			case DIB_32RGBA8888: // 32-bpp RGBA
+			case DIB_32RGB888:   // 32-bpp RGB
+				pFilter->Filter32bpp(pDest, pBuffer, m_nWidth, dr1*m_nBytesPerScanline);
+				break;
 
-				default:
-					delete [] pDestBits;
-					return false;
+			default:
+				delete [] pDestBits;
+				return false;
 			}
+		}
 		else
+		{
 			memcpy(pDest, pBuffer, m_nBytesPerScanline); // copy unprocessed scanlines
+		}
 	}
 	
 	memcpy(m_pBits, pDestBits, m_nImageSize); // overwrite source pixel array
