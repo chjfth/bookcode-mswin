@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdvBitmap", "CH11-AdvBitmap
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Imaging", "CH12-Imaging\Imaging.vcxproj", "{E3A30E91-494B-3667-CC43-7BECB512CDDC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Palette", "CH13-Palette\Palette.vcxproj", "{B232E592-AE58-66E2-D8B6-A0F18A12B149}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -59,6 +61,14 @@ Global
 		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Unicode Debug|Win32.Build.0 = Debug|Win32
 		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Unicode Release|Win32.ActiveCfg = Release|Win32
 		{E3A30E91-494B-3667-CC43-7BECB512CDDC}.Unicode Release|Win32.Build.0 = Release|Win32
+		{B232E592-AE58-66E2-D8B6-A0F18A12B149}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B232E592-AE58-66E2-D8B6-A0F18A12B149}.Debug|Win32.Build.0 = Debug|Win32
+		{B232E592-AE58-66E2-D8B6-A0F18A12B149}.Release|Win32.ActiveCfg = Release|Win32
+		{B232E592-AE58-66E2-D8B6-A0F18A12B149}.Release|Win32.Build.0 = Release|Win32
+		{B232E592-AE58-66E2-D8B6-A0F18A12B149}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{B232E592-AE58-66E2-D8B6-A0F18A12B149}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{B232E592-AE58-66E2-D8B6-A0F18A12B149}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{B232E592-AE58-66E2-D8B6-A0F18A12B149}.Unicode Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
