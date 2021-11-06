@@ -368,8 +368,8 @@ void WebColors(HDC hDC, int x, int y, int crtyp)
 
 		switch ( crtyp )
 		{
-			case 0: cr = RGB(r*51, g*51, b*51);        break;
-			case 1: cr = PALETTERGB(r*51, g*51, b*51); break;
+			case 0: cr = RGB(r*WEBCOLOR_HOP, g*WEBCOLOR_HOP, b*WEBCOLOR_HOP);        break;
+			case 1: cr = PALETTERGB(r*WEBCOLOR_HOP, g*WEBCOLOR_HOP, b*WEBCOLOR_HOP); break;
 			case 2: cr = PALETTEINDEX(r*36+g*6+b);     break;
 		}
 
@@ -391,7 +391,7 @@ void AnalyzePalette(PALETTEENTRY entry[], int no, TCHAR mess[], int bufsize)
 
 	for (int i=0; i<no; i++)
 	{
-		if ( ( (entry[i].peBlue % 0x33) + (entry[i].peGreen % 0x33) + (entry[i].peRed % 0x33) )==0 )
+		if ( ( (entry[i].peBlue % WEBCOLOR_HOP) + (entry[i].peGreen % WEBCOLOR_HOP) + (entry[i].peRed % WEBCOLOR_HOP) )==0 )
 			web ++;
 		else if ( ( entry[i].peBlue==entry[i].peGreen) && ( entry[i].peGreen==entry[i].peBlue) )
 			gray ++;
