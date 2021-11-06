@@ -40,7 +40,8 @@ LRESULT KWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         return 0;
 
 		case WM_PALETTEISCHANGING: // should not happen
-			MessageBox(NULL, _T("Hello"), _T("Hi"), MB_OK);
+			// Chj memo: Yes, I never see it on WinXP, even in 256-color video mode.
+			MessageBox(NULL, _T("See WM_PALETTEISCHANGING. But, we do not expect to see it!"), _T("Hi"), MB_OK);
 			return 0;
 
 		case WM_PALETTECHANGED:
@@ -231,6 +232,7 @@ LRESULT KWindow::OnPaletteChanged(HWND hWnd, WPARAM wParam)
 		HPALETTE hOld = SelectPalette(hDC, m_hPalette, FALSE);
 				
 		if ( RealizePalette(hDC) )
+		{
 			if ( m_nUpdateCount >=2 )
 			{
 				InvalidateRect(hWnd, NULL, TRUE);
@@ -241,6 +243,7 @@ LRESULT KWindow::OnPaletteChanged(HWND hWnd, WPARAM wParam)
 				UpdateColors(hDC);
 				m_nUpdateCount ++;
 			}
+		}
 
 		SelectPalette(hDC, hOld, FALSE);
 		ReleaseDC(hWnd, hDC);
