@@ -83,7 +83,6 @@
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      
       <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
@@ -169,7 +168,6 @@
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      
       <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
@@ -228,6 +226,7 @@
     <ClCompile Include="..\Status.cpp" />
     <ClCompile Include="..\Toolbar.cpp" />
     <ClCompile Include="..\treeview.cpp" />
+    <ClCompile Include="..\utils.cpp" />
     <ClCompile Include="..\win.cpp" />
   </ItemGroup>
   <ItemGroup>
