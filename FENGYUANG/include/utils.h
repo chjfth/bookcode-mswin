@@ -49,5 +49,7 @@ inline const TCHAR *RgnShapeStr(RgnShape_et shape)
 
 RgnExist_et GetRandomRgn_refdc(HDC hDC, HRGN hrgn, int iNum=SYSRGN);
 
+void Draw_16x16_PaletteArray(HDC hdcShow, int x, int y, int width, int height);
+
 
 #endif

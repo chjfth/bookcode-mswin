@@ -357,6 +357,9 @@ void Label(HDC hDC, int x, int y, const TCHAR * mess)
 
 void WebColors(HDC hDC, int x, int y, int crtyp)
 {
+	// Chj memo: This function draws 6*6*6=216 color cells.
+	// Each channel takes 6 values: 0, 51, 102, 153, 204, and 255 .
+
 	for (int r=0; r<6; r++)
 	for (int g=0; g<6; g++)
 	for (int b=0; b<6; b++)
@@ -540,34 +543,15 @@ void TestPalette(HDC hDC, HINSTANCE hInstance)
 	
 	ShowPaletteLegend(hDC, 10, 260, hPalette);
 
+	Draw_16x16_PaletteArray(hDC, 850,10,256,256);
+
 	// colors in system palette
 	HDC hMemDC = CreateCompatibleDC(hDC);
-	HGDIOBJ hOld;
-	{
-		BYTE data[80][80];
+	HBITMAP hBitmap = (HBITMAP) LoadImage(hInstance, MAKEINTRESOURCE(IDB_TIGER2), IMAGE_BITMAP, 
+		0, 0, LR_DEFAULTCOLOR | LR_CREATEDIBSECTION);
 
-		for (int i=0; i<80; i++)
-		for (int j=0; j<80; j++)
-		{
-			data[i][j] = (i/5) * 16 + (j/5);
-			if ( ((i%5)==0) || ((j%5)==0) )
-				data[i][j] = 255;
-		}
-
-		HBITMAP hBitmap = CreateBitmap(80, 80, 1, 8, data);
-
-		hOld = SelectObject(hMemDC, hBitmap);
-
-		StretchBlt(hDC, 850, 10, 256, 256, hMemDC, 0, 0, 80, 80, SRCCOPY);
-
-		SelectObject(hMemDC, hOld);
-		DeleteObject(hBitmap);
-	}
-
-	HBITMAP hBitmap = (HBITMAP) LoadImage(hInstance, MAKEINTRESOURCE(IDB_TIGER2), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_CREATEDIBSECTION);
-
-	hOld = SelectObject(hMemDC, hBitmap);
-	BITMAP bmp;
+	HGDIOBJ hOld = SelectObject(hMemDC, hBitmap);
+	BITMAP bmp = {};
 	GetObject(hBitmap, sizeof(bmp), & bmp);
 
 	BitBlt(hDC, 10, 350, bmp.bmWidth, bmp.bmHeight, hMemDC, 0, 0, SRCCOPY);

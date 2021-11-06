@@ -11,6 +11,8 @@
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
+#include "..\..\include\utils.h"
+
 void AnalyzePalette(PALETTEENTRY entry[], int no, TCHAR mess[], int bufsize);
 BOOL Switch8bpp(void);
 
@@ -51,31 +53,7 @@ class KPaletteWnd : public KWindow
 
 					TextOut(hDC, 10, 10, m_name, _tcslen(m_name));
 
-					HDC hMemDC = CreateCompatibleDC(hDC);
-					HGDIOBJ hOld;
-	
-					BYTE data[80][80];
-
-					for (int i=0; i<80; i++)
-					for (int j=0; j<80; j++)
-					{
-						// Chj: every "cell" is 5 pixels
-						data[i][j] = (i/5) * 16 + (j/5);
-
-						// Chj: Left-most and top-most pixels are white, to act as gap
-						if ( ((i%5)==0) || ((j%5)==0) )
-							data[i][j] = 255;
-					}
-
-					HBITMAP hBitmap = CreateBitmap(80, 80, 1, 8, data);
-
-					hOld = SelectObject(hMemDC, hBitmap);
-
-					StretchBlt(hDC, 10, 45, 256, 256, hMemDC, 0, 0, 80, 80, SRCCOPY);
-
-					SelectObject(hMemDC, hOld);
-					DeleteObject(hBitmap);
-					DeleteObject(hMemDC);
+					Draw_16x16_PaletteArray(hDC, 10, 45, 256, 256);
 
 					TCHAR temp[64];
 					AnalyzePalette(m_Entry, m_nEntry, temp, ARRAYSIZE(temp));

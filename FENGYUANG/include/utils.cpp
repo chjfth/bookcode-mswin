@@ -63,4 +63,33 @@ RgnExist_et GetRandomRgn_refdc(HDC hDC, HRGN hrgn, int iNum)
 	return RgnExist_Yes;
 }
 
+void Draw_16x16_PaletteArray(HDC hdcShow, int x, int y, int width, int height)
+{
+	HDC hMemDC = CreateCompatibleDC(hdcShow);
 
+	BYTE data[80][80]; // 80=16*5
+
+	for (int i=0; i<80; i++)
+	{
+		for (int j=0; j<80; j++)
+		{
+			// Chj: every "cell" is 5 pixels
+			data[i][j] = (i/5) * 16 + (j/5);
+
+			// Chj: Left-most and top-most pixels are white, to act as gap
+			if ( ((i%5)==0) || ((j%5)==0) )
+				data[i][j] = 255;
+		}
+	}
+
+	HBITMAP hBitmap = CreateBitmap(80, 80, 1, 8, data);
+
+	HGDIOBJ hOld = SelectObject(hMemDC, hBitmap);
+
+	StretchBlt(hdcShow, x,y,width,height, hMemDC,0,0,80,80, SRCCOPY);
+
+	SelectObject(hMemDC, hOld); // restore old hBitmap
+	DeleteObject(hBitmap);
+
+	DeleteObject(hMemDC);
+}
