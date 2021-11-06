@@ -481,18 +481,34 @@ HPALETTE CreateExplicitPalette(void)
 }
 
 
-void TestPalette(HDC hDC, HINSTANCE hInstance, int type)
+enum TestPal_et {
+	TestPal_Halftone = 0,
+	TestPal_GrayscaleKeepStatic = 1,
+	TestPal_GrayscaleFull = 2,
+	TestPal_Explicit = 3,
+};
+
+void TestPalette(HDC hDC, HINSTANCE hInstance, TestPal_et type)
 {
 	HPALETTE hPal;
 		
 	switch ( type )
 	{
-		case 0:	hPal = CreateHalftonePalette(hDC); break;
+		case TestPal_Halftone:	
+			hPal = CreateHalftonePalette(hDC); 
+			break;
 	
-		case 2: SetSystemPaletteUse(hDC, SYSPAL_NOSTATIC);
-		case 1:	hPal = CreateGrayscalePalette();   break;
+		case TestPal_GrayscaleFull: 
+			SetSystemPaletteUse(hDC, SYSPAL_NOSTATIC);
+			// ... fall through ...
 
-		case 3: hPal = CreateExplicitPalette();
+		case TestPal_GrayscaleKeepStatic:	
+			hPal = CreateGrayscalePalette();   
+			break;
+
+		case TestPal_Explicit: 
+			hPal = CreateExplicitPalette();
+			break;
 	}
 
 	HPALETTE hOld = SelectPalette(hDC, hPal, FALSE);
@@ -514,7 +530,7 @@ void TestPalette(HDC hDC, HINSTANCE hInstance, int type)
 }
 
 
-void TestPalette(HDC hDC, HINSTANCE hInstance)
+void TestPalette_StaticColor20(HDC hDC, HINSTANCE hInstance)
 {
 	TCHAR temp[64];
 
@@ -612,23 +628,23 @@ class KTestView : public KScrollCanvas
 		switch ( m_nViewOpt )
 		{
 			case IDM_VIEW_PALETTE:
-				TestPalette(hDC, m_hInstance);
+				TestPalette_StaticColor20(hDC, m_hInstance);
 				break;
 
 			case IDM_VIEW_HALFTONEPALETTE:
-				TestPalette(hDC, m_hInstance, 0);
+				TestPalette(hDC, m_hInstance, TestPal_Halftone);
 				break;
 
 			case IDM_VIEW_GRAYSCALEPALETTE:
-				TestPalette(hDC, m_hInstance, 1);
+				TestPalette(hDC, m_hInstance, TestPal_GrayscaleKeepStatic);
 				break;
 
 			case IDM_VIEW_GRAYSCALEFULL:
-				TestPalette(hDC, m_hInstance, 2);
+				TestPalette(hDC, m_hInstance, TestPal_GrayscaleFull);
 				break;
 
 			case IDM_VIEW_EXPLICITPALETTE:
-				TestPalette(hDC, m_hInstance, 3);
+				TestPalette(hDC, m_hInstance, TestPal_Explicit);
 				break;
 		}
 	}

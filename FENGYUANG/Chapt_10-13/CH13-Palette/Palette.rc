@@ -79,7 +79,7 @@ BEGIN
     END
     POPUP "&Tests"
     BEGIN
-        MENUITEM "Palette",                     IDM_VIEW_PALETTE
+        MENUITEM "Palette (20 static colors)",  IDM_VIEW_PALETTE
         MENUITEM "Halftone Palette",            IDM_VIEW_HALFTONEPALETTE
         MENUITEM "Grayscale Palette",           IDM_VIEW_GRAYSCALEPALETTE
         MENUITEM "Full Grayscale",              IDM_VIEW_GRAYSCALEFULL

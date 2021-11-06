@@ -29,41 +29,44 @@ class KPaletteWnd : public KWindow
 		switch ( uMsg )
 		{
 			case WM_CREATE:
+			{
 				m_hWnd   = hWnd;
 				m_hDC    = GetDC(m_hWnd);
 				m_nEntry = GetSystemPaletteEntries(m_hDC, 0, 256, m_Entry);
 				m_nGeneration = 0;
 				_tcscpy_s(m_name, ARRAYSIZE(m_name), "Original");
 				return 0;
+			}
 
 			case WM_MOUSEMOVE:
-				{
-					COLORREF cr = GetPixel(m_hDC, LOWORD(lParam), HIWORD(lParam));
-					TCHAR temp[32];
-					wsprintf(temp, "RGB(%02X, %02X, %02X)   ", GetRValue(cr), GetGValue(cr), GetBValue(cr));
-					TextOut(m_hDC, 10, 310, temp, _tcslen(temp));
-				}
+			{
+				COLORREF cr = GetPixel(m_hDC, LOWORD(lParam), HIWORD(lParam));
+				TCHAR temp[32];
+				wsprintf(temp, "RGB(%02X, %02X, %02X)   ", GetRValue(cr), GetGValue(cr), GetBValue(cr));
+				TextOut(m_hDC, 10, 310, temp, _tcslen(temp));
 				return 0;
+			}
 
 			case WM_PAINT:
-				{
-					PAINTSTRUCT ps;
+			{
+				PAINTSTRUCT ps;
 
-					HDC hDC = BeginPaint(hWnd, & ps);
+				HDC hDC = BeginPaint(hWnd, & ps);
 
-					TextOut(hDC, 10, 10, m_name, _tcslen(m_name));
+				TextOut(hDC, 10, 10, m_name, _tcslen(m_name));
 
-					Draw_16x16_PaletteArray(hDC, 10, 45, 256, 256);
+				Draw_16x16_PaletteArray(hDC, 10, 45, 256, 256);
 
-					TCHAR temp[64];
-					AnalyzePalette(m_Entry, m_nEntry, temp, ARRAYSIZE(temp));
-					TextOut(hDC, 10, 25, temp, _tcslen(temp));
+				TCHAR temp[64];
+				AnalyzePalette(m_Entry, m_nEntry, temp, ARRAYSIZE(temp));
+				TextOut(hDC, 10, 25, temp, _tcslen(temp));
 
-					wsprintf(temp, "System Palette [%d]", m_nGeneration);
-					SetWindowText(hWnd, temp);
-					EndPaint(hWnd, & ps);
-				}
+				wsprintf(temp, "System Palette [%d]", m_nGeneration);
+				SetWindowText(hWnd, temp);
+				
+				EndPaint(hWnd, & ps);
 				return 0;
+			}
 
 			case WM_PALETTECHANGED:
 			{
@@ -73,18 +76,22 @@ class KPaletteWnd : public KWindow
 
 				int diff = 0;
 				for (int i=0; i<m_nEntry; i++)
+				{
 					if ( memcmp(& m_New[i], & m_Entry[i], sizeof(PALETTEENTRY)) )
 						diff ++;
+				}
 
-				wsprintf(m_name, "%d entries changed by window(%x) ", diff, wParam);
-				GetWindowModuleFileName((HWND) wParam, m_name + _tcslen(m_name), MAX_PATH - _tcslen(m_name));
+				_sntprintf_s(m_name, ARRAYSIZE(m_name), _T("%d entries changed by HWND(0x%08x) "), diff, wParam);
+
+				int pfxlen = _tcslen(m_name);
+				GetWindowModuleFileName((HWND) wParam, m_name+pfxlen, ARRAYSIZE(m_name)-pfxlen);
 
 				memcpy(m_Entry, m_New, sizeof(m_New));
 				m_nGeneration ++;
 
 				InvalidateRect(hWnd, NULL, TRUE);
-			}
 				return 0;
+			}
 
 			case WM_NCDESTROY:
 				ReleaseDC(m_hWnd, m_hDC);

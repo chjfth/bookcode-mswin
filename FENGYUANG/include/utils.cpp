@@ -65,6 +65,8 @@ RgnExist_et GetRandomRgn_refdc(HDC hDC, HRGN hrgn, int iNum)
 
 void Draw_16x16_PaletteArray(HDC hdcShow, int x, int y, int width, int height)
 {
+	// Used by CH13 Palette.exe sample code.
+
 	HDC hMemDC = CreateCompatibleDC(hdcShow);
 
 	BYTE data[80][80]; // 80=16*5
