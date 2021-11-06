@@ -54,7 +54,7 @@ class KDIBView : public KScrollCanvas
 
 public:
 
-	HINSTANCE		m_hInstance;
+	//HINSTANCE		m_hInstance; // Fixed: This has been defined in KCanvas::m_hInst
 	KImage			m_DIB;
 
 	KDIBView(void)
@@ -80,7 +80,7 @@ public:
 			SetSize(m_DIB.GetWidth()  + GAP*2,
 					m_DIB.GetHeight() + GAP*2, 5, 5);
 
-			m_hInstance = hInstance;
+			m_hInst = hInstance;
 			m_pStatus   = pStatus;
 
 			RegisterClass(_T("DIBView"), hInstance);
@@ -100,7 +100,7 @@ public:
 			SetSize(m_DIB.GetWidth()  + GAP*2,
 					m_DIB.GetHeight() + GAP*2, 5, 5);
 
-			m_hInstance = hInstance;
+			m_hInst = hInstance;
 			m_pStatus   = pStatus;
 
 			RegisterClass(_T("DIBView"), hInstance);
@@ -161,7 +161,7 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_CREATE:
 			m_hWnd		= hWnd;
-			m_hViewMenu = LoadMenu(m_hInstance, MAKEINTRESOURCE(IDR_DIBVIEW));
+			m_hViewMenu = LoadMenu(m_hInst, MAKEINTRESOURCE(IDR_DIBVIEW));
 			{
 				HDC hDC = GetDC(hWnd);
 
@@ -1019,9 +1019,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	TCHAR title[MAX_PATH];
 
-	_tcscpy_s(title, MAX_PATH, "Chapt_12 Palette");
+	_tcscpy_s(title, MAX_PATH, "Chapt_13 Palette");
 
-	frame.CreateEx(0, _T("CH12_Palette_ClassName"), title,
+	frame.CreateEx(0, _T("CH13_Palette_ClassName"), title,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);
