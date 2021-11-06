@@ -19,6 +19,7 @@
 
 #include <windows.h>
 #include <assert.h>
+#include <stdio.h>
 #include <tchar.h>
 #include <math.h>
 
@@ -376,7 +377,7 @@ void WebColors(HDC hDC, int x, int y, int crtyp)
 }
 
 
-void AnalyzePalette(PALETTEENTRY entry[], int no, TCHAR mess[])
+void AnalyzePalette(PALETTEENTRY entry[], int no, TCHAR mess[], int bufsize)
 {
 	int web = 0;
 	int gray = 0;
@@ -387,14 +388,13 @@ void AnalyzePalette(PALETTEENTRY entry[], int no, TCHAR mess[])
 			web ++;
 		else if ( ( entry[i].peBlue==entry[i].peGreen) && ( entry[i].peGreen==entry[i].peBlue) )
 			gray ++;
-
 	}
 
-	wsprintf(mess, "%d web colors, %d grayscale colors", web, gray);
+	_sntprintf_s(mess, bufsize, _TRUNCATE, _T("%d web colors, %d grayscale colors"), web, gray);
 }
 
 
-void ShowPalette(HDC hDC, int x0, int y0, HPALETTE hPal)
+void ShowPaletteLegend(HDC hDC, int x0, int y0, HPALETTE hPal)
 {
 	PALETTEENTRY entries[256];
 
@@ -425,7 +425,7 @@ void ShowPalette(HDC hDC, int x0, int y0, HPALETTE hPal)
 		DeleteObject(hBrush);
 	}
 
-	AnalyzePalette(entries, no, temp);
+	AnalyzePalette(entries, no, temp, ARRAYSIZE(temp));
 	TextOut(hDC, x0, y0, temp, _tcslen(temp));
 }
 
@@ -500,7 +500,7 @@ void TestPalette(HDC hDC, HINSTANCE hInstance, int type)
 	wsprintf(temp, "%d colors realized", n);
 	TextOut(hDC, 10, 250, temp, _tcslen(temp));
 
-	ShowPalette(hDC, 10, 280, hPal);
+	ShowPaletteLegend(hDC, 10, 280, hPal);
 
 	SelectPalette(hDC, hOld, TRUE);
 	DeleteObject(hPal);
@@ -523,7 +523,7 @@ void TestPalette(HDC hDC, HINSTANCE hInstance)
 	wsprintf(temp, "NUMRESERVED %d", GetDeviceCaps(hDC, NUMRESERVED));
 	Label(hDC, 10, 50, temp);
 
-	wsprintf(temp, "COLORRES    %d", GetDeviceCaps(hDC, COLORRES));
+	wsprintf(temp, "COLORRES %d bits", GetDeviceCaps(hDC, COLORRES));
 	Label(hDC, 10, 70, temp);
 
 	// web colors
@@ -534,7 +534,7 @@ void TestPalette(HDC hDC, HINSTANCE hInstance)
 	// default palette
 	HPALETTE hPalette = (HPALETTE) GetCurrentObject(hDC, OBJ_PAL);
 	
-	ShowPalette(hDC, 10, 260, hPalette);
+	ShowPaletteLegend(hDC, 10, 260, hPalette);
 
 	// colors in system palette
 	HDC hMemDC = CreateCompatibleDC(hDC);
@@ -1015,9 +1015,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
 	TCHAR title[MAX_PATH];
 
-	_tcscpy(title, "Palette");
+	_tcscpy_s(title, MAX_PATH, "Chapt_12 Palette");
 
-	frame.CreateEx(0, _T("ClassName"), title,
+	frame.CreateEx(0, _T("CH12_Palette_ClassName"), title,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
 	    NULL, LoadMenu(hInst, MAKEINTRESOURCE(IDR_MAIN)), hInst);

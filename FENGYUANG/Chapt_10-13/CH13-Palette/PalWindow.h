@@ -11,7 +11,7 @@
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
-void AnalyzePalette(PALETTEENTRY entry[], int no, TCHAR mess[]);
+void AnalyzePalette(PALETTEENTRY entry[], int no, TCHAR mess[], int bufsize);
 BOOL Switch8bpp(void);
 
 class KPaletteWnd : public KWindow
@@ -31,7 +31,7 @@ class KPaletteWnd : public KWindow
 				m_hDC    = GetDC(m_hWnd);
 				m_nEntry = GetSystemPaletteEntries(m_hDC, 0, 256, m_Entry);
 				m_nGeneration = 0;
-				_tcscpy(m_name, "Original");
+				_tcscpy_s(m_name, ARRAYSIZE(m_name), "Original");
 				return 0;
 
 			case WM_MOUSEMOVE:
@@ -59,7 +59,10 @@ class KPaletteWnd : public KWindow
 					for (int i=0; i<80; i++)
 					for (int j=0; j<80; j++)
 					{
+						// Chj: every "cell" is 5 pixels
 						data[i][j] = (i/5) * 16 + (j/5);
+
+						// Chj: Left-most and top-most pixels are white, to act as gap
 						if ( ((i%5)==0) || ((j%5)==0) )
 							data[i][j] = 255;
 					}
@@ -75,7 +78,7 @@ class KPaletteWnd : public KWindow
 					DeleteObject(hMemDC);
 
 					TCHAR temp[64];
-					AnalyzePalette(m_Entry, m_nEntry, temp);
+					AnalyzePalette(m_Entry, m_nEntry, temp, ARRAYSIZE(temp));
 					TextOut(hDC, 10, 25, temp, _tcslen(temp));
 
 					wsprintf(temp, "System Palette [%d]", m_nGeneration);

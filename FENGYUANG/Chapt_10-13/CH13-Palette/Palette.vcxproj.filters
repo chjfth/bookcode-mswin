@@ -45,9 +45,6 @@
     <CustomBuild Include="..\..\Res\flower.bmp">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="Res\lion.bmp">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\Res\palette.ico">
       <Filter>Resource Files</Filter>
     </CustomBuild>

@@ -139,7 +139,6 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\Res\flower.bmp" />
-    <CustomBuild Include="Res\lion.bmp" />
     <CustomBuild Include="..\..\Res\palette.ico" />
     <CustomBuild Include="..\..\Res\tiger1.bmp" />
   </ItemGroup>
