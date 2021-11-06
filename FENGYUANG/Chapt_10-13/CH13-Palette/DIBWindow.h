@@ -11,7 +11,7 @@
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
-typedef enum
+enum
 {
 	pal_no		 = 0x00,
 	pal_halftone = 0x01, 
@@ -49,10 +49,12 @@ class KDIBWindow : public KWindow
 					HDC hDC = GetDC(m_hWnd);
 
 					if ( (m_nOption & 3)==pal_bitmap )
+					{
 						if ( m_pBMI )
 							m_hPalette = CreateDIBPalette(m_pBMI);
 						else
 							m_hPalette = CreateDIBSectionPalette(hDC, m_hDIBSection);
+					}
 					else if ( (m_nOption & 3)==pal_halftone )
 						m_hPalette = CreateHalftonePalette(hDC);
 					else
@@ -143,7 +145,7 @@ public:
 		m_pBits   = pBits;
 
 		TCHAR title[32];
-		wsprintf(title, _T("DIB Window (%d)"), m_nOption);
+		wsprintf(title, _T("DIB Window (flag %d)"), m_nOption);
 
 		CreateEx(0, _T("DIBWindow"), title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 			CW_USEDEFAULT, CW_USEDEFAULT, m_pBMI->bmiHeader.biWidth + 28, 
@@ -162,9 +164,9 @@ public:
 			return;
 
 		TCHAR title[32];
-		wsprintf(title, _T("DIBSection Window (%d)"), m_nOption);
+		wsprintf(title, _T("DIBSection Window (flag %d)"), m_nOption);
 
-		CreateEx(0, _T("DIBWindow"), title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+		CreateEx(0, _T("DIBSectionWindow"), title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 			CW_USEDEFAULT, CW_USEDEFAULT, 300, 
 				400, NULL, NULL, hInst);
 		ShowWindow(SW_NORMAL);

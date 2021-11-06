@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\PalLoadBitmap.h" />
+    <ClInclude Include="DIBWindow.h" />
     <ClInclude Include="PalWindow.h" />
     <ClInclude Include="..\..\include\toolbarb.h" />
   </ItemGroup>

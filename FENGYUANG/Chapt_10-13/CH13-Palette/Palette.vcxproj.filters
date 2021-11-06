@@ -34,10 +34,13 @@
     <ClInclude Include="..\..\include\PalLoadBitmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\toolbarb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>    
     <ClInclude Include="PalWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\toolbarb.h">
+    <ClInclude Include="DIBWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

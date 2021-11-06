@@ -34,7 +34,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Tests",                       IDM_FILE_TEST
         MENUITEM "Demo\tSystem Palette Window", IDM_FILE_PALETTEWND
-        MENUITEM "Demo\tHalftone halette & Palette Message Handling", 
+        MENUITEM "Demo\tHalftone Palette && Palette Message Handling", 
                                                 IDM_FILE_PALMESSAGE
         MENUITEM "Demo\tDIB Palette/STRETCH_HALFTONE", IDM_FILE_DIBPAL
         MENUITEM SEPARATOR
