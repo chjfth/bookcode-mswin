@@ -34,6 +34,10 @@
 #include "DIBWindow.h"
 #include "PalWindow.h"
 
+#define WM_USER_CREATE_DIBVIEW ((WM_USER)+1)
+// -- Chj: So not to conflict with win.cpp's use of WM_USER.
+
+
 class KDIBView : public KScrollCanvas
 {
 	typedef enum { GAP = 16 };
@@ -147,7 +151,7 @@ void KDIBView::GetWndClassEx(WNDCLASSEX & wc)
 void KDIBView::CreateNewView(BITMAPINFO * pDIB, TCHAR * pTitle)
 {
 	if ( pDIB )
-		SendMessage(m_hFrame, WM_USER, (WPARAM) pDIB, (LPARAM) pTitle);
+		SendMessage(m_hFrame, WM_USER_CREATE_DIBVIEW, (WPARAM) pDIB, (LPARAM) pTitle);
 }
 
 
@@ -934,7 +938,7 @@ class KMyMDIFRame : public KMDIFrame
 	{
 		switch ( uMsg )
 		{
-			case WM_USER:
+			case WM_USER_CREATE_DIBVIEW:
 				CreateDIBView((BITMAPINFO *) wParam, (const TCHAR *) lParam);
 				return 0;
 
