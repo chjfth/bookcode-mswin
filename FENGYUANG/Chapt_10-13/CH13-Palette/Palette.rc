@@ -37,6 +37,7 @@ BEGIN
         MENUITEM "Demo\tHalftone Palette && Palette Message Handling", 
                                                 IDM_FILE_PALMESSAGE
         MENUITEM "Demo\tDIB Palette/STRETCH_HALFTONE", IDM_FILE_DIBPAL
+    	MENUITEM "Demo\tDIB Palette Limit Colors...", IDM_FILE_DIB_LIMIT_COLORS
         MENUITEM SEPARATOR
         MENUITEM "&Close",                      IDM_FILE_CLOSE
         MENUITEM SEPARATOR

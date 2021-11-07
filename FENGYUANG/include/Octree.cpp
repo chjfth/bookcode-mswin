@@ -465,7 +465,7 @@ HPALETTE LUTCreatePalette(const BYTE * pRGB, int nSize, int nColor)
 
 
 // Create palette from Color table in a DIB
-HPALETTE CreateDIBPalette(const BITMAPINFO * pDIB)
+HPALETTE CreateDIBPalette(const BITMAPINFO * pDIB, int nColorLimit)
 {
 	int	   nSize;
 	int    nColor;
@@ -474,10 +474,12 @@ HPALETTE CreateDIBPalette(const BITMAPINFO * pDIB)
 
 	if ( pRGB==NULL )
 	{
-		RGBQUAD		 RGB[256];
-		int			 freq[256];
+		RGBQUAD		 RGB[256] = {};
+		int			 freq[256] = {};
 
-		nColor = GenPalette((BITMAPINFO *) pDIB, RGB, freq, 236);
+		nColor = GenPalette((BITMAPINFO *) pDIB, RGB, freq, 
+			(nColorLimit>1 && nColorLimit<236) ? nColorLimit : 236
+			);
 
 #ifdef _DEBUG
 		for (int i=0; i<nColor; i++)
@@ -515,10 +517,12 @@ BITMAPINFO * IndexColorTable(BITMAPINFO * pDIB, HPALETTE hPal)
 	WORD * pIndex = (WORD *) pNew->bmiColors;
 
 	for (int i=0; i<nColor; i++, pRGB+=nSize)
+	{
 		if ( hPal )
 			pIndex[i] = GetNearestPaletteIndex(hPal, RGB(pRGB[2], pRGB[1], pRGB[0]));
 		else
 			pIndex[i] = i;
+	}
 
 	return pNew;
 }

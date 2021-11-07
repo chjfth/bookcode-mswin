@@ -207,7 +207,7 @@ public:
 };
 
 
-HPALETTE     CreateDIBPalette(const BITMAPINFO * pDIB);
+HPALETTE     CreateDIBPalette(const BITMAPINFO * pDIB, int nColorLimit=0);
 BITMAPINFO * IndexColorTable(BITMAPINFO * pDIB, HPALETTE hPal);
 HPALETTE     LUTCreatePalette(const BYTE * pRGB, int nSize, int nColor);
 

@@ -251,7 +251,7 @@ LRESULT KDIBView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					return 0;
 
 				case IDM_COLORS_CDR_ERRORDIFFUSION:
-					CreateNewView(Convert8bpp_ErrorDiffusion(m_DIB.GetBMI()), "Color Depth Reduction: Error Diffusuin");
+					CreateNewView(Convert8bpp_ErrorDiffusion(m_DIB.GetBMI()), "Color Depth Reduction: Error Diffusion");
 					return 0;
 			}
 			return 0;
@@ -273,6 +273,8 @@ void KDIBView::OnDraw(HDC hDC, const RECT * rcPaint)
 
 	if ( m_hPalette )
 	{
+		// This m_hPalette was prepared in WM_CREATE
+
 		SelectPalette(hDC, m_hPalette, FALSE);
 		RealizePalette(hDC);
 	}
@@ -805,6 +807,11 @@ class KMyMDIFRame : public KMDIFrame
 	KDIBWindow	    dibwindow5;
 	KDIBWindow	    dibwindow6;
 
+	KDIB dibLimitColors;
+	KDIBWindow	    dibwindow7;
+	KDIBWindow	    dibwindow8;
+	KDIBWindow	    dibwindow9;
+
 	void CreateMDIChild(KScrollCanvas * canvas, const TCHAR * klass, const TCHAR * filename, const TCHAR * title)
 	{
 		MDICREATESTRUCT mdic;
@@ -926,6 +933,26 @@ class KMyMDIFRame : public KMDIFrame
 				
 				dibwindow6.CreateDIBWindow(m_hInst, MAKEINTRESOURCE(IDB_FLOWER), 
 					pal_bitmap | pal_react);
+				
+				return TRUE;
+			}
+
+			case IDM_FILE_DIB_LIMIT_COLORS:
+			{
+				KFileDialog fo;
+
+				if ( !fo.GetOpenFileName(m_hWnd, "bmp", "Bitmap Files") )
+					return FALSE;
+				
+				if( !dibLimitColors.LoadFile(fo.m_TitleName) )
+					return FALSE;
+				
+				const BITMAPINFO * pBMI = dibLimitColors.GetBMI();
+				const BYTE *pBits = dibLimitColors.GetBits();
+
+				dibwindow7.CreateDIBWindow_LimitColors(m_hInst, pBMI, pBits, 16);
+				dibwindow8.CreateDIBWindow_LimitColors(m_hInst, pBMI, pBits, 64);
+				dibwindow9.CreateDIBWindow_LimitColors(m_hInst, pBMI, pBits, 236);
 				
 				return TRUE;
 			}

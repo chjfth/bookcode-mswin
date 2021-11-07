@@ -30,6 +30,7 @@ class KDIBWindow : public KWindow
 	const BYTE		 * m_pBits;
 	HBITMAP			   m_hDIBSection;
 	int				   m_nOption;
+	int m_LimitColors;
 	HINSTANCE		   m_hInst;
 
 	void GetWndClassEx(WNDCLASSEX & wc)
@@ -51,7 +52,7 @@ class KDIBWindow : public KWindow
 					if ( (m_nOption & 3)==pal_bitmap )
 					{
 						if ( m_pBMI )
-							m_hPalette = CreateDIBPalette(m_pBMI);
+							m_hPalette = CreateDIBPalette(m_pBMI, m_LimitColors);
 						else
 							m_hPalette = CreateDIBSectionPalette(hDC, m_hDIBSection);
 					}
@@ -80,8 +81,8 @@ class KDIBWindow : public KWindow
 					else
 					{
 						SetStretchBltMode(hDC, STRETCH_DELETESCANS);
-						const char *text = "STRETCH_DELETESCANS";
-						TextOut(hDC, 0, 0, text, strlen(text));
+						//const char *text = "STRETCH_DELETESCANS";
+						//TextOut(hDC, 0, 0, text, strlen(text));
 					}
 
 					if ( m_pBMI )
@@ -134,6 +135,9 @@ public:
 		m_pBits		  = NULL;
 		m_hDIBSection = NULL;
 		m_hInst       = NULL;
+
+		m_nOption = 0;
+		m_LimitColors = 0;
 	}
 
 	~KDIBWindow()
@@ -147,6 +151,7 @@ public:
 		if ( pBMI==NULL )
 			return;
 
+		m_hInst = hInst;
 		m_nOption = option;
 		m_pBMI    = pBMI;
 		m_pBits   = pBits;
@@ -176,6 +181,33 @@ public:
 		CreateEx(0, _T("DIBSectionWindow"), title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 			CW_USEDEFAULT, CW_USEDEFAULT, 300, 
 				400, NULL, NULL, hInst);
+		ShowWindow(SW_NORMAL);
+		UpdateWindow();
+	}
+
+	void CreateDIBWindow_LimitColors(HINSTANCE hInst, const BITMAPINFO * pBMI, const BYTE * pBits,
+		int limit_colors)
+	{
+		// Chj add this: limit_colors may be 16, 64, 236 etc.
+
+		if ( pBMI==NULL )
+			return;
+
+		m_hInst = hInst;
+		m_nOption = pal_bitmap;
+		m_pBMI    = pBMI;
+		m_pBits   = pBits;
+
+		m_LimitColors = limit_colors;
+
+		TCHAR title[32];
+		_sntprintf_s(title, ARRAYSIZE(title), _T("Limit colors to %d"), m_LimitColors);
+
+		CreateEx(0, _T("DIBSectionLimitColors"), title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+			CW_USEDEFAULT, CW_USEDEFAULT,
+			m_pBMI->bmiHeader.biWidth+28, abs(m_pBMI->bmiHeader.biHeight)+48, 
+			NULL, NULL, hInst);
+
 		ShowWindow(SW_NORMAL);
 		UpdateWindow();
 	}

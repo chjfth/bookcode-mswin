@@ -83,6 +83,8 @@ BITMAPINFO * LoadDIB(HINSTANCE hInst, LPCTSTR pBitmapName, bool & bNeedFree)
 
 HBITMAP PaletteLoadBitmap(HINSTANCE hInst, LPCTSTR pBitmapName, HPALETTE hPalette)
 {
+	// Introduced in CH13.4 
+
 	bool bDIBNeedFree;
 	BITMAPINFO * pDIB = LoadDIB(hInst, pBitmapName, bDIBNeedFree);
 
