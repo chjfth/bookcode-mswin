@@ -74,15 +74,22 @@ class KDIBWindow : public KWindow
 					if ( m_nOption & pal_stretchHT )
 					{
 						SetStretchBltMode(hDC, STRETCH_HALFTONE);
-						TextOut(hDC, 0, 0, "halftone", 8);
+						const char *text = "STRETCH_HALFTONE";
+						TextOut(hDC, 0, 0, text, strlen(text));
 					}
 					else
+					{
 						SetStretchBltMode(hDC, STRETCH_DELETESCANS);
+						const char *text = "STRETCH_DELETESCANS";
+						TextOut(hDC, 0, 0, text, strlen(text));
+					}
 
 					if ( m_pBMI )
-						StretchDIBits(hDC, 10, 10, m_pBMI->bmiHeader.biWidth, m_pBMI->bmiHeader.biHeight,
+					{
+						StretchDIBits(hDC, 15, 15, m_pBMI->bmiHeader.biWidth, m_pBMI->bmiHeader.biHeight,
 							0, 0, m_pBMI->bmiHeader.biWidth, m_pBMI->bmiHeader.biHeight,
 							m_pBits, m_pBMI, DIB_RGB_COLORS, SRCCOPY);
+					}
 	
 					if ( m_hDIBSection )
 					{
