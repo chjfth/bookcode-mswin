@@ -11,10 +11,20 @@
 inline int RectW(const RECT &r){ return r.right - r.left; }
 inline int RectH(const RECT &r){ return r.bottom - r.top; }
 
+inline bool IsDisplayMode256color()
+{
+	HDC hdc = GetDC(NULL);
+	int ret = GetDeviceCaps(hdc, SIZEPALETTE);
+	ReleaseDC(NULL, hdc);
+	return ret==256 ? true: false;
+}
+
 
 void vaSetDlgItemText(HWND hwnd, UINT ctrlid, const TCHAR *fmt, ...);
 
 void vaDbg(const TCHAR *fmt, ...);
+
+void vaMsgBox(HWND hwndParent, const TCHAR *title, const TCHAR *fmt, ...);
 
 TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false);
 

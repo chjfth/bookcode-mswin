@@ -47,6 +47,20 @@ void vaSetDlgItemText(HWND hwnd, UINT ctrlid, const TCHAR *fmt, ...)
 	va_end(args);
 }
 
+void vaMsgBox(HWND hwndParent, const TCHAR *title, const TCHAR *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+
+	TCHAR buf[1000] = _T("");
+	_vsnprintf_s(buf, ARRAYSIZE(buf), fmt, args);
+
+	::MessageBox(hwndParent, buf, title, MB_OK);
+
+	va_end(args);
+}
+
+
 TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd)
 {
 	SYSTEMTIME st = {0};
@@ -123,3 +137,4 @@ void Draw_16x16_PaletteArray(HDC hdcShow, int x, int y, int width, int height)
 
 	DeleteObject(hMemDC);
 }
+

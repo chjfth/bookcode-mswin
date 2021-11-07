@@ -939,13 +939,26 @@ class KMyMDIFRame : public KMDIFrame
 
 			case IDM_FILE_DIB_LIMIT_COLORS:
 			{
+				if(!IsDisplayMode256color())
+				{
+					vaMsgBox(m_hWnd, "Info", 
+						"You need to switch to 256-color display mode before you run this test.\r\n"
+						"\r\n"
+						"To do this, execute File -> Demo System Palette Window ."
+						);
+					return FALSE;
+				}
+
 				KFileDialog fo;
 
 				if ( !fo.GetOpenFileName(m_hWnd, "bmp", "Bitmap Files") )
 					return FALSE;
 				
-				if( !dibLimitColors.LoadFile(fo.m_TitleName) )
+				if( !dibLimitColors.LoadFile(fo.m_FileName) )
+				{
+					vaMsgBox(m_hWnd, "Error", "Image file loading fail: %s", fo.m_FileName);
 					return FALSE;
+				}
 				
 				const BITMAPINFO * pBMI = dibLimitColors.GetBMI();
 				const BYTE *pBits = dibLimitColors.GetBits();
