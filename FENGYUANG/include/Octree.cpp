@@ -17,6 +17,7 @@
 #include <tchar.h>
 #include <assert.h>
 
+#include "utils.h"
 #include "DIB.h"
 #include "Image.h"
 #include "Octree.h"
@@ -484,11 +485,9 @@ HPALETTE CreateDIBPalette(const BITMAPINFO * pDIB, int nColorLimit)
 #ifdef _DEBUG
 		for (int i=0; i<nColor; i++)
 		{
-			TCHAR temp[64];
-
-			wsprintf(temp, _T("{ %d, %d, %d }, // %3d, %d\n"), RGB[i].rgbRed, RGB[i].rgbGreen, RGB[i].rgbBlue,
-				i, freq[i]);
-			OutputDebugString(temp);
+			vaDbg(_T("Palette#%d RGB(%d, %d, %d) freq=%d"), i,
+				RGB[i].rgbRed, RGB[i].rgbGreen, RGB[i].rgbBlue,
+				freq[i]);
 		}
 #endif
 

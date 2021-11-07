@@ -241,7 +241,6 @@
     <ClInclude Include="..\CheckMark.h" />
     <ClInclude Include="..\Color.h" />
     <ClInclude Include="..\curve.h" />
-    <ClInclude Include="..\dbgprint.h" />
     <ClInclude Include="..\DDB.h" />
     <ClInclude Include="..\dialog.h" />
     <ClInclude Include="..\Dib.h" />

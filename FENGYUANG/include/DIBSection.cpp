@@ -19,7 +19,7 @@
 #include <tchar.h>
 #include <math.h>
 
-#include "dbgprint.h"
+#include "utils.h"
 
 #include "DIBSection.h"
 #include "BitmapInfo.h"

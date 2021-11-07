@@ -1,6 +1,8 @@
 #ifndef __utils_h_
 #define __utils_h_
 
+#define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>
@@ -11,6 +13,8 @@ inline int RectH(const RECT &r){ return r.bottom - r.top; }
 
 
 void vaSetDlgItemText(HWND hwnd, UINT ctrlid, const TCHAR *fmt, ...);
+
+void vaDbg(const TCHAR *fmt, ...);
 
 TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false);
 
