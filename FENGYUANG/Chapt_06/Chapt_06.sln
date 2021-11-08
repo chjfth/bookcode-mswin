@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CoordinateSpace", "CoordinateSpace\CoordinateSpace.vcxproj", "{C281A0B7-5469-F1F1-AF79-AC7517EC961D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WeiQi", "WeiQi\WeiQi.vcxproj", "{4AD16B89-037D-5BAF-A35C-4093EFCE691E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wingraph", "..\include\wingraph\wingraph.vcxproj", "{227E3A6E-D602-241F-9C67-C45C9E248700}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Unicode Debug|Win32 = Unicode Debug|Win32
+		Unicode Release|Win32 = Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C281A0B7-5469-F1F1-AF79-AC7517EC961D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C281A0B7-5469-F1F1-AF79-AC7517EC961D}.Debug|Win32.Build.0 = Debug|Win32
+		{C281A0B7-5469-F1F1-AF79-AC7517EC961D}.Release|Win32.ActiveCfg = Release|Win32
+		{C281A0B7-5469-F1F1-AF79-AC7517EC961D}.Release|Win32.Build.0 = Release|Win32
+		{C281A0B7-5469-F1F1-AF79-AC7517EC961D}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{C281A0B7-5469-F1F1-AF79-AC7517EC961D}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{C281A0B7-5469-F1F1-AF79-AC7517EC961D}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{C281A0B7-5469-F1F1-AF79-AC7517EC961D}.Unicode Release|Win32.Build.0 = Release|Win32
+		{4AD16B89-037D-5BAF-A35C-4093EFCE691E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4AD16B89-037D-5BAF-A35C-4093EFCE691E}.Debug|Win32.Build.0 = Debug|Win32
+		{4AD16B89-037D-5BAF-A35C-4093EFCE691E}.Release|Win32.ActiveCfg = Release|Win32
+		{4AD16B89-037D-5BAF-A35C-4093EFCE691E}.Release|Win32.Build.0 = Release|Win32
+		{4AD16B89-037D-5BAF-A35C-4093EFCE691E}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{4AD16B89-037D-5BAF-A35C-4093EFCE691E}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{4AD16B89-037D-5BAF-A35C-4093EFCE691E}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{4AD16B89-037D-5BAF-A35C-4093EFCE691E}.Unicode Release|Win32.Build.0 = Release|Win32
+		{227E3A6E-D602-241F-9C67-C45C9E248700}.Debug|Win32.ActiveCfg = Debug|Win32
+		{227E3A6E-D602-241F-9C67-C45C9E248700}.Debug|Win32.Build.0 = Debug|Win32
+		{227E3A6E-D602-241F-9C67-C45C9E248700}.Release|Win32.ActiveCfg = Release|Win32
+		{227E3A6E-D602-241F-9C67-C45C9E248700}.Release|Win32.Build.0 = Release|Win32
+		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
+		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
