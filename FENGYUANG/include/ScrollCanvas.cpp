@@ -23,7 +23,7 @@
 #include "ScrollCanvas.h"
 
 
-// nBar should be eiter SB_HORZ or SB_VERT
+// nBar should be either SB_HORZ or SB_VERT
 void KScrollCanvas::OnScroll(int nBar, int nScrollCode, int nPos)
 {
 	SCROLLINFO si;

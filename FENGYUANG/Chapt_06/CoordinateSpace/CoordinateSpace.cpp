@@ -161,7 +161,12 @@ void Face(HDC hDC, COLORREF color, int size)
 {
 	for (int x=0; x<size; x++)
 	for (int y=0; y<size; y++)
+	{
 		SetPixel(hDC, x, y, color);
+	}
+
+	SelectObject(hDC, GetStockObject(HOLLOW_BRUSH));
+	Ellipse(hDC, 0,0, size,size); // Chj test
 }
 
 
