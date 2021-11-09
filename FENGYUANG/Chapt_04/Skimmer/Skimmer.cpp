@@ -38,9 +38,9 @@ public:
 	bool Open(const char * file)
 	{
 		str = CreateFile(file, 
-					       GENERIC_READ, FILE_SHARE_READ, NULL,
-					           OPEN_EXISTING,
-					           FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+			GENERIC_READ, FILE_SHARE_READ, NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
 		if ( str == INVALID_HANDLE_VALUE )
 			return false;

@@ -21,6 +21,7 @@
 #include "..\..\include\win.h"
 #include "..\..\include\listview.h"
 #include "..\..\include\property.h"
+#include "..\..\include\JULayout.h"
 
 #include "..\Diver\Diver.h"
 #include "..\Diver\Report.h"
@@ -73,6 +74,7 @@ BOOL KEventPage::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
     {
 		case WM_INITDIALOG:
+		{
             hMailBox  = NULL;
 
             StartTime = 0;
@@ -92,8 +94,11 @@ BOOL KEventPage::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 SetDlgItemText(GetParent(hWnd), IDCANCEL, "&Exit");
             }
 
-			return TRUE;
+			JULayout* jul = JULayout::EnableJULayout(hWnd);
+			jul->AnchorControl(0,0, 100,100, IDC_EVENT);
 
+			return TRUE;
+		}
 		
         case WM_COPYDATA:
             {

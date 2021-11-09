@@ -38,6 +38,8 @@ BOOL KApiPage::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
 		case WM_INITDIALOG:
+		{
+
 			m_hWnd    = hWnd;
 
             List.FromDlgItem(hWnd, IDC_LIST);
@@ -56,10 +58,16 @@ BOOL KApiPage::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 SendDlgItemMessage(hWnd, IDC_TARGET, CB_SETCURSEL, 0, 0);
                 ApiTable.Add2ListView(List);
             }
-                                
-            return TRUE;
 
-        case WM_COMMAND:
+			JULayout* jul = JULayout::EnableJULayout(hWnd);
+			jul->AnchorControl(0,0, 100,0, IDC_TARGET);
+			jul->AnchorControl(0,0, 100,100, IDC_LIST);
+
+            return TRUE;
+		}
+        
+		case WM_COMMAND:
+		{
             if ( wParam==MAKEWPARAM(IDC_TARGET, CBN_SELCHANGE) )
             {
                 if (ApiTable.Initialize(hInst, SendDlgItemMessage(hWnd, IDC_TARGET, CB_GETCURSEL, 0, 0)))
@@ -67,6 +75,7 @@ BOOL KApiPage::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
                 return TRUE;
             }
+		}
     }
         
     return FALSE;
