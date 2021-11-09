@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <tchar.h>
 #include <math.h>
+#include "utils.h"
 
 #include "Color.h"
 #include "Dib.h"
@@ -827,7 +828,7 @@ BOOL KDIB::PlgBlt24(const POINT pPoint[3],
 
 		int minx = dx;
 
-		// search for the last pixel on the scaneline within source rectangle
+		// search for the last pixel on the scanline within source rectangle
 		sx = m11 * map.maxx + m21 * dy + mdx;
 		sy = m12 * map.maxx + m22 * dy + mdy;
 
@@ -839,7 +840,7 @@ BOOL KDIB::PlgBlt24(const POINT pPoint[3],
 
 		int maxx = dx;
 */
-		// precalculate destination pixel address for first pixel
+		// pre-calculate destination pixel address for first pixel
 		BYTE * pDPixel = m_pOrigin + dy * m_nDelta + map.minx * 3;
 
 		// source pixel address for the first pixel
@@ -848,6 +849,7 @@ BOOL KDIB::PlgBlt24(const POINT pPoint[3],
 
 		// go through each pixel on the scan line
 		for (int dx=map.minx; dx<map.maxx; dx++, pDPixel+=3, sx+=m11, sy+=m12)
+		{
 			if ( (sx>=sminx) && (sx<smaxx) )
 			if ( (sy>=sminy) && (sy<smaxy) )
 			{
@@ -857,6 +859,7 @@ BOOL KDIB::PlgBlt24(const POINT pPoint[3],
 				// copy three bytes
 				* ((RGBTRIPLE *)pDPixel) = ((RGBTRIPLE *)pSPixel)[sx/FACTOR];
 			}
+		}
 	}
 
 	return TRUE;
@@ -969,27 +972,37 @@ HBITMAP KDIB::TransformBitmap(XFORM * xm, COLORREF crBack, int method)
 
 	POINT P[3] = { { x0-xmin, y0-ymin }, { x1-xmin, y1-ymin }, { x2-xmin, y2-ymin } };
 
+	const TCHAR *opstr = NULL;
 	dibtick = GetTickCount();
 	
-	if ( (m_nBitCount<=8) && (method==method_24bpp) )
+	if ( (method==method_24bpp) && (m_nBitCount!=24) )
+	{
 		method = method_direct;
+
+		vaDbg(_T("Input image is not 24bpp, so not using 24bpp-integer method. Fallback to float-point method."));
+	}
 
 	switch ( method )
 	{
 		case method_gdi:
+			opstr = _T("GDI");
 			destDIB.PlgBltGetPixel(P, hSrcDC, 0, 0, m_nWidth, m_nHeight, hDstDC);
 			break;   
 
 		case method_direct:	
+			opstr = _T("float-point");
 			destDIB.PlgBlt(P, this, 0, 0, m_nWidth, m_nHeight);
 			break;   
 
 		case method_24bpp:
+			opstr = _T("24bpp-integer");
 			destDIB.PlgBlt24(P, this, 0, 0, m_nWidth, m_nHeight);
 			break;
 	}
 
 	dibtick = GetTickCount() - dibtick;
+
+	vaDbg(_T("KDIB::TransformBitmap(%s) costs %d millisec."), opstr, dibtick);
 
 	SelectObject(hDstDC, hDstOld);
 	DeleteObject(hDstDC);
