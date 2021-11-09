@@ -184,16 +184,18 @@ void Draw_Cube(HDC hDC, int width, int height, int degree)
 	const float dx   = (float) (size * cos(pi*degree/180));
 	const float dy   = (float) (size * sin(pi*degree/180));
 	
-	af.MapTri(0, 0, (float)size, 0, 0, (float)size,   0, 0, dx, dy, 0, (float)size);
+	af.MapTri(0,0,  (float)size,0,  0,(float)size,   
+		      0,0,          dx,dy,  0,(float)size);
 	SetWorldTransform(hDC, & af.m_xm);
-
 	Face(hDC, RGB(0xFF, 0, 0), size);
 
-	af.MapTri(0, 0, (float)size, 0, 0, (float)size,   0, 0, -dx, dy, 0, (float)size);
+	af.MapTri(0,0,  (float)size,0,  0,(float)size,   
+		      0,0,        -dx, dy,  0,(float)size);
 	SetWorldTransform(hDC, & af.m_xm);
 	Face(hDC, RGB(0, 0xFF, 0), size);
 
-	af.MapTri(0, 0, (float)size, 0, 0, (float)size,   0, (float)size, dx, size + dy, -dx, size + dy);
+	af.MapTri(0,0,           (float)size,0,   0,(float)size,   
+		      0,(float)size,  dx,size+dy,    -dx,size+dy);
 	SetWorldTransform(hDC, & af.m_xm);
 	Face(hDC, RGB(0, 0, 0xFF), size);
 }	

@@ -115,12 +115,11 @@ BOOL KAffine::Scale(FLOAT sx, FLOAT sy)
 
 BOOL KAffine::Rotate(FLOAT angle, FLOAT x0, FLOAT y0)
 {
-	XFORM xm;
-
 	Translate(-x0, -y0);	// make (x0,y0) the origin
 	
     double rad = angle * (3.14159265359 / 180); 
 
+	XFORM xm;
 	xm.eM11 =   (FLOAT) cos(rad);
 	xm.eM12 =   (FLOAT) sin(rad);
 	xm.eM21 = -         xm.eM12;
@@ -138,8 +137,11 @@ BOOL KAffine::Rotate(FLOAT angle, FLOAT x0, FLOAT y0)
 // Find a transform which maps (0,0) (1,0) (0,1) to p, q, and r respectively
 BOOL KAffine::MapTri(FLOAT px0, FLOAT py0, FLOAT qx0, FLOAT qy0, FLOAT rx0, FLOAT ry0)
 {
-	// px0 = dx, qx0 = m11 + dx, rx0 = m21 + dx
-	// py0 = dy, qy0 = m12 + dy, ry0 = m22 + dy
+	// We need to do:
+	// (0,0)->(px0,py0) , (1,0)->(qx0,qy0) , (0,1)->(rx0,ry0)
+	// so:
+	// px0 = dx         , qx0 = m11 + dx   , rx0 = m21 + dx
+	// py0 = dy         , qy0 = m12 + dy   , ry0 = m22 + dy
 	m_xm.eM11 = qx0 - px0;
 	m_xm.eM12 = qy0 - py0;
 	m_xm.eM21 = rx0 - px0;
@@ -151,7 +153,7 @@ BOOL KAffine::MapTri(FLOAT px0, FLOAT py0, FLOAT qx0, FLOAT qy0, FLOAT rx0, FLOA
 }
 
 
-// Find a transform which maps p0, q0, and r0 to p1, p1 and r1 respectively
+// Find a transform which maps p0, q0, and r0 to p1, q1 and r1 respectively
 BOOL KAffine::MapTri(FLOAT px0, FLOAT py0, FLOAT qx0, FLOAT qy0, FLOAT rx0, FLOAT ry0,
 			  	     FLOAT px1, FLOAT py1, FLOAT qx1, FLOAT qy1, FLOAT rx1, FLOAT ry1)
 {
@@ -165,7 +167,7 @@ BOOL KAffine::MapTri(FLOAT px0, FLOAT py0, FLOAT qx0, FLOAT qy0, FLOAT rx0, FLOA
 	if (! map1.MapTri(px1, py1, qx1, qy1, rx1, ry1) )
 		return FALSE;
 
-	return Combine(map1.m_xm);	// then to p1,r1,q1
+	return Combine(map1.m_xm);	// then to p1,q1,r1
 }
 
 
