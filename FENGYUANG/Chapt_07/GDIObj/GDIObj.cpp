@@ -9,6 +9,7 @@
 //  FileName   : gdiobj.cpp						                                     //
 //  Description: GDI object table monitoring tool, Windows NT/2000, Chapter 7        //
 //  Version    : 1.00.000, May 31, 2000                                              //
+//               1.00.001, Apr 10, 2001 Add InitCommonControls (used by listview)    //
 //-----------------------------------------------------------------------------------//
 
 #define STRICT
@@ -257,6 +258,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 			"KGDITable", MB_OK|MB_ICONSTOP);
 		return 4;
 	}
+
+	InitCommonControls();
 
 	KGDIObjectTable gdiobj;
 

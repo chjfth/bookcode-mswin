@@ -46,7 +46,6 @@ BEGIN
         MENUITEM "World Transformation\t&Dotted Line", IDM_VIEW_DOTLINE
         MENUITEM "World Transformation\t&Cube 30 degree", IDM_VIEW_CUBE30
         MENUITEM "World Transformation\tCube 45 degree", IDM_VIEW_CUBE45
-        MENUITEM "&Region",                     IDM_VIEW_REGION
     END
 END
 

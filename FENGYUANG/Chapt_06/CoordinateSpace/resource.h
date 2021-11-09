@@ -7,7 +7,6 @@
 #define IDM_FILE_EXIT                   40001
 #define IDM_VIEW_DOTLINE                40002
 #define IDM_VIEW_CUBE30                 40003
-#define IDM_VIEW_REGION                 40004
 #define IDM_VIEW_CUBE45                 40005
 #define IDM_VIEW_MMTEXT                 40006
 #define IDM_VIEW_MMLOENGLISH            40007
