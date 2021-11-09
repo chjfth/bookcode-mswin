@@ -174,7 +174,7 @@ int KGDIDecoder::Decode(ATOM typ, const void * pValue, char * szBuffer, int nBuf
 
 	if ( typ==atom_COLORREF )
 	{
-		if ( ! Lookup( data, Dic_COLORREF, szBuffer) )
+		if ( ! Lookup( data, Dic_COLORREF, szBuffer, nBufferSize) )
 			wsprintf(szBuffer, "%06x", data);
 
 		return 4;
@@ -184,12 +184,12 @@ int KGDIDecoder::Decode(ATOM typ, const void * pValue, char * szBuffer, int nBuf
 		 (typ==atom_HBRUSH) || (typ==atom_HPALETTE) || (typ==atom_HRGN) ||
 		 (typ==atom_HFONT) )
 	{         
-		TCHAR temp[32];
+		TCHAR temp[32] = {};
 		
 		unsigned objtyp = (data >> 16) & 0xFF;
 
-		if ( ! Lookup( objtyp & 0x7F, Dic_GdiObjectType, temp) )
-			_tcscpy(temp, "HGDIOBJ");
+		if ( ! Lookup( objtyp & 0x7F, Dic_GdiObjectType, temp, ARRAYSIZE(temp)) )
+			_tcscpy_s(temp, "HGDIOBJ");
 		
 		if ( objtyp & 0x80 )  // stock object
 			wsprintf(szBuffer, "(S%s)%x", temp, data & 0xFFFF);
