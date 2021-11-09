@@ -72,10 +72,10 @@ class KSpeedTest : public KDialog
 
 				report.FromDlgItem(hWnd, IDC_REPORT);
 
-				report.AddColumn(0, 120, "Test");
-				report.AddColumn(1,  80, "clock");
-				report.AddColumn(2,  80, "nanosec");
-				report.AddColumn(3,  80, "per-sec");
+				report.AddColumn(0, 180, "Primitive");
+				report.AddColumn(1,  80, "clock/oper");
+				report.AddColumn(2,  80, "ns/oper");
+				report.AddColumn(3,  78, "oper/sec");
 				
 				{
 					TCHAR speed[32], overhead[32];
@@ -85,11 +85,11 @@ class KSpeedTest : public KDialog
 				}
 
 				Measure();
-				Report(measurement[0]/10000, "SetPixel(RGB)");
-				Report(measurement[1]/10000, "SetPixel(PALETTERGB)");
-				Report(measurement[2]/10000, "SetPixel(PALETTEINDEX)");
-				Report(measurement[3]/10000, "SetPixelV(RGB)");
-				Report(measurement[4]/10000, "GetPixel()");
+				Report(measurement[0]/10000, "SetPixel(hDC, RGB)");
+				Report(measurement[1]/10000, "SetPixel(hDC, PALETTERGB)");
+				Report(measurement[2]/10000, "SetPixel(hDC, PALETTEINDEX)");
+				Report(measurement[3]/10000, "SetPixelV(hDC, RGB)");
+				Report(measurement[4]/10000, "GetPixel(hDC)");
 	
 				return TRUE;
 
@@ -97,6 +97,7 @@ class KSpeedTest : public KDialog
 				switch ( LOWORD(wParam) )
 				{
 					case IDOK:
+					case IDCANCEL:
 						EndDialog(hWnd, 1);
 						return TRUE;
 
