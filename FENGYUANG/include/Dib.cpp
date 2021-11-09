@@ -660,7 +660,7 @@ DWORD KDIB::GetPixelIndex(int x, int y) const
 			return ( pPixel[x/4] >> Shift2bpp[x%4] ) & 0x03;
 
 		case DIB_4BPP:
-			return ( pPixel[x/2] >> Shift4bpp[x%4] ) & 0x0F;
+			return ( pPixel[x/2] >> Shift4bpp[x%2] ) & 0x0F;
 
 		case DIB_8BPP:
 			return pPixel[x];
