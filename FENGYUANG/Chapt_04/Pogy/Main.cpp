@@ -17,6 +17,8 @@
 #include <commctrl.h>
 #include <assert.h>
 
+#define JULAYOUT_IMPL
+
 #include "..\..\include\win.h"
 #include "..\..\include\property.h"
 

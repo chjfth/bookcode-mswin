@@ -156,9 +156,9 @@ void KMyFuncTable::FuncExitCallBack(KRoutineInfo *routine, ExitInfo *info, unsig
         {
 			TCHAR fullname[64];
 
-			_tcscpy(fullname, CallerName(m_func[funcid].f_module));		// caller module
-			_tcscat(fullname, "!");
-			_tcscat(fullname, name);
+			_tcscpy_s(fullname, CallerName(m_func[funcid].f_module));		// caller module
+			_tcscat_s(fullname, "!");
+			_tcscat_s(fullname, name);
 
 			ApiLog.WriteField(fullname);								// function
 		}

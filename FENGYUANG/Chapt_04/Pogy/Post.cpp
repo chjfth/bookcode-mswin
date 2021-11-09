@@ -18,7 +18,9 @@
 
 #include "..\Diver\Diver.h"
 
-#define nCopy(dest, src) { dest[sizeof(dest)-1] = 0; strncpy(dest, src, sizeof(dest)-1); }
+#define nCopy(dest, src) do \
+	{ dest[ARRAYSIZE(dest)-1] = 0; strncpy_s(dest, src, ARRAYSIZE(dest)-1); } \
+	while(0)
 
 
 int KPost::LoadModule(const char *caller, const char *callee,
@@ -62,7 +64,7 @@ int KPost::AddFunc(const char *name, unsigned cls, int parano, const char * para
 	af.m_oldaddress = pOldAddr;
 
 	if ( strlen(paratype) < sizeof(af.m_paratype) )
-		strcpy(af.m_paratype, paratype);
+		strcpy_s(af.m_paratype, paratype);
 	else
 		assert(false);
 

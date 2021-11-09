@@ -43,7 +43,7 @@ ATOM KAtomTable::AddAtom(const char *name)
 
 	// search for it
 	for (int i=1; i<m_names; i++)
-		if ( stricmp(name, m_name[i])==0 )
+		if ( _stricmp(name, m_name[i])==0 )
 			return (ATOM) i;
 
     if ( m_bufpos+len >= MAX_BUFFER )
@@ -54,7 +54,7 @@ ATOM KAtomTable::AddAtom(const char *name)
            
     m_name[m_names] = m_buffer + m_bufpos;
     
-	strcpy(m_buffer + m_bufpos, name);
+	strcpy_s(m_buffer+m_bufpos, ARRAYSIZE(m_buffer)-m_bufpos, name);
     m_bufpos += len;
     m_buffer[m_bufpos++] = 0;
 

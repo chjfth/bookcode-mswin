@@ -44,7 +44,7 @@ LRESULT KEventPage::MonitorWindow(HWND hWnd, int oper, const char *owner)
         owner = strchr(owner, '\\') + 1;
 
     if ( ApiTable.MainTarget() )
-    if ( stricmp(owner, ApiTable.MainTarget())==0 )
+    if ( _stricmp(owner, ApiTable.MainTarget())==0 )
     {
          
         if (StartTime==0)
@@ -116,18 +116,18 @@ BOOL KEventPage::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		                GetWindowText((HWND) msg->m_para, t+1, sizeof(t)-2);
 				            
                         if ( pcds->dwData==M_CREATE )
-                            strcat(t, "\' created");
+                            strcat_s(t, "\' created");
                         else
-                            strcat(t, "\' destroyed");
+                            strcat_s(t, "\' destroyed");
 
                         if ( strlen(msg->m_text) )
-                            strcat(t, " by ");
+                            strcat_s(t, " by ");
 
                         lr = MonitorWindow((HWND) msg->m_para, pcds->dwData, msg->m_text);
                         break;
 
                    case M_ENTER: 
-                        strcpy(t, "=> "); 
+                        strcpy_s(t, "=> "); 
 
                         if (hMailBox)
                             SendMessage(hMailBox, WM_USER, 0x12345678, msg->m_para);
@@ -156,11 +156,11 @@ BOOL KEventPage::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         break;
 
 				   case M_TEXT:
-						strcpy(t, "Diver: ");
+						strcpy_s(t, "Diver: ");
 						break;
 
                    default: 
-                        strcpy(t, "Unknown "); break;
+                        strcpy_s(t, "Unknown "); break;
                 }
 
                 unsigned time = msg->m_tick - StartTime;
@@ -168,8 +168,8 @@ BOOL KEventPage::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 wsprintf(temp, "(%d)  %d:%02d.%03d ", lr, time / 60000, 
                                                 time / 1000 % 60, 
                                                 time % 1000);
-                strcat(temp, t);
-                strcat(temp, msg->m_text);
+                strcat_s(temp, t);
+                strcat_s(temp, msg->m_text);
                 SendDlgItemMessage(hWnd, IDC_EVENT, LB_ADDSTRING, 0, (LPARAM) temp);
 
                 return lr;

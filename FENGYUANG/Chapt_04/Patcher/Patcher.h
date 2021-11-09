@@ -6,39 +6,43 @@
 //  Copyright (c) 2000 by  Hewlett-Packard Company                www.hp.com         //
 //  Published          by  Prentice Hall PTR, Prentice-Hall, Inc. www.phptr.com      //
 //                                                                                   //
-//  FileName   : report.cpp				                                             //
-//  Description: Send report to spy control program                                  //
+//  FileName   : patcher.h				                                             //
+//  Description: API hacking by target relocation                                    //
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
-#define NOCRYPT
+#pragma once
 
-#include <windows.h>
-#include <tchar.h>
-
-#include "Report.h"
-
-// Report to Client
-
-extern HWND h_Controller;
-
-LRESULT Send(unsigned id, unsigned para, unsigned time, const TCHAR *messtext)
+class KPatcher  
 {
-    COPYDATASTRUCT cds;
-    ReportMessage  rpt;
+	typedef enum { MaxBufferSize = 16384 };
 
-    memset(& rpt, 0, sizeof(rpt));
+	char	  m_buffer[MaxBufferSize];
+	int		  m_bufpos;
 
-    rpt.m_para = para;
-    rpt.m_time = time;
-    rpt.m_tick = GetTickCount();
+	void Asm(char ch)
+	{
+		m_buffer[m_bufpos++] = ch;
+	}
 
-    if ( messtext )
-        _tcsncpy_s(rpt.m_text, messtext, ARRAYSIZE(rpt.m_text));
+	void Asm(unsigned long data)
+	{
+		* ( (unsigned long *) (m_buffer+m_bufpos) ) = data;
+		m_bufpos += sizeof(unsigned long);
+	}
 
-    cds.dwData = id;
-    cds.cbData = sizeof(rpt);
-    cds.lpData = (void *) & rpt;
+	void AsmRel(void * ptr)
+	{
+		Asm((unsigned long ) ptr - (unsigned long) (m_buffer+m_bufpos+4));
+	}
 
-    return SendMessage(h_Controller, WM_COPYDATA, NULL, (LPARAM) & cds);
-}
+public:
+	
+	KPatcher()
+	{
+		m_bufpos = 0;
+	}
+
+	bool Patch(HMODULE hModule, const TCHAR * name, int funcid, void * pProxy,
+		       unsigned long *pNewAddress);
+};

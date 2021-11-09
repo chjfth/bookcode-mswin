@@ -36,10 +36,10 @@ BOOL KProfile::SetFileName(HINSTANCE hInstance, const TCHAR *filename)
             else
                 p = strchr(p, '\\') + 1;
 
-        strcpy(p, filename);
+        strcpy_s(p, ARRAYSIZE(sFileName), filename);
     }
     else
-        strcpy(sFileName, filename);
+        strcpy_s(sFileName, ARRAYSIZE(sFileName), filename);
 
     return OpenFile(sFileName, &ofs, OF_EXIST) != HFILE_ERROR;
 }

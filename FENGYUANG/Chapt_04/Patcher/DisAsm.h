@@ -6,39 +6,26 @@
 //  Copyright (c) 2000 by  Hewlett-Packard Company                www.hp.com         //
 //  Published          by  Prentice Hall PTR, Prentice-Hall, Inc. www.phptr.com      //
 //                                                                                   //
-//  FileName   : report.cpp				                                             //
-//  Description: Send report to spy control program                                  //
+//  FileName   : disasm.h				                                             //
+//  Description: Intel machine code parser                                           //
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
-#define NOCRYPT
+#pragma once
 
-#include <windows.h>
-#include <tchar.h>
+#include "OpCode.h"
 
-#include "Report.h"
-
-// Report to Client
-
-extern HWND h_Controller;
-
-LRESULT Send(unsigned id, unsigned para, unsigned time, const TCHAR *messtext)
+class KDisAsm  
 {
-    COPYDATASTRUCT cds;
-    ReportMessage  rpt;
+	const char * m_funcname;
+	bool		 m_error;
 
-    memset(& rpt, 0, sizeof(rpt));
+public:
+	KDisAsm();
+	virtual ~KDisAsm();
 
-    rpt.m_para = para;
-    rpt.m_time = time;
-    rpt.m_tick = GetTickCount();
+	int OperandLen(const OpCode * map, unsigned opcode, int opndsize, int & modrm);
+	int Length(const unsigned char * code, const char * funcname);
+};
 
-    if ( messtext )
-        _tcsncpy_s(rpt.m_text, messtext, ARRAYSIZE(rpt.m_text));
-
-    cds.dwData = id;
-    cds.cbData = sizeof(rpt);
-    cds.lpData = (void *) & rpt;
-
-    return SendMessage(h_Controller, WM_COPYDATA, NULL, (LPARAM) & cds);
-}
+int First5(const unsigned char * pProc, const char * funcname);

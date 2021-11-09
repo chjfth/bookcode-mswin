@@ -170,7 +170,7 @@ int KBasicDecoder::Decode(ATOM typ, const void * pValue, char * szBuffer, int nB
 	if ( (typ==atom_LPVOID) || (typ==atom_this) )
 	{
 		if ( data==0 )
-			strcpy(szBuffer, "NULL");
+			strcpy_s(szBuffer, nBufferSize, "NULL");
 		else
 			wsprintf(szBuffer, "0x%x", data);
 
@@ -180,9 +180,9 @@ int KBasicDecoder::Decode(ATOM typ, const void * pValue, char * szBuffer, int nB
 	if ( typ==atom_COLORREF )
 	{
 		if ( data==0 )
-			strcpy(szBuffer, "BLACK");
+			strcpy_s(szBuffer, nBufferSize, "BLACK");
 		else if ( data==0xFFFFFF )
-			strcpy(szBuffer, "WHITE");
+			strcpy_s(szBuffer, nBufferSize, "WHITE");
 		else
 			wsprintf(szBuffer, "%06x", data);
 
@@ -192,12 +192,12 @@ int KBasicDecoder::Decode(ATOM typ, const void * pValue, char * szBuffer, int nB
 	if ( typ==atom_LPSTR )
 	{
 		if ( data==0 )
-			strcpy(szBuffer, "NULL");
+			strcpy_s(szBuffer, nBufferSize, "NULL");
 		else
 		{
 			* szBuffer='"';
-			strcpy(szBuffer+1, (const char *) data);
-			strcat(szBuffer, """");
+			strcpy_s(szBuffer+1, nBufferSize-1, (const char *) data);
+			strcat_s(szBuffer, nBufferSize-1, "\""); // Chj: string fix
 		}
 
 		return 4;
@@ -206,9 +206,9 @@ int KBasicDecoder::Decode(ATOM typ, const void * pValue, char * szBuffer, int nB
 	if ( typ==atom_BOOL )
 	{
 		if ( data==0 )
-			strcpy(szBuffer, "FALSE");
+			strcpy_s(szBuffer, nBufferSize, "FALSE");
 		else if ( data==1 )
-			strcpy(szBuffer, "TRUE");
+			strcpy_s(szBuffer, nBufferSize, "TRUE");
 		else
 			wsprintf(szBuffer, "%d", data);
 

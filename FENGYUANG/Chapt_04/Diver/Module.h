@@ -13,7 +13,9 @@
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
-#define Copy(dest, src) { dest[sizeof(dest)-1] = 0; strncpy(dest, src, sizeof(dest)-1); }
+#define Copy(dest, src) do \
+	{ dest[ARRAYSIZE(dest)-1] = 0; strncpy_s(dest, src, ARRAYSIZE(dest)); } \
+	while(0)
 
 class KInterface
 {        

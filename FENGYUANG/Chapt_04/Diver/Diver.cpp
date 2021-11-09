@@ -205,7 +205,7 @@ IDecoder * KDiver::InstallExternalDecoders(IDecoder * pChain, HINSTANCE hInst)
 		return pChain;
 
 	TCHAR szSeq[32];
-	_tcscpy(szSeq, "Decoder1");
+	_tcscpy_s(szSeq, "Decoder1");
 
 	while ( pro.ReadString("Option", szSeq) )
 	{
@@ -237,9 +237,9 @@ IDecoder * KDiver::InstallExternalDecoders(IDecoder * pChain, HINSTANCE hInst)
 						pNew->pNextDecoder = pChain;
 						pChain = pNew;
 
-						_tcscat(module, "!");
-						_tcscat(module, name);
-						_tcscat(module, " installed.");
+						_tcscat_s(module, "!");
+						_tcscat_s(module, name);
+						_tcscat_s(module, " installed.");
 						Send(M_TEXT, 0, 0, module);
 					}
 					else

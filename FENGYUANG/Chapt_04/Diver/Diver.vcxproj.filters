@@ -96,7 +96,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="spy.ico">
+    <CustomBuild Include="..\..\Res\spy.ico">
       <Filter>Resource Files</Filter>
     </CustomBuild>
   </ItemGroup>

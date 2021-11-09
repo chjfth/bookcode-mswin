@@ -52,8 +52,8 @@ BOOL HackMethod(unsigned vtable, int n, FARPROC newfunc)
 int KModuleTable::LookupModule(const char *caller, const char *callee)
 {
     for (int i=0; i<m_moduleno; i++)
-        if ( (stricmp(m_modules[i].m_caller, caller)==0) &&
-             (stricmp(m_modules[i].m_callee, callee)==0) )
+        if ( (_stricmp(m_modules[i].m_caller, caller)==0) &&
+             (_stricmp(m_modules[i].m_callee, callee)==0) )
             return i;
 
     return -1;
@@ -91,7 +91,7 @@ int KModuleTable::LoadModule(const char *caller, const char *callee,
 
 //  char temp[64];
     
-//  wsprintf(temp, "Loadlibrary(%s)=%x", callee, m_modules[m_moduleno].m_handle);
+//  wsprintf(temp, "LoadLibrary(%s)=%x", callee, m_modules[m_moduleno].m_handle);
 //  MessageBox(NULL, temp, "LoadModule", MB_OK);
 
     if (m_modules[m_moduleno].m_handle == NULL)

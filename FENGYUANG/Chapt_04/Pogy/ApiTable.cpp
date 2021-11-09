@@ -44,7 +44,7 @@ BOOL KTarget::ParseMethod(KProfile & Profile, KMethod & Method)
 
 	TCHAR szParaName[MAX_PATH];
 
-	_tcscpy(szParaName, sTypeName);
+	_tcscpy_s(szParaName, sTypeName);
 
     Profile.ReadIdentifier(sName, sizeof(sName));
                     
@@ -58,9 +58,9 @@ BOOL KTarget::ParseMethod(KProfile & Profile, KMethod & Method)
             //  if (Method.nParaNo < MAXPARANO)
 				{
 					if ( Method.nParaNo )
-						strcat(szParaName, " ");
+						strcat_s(szParaName, " ");
 
-                    strcat(szParaName, sTypeName);
+                    strcat_s(szParaName, sTypeName);
 					Method.nParaNo ++;
 				}
             //  else
@@ -123,8 +123,8 @@ int KTarget::ParseAPISet(HINSTANCE hInstance, const char * szAPISetName, KMethod
 	KProfile pro;
 	TCHAR sName[MAX_PATH];
 
-	_tcscpy(sName, szAPISetName);
-	_tcscat(sName, ".ini");
+	_tcscpy_s(sName, szAPISetName);
+	_tcscat_s(sName, ".ini");
 
 	if ( ! pro.SetFileName(hInstance, sName) )
 		return 0;
@@ -138,8 +138,8 @@ int KTarget::ParseAPISet(HINSTANCE hInstance, const char * szAPISetName, KMethod
 			no ++;
 		}
 
-	_tcscpy(sName, "COM_");
-	_tcscat(sName, szAPISetName);	// eg: [COM_ddraw]
+	_tcscpy_s(sName, "COM_");
+	_tcscat_s(sName, szAPISetName);	// eg: [COM_ddraw]
 
 	if ( pro.ReadSection(sName) )
 	{
@@ -180,7 +180,7 @@ void KTarget::Initialize(HINSTANCE hInstance, const TCHAR *Target, const TCHAR *
     TCHAR    sName[64];
     KMethod  Method;
 
-    _tcscpy(TargetName, Target);
+    _tcscpy_s(TargetName, Target);
 
     InterfaceTable_nElement = 0;
     MethodTable_nElement = 0;
@@ -343,8 +343,9 @@ int KApiTable::AddTargets(HINSTANCE hInstance, HWND hWnd)
                 cont = TRUE;
 
                 if ( strlen(TargetList) )
-                    strcat(TargetList, ", ");
-                strcat(TargetList, Target);
+                    strcat_s(TargetList, ", ");
+                
+				strcat_s(TargetList, Target);
             }
 
             if ( !cont || ! Profile.ReadDelimiter(',') )
@@ -427,7 +428,8 @@ int KApiTable::Add2ListView(KListView & listview)
 {
     listview.DeleteAll();
 
-    for (int i=0, sum=0; i<TargetNo; i++)
+	int sum = 0, i;
+    for (i=0; i<TargetNo; i++)
         sum += TargetList[i]->Add2ListView(listview);
     
     return sum;

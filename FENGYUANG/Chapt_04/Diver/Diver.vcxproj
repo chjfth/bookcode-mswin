@@ -174,7 +174,12 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="spy.ico" />
+    <CustomBuild Include="..\..\Res\spy.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Patcher\Patcher.vcxproj">
+      <Project>{541c6321-e2f5-c88a-e78c-6c149922b2e7}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
