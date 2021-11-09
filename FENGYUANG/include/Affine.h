@@ -69,7 +69,7 @@ class KReverseAffine : public KAffine
 public:
 	int minx, maxx, miny, maxy;
 
-	KReverseAffine(const POINT * pPoint)
+	KReverseAffine(const POINT pPoint[3])
 	{
 		x0 = pPoint[0].x;	//   P0       P1
 		y0 = pPoint[0].y;	//

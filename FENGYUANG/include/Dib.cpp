@@ -730,7 +730,7 @@ BOOL  KDIB::SetPixelIndex(int x, int y, DWORD index)
 }
 
 
-BOOL KDIB::PlgBlt(const POINT * pPoint, 
+BOOL KDIB::PlgBlt(const POINT pPoint[3], 
 				   KDIB * pSrc, int nXSrc, int nYSrc, int nWidth, int nHeight)
 {
 	KReverseAffine map(pPoint);
@@ -738,14 +738,16 @@ BOOL KDIB::PlgBlt(const POINT * pPoint,
 	map.Setup(nXSrc, nYSrc, nWidth, nHeight);
 
 	for (int dy=map.miny; dy<=map.maxy; dy++)
-	for (int dx=map.minx; dx<=map.maxx; dx++)
 	{
-		float sx, sy;
-		map.Map(dx, dy, sx, sy);
+		for (int dx=map.minx; dx<=map.maxx; dx++)
+		{
+			float sx, sy;
+			map.Map(dx, dy, sx, sy);
 
-		if ( (sx>=nXSrc) && (sx<(nXSrc+nWidth))  )
-		if ( (sy>=nYSrc) && (sy<(nYSrc+nHeight)) )
-			SetPixelIndex(dx, dy, pSrc->GetPixelIndex( (int)sx, (int)sy));
+			if ( (sx>=nXSrc) && (sx<(nXSrc+nWidth))  )
+				if ( (sy>=nYSrc) && (sy<(nYSrc+nHeight)) )
+					SetPixelIndex(dx, dy, pSrc->GetPixelIndex( (int)sx, (int)sy));
+		}
 	}
 
 	return TRUE;
@@ -774,7 +776,7 @@ BOOL KDIB::PlgBltGetPixel(const POINT * pPoint,
 }
 
 
-BOOL KDIB::PlgBlt24(const POINT * pPoint, 
+BOOL KDIB::PlgBlt24(const POINT pPoint[3], 
 				   KDIB * pSrc, int nXSrc, int nYSrc, int nWidth, int nHeight)
 {
 	// factor to change FLOAT to fixed point

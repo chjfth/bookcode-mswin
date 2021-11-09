@@ -146,10 +146,10 @@ public:
 			HDC hSrc, int nXSrc, int nYSrc, int nWidth, int nHeight, HDC hDst);
 
 	// transformation using GetPixelIndex/SetPixelIndex
-	BOOL  PlgBlt(const POINT * pPoint, KDIB * pSrc, int nXSrc, int nYSrc, int nWidth, int nHeight);
+	BOOL  PlgBlt(const POINT pPoint[3], KDIB * pSrc, int nXSrc, int nYSrc, int nWidth, int nHeight);
 
 	// transformation using inline function + integer only operations
-	BOOL  PlgBlt24(const POINT * pPoint, KDIB * pSrc, int nXSrc, int nYSrc, int nWidth, int nHeight);
+	BOOL  PlgBlt24(const POINT pPoint[3], KDIB * pSrc, int nXSrc, int nYSrc, int nWidth, int nHeight);
 
 	enum { method_gdi, method_direct, method_24bpp };
 	HBITMAP TransformBitmap(XFORM * xm, COLORREF crBack, int method);
