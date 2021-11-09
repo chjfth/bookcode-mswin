@@ -7,7 +7,7 @@
 //  Published          by  Prentice Hall PTR, Prentice-Hall, Inc. www.phptr.com      //
 //                                                                                   //
 //  FileName   : hello2.cpp						                                     //
-//  Description: Hellow World Demo 2, full screen display, Chapter 1                 //
+//  Description: Hello World Demo 2, full screen display, Chapter 1                 //
 //  Version    : 1.00.001, July 26, 2000                                             //
 //-----------------------------------------------------------------------------------//
 
@@ -41,7 +41,12 @@ const TCHAR szMessage[] = _T("Hello, World");
 const TCHAR szFace[]    = _T("Times New Roman");
 
 #pragma comment(linker, "-merge:.rdata=.text")
+
+#if _MSC_VER<1600
+// [2021-11-10] Chj: On VC2010(_MSC_VER==1600), setting -align:512 causes this
+// generated Win32 fail to launch, reported as "not a valid Win32 application" on run.
 #pragma comment(linker, "-align:512")
+#endif
 
 extern "C" void WinMainCRTStartup()
 {
