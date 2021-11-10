@@ -61,6 +61,7 @@ LRESULT KWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 
 // Generic window procedure passed to WIN32 API, dispatches to KWindow::WndProc
+// -- this is C++ static func.
 LRESULT CALLBACK KWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	KWindow * pWindow;
@@ -79,7 +80,7 @@ LRESULT CALLBACK KWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		pWindow = (KWindow *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	if ( pWindow )
-		return pWindow->WndProc(hWnd, uMsg, wParam, lParam);
+		return pWindow->WndProc(hWnd, uMsg, wParam, lParam); // this is C++ virtual func
 	else
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
