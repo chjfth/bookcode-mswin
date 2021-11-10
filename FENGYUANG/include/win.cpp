@@ -118,8 +118,7 @@ bool KWindow::CreateEx(DWORD dwExStyle, LPCTSTR lpszClass, LPCTSTR lpszName, DWO
 		return false;
 
 	// Use MDICREATESTRUCT to support MDI child window
-	MDICREATESTRUCT mdic;
-	memset(& mdic, 0, sizeof(mdic));
+	MDICREATESTRUCT mdic = {};
 	mdic.lParam = (LPARAM) this;
 
 	m_hWnd = CreateWindowEx(dwExStyle, lpszClass, 
@@ -256,9 +255,8 @@ LRESULT KWindow::OnPaletteChanged(HWND hWnd, WPARAM wParam)
 
 int MyMessageBox(HWND hWnd, const TCHAR * text, const TCHAR * caption, DWORD style, int iconid)
 {
-	MSGBOXPARAMS param;
+	MSGBOXPARAMS param = {};
 
-	memset(& param, 0, sizeof(param));
 	param.cbSize	  = sizeof(param);
 	param.hwndOwner   = hWnd;
 	param.hInstance   = GetModuleHandle(NULL);

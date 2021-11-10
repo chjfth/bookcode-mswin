@@ -115,9 +115,7 @@ bool KDDrawWindow::CreateSurface(void)
     if (hr!=DD_OK) 
         return false;
 
-    DDSURFACEDESC ddsd;
-    memset(& ddsd, 0, sizeof(ddsd));
-    ddsd.dwSize = sizeof(ddsd);
+	DDSURFACEDESC ddsd = {sizeof(ddsd)};
     ddsd.dwFlags = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
 
@@ -136,17 +134,20 @@ void inline Blend(unsigned char *dest, unsigned char *src)
 
 void KDDrawWindow::Blend(int left, int right, int top, int bottom)
 {
-    DDSURFACEDESC ddsd;
-
-    memset(&ddsd, 0, sizeof(ddsd));
-    ddsd.dwSize = sizeof(ddsd);
+	DDSURFACEDESC ddsd = {sizeof(ddsd)};
 
     HRESULT hr = lpddsprimary->Lock(NULL, &ddsd, 
         DDLOCK_SURFACEMEMORYPTR | DDLOCK_WAIT, NULL);
     
-	assert(hr==DD_OK);
+	//assert(hr==DD_OK);
 	// -- Chj: This assert is not reasonable. When user Alt+Tab switches to another program,
 	// we'll get hr=0x887601c2 (DDERR_SURFACELOST).
+
+	if(hr!=DD_OK)
+	{
+		assert(ddsd.lpSurface==NULL); // we did not get a "surface" pointer
+		return;
+	}
 
     unsigned char *screen = (unsigned char *) ddsd.lpSurface;
 

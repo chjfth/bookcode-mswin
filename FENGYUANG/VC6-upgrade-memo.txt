@@ -16,3 +16,8 @@ typedef enum { ... };
 Should only write enum { ... };
 
 [*] VS2019 not-friendly option: <MinimalRebuild>true</MinimalRebuild>
+
+[2021-11-10] To build DirectX programs on VS2010, we need DXSDK Jun 2007, and
+set env-var DIR_DXSDK to point to its root dir (see UseDirectX.props).
+
+
