@@ -32,6 +32,12 @@ void CenterText(HDC hDC, int x, int y, LPCTSTR szFace, LPCTSTR szMessage, int po
 							 ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, 
 							 PROOF_QUALITY, VARIABLE_PITCH, szFace);
 
+	int oldlimit = GdiSetBatchLimit(1); // 1=No Batch
+	// -- Chj: With no-batch enabled, We will see that TextOut() causes the big blue text
+	// to appear on screen immediately as soon as TextOut is called. Otherwise, the blue
+	// text appearance is delayed until DeleteObject(hFont) is called.
+	// 2021.11.10, verified on Windows XP. Remote debugging exhibits this clearly.
+
     HGDIOBJ hOld = SelectObject(hDC, hFont);
 
     SetTextAlign(hDC, TA_CENTER | TA_BASELINE);
@@ -42,6 +48,8 @@ void CenterText(HDC hDC, int x, int y, LPCTSTR szFace, LPCTSTR szMessage, int po
 
     SelectObject(hDC, hOld);
     DeleteObject(hFont);
+
+	GdiSetBatchLimit(oldlimit);
 }
 
 const TCHAR szMessage[] = _T("Hello, World");

@@ -66,9 +66,9 @@ class KDDrawWindow : public KWindow
     void OnDraw(HDC hDC)
     {
         TextOut(hDC, 0, 0, szHint, lstrlen(szHint));
-        CenterText(hDC, GetSystemMetrics(SM_CXSCREEN)/2,
-	    GetSystemMetrics(SM_CYSCREEN)/2,
-	    szFace, szMessage, 48);
+        CenterText(hDC, 
+			GetSystemMetrics(SM_CXSCREEN)/2, GetSystemMetrics(SM_CYSCREEN)/2,
+		    szFace, szMessage, 48);
 
         Blend(80, 560, 160, 250);
     }
@@ -121,7 +121,8 @@ bool KDDrawWindow::CreateSurface(void)
     ddsd.dwFlags = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
 
-    return lpdd->CreateSurface(&ddsd, &lpddsprimary, NULL)==DD_OK;
+    hr = lpdd->CreateSurface(&ddsd, &lpddsprimary, NULL);
+	return hr==DD_OK;
 }
 
 
@@ -133,8 +134,7 @@ void inline Blend(unsigned char *dest, unsigned char *src)
 }
 
 
-void KDDrawWindow::Blend(int left, int right, 
-                         int top, int bottom)
+void KDDrawWindow::Blend(int left, int right, int top, int bottom)
 {
     DDSURFACEDESC ddsd;
 
@@ -143,25 +143,28 @@ void KDDrawWindow::Blend(int left, int right,
 
     HRESULT hr = lpddsprimary->Lock(NULL, &ddsd, 
         DDLOCK_SURFACEMEMORYPTR | DDLOCK_WAIT, NULL);
-    assert(hr==DD_OK);
+    
+	assert(hr==DD_OK);
+	// -- Chj: This assert is not reasonable. When user Alt+Tab switches to another program,
+	// we'll get hr=0x887601c2 (DDERR_SURFACELOST).
 
     unsigned char *screen = (unsigned char *) ddsd.lpSurface;
 
     for (int y=top; y<bottom; y++)
     {
-        unsigned char * pixel = screen + y * ddsd.lPitch 
-           + left * 4;
+        unsigned char *pixel = screen + y*ddsd.lPitch + left*4;
 
         for (int x=left; x<right; x++, pixel+=4)
-            if ( pixel[0]!=255 || pixel[1]!=255 || 
-               pixel[2]!=255 ) // non white
-            {
-                ::Blend(pixel-4, pixel);           // left
-                ::Blend(pixel+4, pixel);           // right
+		{
+			if ( pixel[0]!=255 || pixel[1]!=255 || pixel[2]!=255 ) // non white
+			{
+				::Blend(pixel-4, pixel);           // left
+				::Blend(pixel+4, pixel);           // right
 
-                ::Blend(pixel-ddsd.lPitch, pixel); // up
-                ::Blend(pixel+ddsd.lPitch, pixel); // down
-            }
+				::Blend(pixel-ddsd.lPitch, pixel); // up
+				::Blend(pixel+ddsd.lPitch, pixel); // down
+			}
+		}
     }
 
     lpddsprimary->Unlock(ddsd.lpSurface);
