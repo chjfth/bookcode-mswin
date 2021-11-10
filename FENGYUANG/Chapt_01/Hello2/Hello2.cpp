@@ -11,6 +11,13 @@
 //  Version    : 1.00.001, July 26, 2000                                             //
 //-----------------------------------------------------------------------------------//
 
+/* Chj memo:
+
+Command line compiling:
+
+    cl hello2.cpp /UNICODE /Od /Zi /GS- /link /subsystem:windows kernel32.lib user32.lib gdi32.lib
+*/
+
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 
