@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hello3", "Hello3\Hello3.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hello4", "Hello4\Hello4.vcxproj", "{2B9C9D4C-AB1F-C723-089B-9E30FEF3F89C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GDISpeed", "GDISpeed\GDISpeed.vcxproj", "{64F83926-EDF8-26F3-4002-834D4F7B6FD9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{2B9C9D4C-AB1F-C723-089B-9E30FEF3F89C}.Debug|Win32.Build.0 = Debug|Win32
 		{2B9C9D4C-AB1F-C723-089B-9E30FEF3F89C}.Release|Win32.ActiveCfg = Release|Win32
 		{2B9C9D4C-AB1F-C723-089B-9E30FEF3F89C}.Release|Win32.Build.0 = Release|Win32
+		{64F83926-EDF8-26F3-4002-834D4F7B6FD9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{64F83926-EDF8-26F3-4002-834D4F7B6FD9}.Debug|Win32.Build.0 = Debug|Win32
+		{64F83926-EDF8-26F3-4002-834D4F7B6FD9}.Release|Win32.ActiveCfg = Release|Win32
+		{64F83926-EDF8-26F3-4002-834D4F7B6FD9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -16,6 +16,7 @@
 
 #include <windows.h>
 #include <tchar.h>
+#include <stdio.h>
 
 #include "..\..\include\timer.h"
 #include "resource.h"
@@ -45,14 +46,16 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCmd, int nShow)
     timer.Start(); 
 	Sleep(1000); 
     unsigned cpuspeed10 = (unsigned)(timer.Stop()/100000);
+	// -- cpu-ticks per 10-microsecond
     
     timer.Start(); 
     CreateSolidBrush(RGB(0xAA, 0xAA, 0xAA));
     unsigned time = (unsigned) timer.Stop();
 
-    wsprintf(mess, _T("CPU speed       %d.%d mhz\n")
+    _sntprintf_s(mess, ARRAYSIZE(mess),
+		_T("CPU speed       %d.%d MHz\n")
         _T("KTimer overhead %d clock cycles\n")
-        _T("CreateSolidBrush %d clock cycles %d ns"),
+        _T("CreateSolidBrush %d clock cycles, %d ns"),
         cpuspeed10 / 10,  cpuspeed10 % 10,
         (unsigned) timer.m_overhead,
         time, time * 10000 / cpuspeed10);

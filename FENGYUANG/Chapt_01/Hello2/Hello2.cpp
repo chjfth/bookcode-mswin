@@ -16,6 +16,9 @@
 Command line compiling:
 
     cl hello2.cpp /UNICODE /Od /Zi /GS- /link /subsystem:windows kernel32.lib user32.lib gdi32.lib
+
+On VS2015+, append extra lib: libucrt.lib
+
 */
 
 #define STRICT

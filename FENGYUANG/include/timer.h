@@ -17,6 +17,7 @@
 
 inline unsigned __int64 GetCycleCount(void)
 {
+	// Chj memo: Read RDTSC counter, result in EDX:EAX
     _asm    _emit 0x0F
     _asm    _emit 0x31
 }
@@ -43,6 +44,6 @@ public:
 
     unsigned __int64 Stop(void)
     {
-        return GetCycleCount()-m_startcycle-m_overhead;
+        return GetCycleCount() - m_startcycle - m_overhead;
     }
 };
