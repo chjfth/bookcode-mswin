@@ -14,6 +14,8 @@ DigClock.cpp -- Updated by Chj, 2021.11.
 #include <windows.h>
 #include <windowsx.h>
 
+#include "resource.h"
+
 void dbgprint(const TCHAR *fmt, ...)
 {
 	static int count = 0;
@@ -41,6 +43,20 @@ void dbgprint(const TCHAR *fmt, ...)
 	va_end(args);
 
 	OutputDebugString(buf);
+}
+
+void ShowHelp(HWND hwndParent)
+{
+	static TCHAR *s_help =
+		_T("To Move the clock window:\r\n")
+		_T("(1) Click and drag with mouse left button.\r\n")
+		_T("(2) Use keyboard arrow keys, pixel by pixel. Press Ctrl key to accelerate.\r\n")
+		_T("\r\n")
+		_T("To change digit color: \r\n")
+		_T("(1) Left click on the clock for next color.\r\n")
+		_T("(2) Ctrl + Left-click to cycle back.\r\n")
+		;
+	MessageBox(hwndParent, s_help, _T("Help"), MB_OK);
 }
 
 #define ID_TIMER    1
@@ -73,10 +89,13 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
+	POINT mousepos = {};
+	GetCursorPos(&mousepos);
+
 	hwnd = CreateWindowEx (WS_EX_DLGMODALFRAME,
 		szAppName, TEXT ("Digital Clock"),
 		WS_POPUPWINDOW|WS_THICKFRAME,  // WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		mousepos.x, mousepos.y,
 		160, 60, // CW_USEDEFAULT, CW_USEDEFAULT, 
 		NULL, NULL, hInstance, NULL) ;
 
@@ -91,6 +110,30 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		DispatchMessage (&msg) ;
 	}
 	return msg.wParam ;
+}
+
+static COLORREF s_colors[] = 
+{
+	RGB(0x54, 0x84, 0x14), // swamp green
+	RGB(0x30, 0xA0, 0xD0), // dyeing blue
+	RGB(0xD4, 0x62, 0x62), // dark red
+	RGB(0xC0, 0x30, 0xFF), // shining purple
+	RGB(0x70, 0x42, 0x14), // brown
+	RGB(0xF8, 0x60, 0x30), // deep orange
+	RGB(0xff, 0x00, 0xff), // magenta
+	RGB(0xff, 0x00, 0x00), // full red
+};
+
+int Get_NewColorIdx(int old, int shift)
+{
+	int total = ARRAYSIZE(s_colors);
+	int idxnew = old + shift;
+	if(idxnew>=total)
+		idxnew = 0;
+	else if(idxnew<0)
+		idxnew = total-1;
+	
+	return idxnew;
 }
 
 void DisplayDigit (HDC hdc, int iNumber)
@@ -164,6 +207,21 @@ void DisplayTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 	DisplayTwoDigits (hdc, st.wSecond, FALSE) ;
 }
 
+static BOOL   f24Hour, fSuppress ;
+//
+void ReloadSetting(HWND hwnd)
+{
+	TCHAR         szBuffer [2] ;
+
+	GetLocaleInfo (LOCALE_USER_DEFAULT, LOCALE_ITIME, szBuffer, 2) ;
+	f24Hour = (szBuffer[0] == '1') ;
+
+	GetLocaleInfo (LOCALE_USER_DEFAULT, LOCALE_ITLZERO, szBuffer, 2) ;
+	fSuppress = (szBuffer[0] == '0') ;
+
+	InvalidateRect (hwnd, NULL, TRUE) ;
+}
+
 void MoveWindow_byOffset(HWND hwnd, int offsetx, int offsety)
 {
 	RECT oldrect = {};
@@ -172,34 +230,50 @@ void MoveWindow_byOffset(HWND hwnd, int offsetx, int offsety)
 		oldrect.right-oldrect.left, oldrect.bottom-oldrect.top, TRUE);
 }
 
+void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop)
+{
+	SetWindowPos(hwnd, 
+		istop? HWND_TOPMOST : HWND_NOTOPMOST,
+		0,0,0,0, SWP_NOMOVE|SWP_NOSIZE
+		);
+}
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static BOOL   f24Hour, fSuppress ;
-	static HBRUSH hBrushRed ;
+//	static HBRUSH hBrushRed ;
 	static int    cxClient, cyClient ;
 	HDC           hdc ;
 	PAINTSTRUCT   ps ;
-	TCHAR         szBuffer [2] ;
+
+	static HMENU s_popmenu;
+	static bool s_is_always_on_top = true;
 
 	static POINT s_pos_mousedown; // client-area position
 	static bool s_is_dragging = false;
+	static bool s_is_moved = false;
+	static int s_idxcolor = 0;
+
+	bool isCtrl = GetKeyState(VK_CONTROL)<0;
 
 	switch (message)
 	{{
 	case WM_CREATE:
-		hBrushRed = CreateSolidBrush (RGB (0, 160, 0)) ;
+	{
 		SetTimer (hwnd, ID_TIMER, 1000, NULL) ;
 
-		// fall through
+		if(!s_popmenu)
+		{
+			s_popmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MENU1));
+			s_popmenu = GetSubMenu(s_popmenu, 0) ; 
+		}
 
+		Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
+
+		ReloadSetting(hwnd);
+		return 0;
+	}
 	case WM_SETTINGCHANGE:
-		GetLocaleInfo (LOCALE_USER_DEFAULT, LOCALE_ITIME, szBuffer, 2) ;
-		f24Hour = (szBuffer[0] == '1') ;
-
-		GetLocaleInfo (LOCALE_USER_DEFAULT, LOCALE_ITLZERO, szBuffer, 2) ;
-		fSuppress = (szBuffer[0] == '0') ;
-
-		InvalidateRect (hwnd, NULL, TRUE) ;
+		ReloadSetting(hwnd);
 		return 0 ;
 
 	case WM_SIZE:
@@ -212,7 +286,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_PAINT:
+	{
 		hdc = BeginPaint (hwnd, &ps) ;
+		HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
 
 		SetMapMode (hdc, MM_ISOTROPIC) ;
 		SetWindowExtEx (hdc, 276, 72, NULL) ;
@@ -222,16 +298,22 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetViewportOrgEx (hdc, cxClient / 2, cyClient / 2, NULL) ;
 
 		SelectObject (hdc, GetStockObject (NULL_PEN)) ;
-		SelectObject (hdc, hBrushRed) ;
+		SelectObject (hdc, hbrush) ;
 
 		DisplayTime (hdc, f24Hour, fSuppress) ;
 
 		EndPaint (hwnd, &ps) ;
+
+		SelectObject(hdc, GetStockBrush(WHITE_BRUSH));
+		DeleteObject(hbrush);
+
 		return 0 ;
+	}
 
 	case WM_LBUTTONDOWN:
 	{
 		s_is_dragging = true;
+		s_is_moved = false;
 		SetCapture(hwnd);
 
 		s_pos_mousedown.x = GET_X_LPARAM(lParam);
@@ -247,6 +329,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		int offsetx = GET_X_LPARAM(lParam) - s_pos_mousedown.x;
 		int offsety = GET_Y_LPARAM(lParam) - s_pos_mousedown.y;
+		if(offsetx!=0 || offsety!=0)
+		{
+			s_is_moved = true;
+		}
 
 		MoveWindow_byOffset(hwnd, offsetx, offsety);
 		
@@ -257,11 +343,25 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		s_is_dragging = false;
 		ReleaseCapture();
 
+		if(s_is_moved==false)
+		{
+			s_idxcolor = Get_NewColorIdx(s_idxcolor, isCtrl ? -1 : 1);
+			InvalidateRect(hwnd, NULL, TRUE);
+		}
+
 		return 0;
 	}
+
+	case WM_RBUTTONDOWN:
+	{
+		POINT point = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+		ClientToScreen (hwnd, &point) ;
+		TrackPopupMenu(s_popmenu, TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL) ;
+		return 0;
+	}
+
 	case WM_KEYDOWN:
 	{
-		bool isCtrl = GetKeyState(VK_CONTROL)<0;
 		int scale = isCtrl ? 10 : 1;
 
 		int offsetx = 0, offsety = 0;
@@ -278,10 +378,43 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		return 0;
 	}
-	
+
+	case WM_INITMENUPOPUP:
+	{
+		HMENU hmenuPopup = (HMENU)wParam;
+		if(hmenuPopup!=s_popmenu)
+			break;
+
+		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
+			s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
+
+		return 0;
+	}
+
+	case WM_COMMAND:
+	{
+		int cmdid = GET_WM_COMMAND_ID(wParam, lParam);
+
+		if(cmdid==IDM_ALWAYS_ON_TOP)
+		{
+			s_is_always_on_top = !s_is_always_on_top;
+			Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
+		}
+		else if(cmdid==IDM_HELP)
+		{
+			ShowHelp(hwnd);
+		}
+		else if(cmdid==IDM_EXIT)
+		{
+			PostMessage(hwnd, WM_CLOSE, 0, 0);
+		}
+
+		return 0;
+	}
+
 	case WM_DESTROY:
 		KillTimer (hwnd, ID_TIMER) ;
-		DeleteObject (hBrushRed) ;
+//		DeleteObject (hBrushRed) ;
 		PostQuitMessage (0) ;
 		return 0 ;
 	}}

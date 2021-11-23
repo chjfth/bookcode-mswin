@@ -1,3 +1,5 @@
+#include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
@@ -7,3 +9,17 @@
 // remains consistent on all systems.
 MYPROGRAM                ICON                    "DigClock.ico"
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU
+BEGIN
+    POPUP "MYPOPUP"
+    BEGIN
+        MENUITEM "&Always on Top",          IDM_ALWAYS_ON_TOP
+        MENUITEM "&Help",                   IDM_HELP
+        MENUITEM "&Exit",                   IDM_EXIT
+    END
+END
