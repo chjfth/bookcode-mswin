@@ -58,15 +58,20 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps ;
 
 	switch (message)
-	{
+	{{
 	case WM_CREATE:
-		cxSource = GetSystemMetrics (SM_CXSIZEFRAME) +
-			GetSystemMetrics (SM_CXSIZE) ;
+	{
+		int cxsizeframe = GetSystemMetrics (SM_CXSIZEFRAME);
+		int cxsize = GetSystemMetrics (SM_CXSIZE);
+		int cysize = GetSystemMetrics (SM_CYSIZE); // just a peek
+		cxSource = cxsizeframe + cxsize;
 
-		cySource = GetSystemMetrics (SM_CYSIZEFRAME) + 
-			GetSystemMetrics (SM_CYCAPTION) ;
+		int cysizeframe = GetSystemMetrics (SM_CYSIZEFRAME);
+		int cycaption = GetSystemMetrics (SM_CYCAPTION);
+		cySource = cysizeframe + cycaption;
+		
 		return 0 ;
-
+	}
 	case WM_SIZE:
 		cxClient = LOWORD (lParam) ;
 		cyClient = HIWORD (lParam) ;
@@ -92,6 +97,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage (0) ;
 		return 0 ;
-	}
+	}}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
