@@ -66,6 +66,8 @@ void ShowHelp(HWND hwndParent)
 
 #define ID_TIMER    1
 
+SIZE g_init_winsize = {160, 60};
+
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -101,7 +103,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		szAppName, TEXT ("Digital Clock"),
 		WS_POPUPWINDOW|WS_THICKFRAME,  // WS_OVERLAPPEDWINDOW,
 		mousepos.x, mousepos.y,
-		160, 60, // CW_USEDEFAULT, CW_USEDEFAULT, 
+		g_init_winsize.cx, g_init_winsize.cy, // CW_USEDEFAULT, CW_USEDEFAULT, 
 		NULL, NULL, hInstance, NULL) ;
 
 	SendMessage(hwnd, WM_SETICON, TRUE, (LPARAM)LoadIcon(hInstance, _T("MYPROGRAM")));
@@ -444,6 +446,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else if(cmdid==IDM_HELP)
 		{
 			ShowHelp(hwnd);
+		}
+		else if(cmdid==IDM_RESET_SIZE)
+		{
+			RECT oldrect = {};
+			GetWindowRect(hwnd, &oldrect);
+			MoveWindow(hwnd, oldrect.left, oldrect.top, 
+				g_init_winsize.cx, g_init_winsize.cy, TRUE);
 		}
 		else if(cmdid==IDM_EXIT)
 		{

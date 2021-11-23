@@ -1,4 +1,5 @@
 #define IDR_MENU1  101
 #define IDM_ALWAYS_ON_TOP 1000
+#define IDM_RESET_SIZE 1001
 #define IDM_EXIT 4000
 #define IDM_HELP 4001
