@@ -50,6 +50,8 @@ void dbgprint(const TCHAR *fmt, ...)
 void ShowHelp(HWND hwndParent)
 {
 	static TCHAR *s_help =
+		_T("DigClock from Charles Petzold [PRWIN5] Chap08, with improvements from Chj.\r\n")
+		_T("\r\n")
 		_T("To Move the clock window:\r\n")
 		_T("(1) Click and drag with mouse left button.\r\n")
 		_T("(2) Use keyboard arrow keys, pixel by pixel. Press Ctrl key to accelerate.\r\n")
