@@ -7,6 +7,7 @@ DigClock.cpp -- Updated by Chj, 2021.11.
 * Move window by pressing arrow keys, Ctrl to accelerate.
 * Right-click context menu, toggle always on top.
 * Select different color by mouse clicking.
+* Scale down "second" value display(75%), so to have it stand out.
 * Eliminate UI flickering by MemDC-double-buffering.
   -----------------------------------------*/
 
@@ -140,7 +141,14 @@ int Get_NewColorIdx(int old, int shift)
 	return idxnew;
 }
 
-void DisplayDigit (HDC hdc, int iNumber)
+int Digit_ScaleDown(int value)
+{
+	// Chj: For Second value(not Hour, Minute value), we scale down the 
+	// digit display size to 75% to make the second value stands out.
+	return value * 3 /4;
+}
+
+void DisplayDigit (HDC hdc, int iNumber, bool is_scale_down=false)
 {
 	static BOOL  fSevenSegment [10][7] = {
 		1, 1, 1, 0, 1, 1, 1,     // 0
@@ -152,10 +160,11 @@ void DisplayDigit (HDC hdc, int iNumber)
 		1, 1, 0, 1, 1, 1, 1,     // 6
 		1, 0, 1, 0, 0, 1, 0,     // 7
 		1, 1, 1, 1, 1, 1, 1,     // 8
-		1, 1, 1, 1, 0, 1, 1 
-	} ;  // 9
+		1, 1, 1, 1, 0, 1, 1      // 9
+	} ;  
 
-	static POINT ptSegment [7][6] = {
+	const int NVERTEX = 6;
+	static POINT ptSegment [7][NVERTEX] = {
 		7,  6,  11,  2,  31,  2,  35,  6,  31, 10,  11, 10,
 		6,  7,  10, 11,  10, 31,   6, 35,   2, 31,   2, 11,
 		36,  7,  40, 11,  40, 31,  36, 35,  32, 31,  32, 11,
@@ -165,22 +174,45 @@ void DisplayDigit (HDC hdc, int iNumber)
 		7, 66,  11, 62,  31, 62,  35, 66,  31, 70,  11, 70 
 	} ;
 
+	POINT arPtVertex[NVERTEX] = {};
+
+
+//SetWindowExtEx (hdc, 276*2, 72*2, NULL) ;
+
 	int          iSeg ;
 
-	for (iSeg = 0 ; iSeg < 7 ; iSeg++)
+	for (iSeg = 0 ; iSeg < ARRAYSIZE(ptSegment) ; iSeg++)
 	{
 		if (fSevenSegment [iNumber][iSeg])
-			Polygon (hdc, ptSegment [iSeg], 6) ;
+		{
+			POINT *pVertex = ptSegment[iSeg];
+
+			if(is_scale_down)
+			{
+				for(int j=0; j<NVERTEX; j++)
+				{
+					arPtVertex[j].x = Digit_ScaleDown(ptSegment[iSeg][j].x);
+					arPtVertex[j].y = Digit_ScaleDown(ptSegment[iSeg][j].y);
+				}
+				pVertex = arPtVertex;
+			}
+
+			Polygon (hdc, pVertex, NVERTEX) ;
+		}
 	}
+
+//SetWindowExtEx (hdc, 276, 72, NULL) ;
+
 }
 
-void DisplayTwoDigits (HDC hdc, int iNumber, BOOL fSuppress)
+void DisplayTwoDigits (HDC hdc, int iNumber, BOOL fSuppress, bool is_scale_down=false)
 {
 	if (!fSuppress || (iNumber / 10 != 0))
-		DisplayDigit (hdc, iNumber / 10) ;
+		DisplayDigit (hdc, iNumber / 10, is_scale_down) ;
 
 	OffsetWindowOrgEx (hdc, -42, 0, NULL) ;
-	DisplayDigit (hdc, iNumber % 10) ;
+	
+	DisplayDigit (hdc, iNumber % 10, is_scale_down) ;
 	OffsetWindowOrgEx (hdc, -42, 0, NULL) ;
 }
 
@@ -207,8 +239,9 @@ void DisplayTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 
 	DisplayColon (hdc) ;
 	DisplayTwoDigits (hdc, st.wMinute, FALSE) ;
+	
 	DisplayColon (hdc) ;
-	DisplayTwoDigits (hdc, st.wSecond, FALSE) ;
+	DisplayTwoDigits (hdc, st.wSecond, FALSE, true) ;
 }
 
 static BOOL   f24Hour, fSuppress ;
