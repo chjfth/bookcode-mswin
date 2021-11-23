@@ -6,15 +6,17 @@ DigClock.cpp -- Updated by Chj, 2021.11.
 * Drag window by clicking anywhere inside the window.
 * Move window by pressing arrow keys, Ctrl to accelerate.
 * Right-click context menu, toggle always on top.
-* Select different color by mouse left/right clicking.
+* Select different color by mouse clicking.
+* Eliminate UI flickering by MemDC-double-buffering.
   -----------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
 #include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
-
 #include "resource.h"
+
+#include "BeginPaint_NoFlicker.h"
 
 void dbgprint(const TCHAR *fmt, ...)
 {
@@ -78,7 +80,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hInstance     = hInstance ;
 	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
+	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of no-flickering
 	wndclass.lpszMenuName  = NULL ;
 	wndclass.lpszClassName = szAppName ;
 
@@ -287,7 +289,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_PAINT:
 	{
-		hdc = BeginPaint (hwnd, &ps) ;
+		hdc = BeginPaint_NoFlicker(hwnd, &ps) ;
+		RECT rccli = {};
+		GetClientRect(hwnd, &rccli);
+		FillRect(hdc, &rccli, GetStockBrush(WHITE_BRUSH));
+
 		HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
 
 		SetMapMode (hdc, MM_ISOTROPIC) ;
@@ -302,7 +308,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		DisplayTime (hdc, f24Hour, fSuppress) ;
 
-		EndPaint (hwnd, &ps) ;
+		EndPaint_NoFlicker(hwnd, &ps) ;
 
 		SelectObject(hdc, GetStockBrush(WHITE_BRUSH));
 		DeleteObject(hbrush);

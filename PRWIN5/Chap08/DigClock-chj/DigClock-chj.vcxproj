@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(RootNamespace).cpp" />
+    <ClCompile Include="BeginPaint_NoFlicker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc" />
@@ -91,6 +92,7 @@
     <None Include="DigClock.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BeginPaint_NoFlicker.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <PropertyGroup>
