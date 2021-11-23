@@ -3,7 +3,8 @@ DIGCLOCK.c -- Digital Clock(c) Charles Petzold, 1998
 
 DigClock.cpp -- Updated by Chj, 2021.11.
 * Thin window border.
-* Drag window by clicking anywhere inside the window, or pressing arrow keys.
+* Drag window by clicking anywhere inside the window.
+* Move window by pressing arrow keys, Ctrl to accelerate.
 * Right-click context menu, toggle always on top.
 * Select different color by mouse left/right clicking.
   -----------------------------------------*/
@@ -163,6 +164,14 @@ void DisplayTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 	DisplayTwoDigits (hdc, st.wSecond, FALSE) ;
 }
 
+void MoveWindow_byOffset(HWND hwnd, int offsetx, int offsety)
+{
+	RECT oldrect = {};
+	GetWindowRect(hwnd, &oldrect);
+	MoveWindow(hwnd, oldrect.left+offsetx, oldrect.top+offsety, 
+		oldrect.right-oldrect.left, oldrect.bottom-oldrect.top, TRUE);
+}
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static BOOL   f24Hour, fSuppress ;
@@ -239,16 +248,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		int offsetx = GET_X_LPARAM(lParam) - s_pos_mousedown.x;
 		int offsety = GET_Y_LPARAM(lParam) - s_pos_mousedown.y;
 
-		RECT oldrect = {};
-		GetWindowRect(hwnd, &oldrect);
-		MoveWindow(hwnd, oldrect.left+offsetx, oldrect.top+offsety, 
-			oldrect.right-oldrect.left, oldrect.bottom-oldrect.top, TRUE);
-
-dbgprint(_T("offset x,y = %d , %d [%d,%d , %d,%d]"), offsetx, offsety,
-	oldrect.left+offsetx, oldrect.top+offsety, 
-	oldrect.right-oldrect.left, oldrect.bottom-oldrect.top
-	);
-		return 0; // this is a must!
+		MoveWindow_byOffset(hwnd, offsetx, offsety);
+		
+		return 0; // this return is a must!
 	}
 	case WM_LBUTTONUP:
 	{
@@ -257,7 +259,26 @@ dbgprint(_T("offset x,y = %d , %d [%d,%d , %d,%d]"), offsetx, offsety,
 
 		return 0;
 	}
+	case WM_KEYDOWN:
+	{
+		bool isCtrl = GetKeyState(VK_CONTROL)<0;
+		int scale = isCtrl ? 10 : 1;
 
+		int offsetx = 0, offsety = 0;
+		if(wParam==VK_UP)
+			offsety = -1 * scale;
+		else if(wParam==VK_DOWN)
+			offsety = 1 * scale;
+		else if(wParam==VK_LEFT)
+			offsetx = -1 * scale;
+		else if(wParam==VK_RIGHT)
+			offsetx = 1 * scale;
+
+		MoveWindow_byOffset(hwnd, offsetx, offsety);
+
+		return 0;
+	}
+	
 	case WM_DESTROY:
 		KillTimer (hwnd, ID_TIMER) ;
 		DeleteObject (hBrushRed) ;
