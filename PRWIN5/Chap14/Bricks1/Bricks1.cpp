@@ -1,5 +1,5 @@
 /*----------------------------------------
-   STRETCH.C -- StretchBlt Demonstration
+   BRICKS1.C -- LoadBitmap Demonstration
                 (c) Charles Petzold, 1998
   ----------------------------------------*/
 
@@ -10,7 +10,7 @@ LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
-	static TCHAR szAppName [] = TEXT ("Stretch") ;
+	static TCHAR szAppName [] = TEXT ("Bricks1") ;
 	HWND         hwnd ;
 	MSG          msg ;
 	WNDCLASS     wndclass ;
@@ -20,7 +20,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.cbClsExtra    = 0 ;
 	wndclass.cbWndExtra    = 0 ;
 	wndclass.hInstance     = hInstance ;
-	wndclass.hIcon         = LoadIcon (NULL, IDI_INFORMATION) ;
+	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
 	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
 	wndclass.lpszMenuName  = NULL ;
@@ -33,7 +33,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	hwnd = CreateWindow (szAppName, TEXT ("StretchBlt Demo"), 
+	hwnd = CreateWindow (szAppName, TEXT ("LoadBitmap Demo"), 
 		WS_OVERLAPPEDWINDOW, 
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT,
@@ -52,23 +52,27 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static int  cxClient, cyClient, cxSource, cySource ;
-	HDC         hdcClient, hdcWindow ;
-	PAINTSTRUCT ps ;
+	static HBITMAP hBitmap ;
+	static int     cxClient, cyClient, cxSource, cySource ;
+	BITMAP         bitmap ;
+	HDC            hdc, hdcMem ;
+	HINSTANCE      hInstance ;
+	int            x, y ;
+	PAINTSTRUCT    ps ;
 
 	switch (message)
-	{{
-	case WM_CREATE:
 	{
-		int cxsizeframe = GetSystemMetrics (SM_CXSIZEFRAME);
-		int cxsize = GetSystemMetrics (SM_CXSIZE);
-		cxSource = cxsizeframe + cxsize;
+	case WM_CREATE:
+		hInstance = ((LPCREATESTRUCT) lParam)->hInstance ;
 
-		int cysizeframe = GetSystemMetrics (SM_CYSIZEFRAME);
-		int cycaption = GetSystemMetrics (SM_CYCAPTION);
-		cySource = cysizeframe + cycaption;
+		// Key: Use LoadBitmap() to get a DDB, represented by a HBITMAP handle.
+		hBitmap = LoadBitmap (hInstance, TEXT ("Bricks")) ;
+		GetObject (hBitmap, sizeof (BITMAP), &bitmap) ;
+
+		cxSource = bitmap.bmWidth ;
+		cySource = bitmap.bmHeight ;
+
 		return 0 ;
-	}
 
 	case WM_SIZE:
 		cxClient = LOWORD (lParam) ;
@@ -76,27 +80,27 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_PAINT:
-	{
-		hdcClient = BeginPaint (hwnd, &ps) ;
-		hdcWindow = GetWindowDC (hwnd) ;
+		hdc = BeginPaint (hwnd, &ps) ;
 
-#if 0 // try raster operation
-		SelectObject (hdcClient, CreateHatchBrush (HS_DIAGCROSS, RGB (0, 0, 0)));
-		StretchBlt (hdcClient, 0, 0, cxClient, cyClient,
-			hdcWindow, 0, 0, cxSource, cySource, MERGECOPY) ;
-		DeleteObject (SelectObject(hdcClient, GetStockObject (WHITE_BRUSH))) ;
-#else
-		StretchBlt (hdcClient, 0, 0, cxClient, cyClient,
-			hdcWindow, 0, 0, cxSource, cySource, MERGECOPY) ;
-#endif 
+		hdcMem = CreateCompatibleDC (hdc) ;
+		SelectObject (hdcMem, hBitmap) ;
 
-		ReleaseDC (hwnd, hdcWindow) ;
+		for (y = 0 ; y < cyClient ; y += cySource)
+		{
+			for (x = 0 ; x < cxClient ; x += cxSource)
+			{
+				BitBlt (hdc, x, y, cxSource, cySource, hdcMem, 0, 0, SRCCOPY) ;
+			}
+		}
+
+		DeleteDC (hdcMem) ;
 		EndPaint (hwnd, &ps) ;
 		return 0 ;
-	}
+
 	case WM_DESTROY:
+		DeleteObject (hBitmap) ;
 		PostQuitMessage (0) ;
 		return 0 ;
-	}}
+	}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
