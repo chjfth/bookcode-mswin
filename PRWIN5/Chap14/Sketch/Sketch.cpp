@@ -22,7 +22,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hInstance     = hInstance ;
 	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
+	wndclass.hbrBackground = NULL; // (HBRUSH) GetStockObject (WHITE_BRUSH) ;
 	wndclass.lpszMenuName  = NULL ;
 	wndclass.lpszClassName = szAppName ;
 
@@ -100,6 +100,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 
 		SelectObject (hdcMem, hBitmap) ;
+
+		// Chj memo: Make the whole canvas WHITE. Would be whole black otherwise.
 		PatBlt (hdcMem, 0, 0, cxBitmap, cyBitmap, WHITENESS) ;
 		return 0 ;
 
@@ -167,7 +169,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint (hwnd, &ps) ;
 
-		// Key: Use double-buffering to eliminate screen flickering.
+		// Chj memo: One-time blit, thus eliminate screen flickering.
 		BitBlt (hdc, 0, 0, cxClient, cyClient, hdcMem, 0, 0, SRCCOPY) ;
 
 		EndPaint (hwnd, &ps) ;
