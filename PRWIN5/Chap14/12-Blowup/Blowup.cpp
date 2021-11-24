@@ -96,10 +96,10 @@ HBITMAP CopyBitmap (HBITMAP hBitmapSrc)
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static BOOL    bCapturing, bBlocking ;
-	static HBITMAP hBitmap ;
-	static HWND    hwndScr ;
-	static POINT   ptBeg, ptEnd ;
+	static BOOL    s_bCapturing, s_bBlocking ;
+	static HBITMAP s_hBitmap ;
+	static HWND    s_hwndScr ;
+	static POINT   s_ptBeg, s_ptEnd ;
 	BITMAP         bm ;
 	HBITMAP        hBitmapClip ;
 	HDC            hdc, hdcMem ;
@@ -110,11 +110,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_LBUTTONDOWN:
-		if (!bCapturing)
+		if (!s_bCapturing)
 		{
-			if (LockWindowUpdate (hwndScr = GetDesktopWindow ()))
+			if (LockWindowUpdate (s_hwndScr = GetDesktopWindow ()))
 			{
-				bCapturing = TRUE ;
+				s_bCapturing = TRUE ;
 				SetCapture (hwnd) ;
 				SetCursor (LoadCursor (NULL, IDC_CROSS)) ;
 			}
@@ -124,60 +124,60 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_RBUTTONDOWN:
-		if (bCapturing)
+		if (s_bCapturing)
 		{
-			bBlocking = TRUE ;
-			ptBeg.x = LOWORD (lParam) ;
-			ptBeg.y = HIWORD (lParam) ;
-			ptEnd = ptBeg ;
-			InvertBlock (hwndScr, hwnd, ptBeg, ptEnd) ;
+			s_bBlocking = TRUE ;
+			s_ptBeg.x = LOWORD (lParam) ;
+			s_ptBeg.y = HIWORD (lParam) ;
+			s_ptEnd = s_ptBeg ;
+			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
 		}
 		return 0 ;
 
 	case WM_MOUSEMOVE:
-		if (bBlocking)
+		if (s_bBlocking)
 		{
-			InvertBlock (hwndScr, hwnd, ptBeg, ptEnd) ;
-			ptEnd.x = LOWORD (lParam) ;
-			ptEnd.y = HIWORD (lParam) ;
-			InvertBlock (hwndScr, hwnd, ptBeg, ptEnd) ;
+			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
+			s_ptEnd.x = LOWORD (lParam) ;
+			s_ptEnd.y = HIWORD (lParam) ;
+			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
 		}
 		return 0 ;
 
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
-		if (bBlocking)
+		if (s_bBlocking)
 		{
-			InvertBlock (hwndScr, hwnd, ptBeg, ptEnd) ;
-			ptEnd.x = LOWORD (lParam) ;
-			ptEnd.y = HIWORD (lParam) ;
+			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
+			s_ptEnd.x = LOWORD (lParam) ;
+			s_ptEnd.y = HIWORD (lParam) ;
 
-			if (hBitmap)
+			if (s_hBitmap)
 			{
-				DeleteObject (hBitmap) ;
-				hBitmap = NULL ;
+				DeleteObject (s_hBitmap) ;
+				s_hBitmap = NULL ;
 			}
 
 			hdc = GetDC (hwnd) ;
 			hdcMem = CreateCompatibleDC (hdc) ;
-			hBitmap = CreateCompatibleBitmap (hdc, 
-				abs (ptEnd.x - ptBeg.x),
-				abs (ptEnd.y - ptBeg.y)) ;
+			s_hBitmap = CreateCompatibleBitmap (hdc, 
+				abs (s_ptEnd.x - s_ptBeg.x),
+				abs (s_ptEnd.y - s_ptBeg.y)) ;
 
-			SelectObject (hdcMem, hBitmap) ;
+			SelectObject (hdcMem, s_hBitmap) ;
 
-			StretchBlt (hdcMem, 0, 0, abs (ptEnd.x - ptBeg.x),
-				abs (ptEnd.y - ptBeg.y), 
-				hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, 
-				ptEnd.y - ptBeg.y, SRCCOPY) ;
+			StretchBlt (hdcMem, 0, 0, abs (s_ptEnd.x - s_ptBeg.x),
+				abs (s_ptEnd.y - s_ptBeg.y), 
+				hdc, s_ptBeg.x, s_ptBeg.y, s_ptEnd.x - s_ptBeg.x, 
+				s_ptEnd.y - s_ptBeg.y, SRCCOPY) ;
 
 			DeleteDC (hdcMem) ;
 			ReleaseDC (hwnd, hdc) ;
 			InvalidateRect (hwnd, NULL, TRUE) ;
 		}
-		if (bBlocking || bCapturing)
+		if (s_bBlocking || s_bCapturing)
 		{
-			bBlocking = bCapturing = FALSE ;
+			s_bBlocking = s_bCapturing = FALSE ;
 			SetCursor (LoadCursor (NULL, IDC_ARROW)) ;
 			ReleaseCapture () ;
 			LockWindowUpdate (NULL) ;
@@ -189,7 +189,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		EnableMenuItem ((HMENU) wParam, IDM_EDIT_PASTE, iEnable) ;
 
-		iEnable = hBitmap ? MF_ENABLED : MF_GRAYED ;
+		iEnable = s_hBitmap ? MF_ENABLED : MF_GRAYED ;
 
 		EnableMenuItem ((HMENU) wParam, IDM_EDIT_CUT,    iEnable) ;
 		EnableMenuItem ((HMENU) wParam, IDM_EDIT_COPY,   iEnable) ;
@@ -201,9 +201,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case IDM_EDIT_CUT:
 		case IDM_EDIT_COPY:
-			if (hBitmap)
+			if (s_hBitmap)
 			{
-				hBitmapClip = CopyBitmap (hBitmap) ;
+				hBitmapClip = CopyBitmap (s_hBitmap) ;
 				OpenClipboard (hwnd) ;
 				EmptyClipboard () ;
 				SetClipboardData (CF_BITMAP, hBitmapClip) ;
@@ -212,25 +212,25 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0 ;
 			// fall through for IDM_EDIT_CUT
 		case IDM_EDIT_DELETE:
-			if (hBitmap)
+			if (s_hBitmap)
 			{
-				DeleteObject (hBitmap) ;
-				hBitmap = NULL ;
+				DeleteObject (s_hBitmap) ;
+				s_hBitmap = NULL ;
 			}
 			InvalidateRect (hwnd, NULL, TRUE) ;
 			return 0 ;
 
 		case IDM_EDIT_PASTE:
-			if (hBitmap)
+			if (s_hBitmap)
 			{
-				DeleteObject (hBitmap) ;
-				hBitmap = NULL ;
+				DeleteObject (s_hBitmap) ;
+				s_hBitmap = NULL ;
 			}
 			OpenClipboard (hwnd) ;
 			hBitmapClip = (HBITMAP)GetClipboardData (CF_BITMAP) ;
 
 			if (hBitmapClip)
-				hBitmap = CopyBitmap (hBitmapClip) ;
+				s_hBitmap = CopyBitmap (hBitmapClip) ;
 
 			CloseClipboard () ;
 			InvalidateRect (hwnd, NULL, TRUE) ;
@@ -241,13 +241,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint (hwnd, &ps) ;
 
-		if (hBitmap)
+		if (s_hBitmap)
 		{
 			GetClientRect (hwnd, &rect) ;
 
 			hdcMem = CreateCompatibleDC (hdc) ;
-			SelectObject (hdcMem, hBitmap) ;
-			GetObject (hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
+			SelectObject (hdcMem, s_hBitmap) ;
+			GetObject (s_hBitmap, sizeof (BITMAP), (PSTR) &bm) ;
 			SetStretchBltMode (hdc, COLORONCOLOR) ;
 
 			StretchBlt (hdc,    0, 0, rect.right, rect.bottom,
@@ -259,8 +259,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_DESTROY:
-		if (hBitmap)
-			DeleteObject (hBitmap) ;
+		if (s_hBitmap)
+			DeleteObject (s_hBitmap) ;
 
 		PostQuitMessage (0) ;
 		return 0 ;
