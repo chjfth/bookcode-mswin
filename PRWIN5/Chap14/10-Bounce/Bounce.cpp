@@ -55,7 +55,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HBITMAP hBitmap ;
 	static int     cxClient, cyClient, xCenter, yCenter, cxTotal, cyTotal,
-		cxRadius, cyRadius, cxMove, cyMove, xPixel, yPixel ;
+		cxRadius, cyRadius, cxMove, cyMove ;
 	HBRUSH         hBrush ;
 	HDC            hdc, hdcMem ;
 	int            iScale ;
@@ -63,11 +63,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 	switch (iMsg)
 	{
 	case WM_CREATE:
-		hdc = GetDC (hwnd) ;
-		xPixel = GetDeviceCaps (hdc, ASPECTX) ; // Relative width of a device pixel used for line drawing.
-		yPixel = GetDeviceCaps (hdc, ASPECTY) ;
-		ReleaseDC (hwnd, hdc) ;
-
 		SetTimer (hwnd, ID_TIMER, 50, NULL) ;
 		return 0 ;
 
@@ -75,12 +70,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		xCenter = (cxClient = LOWORD (lParam)) / 2 ;
 		yCenter = (cyClient = HIWORD (lParam)) / 2 ;
 
-		iScale = min (cxClient * xPixel, cyClient * yPixel) / 16 ;
+		iScale = min (cxClient, cyClient) / 16 ;
 
-		cxRadius = iScale / xPixel ;
-		cyRadius = iScale / yPixel ;
+		cxRadius = iScale;
+		cyRadius = iScale;
 
-		cxMove = max (1, cxRadius / 2) ;
+		cxMove = max (1, cxRadius / 2) ; // pixels of each move(step)
 		cyMove = max (1, cyRadius / 2) ;
 
 		cxTotal = 2 * (cxRadius + cxMove) ;
@@ -91,11 +86,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 		hdc = GetDC (hwnd) ;
 		hdcMem = CreateCompatibleDC (hdc) ;
-		hBitmap = CreateCompatibleBitmap (hdc, cxTotal, cyTotal) ;
+		hBitmap = CreateCompatibleBitmap (hdc, cxTotal, cyTotal) ; 
+		// only a bit larger than the ball size, the ball size and its surrounding white frame(margin).
+		// Painting this margin-surrounding ball at a new position will simultaneously wipe out previous ball figure.
 		ReleaseDC (hwnd, hdc) ;
 
 		SelectObject (hdcMem, hBitmap) ;
-		Rectangle (hdcMem, -1, -1, cxTotal + 1, cyTotal + 1) ;
+		Rectangle (hdcMem, -1, -1, cxTotal + 1, cyTotal + 1) ; // paint the ball-bmp background all white
 
 		hBrush = CreateHatchBrush (HS_DIAGCROSS, 0L) ;
 		SelectObject (hdcMem, hBrush) ;
