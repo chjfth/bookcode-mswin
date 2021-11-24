@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sketch", "7-Sketch\Sketch.v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GrafMenu", "8-GrafMenu\GrafMenu.vcxproj", "{8B5BC0EF-688F-F056-E3CA-DE011EF2AFE1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BitMask", "9-BitMask\BitMask.vcxproj", "{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -89,6 +91,14 @@ Global
 		{8B5BC0EF-688F-F056-E3CA-DE011EF2AFE1}.Release|Win32.Build.0 = Release|Win32
 		{8B5BC0EF-688F-F056-E3CA-DE011EF2AFE1}.Release|x64.ActiveCfg = Release|x64
 		{8B5BC0EF-688F-F056-E3CA-DE011EF2AFE1}.Release|x64.Build.0 = Release|x64
+		{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}.Debug|Win32.Build.0 = Debug|Win32
+		{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}.Debug|x64.ActiveCfg = Debug|x64
+		{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}.Debug|x64.Build.0 = Debug|x64
+		{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}.Release|Win32.ActiveCfg = Release|Win32
+		{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}.Release|Win32.Build.0 = Release|Win32
+		{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}.Release|x64.ActiveCfg = Release|x64
+		{1520CC74-830F-CDB4-BF5C-2D7A1DD89DEF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
