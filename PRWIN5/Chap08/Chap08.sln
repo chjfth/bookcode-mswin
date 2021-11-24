@@ -5,8 +5,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DigClock", "DigClock\DigClo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DigClock-chj", "DigClock-chj\DigClock-chj.vcxproj", "{9BD5D62B-D7AA-A925-811C-89D3CC1EDF66}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BitBlt", "BitBlt\BitBlt.vcxproj", "{4666938A-346D-BCE8-2F19-E06F294010AF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,14 +29,6 @@ Global
 		{9BD5D62B-D7AA-A925-811C-89D3CC1EDF66}.Release|Win32.Build.0 = Release|Win32
 		{9BD5D62B-D7AA-A925-811C-89D3CC1EDF66}.Release|x64.ActiveCfg = Release|x64
 		{9BD5D62B-D7AA-A925-811C-89D3CC1EDF66}.Release|x64.Build.0 = Release|x64
-		{4666938A-346D-BCE8-2F19-E06F294010AF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4666938A-346D-BCE8-2F19-E06F294010AF}.Debug|Win32.Build.0 = Debug|Win32
-		{4666938A-346D-BCE8-2F19-E06F294010AF}.Debug|x64.ActiveCfg = Debug|x64
-		{4666938A-346D-BCE8-2F19-E06F294010AF}.Debug|x64.Build.0 = Debug|x64
-		{4666938A-346D-BCE8-2F19-E06F294010AF}.Release|Win32.ActiveCfg = Release|Win32
-		{4666938A-346D-BCE8-2F19-E06F294010AF}.Release|Win32.Build.0 = Release|Win32
-		{4666938A-346D-BCE8-2F19-E06F294010AF}.Release|x64.ActiveCfg = Release|x64
-		{4666938A-346D-BCE8-2F19-E06F294010AF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
