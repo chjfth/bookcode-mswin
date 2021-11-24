@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloBit", "HelloBit\HelloB
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sketch", "Sketch\Sketch.vcxproj", "{A498322F-90E9-3E26-3B89-A63CF379F558}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GrafMenu", "GrafMenu\GrafMenu.vcxproj", "{96C9E927-155D-04EF-9D23-350AF1507797}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -79,6 +81,14 @@ Global
 		{A498322F-90E9-3E26-3B89-A63CF379F558}.Release|Win32.Build.0 = Release|Win32
 		{A498322F-90E9-3E26-3B89-A63CF379F558}.Release|x64.ActiveCfg = Release|x64
 		{A498322F-90E9-3E26-3B89-A63CF379F558}.Release|x64.Build.0 = Release|x64
+		{96C9E927-155D-04EF-9D23-350AF1507797}.Debug|Win32.ActiveCfg = Debug|Win32
+		{96C9E927-155D-04EF-9D23-350AF1507797}.Debug|Win32.Build.0 = Debug|Win32
+		{96C9E927-155D-04EF-9D23-350AF1507797}.Debug|x64.ActiveCfg = Debug|x64
+		{96C9E927-155D-04EF-9D23-350AF1507797}.Debug|x64.Build.0 = Debug|x64
+		{96C9E927-155D-04EF-9D23-350AF1507797}.Release|Win32.ActiveCfg = Release|Win32
+		{96C9E927-155D-04EF-9D23-350AF1507797}.Release|Win32.Build.0 = Release|Win32
+		{96C9E927-155D-04EF-9D23-350AF1507797}.Release|x64.ActiveCfg = Release|x64
+		{96C9E927-155D-04EF-9D23-350AF1507797}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
