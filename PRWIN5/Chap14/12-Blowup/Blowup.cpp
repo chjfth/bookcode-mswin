@@ -3,7 +3,9 @@
                (c) Charles Petzold, 1998
   ---------------------------------------*/
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <windowsx.h>
 #include <stdlib.h>      // for abs definition
 #include "resource.h"
 
@@ -127,8 +129,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (s_bCapturing)
 		{
 			s_bBlocking = TRUE ;
-			s_ptBeg.x = LOWORD (lParam) ;
-			s_ptBeg.y = HIWORD (lParam) ;
+			s_ptBeg.x = GET_X_LPARAM(lParam) ;
+			s_ptBeg.y = GET_Y_LPARAM(lParam) ;
 			s_ptEnd = s_ptBeg ;
 			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
 		}
@@ -138,8 +140,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (s_bBlocking)
 		{
 			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
-			s_ptEnd.x = LOWORD (lParam) ;
-			s_ptEnd.y = HIWORD (lParam) ;
+			s_ptEnd.x = GET_X_LPARAM(lParam) ;
+			s_ptEnd.y = GET_Y_LPARAM(lParam) ;
 			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
 		}
 		return 0 ;
@@ -149,8 +151,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (s_bBlocking)
 		{
 			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
-			s_ptEnd.x = LOWORD (lParam) ;
-			s_ptEnd.y = HIWORD (lParam) ;
+			s_ptEnd.x = GET_X_LPARAM(lParam) ;
+			s_ptEnd.y = GET_Y_LPARAM(lParam) ;
 
 			if (s_hBitmap)
 			{
