@@ -62,13 +62,17 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 void InvertBlock (HWND hwndScr, HWND hwnd, POINT ptBeg, POINT ptEnd)
 {
+	// Input `hwnd` is only used for ClientToScreen coord translation.
+
 	HDC hdc ;
 
 	hdc = GetDCEx (hwndScr, NULL, DCX_CACHE | DCX_LOCKWINDOWUPDATE) ;
 	ClientToScreen (hwnd, &ptBeg) ;
 	ClientToScreen (hwnd, &ptEnd) ;
+	
 	PatBlt (hdc, ptBeg.x, ptBeg.y, ptEnd.x - ptBeg.x, ptEnd.y - ptBeg.y,
-		DSTINVERT) ;
+		DSTINVERT) ; // invert screen color
+
 	ReleaseDC (hwndScr, hdc) ;
 }
 
@@ -150,7 +154,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONUP:
 		if (s_bBlocking)
 		{
-			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ;
+			InvertBlock (s_hwndScr, hwnd, s_ptBeg, s_ptEnd) ; // turn inverted figure back to normal
+
 			s_ptEnd.x = GET_X_LPARAM(lParam) ;
 			s_ptEnd.y = GET_Y_LPARAM(lParam) ;
 
@@ -160,18 +165,22 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				s_hBitmap = NULL ;
 			}
 
+			int cx_diff = s_ptEnd.x - s_ptBeg.x; // can be negative
+			int cy_diff = s_ptEnd.y - s_ptBeg.y; // can be negative
+			int abs_width = abs(cx_diff);
+			int abs_height = abs(cy_diff);
+
 			hdc = GetDC (hwnd) ;
 			hdcMem = CreateCompatibleDC (hdc) ;
-			s_hBitmap = CreateCompatibleBitmap (hdc, 
-				abs (s_ptEnd.x - s_ptBeg.x),
-				abs (s_ptEnd.y - s_ptBeg.y)) ;
-
+			s_hBitmap = CreateCompatibleBitmap (hdc, abs_width, abs_height);
 			SelectObject (hdcMem, s_hBitmap) ;
 
-			StretchBlt (hdcMem, 0, 0, abs (s_ptEnd.x - s_ptBeg.x),
-				abs (s_ptEnd.y - s_ptBeg.y), 
-				hdc, s_ptBeg.x, s_ptBeg.y, s_ptEnd.x - s_ptBeg.x, 
-				s_ptEnd.y - s_ptBeg.y, SRCCOPY) ;
+			// note: s_ptBeg, s_ptEnd is relative to hwnd(hdc),
+			// and the POINT .x, .y values can go beyond the hwnd area.
+
+			StretchBlt (hdcMem, 0, 0, abs_width, abs_height,
+				hdc, s_ptBeg.x, s_ptBeg.y, cx_diff, cy_diff, 
+				SRCCOPY) ;
 
 			DeleteDC (hdcMem) ;
 			ReleaseDC (hwnd, hdc) ;
