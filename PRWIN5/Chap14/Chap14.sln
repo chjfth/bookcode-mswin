@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BitBlt", "BitBlt\BitBlt.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Stretch", "Stretch\Stretch.vcxproj", "{CA6C7DBA-61D9-E153-1B55-DDE1FAFB45C3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bricks1", "Bricks1\Bricks1.vcxproj", "{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -29,6 +31,14 @@ Global
 		{CA6C7DBA-61D9-E153-1B55-DDE1FAFB45C3}.Release|Win32.Build.0 = Release|Win32
 		{CA6C7DBA-61D9-E153-1B55-DDE1FAFB45C3}.Release|x64.ActiveCfg = Release|x64
 		{CA6C7DBA-61D9-E153-1B55-DDE1FAFB45C3}.Release|x64.Build.0 = Release|x64
+		{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}.Debug|Win32.Build.0 = Debug|Win32
+		{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}.Debug|x64.ActiveCfg = Debug|x64
+		{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}.Debug|x64.Build.0 = Debug|x64
+		{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}.Release|Win32.ActiveCfg = Release|Win32
+		{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}.Release|Win32.Build.0 = Release|Win32
+		{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}.Release|x64.ActiveCfg = Release|x64
+		{CDFB1D62-53C5-B093-CC2F-AD34B58BE60A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
