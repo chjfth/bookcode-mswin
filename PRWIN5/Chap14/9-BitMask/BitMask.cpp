@@ -61,8 +61,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT      ps ;
 
 	switch (message)
-	{
+	{{
 	case WM_CREATE:
+	{
 		hInstance = ((LPCREATESTRUCT) lParam)->hInstance ;
 
 		// Load the original image and get its size
@@ -93,11 +94,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Mask the original image
 
 		BitBlt (hdcMemImag, 0, 0, cxBitmap, cyBitmap, 
-			hdcMemMask, 0, 0, SRCAND) ;
+			hdcMemMask, 0, 0, SRCAND) ; // S & D
+		// -- Chj: now hBitmapImag's "background" has been all "black"
 
 		DeleteDC (hdcMemImag) ;
 		DeleteDC (hdcMemMask) ;
 		return 0 ;
+	}
 
 	case WM_SIZE:
 		cxClient = LOWORD (lParam) ;
@@ -122,8 +125,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// Do the bitblts
 
-		BitBlt (hdc, x, y, cxBitmap, cyBitmap, hdcMemMask, 0, 0, 0x220326) ;
-		BitBlt (hdc, x, y, cxBitmap, cyBitmap, hdcMemImag, 0, 0, SRCPAINT) ;
+		BitBlt (hdc, x, y, cxBitmap, cyBitmap, hdcMemMask, 0, 0, 0x220326) ; // ~S & D
+		//
+		BitBlt (hdc, x, y, cxBitmap, cyBitmap, hdcMemImag, 0, 0, SRCPAINT) ; //  S | D
+		// --Chj memo: SRCINVERT(S ^ D) is OK too, while the name SRCINVERT is quite bad.
 
 		DeleteDC (hdcMemImag) ;
 		DeleteDC (hdcMemMask) ;
@@ -135,6 +140,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		DeleteObject (hBitmapMask) ;
 		PostQuitMessage (0) ;
 		return 0 ;
-	}
+	}}
+
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
