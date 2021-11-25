@@ -266,6 +266,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					pBits + y * iRowLength, 
 					pbmi, 
 					DIB_RGB_COLORS) ;
+
+				// Chj: add a sleep to show line-by-line effect.
+				// For bottom-up bmp, bottom lines are displayed first.
+				// For top-down bmp, top lines are display first.
+				Sleep(1); 
 			}
 			ReleaseDC (hwnd, hdc) ;
 			CloseHandle (hFile) ;
