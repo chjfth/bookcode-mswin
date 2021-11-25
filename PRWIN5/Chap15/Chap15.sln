@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Apollo11", "3-Apollo11\Apol
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SeqDisp", "4-SeqDisp\SeqDisp.vcxproj", "{C2B14AAB-78BF-01EA-C750-32192BA5E120}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShowDib2", "5-ShowDib2\ShowDib2.vcxproj", "{702C4618-13A7-3570-B282-839BD5DCFDBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -49,6 +51,14 @@ Global
 		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Release|Win32.Build.0 = Release|Win32
 		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Release|x64.ActiveCfg = Release|x64
 		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Release|x64.Build.0 = Release|x64
+		{702C4618-13A7-3570-B282-839BD5DCFDBE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{702C4618-13A7-3570-B282-839BD5DCFDBE}.Debug|Win32.Build.0 = Debug|Win32
+		{702C4618-13A7-3570-B282-839BD5DCFDBE}.Debug|x64.ActiveCfg = Debug|x64
+		{702C4618-13A7-3570-B282-839BD5DCFDBE}.Debug|x64.Build.0 = Debug|x64
+		{702C4618-13A7-3570-B282-839BD5DCFDBE}.Release|Win32.ActiveCfg = Release|Win32
+		{702C4618-13A7-3570-B282-839BD5DCFDBE}.Release|Win32.Build.0 = Release|Win32
+		{702C4618-13A7-3570-B282-839BD5DCFDBE}.Release|x64.ActiveCfg = Release|x64
+		{702C4618-13A7-3570-B282-839BD5DCFDBE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
