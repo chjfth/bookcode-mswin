@@ -11,6 +11,18 @@
 #include <stdlib.h>      // for abs definition
 #include "resource.h"
 
+bool IsWin7OrAbove()
+{
+	OSVERSIONINFOEX osv = {sizeof(OSVERSIONINFOEX)};
+	GetVersionEx((OSVERSIONINFO*)&osv);
+	if( osv.dwMajorVersion>=6 )
+		return true;
+	else 
+		return false;
+}
+
+bool g_isWin7 = IsWin7OrAbove();
+
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -193,6 +205,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			s_ptEnd.x = GET_X_LPARAM(lParam) ;
 			s_ptEnd.y = GET_Y_LPARAM(lParam) ;
 
+			// We need to use screen DC and screen coordinate on Win7. So prepare it.
+			HDC hdcScreen = GetDC(NULL);
+			POINT ptScreenBeg = s_ptBeg;
+			ClientToScreen (hwnd, &ptScreenBeg); 
+
 			if (s_hBitmap)
 			{
 				DeleteObject (s_hBitmap) ;
@@ -204,17 +221,29 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			int abs_width = abs(cx_diff);
 			int abs_height = abs(cy_diff);
 
-			hdc = GetDC (hwnd) ;
+			hdc = GetDC(hwnd);
+
 			hdcMem = CreateCompatibleDC (hdc) ;
 			s_hBitmap = CreateCompatibleBitmap (hdc, abs_width, abs_height);
 			SelectObject (hdcMem, s_hBitmap) ;
 
-			// note: s_ptBeg, s_ptEnd is relative to hwnd(hdc),
-			// and the POINT .x, .y values can go beyond the hwnd area.
-
-			StretchBlt (hdcMem, 0, 0, abs_width, abs_height,
-				hdc, s_ptBeg.x, s_ptBeg.y, cx_diff, cy_diff, 
-				SRCCOPY) ;
+			if(!g_isWin7)
+			{
+				// note: s_ptBeg, s_ptEnd is relative to hwnd(hdc),
+				// and the POINT .x, .y values can go beyond the hwnd area.
+				// On WinXP, we can use hwnd(hdc) to fetch screen content beyond hwnd area;
+				// But on Win7+, we cannot.
+				StretchBlt (hdcMem, 0, 0, abs_width, abs_height,
+					hdc, s_ptBeg.x, s_ptBeg.y, cx_diff, cy_diff, 
+					SRCCOPY) ;
+			}
+			else
+			{
+				// On Win7, we have to use hdcScreen instead. (suitable for WinXP as well)
+				StretchBlt (hdcMem, 0, 0, abs_width, abs_height,
+					hdcScreen, ptScreenBeg.x, ptScreenBeg.y, cx_diff, cy_diff, 
+					SRCCOPY) ;
+			}
 
 			DeleteDC (hdcMem) ;
 			ReleaseDC (hwnd, hdc) ;
