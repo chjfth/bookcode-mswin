@@ -6,6 +6,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
+#include <tchar.h>
+#include <assert.h>
 #include <stdlib.h>      // for abs definition
 #include "resource.h"
 
@@ -78,11 +80,43 @@ void InvertBlock (HWND hwndScr, HWND hwnd, POINT ptBeg, POINT ptEnd)
 
 HBITMAP CopyBitmap (HBITMAP hBitmapSrc)
 {
-	BITMAP  bitmap ;
+	BITMAP  bitmap = {};
 	HBITMAP hBitmapDst ;
 	HDC     hdcSrc, hdcDst ;
 
-	GetObject (hBitmapSrc, sizeof (BITMAP), &bitmap) ;
+	int bytes_required = GetObject (hBitmapSrc, 0, NULL); // query buffer size required
+	assert(bytes_required==sizeof(BITMAP));
+
+	int bytes_copied = GetObject (hBitmapSrc, sizeof (bitmap), &bitmap);
+	//
+	// [2021-11-25] Chj memo: A strange Windows XP bug?
+	// If we run the program inside a WinXP VM, a weird symptom happens:  
+	// Operations:
+	// * On Host PC(Win10), press Alt+PrintScreen to copy a window bitmap.
+	// * Switch to the VM, so the clipboard content(with a bitmap) is transferred to the 
+	//   clipboard inside the WinXP VM(automatically).
+	// * In VM, open mspaint.exe, press Ctrl+V, we can verify that the bitmap is pasted.
+	// * Now, switch to Blowup program, Ctrl+V paste, and this CopyBitmap function
+	//   is triggered.
+	// * Weird things happen here: 
+	//   - bytes_required gets value 24, which is exactly sizeof(BITMAP).
+	//   - bytes_copied is 0, which means GetObject() fails to return BITMAP struct.
+	// WHY?
+
+	if(bytes_copied!=bytes_required)
+	{
+		TCHAR errtext[200] = {};
+		_sntprintf_s(errtext, ARRAYSIZE(errtext),
+			_T("Error: GetObject() returns %d for HBITMAP from clipboard (should be %d).\r\n")
+			_T("\r\n")
+			_T("This may happen on WinXP, but should not happen on Win7.\r\n")
+			,
+			bytes_copied, bytes_required);
+
+		MessageBox(NULL, errtext, _T("Unexpected Error"), MB_OK|MB_ICONWARNING);
+		return NULL;
+	}
+	
 	hBitmapDst = CreateBitmapIndirect (&bitmap) ;
 
 	hdcSrc = CreateCompatibleDC (NULL) ;
@@ -238,6 +272,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				s_hBitmap = NULL ;
 			}
 			OpenClipboard (hwnd) ;
+
+			iEnable =  IsClipboardFormatAvailable(CF_BITMAP);
 			hBitmapClip = (HBITMAP)GetClipboardData (CF_BITMAP) ;
 
 			if (hBitmapClip)
