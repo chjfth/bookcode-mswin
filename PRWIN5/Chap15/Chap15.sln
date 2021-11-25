@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DibHeads", "1-DibHeads\DibHeads.vcxproj", "{D490DB8C-C7B9-61BF-CB79-CBA90F846560}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShowDib1", "2-ShowDib1\ShowDib1.vcxproj", "{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,14 @@ Global
 		{D490DB8C-C7B9-61BF-CB79-CBA90F846560}.Release|Win32.Build.0 = Release|Win32
 		{D490DB8C-C7B9-61BF-CB79-CBA90F846560}.Release|x64.ActiveCfg = Release|x64
 		{D490DB8C-C7B9-61BF-CB79-CBA90F846560}.Release|x64.Build.0 = Release|x64
+		{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}.Debug|Win32.Build.0 = Debug|Win32
+		{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}.Debug|x64.ActiveCfg = Debug|x64
+		{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}.Debug|x64.Build.0 = Debug|x64
+		{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}.Release|Win32.ActiveCfg = Release|Win32
+		{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}.Release|Win32.Build.0 = Release|Win32
+		{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}.Release|x64.ActiveCfg = Release|x64
+		{07C3B86A-A4ED-C1D9-06DF-B758490A27CE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
