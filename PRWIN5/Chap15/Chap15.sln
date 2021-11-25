@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShowDib1", "2-ShowDib1\Show
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Apollo11", "3-Apollo11\Apollo11.vcxproj", "{A905BA09-F1C0-29AC-F515-4FAC18C5B53C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SeqDisp", "4-SeqDisp\SeqDisp.vcxproj", "{C2B14AAB-78BF-01EA-C750-32192BA5E120}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -39,6 +41,14 @@ Global
 		{A905BA09-F1C0-29AC-F515-4FAC18C5B53C}.Release|Win32.Build.0 = Release|Win32
 		{A905BA09-F1C0-29AC-F515-4FAC18C5B53C}.Release|x64.ActiveCfg = Release|x64
 		{A905BA09-F1C0-29AC-F515-4FAC18C5B53C}.Release|x64.Build.0 = Release|x64
+		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Debug|Win32.Build.0 = Debug|Win32
+		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Debug|x64.ActiveCfg = Debug|x64
+		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Debug|x64.Build.0 = Debug|x64
+		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Release|Win32.ActiveCfg = Release|Win32
+		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Release|Win32.Build.0 = Release|Win32
+		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Release|x64.ActiveCfg = Release|x64
+		{C2B14AAB-78BF-01EA-C750-32192BA5E120}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
