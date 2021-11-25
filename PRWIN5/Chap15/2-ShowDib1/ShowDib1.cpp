@@ -172,9 +172,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			0,         // xDst
 			0,         // yDst
 			cxDib,     // cxSrc
-			cyDib,     // cySrc
+			cyDib,     // cySrc // [2021-11-25] Chj memo: if `cyDib/2`, we'll only see astronaut's legs(from Apollo11.bmp)
 			0,         // xSrc
-			0,         // ySrc
+			0,         // ySrc  // [2021-11-25] Chj memo: try it with 30, we'll see some moon ground is wiped out.
 			0,         // first scan line
 			cyDib,     // number of scan lines
 			pBits, 

@@ -10,7 +10,7 @@ static OPENFILENAME ofn ;
 
 void DibFileInitialize (HWND hwnd)
 {
-     static TCHAR szFilter[] = TEXT ("Bitmap Files (*.BMP)\0*.bmp\0")  \
+     static TCHAR szFilter[] = TEXT ("Bitmap Files (*.BMP)\0*.bmp\0")
                                TEXT ("All Files (*.*)\0*.*\0\0") ;
      
      ofn.lStructSize       = sizeof (OPENFILENAME) ;
