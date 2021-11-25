@@ -5,6 +5,8 @@
 
 #define WINVER 0x0500
 #include <windows.h>
+#include <tchar.h>
+#include <stdio.h>
 #include "resource.h"
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
@@ -26,7 +28,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hInstance     = hInstance ;
 	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
+	wndclass.hbrBackground = NULL; //(HBRUSH) GetStockObject (WHITE_BRUSH) ;
 	wndclass.lpszMenuName  = szAppName ;
 	wndclass.lpszClassName = szAppName ;
 
@@ -40,7 +42,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hwnd = CreateWindow (szAppName, TEXT ("DIB Headers"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT, 
+		500, 600, //CW_USEDEFAULT, CW_USEDEFAULT, 
 		NULL, NULL, hInstance, NULL) ;
 
 	ShowWindow (hwnd, iCmdShow) ;
@@ -59,18 +61,22 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return msg.wParam ;
 }
 
-void Printf (HWND hwnd, TCHAR * szFormat, ...)
+void Printf (HWND hedit, TCHAR * szFormat, ...)
 {
 	TCHAR   szBuffer [1024] ;
 	va_list pArgList ;
 
 	va_start (pArgList, szFormat) ;
-	wvsprintf (szBuffer, szFormat, pArgList) ;
+	_vsntprintf_s(szBuffer, ARRAYSIZE(szBuffer), szFormat, pArgList) ;
 	va_end (pArgList) ;
 
-	SendMessage (hwnd, EM_SETSEL, (WPARAM) -1, (LPARAM) -1) ;
-	SendMessage (hwnd, EM_REPLACESEL, FALSE, (LPARAM) szBuffer) ;
-	SendMessage (hwnd, EM_SCROLLCARET, 0, 0) ;
+	int textlen = GetWindowTextLength(hedit);
+	SendMessage (hedit, EM_SETSEL, textlen, textlen) ;
+	// -- wrong way: SendMessage (hedit, EM_SETSEL, (WPARAM) -1, (LPARAM) -1) ;
+	
+	SendMessage (hedit, EM_REPLACESEL, FALSE, (LPARAM) szBuffer) ;
+	
+	// SendMessage (hedit, EM_SCROLLCARET, 0, 0) ; // not a must
 }
 
 void DisplayDibHeaders (HWND hwnd, TCHAR * szFileName)
@@ -301,8 +307,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		TEXT ("All Files (*.*)\0*.*\0\0") ;
 
 	switch (message)
-	{
+	{{
 	case WM_CREATE:
+	{
 		hwndEdit = CreateWindow (TEXT ("edit"), NULL,
 			WS_CHILD | WS_VISIBLE | WS_BORDER | 
 			WS_VSCROLL | WS_HSCROLL |
@@ -331,6 +338,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		ofn.lpfnHook          = NULL ;
 		ofn.lpTemplateName    = NULL ;
 		return 0 ;
+	}
 
 	case WM_SIZE:
 		MoveWindow (hwndEdit, 0, 0, LOWORD (lParam), HIWORD (lParam), TRUE) ;
@@ -350,6 +358,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage (0) ;
 		return 0 ;
-	}
+	}}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
