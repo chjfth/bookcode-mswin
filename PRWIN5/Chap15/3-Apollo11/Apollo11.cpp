@@ -105,7 +105,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint (hwnd, &ps) ;
 
-		// Bottom-up DIB full size
+		// Bottom-up DIB full size (width: 220 , height: 240)
 
 		SetDIBitsToDevice (hdc, 
 			0,                   // xDst
@@ -150,7 +150,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			pbmi[0], 
 			DIB_RGB_COLORS) ;
 
-		// Top-down DIB partial
+		// Top-down DIB partial (Exactly same `Src` params as Bottom-up bmp)
 
 		SetDIBitsToDevice (hdc, 
 			580,                 // xDst
