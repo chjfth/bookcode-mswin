@@ -40,7 +40,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	hwnd = CreateWindow (szAppName, TEXT ("DIB to DDB Conversion"),
+	hwnd = CreateWindow (szAppName, TEXT ("DIB to DDB Conversion (Chj Exp)"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT, 
@@ -58,7 +58,45 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return msg.wParam ;
 }
 
-HBITMAP CreateBitmapObjectFromDibFile (HDC hdc, PTSTR szFileName)
+HBITMAP __stdcall CreateDIBitmap_Petzold (
+	HDC hdc, CONST BITMAPINFOHEADER * pbmih,
+	DWORD fInit, CONST VOID * pBits,
+	CONST BITMAPINFO * pbmi, UINT fUsage)
+{
+	HBITMAP hBitmap ;
+	int cx, cy; //, iBitCount ;
+	if (pbmih->biSize == sizeof (BITMAPCOREHEADER))
+	{
+		cx = ((PBITMAPCOREHEADER) pbmih)->bcWidth ;
+		cy = ((PBITMAPCOREHEADER) pbmih)->bcHeight ;
+		// iBitCount = ((PBITMAPCOREHEADER) pbmih)->bcBitCount ;
+	}
+	else
+	{
+		cx = pbmih->biWidth ;
+		cy = pbmih->biHeight ;
+		// iBitCount = pbmih->biBitCount ; // useless
+	} 
+	
+	if (hdc)
+		hBitmap = CreateCompatibleBitmap (hdc, cx, cy) ;
+	else
+		hBitmap = CreateBitmap (cx, cy, 1, 1, NULL) ;
+	
+	if (fInit == CBM_INIT)
+	{
+		HDC hdcMem = CreateCompatibleDC (hdc) ;
+		SelectObject (hdcMem, hBitmap) ;
+		SetDIBitsToDevice (hdcMem, 0, 0, cx, cy, 0, 0, 0, cy,
+			pBits, pbmi, fUsage) ;
+		DeleteDC (hdcMem) ;
+	}
+
+	return hBitmap;
+}
+
+
+HBITMAP CreateBitmapObjectFromDibFile (HDC hdc, PTSTR szFileName, bool is_petzold_way=false)
 {
 	BITMAPFILEHEADER * pbmfh ;
 	BOOL               bSuccess ;
@@ -107,12 +145,21 @@ HBITMAP CreateBitmapObjectFromDibFile (HDC hdc, PTSTR szFileName)
 
 	// Create the DDB 
 
-	hBitmap = CreateDIBitmap (hdc,              
-		(BITMAPINFOHEADER *) (pbmfh + 1),
+	BITMAPINFOHEADER bmiheader1 = *(BITMAPINFOHEADER *) (pbmfh + 1);
+	// -- Chj Experiment: Use a separate BITMAPINFOHEADER to see how it behaves
+	// when bmi1 and bmi2 contradict. (We need VS IDE live debugger to try it.)
+	// Result: only bmiheader1 .biWidth and .biHeight is used.
+
+	auto fnCreateDIBitmap = is_petzold_way ? CreateDIBitmap_Petzold : CreateDIBitmap;
+	// -- `auto` is supported on VS2010 SP1.
+
+	hBitmap = fnCreateDIBitmap (hdc,              
+		&bmiheader1, // bmi1
 		CBM_INIT,
 		(BYTE *) pbmfh + pbmfh->bfOffBits,
-		(BITMAPINFO *) (pbmfh + 1),
+		(BITMAPINFO *) (pbmfh + 1), // bmi2
 		DIB_RGB_COLORS) ;
+
 	free (pbmfh) ;
 
 	return hBitmap ;
@@ -120,7 +167,7 @@ HBITMAP CreateBitmapObjectFromDibFile (HDC hdc, PTSTR szFileName)
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static HBITMAP      hBitmap ;
+	static HBITMAP      s_hBitmap ;
 	static int          cxClient, cyClient ;
 	static OPENFILENAME ofn ;
 	static TCHAR        szFileName [MAX_PATH], szTitleName [MAX_PATH] ;
@@ -131,7 +178,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT         ps ;
 
 	switch (message)
-	{
+	{{
 	case WM_CREATE:
 		ofn.lStructSize       = sizeof (OPENFILENAME) ;
 		ofn.hwndOwner         = hwnd ;
@@ -162,9 +209,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_COMMAND:
-		switch (LOWORD (wParam))
+	{
+		int cmdid = LOWORD (wParam);
+		switch (cmdid)
 		{
 		case IDM_FILE_OPEN:
+		case IDM_FILE_OPEN_PETZOLD:
 
 			// Show the File Open dialog box
 
@@ -173,10 +223,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			// If there's an existing DIB, delete it
 
-			if (hBitmap)
+			if (s_hBitmap)
 			{
-				DeleteObject (hBitmap) ;
-				hBitmap = NULL ;
+				DeleteObject (s_hBitmap) ;
+				s_hBitmap = NULL ;
 			}
 			// Create the DDB from the DIB
 
@@ -184,7 +234,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ShowCursor (TRUE) ;
 
 			hdc = GetDC (hwnd) ;
-			hBitmap = CreateBitmapObjectFromDibFile (hdc, szFileName) ;
+			s_hBitmap = CreateBitmapObjectFromDibFile (hdc, szFileName,
+				cmdid==IDM_FILE_OPEN_PETZOLD ? true : false
+				) ;
 			ReleaseDC (hwnd, hdc) ;
 
 			ShowCursor (FALSE) ;
@@ -194,7 +246,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			InvalidateRect (hwnd, NULL, TRUE) ;
 
-			if (hBitmap == NULL)
+			if (s_hBitmap == NULL)
 			{
 				MessageBox (hwnd, TEXT ("Cannot load DIB file"), 
 					szAppName, MB_OK | MB_ICONEXCLAMATION) ;
@@ -202,16 +254,17 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0 ;
 		}
 		break ;
+	}
 
 	case WM_PAINT:
 		hdc = BeginPaint (hwnd, &ps) ;
 
-		if (hBitmap)
+		if (s_hBitmap)
 		{
-			GetObject (hBitmap, sizeof (BITMAP), &bitmap) ;
+			GetObject (s_hBitmap, sizeof (BITMAP), &bitmap) ;
 
 			hdcMem = CreateCompatibleDC (hdc) ;
-			SelectObject (hdcMem, hBitmap) ;
+			SelectObject (hdcMem, s_hBitmap) ;
 
 			BitBlt (hdc,    0, 0, bitmap.bmWidth, bitmap.bmHeight, 
 				hdcMem, 0, 0, SRCCOPY) ;
@@ -223,11 +276,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_DESTROY:
-		if (hBitmap)
-			DeleteObject (hBitmap) ;
+		if (s_hBitmap)
+			DeleteObject (s_hBitmap) ;
 
 		PostQuitMessage (0) ;
 		return 0 ;
-	}
+	}}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }

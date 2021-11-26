@@ -56,7 +56,8 @@ DIBCONV MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&Open",                       IDM_FILE_OPEN
+        MENUITEM "&Open",                                 IDM_FILE_OPEN
+        MENUITEM "&Open with CreateDIBitmap_Petzold()",   IDM_FILE_OPEN_PETZOLD
     END
 END
 
