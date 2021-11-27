@@ -5,6 +5,7 @@
 
 #include <windows.h>
 #include <commdlg.h>
+#include <assert.h>
 #include "resource.h"
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
@@ -112,7 +113,17 @@ HBITMAP CreateDibSectionFromDibFile (PTSTR szFileName)
 
 	// Read in the bitmap bits
 
-	ReadFile (hFile, pBits, bmfh.bfSize - bmfh.bfOffBits, &dwBytesRead, NULL) ;
+	DWORD bytes_to_read = bmfh.bfSize - bmfh.bfOffBits;
+	// -- Chj: What if the bmp file content is malformed, and bytes_to_read exceeds
+	// what CreateDIBSection allocates for us? 
+	// Well, DIBSECTION.dsBmih.biSizeImage tells the true buffer size.
+
+	DIBSECTION dibsec_info = {};
+	int gotbytes = GetObject(hBitmap, sizeof(dibsec_info), &dibsec_info);
+	assert(bytes_to_read==dibsec_info.dsBmih.biSizeImage);
+
+	BOOL succ = ReadFile (hFile, pBits, bytes_to_read, &dwBytesRead, NULL) ;
+	assert(succ && dwBytesRead==bytes_to_read);
 
 	free (pbmi) ;
 	CloseHandle (hFile) ;
@@ -122,7 +133,7 @@ HBITMAP CreateDibSectionFromDibFile (PTSTR szFileName)
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static HBITMAP      hBitmap ;
+	static HBITMAP      s_hBitmap ;
 	static int          cxClient, cyClient ;
 	static OPENFILENAME ofn ;
 	static TCHAR        szFileName [MAX_PATH], szTitleName [MAX_PATH] ;
@@ -175,17 +186,17 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			// If there's an existing bitmap, delete it
 
-			if (hBitmap)
+			if (s_hBitmap)
 			{
-				DeleteObject (hBitmap) ;
-				hBitmap = NULL ;
+				DeleteObject (s_hBitmap) ;
+				s_hBitmap = NULL ;
 			}
 			// Create the DIB Section from the DIB file
 
 			SetCursor (LoadCursor (NULL, IDC_WAIT)) ;
 			ShowCursor (TRUE) ;
 
-			hBitmap = CreateDibSectionFromDibFile (szFileName) ;
+			s_hBitmap = CreateDibSectionFromDibFile (szFileName) ;
 
 			ShowCursor (FALSE) ;
 			SetCursor (LoadCursor (NULL, IDC_ARROW)) ;
@@ -194,7 +205,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			InvalidateRect (hwnd, NULL, TRUE) ;
 
-			if (hBitmap == NULL)
+			if (s_hBitmap == NULL)
 			{
 				MessageBox (hwnd, TEXT ("Cannot load DIB file"), 
 					szAppName, MB_OK | MB_ICONEXCLAMATION) ;
@@ -206,12 +217,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint (hwnd, &ps) ;
 
-		if (hBitmap)
+		if (s_hBitmap)
 		{
-			GetObject (hBitmap, sizeof (BITMAP), &bitmap) ;
+			GetObject (s_hBitmap, sizeof (BITMAP), &bitmap) ;
 
 			hdcMem = CreateCompatibleDC (hdc) ;
-			SelectObject (hdcMem, hBitmap) ;
+			SelectObject (hdcMem, s_hBitmap) ;
 
 			BitBlt (hdc,    0, 0, bitmap.bmWidth, bitmap.bmHeight, 
 				hdcMem, 0, 0, SRCCOPY) ;
@@ -223,8 +234,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_DESTROY:
-		if (hBitmap)
-			DeleteObject (hBitmap) ;
+		if (s_hBitmap)
+			DeleteObject (s_hBitmap) ;
 
 		PostQuitMessage (0) ;
 		return 0 ;
