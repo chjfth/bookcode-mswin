@@ -4,6 +4,11 @@
   -----------------------------------------------*/
 
 #include <windows.h>
+#include <tchar.h>
+#include "..\set-256color-mode.h"
+
+bool g_use_red = false, g_use_green = false, g_use_blue = false;
+bool g_prompt_params = false;
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -14,6 +19,23 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	HWND         hwnd ;
 	MSG          msg ;
 	WNDCLASS     wndclass ;
+
+	Set_256ColorMode(szAppName);
+
+	// Chj special: Command-line tells to set "gray" scale of red/green/blue.
+	//
+	const TCHAR *title_append = _T("");
+	CharUpperA(szCmdLine);
+	if( szCmdLine[0]=='R')
+		g_use_red = true, title_append = _T("(R)");
+	else if(szCmdLine[0]=='G')
+		g_use_green = true, title_append = _T("(G)");
+	else if(szCmdLine[0]=='B')
+		g_use_blue = true, title_append = _T("(B)");
+	else {
+		g_use_red = g_use_green = g_use_blue = true;
+		g_prompt_params = true;
+	}
 
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
 	wndclass.lpfnWndProc   = WndProc ;
@@ -33,10 +55,16 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	hwnd = CreateWindow (szAppName, TEXT ("Shades of Gray #2"),
+	TCHAR szTitle[100];
+	_sntprintf_s(szTitle, ARRAYSIZE(szTitle), _T("Shades of Gray #2 %s"), title_append);
+
+	hwnd = CreateWindow (szAppName, 
+		g_prompt_params
+			? TEXT ("Shades of Gray #2 (Hint: pass in param R, G, or B to show colored shades)") 
+			: szTitle,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,             
+		648, 300, // CW_USEDEFAULT, CW_USEDEFAULT,             
 		NULL, NULL, hInstance, NULL) ;
 
 	ShowWindow (hwnd, iCmdShow) ;
@@ -52,7 +80,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static HPALETTE hPalette ;
+	static HPALETTE s_hPalette ;
 	static int      cxClient, cyClient ;
 	HBRUSH          hBrush ;
 	HDC             hdc ;
@@ -66,19 +94,19 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		// Set up a LOGPALETTE structure and create a palette
 
-		plp = malloc (sizeof (LOGPALETTE) + 64 * sizeof (PALETTEENTRY)) ;
+		plp = (LOGPALETTE*) malloc (sizeof (LOGPALETTE) + 64 * sizeof (PALETTEENTRY)) ;
 
 		plp->palVersion    = 0x0300 ;
 		plp->palNumEntries = 65 ;
 
 		for (i = 0 ; i < 65 ; i++)
 		{
-			plp->palPalEntry[i].peRed   = (BYTE) min (255, 4 * i) ;
-			plp->palPalEntry[i].peGreen = (BYTE) min (255, 4 * i) ;
-			plp->palPalEntry[i].peBlue  = (BYTE) min (255, 4 * i) ;
+			plp->palPalEntry[i].peRed   = (BYTE)(g_use_red ? min (255, 4 * i) : 0);
+			plp->palPalEntry[i].peGreen = (BYTE)(g_use_green ? min (255, 4 * i) : 0);
+			plp->palPalEntry[i].peBlue  = (BYTE)(g_use_blue ? min (255, 4 * i) : 0);
 			plp->palPalEntry[i].peFlags = 0 ;
 		}
-		hPalette = CreatePalette (plp) ;
+		s_hPalette = CreatePalette (plp) ;
 		free (plp) ;
 		return 0 ;
 
@@ -92,7 +120,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// Select and realize the palette in the device context
 
-		SelectPalette (hdc, hPalette, FALSE) ;
+		SelectPalette (hdc, s_hPalette, FALSE) ;
 		RealizePalette (hdc) ;
 
 		// Draw the fountain of grays
@@ -104,9 +132,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			rect.right  = (i + 1) * cxClient / 64 ;
 			rect.bottom = cyClient ;
 
-			hBrush = CreateSolidBrush (PALETTERGB (min (255, 4 * i), 
-				min (255, 4 * i), 
-				min (255, 4 * i))) ;
+			// Key: To enable palette, use PALETTERGB() instead of RGB()
+			hBrush = CreateSolidBrush (PALETTERGB (
+				g_use_red ? min (255, 4 * i) : 0, 
+				g_use_green ? min (255, 4 * i) : 0, 
+				g_use_blue ? min (255, 4 * i) : 0
+				)) ;
+
 			FillRect (hdc, &rect, hBrush) ;
 			DeleteObject (hBrush) ;
 		}
@@ -114,11 +146,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_QUERYNEWPALETTE:
-		if (!hPalette)
+		if (!s_hPalette)
 			return FALSE ;
 
 		hdc = GetDC (hwnd) ;
-		SelectPalette (hdc, hPalette, FALSE) ;
+		SelectPalette (hdc, s_hPalette, FALSE) ;
 		RealizePalette (hdc) ;
 		InvalidateRect (hwnd, NULL, TRUE) ;
 
@@ -126,11 +158,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return TRUE ;
 
 	case WM_PALETTECHANGED:
-		if (!hPalette || (HWND) wParam == hwnd)
+		if (!s_hPalette || (HWND) wParam == hwnd)
 			break ;
 
 		hdc = GetDC (hwnd) ;
-		SelectPalette (hdc, hPalette, FALSE) ;
+		SelectPalette (hdc, s_hPalette, FALSE) ;
 		RealizePalette (hdc) ;
 		UpdateColors (hdc) ;
 
@@ -138,7 +170,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break ;
 
 	case WM_DESTROY:
-		DeleteObject (hPalette) ;
+		DeleteObject (s_hPalette) ;
 		PostQuitMessage (0) ;
 		return 0 ;
 	}

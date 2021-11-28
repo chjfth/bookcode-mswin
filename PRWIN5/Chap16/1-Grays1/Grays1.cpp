@@ -6,6 +6,9 @@
 #include <windows.h>
 #include "..\set-256color-mode.h"
 
+bool g_use_red = false, g_use_green = false, g_use_blue = false;
+bool g_prompt_params = false;
+
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -17,6 +20,20 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	WNDCLASS     wndclass ;
 
 	Set_256ColorMode(szAppName);
+
+	// Chj special: Command-line tells to set "gray" scale of red/green/blue.
+	//
+	CharUpperA(szCmdLine);
+	if( szCmdLine[0]=='R')
+		g_use_red = true;
+	else if(szCmdLine[0]=='G')
+		g_use_green = true;
+	else if(szCmdLine[0]=='B')
+		g_use_blue = true;
+	else {
+		g_use_red = g_use_green = g_use_blue = true;
+		g_prompt_params = true;
+	}
 
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
 	wndclass.lpfnWndProc   = WndProc ;
@@ -36,7 +53,10 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	hwnd = CreateWindow (szAppName, TEXT ("Shades of Gray #1"),
+	hwnd = CreateWindow (szAppName, 
+		g_prompt_params
+			? TEXT ("Shades of Gray #1 (Hint: pass in param R, G, or B to show colored shades)") 
+			: TEXT ("Shades of Gray #1"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		648, 300, // CW_USEDEFAULT, CW_USEDEFAULT,             
@@ -81,9 +101,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			rect.right  = (i + 1) * cxClient / 65 ;
 			rect.bottom = cyClient ;
 
-			hBrush = CreateSolidBrush (RGB (min (255, 4 * i), 
-				min (255, 4 * i), 
-				min (255, 4 * i))) ;
+			hBrush = CreateSolidBrush (RGB (
+				g_use_red ? min (255, 4 * i) : 0, 
+				g_use_green ? min (255, 4 * i) : 0, 
+				g_use_blue ? min (255, 4 * i) : 0
+				)) ;
 
 			FillRect (hdc, &rect, hBrush) ;
 			DeleteObject (hBrush) ;
