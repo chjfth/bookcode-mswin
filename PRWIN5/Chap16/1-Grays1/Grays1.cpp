@@ -4,6 +4,7 @@
   ---------------------------------------*/
 
 #include <windows.h>
+#include "..\set-256color-mode.h"
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -14,6 +15,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	HWND         hwnd ;
 	MSG          msg ;
 	WNDCLASS     wndclass ;
+
+	Set_256ColorMode(szAppName);
 
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
 	wndclass.lpfnWndProc   = WndProc ;
@@ -36,7 +39,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hwnd = CreateWindow (szAppName, TEXT ("Shades of Gray #1"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,             
+		648, 300, // CW_USEDEFAULT, CW_USEDEFAULT,             
 		NULL, NULL, hInstance, NULL) ;
 
 	ShowWindow (hwnd, iCmdShow) ;

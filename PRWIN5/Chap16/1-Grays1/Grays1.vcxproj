@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(RootNamespace).cpp" />
+    <ClCompile Include="..\set-256color-mode.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <VSPG_BatDir_NoTBS>..\..\_VSPG</VSPG_BatDir_NoTBS>
