@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Grays1", "1-Grays1\Grays1.vcxproj", "{1F039FE5-FA17-6599-C5EE-F09E7D502146}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Grays2", "2-Grays2\Grays2.vcxproj", "{6AFBFE98-F33E-D0A6-5422-607990ED4A13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,14 @@ Global
 		{1F039FE5-FA17-6599-C5EE-F09E7D502146}.Release|Win32.Build.0 = Release|Win32
 		{1F039FE5-FA17-6599-C5EE-F09E7D502146}.Release|x64.ActiveCfg = Release|x64
 		{1F039FE5-FA17-6599-C5EE-F09E7D502146}.Release|x64.Build.0 = Release|x64
+		{6AFBFE98-F33E-D0A6-5422-607990ED4A13}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6AFBFE98-F33E-D0A6-5422-607990ED4A13}.Debug|Win32.Build.0 = Debug|Win32
+		{6AFBFE98-F33E-D0A6-5422-607990ED4A13}.Debug|x64.ActiveCfg = Debug|x64
+		{6AFBFE98-F33E-D0A6-5422-607990ED4A13}.Debug|x64.Build.0 = Debug|x64
+		{6AFBFE98-F33E-D0A6-5422-607990ED4A13}.Release|Win32.ActiveCfg = Release|Win32
+		{6AFBFE98-F33E-D0A6-5422-607990ED4A13}.Release|Win32.Build.0 = Release|Win32
+		{6AFBFE98-F33E-D0A6-5422-607990ED4A13}.Release|x64.ActiveCfg = Release|x64
+		{6AFBFE98-F33E-D0A6-5422-607990ED4A13}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
