@@ -3,4 +3,6 @@
 
 void Set_256ColorMode(const TCHAR *szAppname);
 
+void vaDbg(const TCHAR *fmt, ...);
+
 #endif

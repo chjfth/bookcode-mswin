@@ -149,6 +149,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (!s_hPalette)
 			return FALSE ;
 
+		vaDbg(_T("See WM_QUERYNEWPALETTE."));
+
 		hdc = GetDC (hwnd) ;
 		SelectPalette (hdc, s_hPalette, FALSE) ;
 		RealizePalette (hdc) ;
@@ -158,8 +160,20 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return TRUE ;
 
 	case WM_PALETTECHANGED:
-		if (!s_hPalette || (HWND) wParam == hwnd)
+		if (!s_hPalette)
+			break;
+		
+		if((HWND)wParam == hwnd)
+		{
+			// Chj: wParam is the HWND that caused system-palette change.
+			// So, if it is ourself causing the change, we have called
+			// SelectPalette() and RealizePalette() in WM_QUERYNEWPALETTE,
+			// then no need to call them again.
+			vaDbg(_T("See WM_PALETTECHANGED (self HWND)."));
 			break ;
+		}
+
+		vaDbg(_T("See WM_PALETTECHANGED (HWND=0x%X)."), (DWORD)wParam);
 
 		hdc = GetDC (hwnd) ;
 		SelectPalette (hdc, s_hPalette, FALSE) ;
