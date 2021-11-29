@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AllColor", "9-AllColor\AllC
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pipes", "10-Pipes\Pipes.vcxproj", "{054C1AA8-CE3A-B5ED-7E35-2ABF0F86A42C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShowDib3", "11-ShowDib3\ShowDib3.vcxproj", "{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -109,6 +111,14 @@ Global
 		{054C1AA8-CE3A-B5ED-7E35-2ABF0F86A42C}.Release|Win32.Build.0 = Release|Win32
 		{054C1AA8-CE3A-B5ED-7E35-2ABF0F86A42C}.Release|x64.ActiveCfg = Release|x64
 		{054C1AA8-CE3A-B5ED-7E35-2ABF0F86A42C}.Release|x64.Build.0 = Release|x64
+		{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}.Debug|Win32.Build.0 = Debug|Win32
+		{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}.Debug|x64.ActiveCfg = Debug|x64
+		{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}.Debug|x64.Build.0 = Debug|x64
+		{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}.Release|Win32.ActiveCfg = Release|Win32
+		{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}.Release|Win32.Build.0 = Release|Win32
+		{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}.Release|x64.ActiveCfg = Release|x64
+		{3D749AB0-0E6A-C89B-FE6E-23475FDA339E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
