@@ -8,6 +8,8 @@
 #include "..\PackeDib.h"
 #include "resource.h"
 
+bool g_isHalftoneStretch = false; // Petzold default for ShowDib4
+
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 TCHAR szAppName[] = TEXT ("ShowDib4") ;
@@ -16,6 +18,13 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
 	Set_256ColorMode(szAppName);
+
+	if(szCmdLine[0]=='H')
+		g_isHalftoneStretch = true;
+	else if(szCmdLine[0]=='h')
+		g_isHalftoneStretch = false;
+
+	////
 
 	HWND     hwnd ;
 	MSG      msg ;
@@ -197,6 +206,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if (pPackedDib)
 		{
+			if(g_isHalftoneStretch)
+				SetStretchBltMode (hdc, HALFTONE) ;
+
 			SelectPalette (hdc, hPalette, FALSE) ;
 			RealizePalette (hdc) ;
 

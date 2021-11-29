@@ -8,6 +8,8 @@
 #include "..\PackeDib.h"
 #include "resource.h"
 
+bool g_isHalftoneStretch = true; // Petzold default for ShowDib5
+
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 TCHAR szAppName[] = TEXT ("ShowDib5") ;
@@ -16,6 +18,13 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
 	Set_256ColorMode(szAppName);
+
+	if(szCmdLine[0]=='H')
+		g_isHalftoneStretch = true;
+	else if(szCmdLine[0]=='h')
+		g_isHalftoneStretch = false;
+
+	////
 
 	HWND     hwnd ;
 	MSG      msg ;
@@ -149,8 +158,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			// Set halftone stretch mode
 
-			SetStretchBltMode (hdc, HALFTONE) ;
-			SetBrushOrgEx (hdc, 0, 0, NULL) ;
+			if(g_isHalftoneStretch)
+			{
+				SetStretchBltMode (hdc, HALFTONE) ;
+				SetBrushOrgEx (hdc, 0, 0, NULL) ;
+			}
 
 			// Select and realize halftone palette
 
