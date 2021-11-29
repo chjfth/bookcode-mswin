@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SysPal2", "5-SysPal2\SysPal
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SysPal3", "6-SysPal3\SysPal3.vcxproj", "{BD1762AC-758A-C29A-F98C-58E70CA5CF58}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bounce-CH16", "7-Bounce\Bounce-CH16.vcxproj", "{B006D222-F9C0-54B3-50C6-BAEDC3496902}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -69,6 +71,14 @@ Global
 		{BD1762AC-758A-C29A-F98C-58E70CA5CF58}.Release|Win32.Build.0 = Release|Win32
 		{BD1762AC-758A-C29A-F98C-58E70CA5CF58}.Release|x64.ActiveCfg = Release|x64
 		{BD1762AC-758A-C29A-F98C-58E70CA5CF58}.Release|x64.Build.0 = Release|x64
+		{B006D222-F9C0-54B3-50C6-BAEDC3496902}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B006D222-F9C0-54B3-50C6-BAEDC3496902}.Debug|Win32.Build.0 = Debug|Win32
+		{B006D222-F9C0-54B3-50C6-BAEDC3496902}.Debug|x64.ActiveCfg = Debug|x64
+		{B006D222-F9C0-54B3-50C6-BAEDC3496902}.Debug|x64.Build.0 = Debug|x64
+		{B006D222-F9C0-54B3-50C6-BAEDC3496902}.Release|Win32.ActiveCfg = Release|Win32
+		{B006D222-F9C0-54B3-50C6-BAEDC3496902}.Release|Win32.Build.0 = Release|Win32
+		{B006D222-F9C0-54B3-50C6-BAEDC3496902}.Release|x64.ActiveCfg = Release|x64
+		{B006D222-F9C0-54B3-50C6-BAEDC3496902}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
