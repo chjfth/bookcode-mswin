@@ -11,13 +11,13 @@
 
 typedef struct
 {
-	PBYTE    * ppRow ;            // must be first field for macros!
-	int        iSignature ;
-	HBITMAP    hBitmap ;
-	BYTE     * pBits ;
+	PBYTE    * ppRow ;      // array of row pointers // must be first field for macros!
+	int        iSignature ; // = "Dib "
+	HBITMAP    hBitmap ;    // handle returned from CreateDIBSection
+	BYTE     * pBits ;      // pointer to bitmap bitarray
 	DIBSECTION ds ;
-	int        iRShift[3] ;
-	int        iLShift[3] ;
+	int        iRShift[3] ; // right-shift values for color masks
+	int        iLShift[3] ; // left-shift values for color masks
 }
 DIBSTRUCT, * PDIBSTRUCT ;
 
@@ -668,10 +668,10 @@ BOOL DibDelete (HDIB hdib)
 
 HDIB DibCreate (int cx, int cy, int cBits, int cColors)
 {
-	BITMAPINFO * pbmi ;
-	DWORD        dwInfoSize ;
-	HDIB         hDib ;
-	int          cEntries ;
+	BITMAPINFO * pbmi = NULL;
+	DWORD        dwInfoSize = 0;
+	HDIB         hDib = NULL;
+	int          cEntries = 0; // Chj fix: Must be init to 0, required when cColors==0 and cBits=24.
 
 	if (cx <= 0 || cy <= 0 || 
 		((cBits !=  1) && (cBits !=  4) && (cBits !=  8) && 
@@ -685,7 +685,7 @@ HDIB DibCreate (int cx, int cy, int cBits, int cColors)
 	else if (cBits <= 8)
 		cEntries = 1 << cBits ;
 
-	dwInfoSize = sizeof (BITMAPINFOHEADER) + (cEntries - 1) * sizeof (RGBQUAD);
+	dwInfoSize = sizeof(BITMAPINFOHEADER) + cEntries*sizeof(RGBQUAD); // Chj fix.
 
 	if (NULL == (pbmi = (BITMAPINFO*)malloc (dwInfoSize)))
 	{
