@@ -34,6 +34,10 @@ const TCHAR *ErrStrDispChange(LONG err)
 
 void Set_256ColorMode(const TCHAR *szAppname)
 {
+	// Check 256-color video mode using either way:
+	// 1. EnumDisplaySettings(), DEVMODE.dmBitsPerPel should be 8.
+	// 2. GetDeviceCaps(, SIZEPALETTE), should return 256.
+
 	DEVMODE dm = {sizeof(dm)};
 	EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, & dm); // query current
 	if( dm.dmBitsPerPel==8 )
