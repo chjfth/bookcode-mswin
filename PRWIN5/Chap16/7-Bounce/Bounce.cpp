@@ -27,6 +27,8 @@ HPALETTE CreateRoutine (HWND hwnd)
 		plp->palPalEntry[i].peRed   = 255 ;
 		plp->palPalEntry[i].peGreen = (i == 0 ? 0 : 255) ;
 		plp->palPalEntry[i].peBlue  = (i == 0 ? 0 : 255) ;
+
+		// KEY: PC_RESERVED, don't share this slot with other palette-entry.
 		plp->palPalEntry[i].peFlags = (i == 33 ? 0 : PC_RESERVED) ;
 	}
 	hPalette = CreatePalette (plp) ;
