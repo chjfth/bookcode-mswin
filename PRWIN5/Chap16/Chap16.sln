@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShowDib8", "16-ShowDib8\Sho
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tunnel", "10a-Tunnel\Tunnel.vcxproj", "{568080C9-276D-61F0-1FA0-EF15223BBDC8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dibble", "17-Dibble\Dibble.vcxproj", "{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -179,6 +181,14 @@ Global
 		{568080C9-276D-61F0-1FA0-EF15223BBDC8}.Release|Win32.Build.0 = Release|Win32
 		{568080C9-276D-61F0-1FA0-EF15223BBDC8}.Release|x64.ActiveCfg = Release|x64
 		{568080C9-276D-61F0-1FA0-EF15223BBDC8}.Release|x64.Build.0 = Release|x64
+		{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}.Debug|Win32.Build.0 = Debug|Win32
+		{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}.Debug|x64.ActiveCfg = Debug|x64
+		{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}.Debug|x64.Build.0 = Debug|x64
+		{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}.Release|Win32.ActiveCfg = Release|Win32
+		{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}.Release|Win32.Build.0 = Release|Win32
+		{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}.Release|x64.ActiveCfg = Release|x64
+		{15D21A7B-E5A6-009B-7DC0-B86D5DBC519D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
