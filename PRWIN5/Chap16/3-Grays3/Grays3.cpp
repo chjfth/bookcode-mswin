@@ -4,6 +4,7 @@
   -----------------------------------------------*/
 
 #include <windows.h>
+#include "..\set-256color-mode.h"
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -14,6 +15,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	HWND         hwnd ;
 	MSG          msg ;
 	WNDCLASS     wndclass ;
+
+	Set_256ColorMode(szAppName);
 
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
 	wndclass.lpfnWndProc   = WndProc ;

@@ -4,6 +4,7 @@
   ----------------------------------------*/
 
 #include <windows.h>
+#include "..\set-256color-mode.h"
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -12,6 +13,8 @@ TCHAR szAppName [] = TEXT ("SysPal1") ;
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
+	Set_256ColorMode(szAppName);
+
 	HWND     hwnd ;
 	MSG      msg ;
 	WNDCLASS wndclass ;
