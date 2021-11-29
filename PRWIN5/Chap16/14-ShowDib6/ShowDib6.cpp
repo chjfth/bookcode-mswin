@@ -1,30 +1,24 @@
-/*-------------------------------------------------------
-   SHOWDIB4.C -- Displays DIB with "all-purpose" palette
+/*------------------------------------------------
+   SHOWDIB6.C -- Display DIB with palette indices
                  (c) Charles Petzold, 1998
-  -------------------------------------------------------*/
+  ------------------------------------------------*/
+
+// Chj note: Under 256-color video mode, This program does not show high-color/true-color
+// images with correct color.
 
 #include <windows.h>
 #include "..\set-256color-mode.h"
 #include "..\PackeDib.h"
 #include "resource.h"
 
-bool g_isHalftoneStretch = false; // Petzold default for ShowDib4
-
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
-TCHAR szAppName[] = TEXT ("ShowDib4") ;
+TCHAR szAppName[] = TEXT ("ShowDib6") ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
 	Set_256ColorMode(szAppName);
-
-	if(szCmdLine[0]=='H')
-		g_isHalftoneStretch = true;
-	else if(szCmdLine[0]=='h')
-		g_isHalftoneStretch = false;
-
-	////
 
 	HWND     hwnd ;
 	MSG      msg ;
@@ -48,7 +42,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	hwnd = CreateWindow (szAppName, TEXT ("Show DIB #4: All-Purpose Palette"),
+	hwnd = CreateWindow (szAppName, TEXT ("Show DIB #6: Palette Indices"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT, 
@@ -65,58 +59,6 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return msg.wParam ;
 }
 
-/*------------------------------------------------------------------------
-   CreateAllPurposePalette: Creates a palette suitable for a wide variety
-          of images; the palette has 247 entries, but 15 of them are 
-          duplicates or match the standard 20 colors.
-  ------------------------------------------------------------------------*/
-
-HPALETTE CreateAllPurposePalette (void)
-{
-	HPALETTE hPalette ;
-	int          i, incr, R, G, B ;
-	LOGPALETTE * plp ;
-
-	plp = (LOGPALETTE*) malloc (sizeof (LOGPALETTE) + 246 * sizeof (PALETTEENTRY)) ;
-
-	plp->palVersion    = 0x0300 ;
-	plp->palNumEntries = 247 ;
-
-	// The following loop calculates 31 gray shades, but 3 of them
-	//        will match the standard 20 colors
-
-	for (i = 0, G = 0, incr = 8 ; G <= 0xFF ; i++, G += incr)
-	{
-		plp->palPalEntry[i].peRed   = (BYTE) G ;
-		plp->palPalEntry[i].peGreen = (BYTE) G ;
-		plp->palPalEntry[i].peBlue  = (BYTE) G ;
-		plp->palPalEntry[i].peFlags = 0 ;
-
-		incr = (incr == 9 ? 8 : 9) ;
-	}
-
-	// The following loop is responsible for 216 entries, but 8 of 
-	//        them will match the standard 20 colors, and another
-	//        4 of them will match the gray shades above.
-
-	for (R = 0 ; R <= 0xFF ; R += 0x33)
-	for (G = 0 ; G <= 0xFF ; G += 0x33)
-	for (B = 0 ; B <= 0xFF ; B += 0x33)
-	{
-		plp->palPalEntry[i].peRed   = (BYTE) R ;
-		plp->palPalEntry[i].peGreen = (BYTE) G ;
-		plp->palPalEntry[i].peBlue  = (BYTE) B ;
-		plp->palPalEntry[i].peFlags = 0 ;
-
-		i++ ;
-	}
-
-	hPalette = CreatePalette (plp) ;
-
-	free (plp) ;
-	return hPalette ;
-}
-
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static BITMAPINFO * pPackedDib ;
@@ -127,6 +69,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static TCHAR        szFilter[] = TEXT ("Bitmap Files (*.BMP)\0*.bmp\0")
 		TEXT ("All Files (*.*)\0*.*\0\0") ;
 	HDC                 hdc ;
+	int                 i, iNumColors ;
 	PAINTSTRUCT         ps ;
 
 	switch (message)
@@ -153,9 +96,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		ofn.lpfnHook          = NULL ;
 		ofn.lpTemplateName    = NULL ;
 
-		// Create the All-Purpose Palette
-
-		hPalette = CreateAllPurposePalette () ;
 		return 0 ;
 
 	case WM_SIZE:
@@ -181,6 +121,14 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				pPackedDib = NULL ;
 			}
 
+			// If there's an existing logical palette, delete it
+
+			if (hPalette)
+			{
+				DeleteObject (hPalette) ;
+				hPalette = NULL ;
+			}
+
 			// Load the packed DIB into memory
 
 			SetCursor (LoadCursor (NULL, IDC_WAIT)) ;
@@ -191,11 +139,28 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ShowCursor (FALSE) ;
 			SetCursor (LoadCursor (NULL, IDC_ARROW)) ;
 
-			if (!pPackedDib)
+			if (pPackedDib)
 			{
-				MessageBox (hwnd, TEXT ("Cannot load DIB file"), 
-					szAppName, 0) ;
+				// Create the palette from the DIB color table
+
+				hPalette = PackedDibCreatePalette (pPackedDib) ;
+
+				// Replace DIB color table with indices
+
+				if (hPalette)
+				{
+					iNumColors = PackedDibGetNumColors (pPackedDib) ;
+					WORD *pwIndex = (WORD*)PackedDibGetColorTablePtr(pPackedDib);
+
+					for (i = 0 ; i < iNumColors ; i++)
+						pwIndex[i] = (WORD) i ;
+				}
 			}
+			else
+			{
+				MessageBox (hwnd, TEXT ("Cannot load DIB file"), szAppName, 0) ;
+			}
+
 			InvalidateRect (hwnd, NULL, TRUE) ;
 			return 0 ;
 		}
@@ -204,55 +169,35 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint (hwnd, &ps) ;
 
-		if (pPackedDib)
+		if (hPalette)
 		{
-			if(g_isHalftoneStretch)
-			{
-				SetStretchBltMode (hdc, HALFTONE) ;
-			}
-
 			SelectPalette (hdc, hPalette, FALSE) ;
 			RealizePalette (hdc) ;
-
-			if(g_isHalftoneStretch)
-			{	
-				// This StretchDIBits call is copied from ShowDib5.cpp .
-				// `SetStretchBltMode(hdc, HALFTONE);` is effective only if we call StretchDIBits(),
-				// no effect if we call SetDIBitsToDevice().
-				StretchDIBits (hdc, 
-					0,   
-					0,   
-					PackedDibGetWidth (pPackedDib), 
-					PackedDibGetHeight (pPackedDib),
-					0,                            
-					0,                            
-					PackedDibGetWidth (pPackedDib),
-					PackedDibGetHeight (pPackedDib),  
-					PackedDibGetBitsPtr (pPackedDib), 
-					pPackedDib, 
-					DIB_RGB_COLORS, 
-					SRCCOPY) ;
-			}
-			else
-			{
-				SetDIBitsToDevice (hdc, 
-					0,   
-					0,   
-					PackedDibGetWidth (pPackedDib), 
-					PackedDibGetHeight (pPackedDib),
-					0,                            
-					0,                            
-					0,                            
-					PackedDibGetHeight (pPackedDib),  
-					PackedDibGetBitsPtr (pPackedDib), 
-					pPackedDib, 
-					DIB_RGB_COLORS) ;
-			}
 		}
+
+		if (pPackedDib)
+		{
+			SetDIBitsToDevice (hdc, 
+				0,   
+				0,   
+				PackedDibGetWidth (pPackedDib), 
+				PackedDibGetHeight (pPackedDib),
+				0,                            
+				0,                            
+				0,                            
+				PackedDibGetHeight (pPackedDib),  
+				PackedDibGetBitsPtr (pPackedDib), 
+				pPackedDib, 
+				DIB_PAL_COLORS) ;
+		}
+
 		EndPaint (hwnd, &ps) ;
 		return 0 ;
 
 	case WM_QUERYNEWPALETTE:
+		if (!hPalette)
+			return FALSE ;
+
 		hdc = GetDC (hwnd) ;
 		SelectPalette (hdc, hPalette, FALSE) ;
 		RealizePalette (hdc) ;
@@ -262,8 +207,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return TRUE ;
 
 	case WM_PALETTECHANGED:
-		if ((HWND) wParam != hwnd)
-			break;
+		if (!hPalette || (HWND) wParam == hwnd)
+			break ;
 
 		hdc = GetDC (hwnd) ;
 		SelectPalette (hdc, hPalette, FALSE) ;
@@ -273,11 +218,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		ReleaseDC (hwnd, hdc) ;
 		break ;
 
+
 	case WM_DESTROY:
 		if (pPackedDib)
 			free (pPackedDib) ;
 
-		DeleteObject (hPalette) ;
+		if (hPalette)
+			DeleteObject (hPalette) ;
 
 		PostQuitMessage (0) ;
 		return 0 ;
