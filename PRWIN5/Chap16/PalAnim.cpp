@@ -4,6 +4,7 @@
   ----------------------------------------------*/
 
 #include <windows.h>
+#include "set-256color-mode.h"
 
 extern HPALETTE CreateRoutine  (HWND) ;
 extern void     PaintRoutine   (HDC, int, int) ;
@@ -16,145 +17,147 @@ extern TCHAR szAppName [] ;
 extern TCHAR szTitle [] ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                    PSTR szCmdLine, int iCmdShow)
+	PSTR szCmdLine, int iCmdShow)
 {
-     HWND     hwnd ;
-     MSG      msg ;
-     WNDCLASS wndclass ;
+	Set_256ColorMode(szAppName);
 
-     wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
-     wndclass.lpfnWndProc   = WndProc ;
-     wndclass.cbClsExtra    = 0 ;
-     wndclass.cbWndExtra    = 0 ;
-     wndclass.hInstance     = hInstance ;
-     wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
-     wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-     wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
-     wndclass.lpszMenuName  = NULL ;
-     wndclass.lpszClassName = szAppName ;
-     
-     if (!RegisterClass (&wndclass))
-     {
-          MessageBox (NULL, TEXT ("This program requires Windows NT!"),
-                      szAppName, MB_ICONERROR) ;
-          return 0 ;
-     }
-     
-     hwnd = CreateWindow (szAppName, szTitle, 
-                          WS_OVERLAPPEDWINDOW, 
-                          CW_USEDEFAULT, CW_USEDEFAULT,
-                          CW_USEDEFAULT, CW_USEDEFAULT,
-                          NULL, NULL, hInstance, NULL) ;
+	HWND     hwnd ;
+	MSG      msg ;
+	WNDCLASS wndclass ;
 
-     if (!hwnd)
-          return 0 ;
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
+	wndclass.lpfnWndProc   = WndProc ;
+	wndclass.cbClsExtra    = 0 ;
+	wndclass.cbWndExtra    = 0 ;
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
+	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
+	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = szAppName ;
 
-     ShowWindow (hwnd, iCmdShow) ;
-     UpdateWindow (hwnd) ;
+	if (!RegisterClass (&wndclass))
+	{
+		MessageBox (NULL, TEXT ("This program requires Windows NT!"),
+			szAppName, MB_ICONERROR) ;
+		return 0 ;
+	}
 
-     while (GetMessage (&msg, NULL, 0, 0))
-     {
-          TranslateMessage (&msg) ;
-          DispatchMessage (&msg) ;
-     }
-     return msg.wParam ;
+	hwnd = CreateWindow (szAppName, szTitle, 
+		WS_OVERLAPPEDWINDOW, 
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		NULL, NULL, hInstance, NULL) ;
+
+	if (!hwnd)
+		return 0 ;
+
+	ShowWindow (hwnd, iCmdShow) ;
+	UpdateWindow (hwnd) ;
+
+	while (GetMessage (&msg, NULL, 0, 0))
+	{
+		TranslateMessage (&msg) ;
+		DispatchMessage (&msg) ;
+	}
+	return msg.wParam ;
 }
 
 BOOL CheckDisplay (HWND hwnd)
 {
-     HDC hdc ;
-     int iPalSize ;
+	HDC hdc ;
+	int iPalSize ;
 
-     hdc = GetDC (hwnd) ;
-     iPalSize = GetDeviceCaps (hdc, SIZEPALETTE) ;
-     ReleaseDC (hwnd, hdc) ;
+	hdc = GetDC (hwnd) ;
+	iPalSize = GetDeviceCaps (hdc, SIZEPALETTE) ;
+	ReleaseDC (hwnd, hdc) ;
 
-     if (iPalSize != 256)
-     {
-          MessageBox (hwnd, TEXT ("This program requires that the video ")
-                            TEXT ("display mode have a 256-color palette."),
-                      szAppName, MB_ICONERROR) ;
-          return FALSE ;
-     }
-     return TRUE ;
+	if (iPalSize != 256)
+	{
+		MessageBox (hwnd, TEXT ("This program requires that the video ")
+			TEXT ("display mode have a 256-color palette."),
+			szAppName, MB_ICONERROR) ;
+		return FALSE ;
+	}
+	return TRUE ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-     static HPALETTE hPalette ;
-     static int      cxClient, cyClient ;
-     HDC             hdc ;
-     PAINTSTRUCT     ps ;
+	static HPALETTE hPalette ;
+	static int      cxClient, cyClient ;
+	HDC             hdc ;
+	PAINTSTRUCT     ps ;
 
-     switch (message)
-     {
-     case WM_CREATE:
-          if (!CheckDisplay (hwnd))
-               return -1 ;
+	switch (message)
+	{
+	case WM_CREATE:
+		if (!CheckDisplay (hwnd))
+			return -1 ;
 
-          hPalette = CreateRoutine (hwnd) ;
-          return 0 ;
-     
-     case WM_DISPLAYCHANGE:
-          if (!CheckDisplay (hwnd))
-               DestroyWindow (hwnd) ;
+		hPalette = CreateRoutine (hwnd) ;
+		return 0 ;
 
-          return 0 ;
+	case WM_DISPLAYCHANGE:
+		if (!CheckDisplay (hwnd))
+			DestroyWindow (hwnd) ;
 
-     case WM_SIZE:
-          cxClient = LOWORD (lParam) ;
-          cyClient = HIWORD (lParam) ;
-          return 0 ;
+		return 0 ;
 
-     case WM_PAINT:
-          hdc = BeginPaint (hwnd, &ps) ;
+	case WM_SIZE:
+		cxClient = LOWORD (lParam) ;
+		cyClient = HIWORD (lParam) ;
+		return 0 ;
 
-          SelectPalette (hdc, hPalette, FALSE) ;
-          RealizePalette (hdc) ;
+	case WM_PAINT:
+		hdc = BeginPaint (hwnd, &ps) ;
 
-          PaintRoutine (hdc, cxClient, cyClient) ;
+		SelectPalette (hdc, hPalette, FALSE) ;
+		RealizePalette (hdc) ;
 
-          EndPaint (hwnd, &ps) ;
-          return 0 ;
+		PaintRoutine (hdc, cxClient, cyClient) ;
 
-     case WM_TIMER:
-          hdc = GetDC (hwnd) ;
+		EndPaint (hwnd, &ps) ;
+		return 0 ;
 
-          SelectPalette (hdc, hPalette, FALSE) ;
+	case WM_TIMER:
+		hdc = GetDC (hwnd) ;
 
-          TimerRoutine (hdc, hPalette) ;
+		SelectPalette (hdc, hPalette, FALSE) ;
 
-          ReleaseDC (hwnd, hdc) ;
-          return 0 ;
+		TimerRoutine (hdc, hPalette) ;
 
-     case WM_QUERYNEWPALETTE:
-          if (!hPalette)
-               return FALSE ;
+		ReleaseDC (hwnd, hdc) ;
+		return 0 ;
 
-          hdc = GetDC (hwnd) ;
-          SelectPalette (hdc, hPalette, FALSE) ;
-          RealizePalette (hdc) ;
-          InvalidateRect (hwnd, NULL, TRUE) ;
+	case WM_QUERYNEWPALETTE:
+		if (!hPalette)
+			return FALSE ;
 
-          ReleaseDC (hwnd, hdc) ;
-          return TRUE ;
+		hdc = GetDC (hwnd) ;
+		SelectPalette (hdc, hPalette, FALSE) ;
+		RealizePalette (hdc) ;
+		InvalidateRect (hwnd, NULL, TRUE) ;
 
-     case WM_PALETTECHANGED:
-          if (!hPalette || (HWND) wParam == hwnd)
-               break ;
+		ReleaseDC (hwnd, hdc) ;
+		return TRUE ;
 
-          hdc = GetDC (hwnd) ;
-          SelectPalette (hdc, hPalette, FALSE) ;
-          RealizePalette (hdc) ;
-          UpdateColors (hdc) ;
+	case WM_PALETTECHANGED:
+		if (!hPalette || (HWND) wParam == hwnd)
+			break ;
 
-          ReleaseDC (hwnd, hdc) ;
-          break ;
+		hdc = GetDC (hwnd) ;
+		SelectPalette (hdc, hPalette, FALSE) ;
+		RealizePalette (hdc) ;
+		UpdateColors (hdc) ;
 
-     case WM_DESTROY:
-          DestroyRoutine (hwnd, hPalette) ;
-          PostQuitMessage (0) ;
-          return 0 ;
-     }
-     return DefWindowProc (hwnd, message, wParam, lParam) ;
+		ReleaseDC (hwnd, hdc) ;
+		break ;
+
+	case WM_DESTROY:
+		DestroyRoutine (hwnd, hPalette) ;
+		PostQuitMessage (0) ;
+		return 0 ;
+	}
+	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
