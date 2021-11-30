@@ -21,13 +21,13 @@
 
 ==== 举例 ====
 
-已有可编译的 $\Chapt_07\GDIObj\GDIObj.vcxproj ，现在要将其作为模板，来“导入” $\Chapt_14\CH14-FontEmbed\FontEmbed.vcxproj 。
+已有可编译的 $\Chapt_07\ColorSpace\ColorSpace.vcxproj ，现在要将其作为模板，来“导入” $\Chapt_14\CH14-FontEmbed\FontEmbed.vcxproj 。
 
-[1] 将 GDIObj.vcxproj 复制到目标目录，并改名成 FontEmbed.vcxproj 。
+[1] 将 ColorSpace.vcxproj 复制到目标目录，并改名成 FontEmbed.vcxproj 。
 
 [2] 文本编辑 FontEmbed.vcxproj ，将
 
-    <RootNamespace>GDIObj</RootNamespace>
+    <RootNamespace>ColorSpace</RootNamespace>
 改成
     <RootNamespace>FontEmbed</RootNamespace>
 
@@ -41,7 +41,7 @@
 
 [4] 将 CH14-FontEmbed 加入 git 仓库。
 
-FontEmbed.vcxproj 中残留的 gditable.cpp，无须存在，可以将其从工程中移除。
+[4+] 如果当前工程还需要其他的 cpp，可以让 VSIDE 将它们 Add Existing Item 进来，目前为止，此操作不会破坏 vcxproj 中的手工语句。
 
 [5] 编译 BuildConf [Debug] ，应该能编译成功。 
 
@@ -52,7 +52,7 @@ FontEmbed.vcxproj 中残留的 gditable.cpp，无须存在，可以将其从工�
 
 ==== 模板注意事项 ====
 
-GDIObj.vcxproj 是高度手工定制化过的。体现在：
+ColorSpace.vcxproj 是高度手工定制化过的。体现在：
 
 (1) 对于 [Debug] 和 [Unicode Debug] 的共同配置项，用了如下手写的 MSBuild Condition ：
 
@@ -66,5 +66,5 @@ GDIObj.vcxproj 是高度手工定制化过的。体现在：
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
 
-这些手写配置在什么场合下会被 VSIDE 的 Saving 动作给破坏，未有定论。因此，强烈建议自己手工维护这些 .vcxproj 。反之这些 exe 工程的结构也很简单，手工操作并不难。
+这些手写配置在什么场合下会被 VSIDE 的 Saving 动作给破坏，未有定论。因此，强烈建议自己手工维护这些 .vcxproj（在发现 VSIDE 会损毁手工语句的情况下）。反正这些 exe 工程的结构也很简单，手工操作并不难。
 

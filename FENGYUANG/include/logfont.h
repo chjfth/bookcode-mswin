@@ -32,7 +32,7 @@ public:
 		m_LogFont.lfClipPrecision  = CLIP_DEFAULT_PRECIS;
 		m_LogFont.lfQuality        = ANTIALIASED_QUALITY;
 		m_LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		_tcscpy(m_LogFont.lfFaceName, FaceName);
+		_tcscpy_s(m_LogFont.lfFaceName, ARRAYSIZE(m_LogFont.lfFaceName), FaceName);
 	}
 
 	void SetHeight(int height)   { m_LogFont.lfHeight = height; }
