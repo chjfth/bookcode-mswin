@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Font", "CH14-Font\Font.vcxp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wingraph", "..\include\wingraph\wingraph.vcxproj", "{227E3A6E-D602-241F-9C67-C45C9E248700}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Text", "CH15-Text\Text.vcxproj", "{123478B5-2445-94D4-1E36-13EFFBAF4A06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -39,6 +41,14 @@ Global
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+		{123478B5-2445-94D4-1E36-13EFFBAF4A06}.Debug|Win32.ActiveCfg = Debug|Win32
+		{123478B5-2445-94D4-1E36-13EFFBAF4A06}.Debug|Win32.Build.0 = Debug|Win32
+		{123478B5-2445-94D4-1E36-13EFFBAF4A06}.Release|Win32.ActiveCfg = Release|Win32
+		{123478B5-2445-94D4-1E36-13EFFBAF4A06}.Release|Win32.Build.0 = Release|Win32
+		{123478B5-2445-94D4-1E36-13EFFBAF4A06}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{123478B5-2445-94D4-1E36-13EFFBAF4A06}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
+		{123478B5-2445-94D4-1E36-13EFFBAF4A06}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{123478B5-2445-94D4-1E36-13EFFBAF4A06}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
