@@ -6,7 +6,7 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Unicode Debug|Win32">
-      <Configuration>Debug</Configuration>
+      <Configuration>Unicode Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -14,7 +14,7 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Unicode Release|Win32">
-      <Configuration>Release</Configuration>
+      <Configuration>Unicode Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -58,7 +58,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.IndexOf('Unicode'))==-1">
-    <CharacterSet>Multibyte</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <!-- 
   	~ 
