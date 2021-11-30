@@ -7,7 +7,7 @@
 //  Published          by  Prentice Hall PTR, Prentice-Hall, Inc. www.phptr.com      //
 //                                                                                   //
 //  FileName   : gditable.cpp					                                     //
-//  Description: Accesing GDI handle table                                           //
+//  Description: Accessing GDI handle table                                           //
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
@@ -38,7 +38,7 @@ KGDITable::KGDITable()
 	{
 		pGDITable = NULL;
 	
-		MessageBox(NULL, "Unable to locate handle table", "KGDITable", MB_OK | MB_ICONSTOP);
+		MessageBox(NULL, _T("Unable to locate handle table"), _T("KGDITable"), MB_OK | MB_ICONSTOP);
 		
 		PostQuitMessage(-1); // Chj: This will not quit the application immediately
 	}

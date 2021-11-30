@@ -85,6 +85,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
       <AdditionalDependencies>comctl32.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -113,6 +114,7 @@
   -->
   <ItemGroup>
     <ClCompile Include="$(RootNamespace).cpp" />
+    <ClCompile Include="..\..\include\gditable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(RootNamespace).rc" />
