@@ -36,7 +36,9 @@ void GetProcessName(DWORD processID, TCHAR szProcessName[], int bufchars)
     DWORD cbNeeded;
 
     if ( EnumProcessModules( hProcess, &hMod, sizeof(hMod), &cbNeeded) )
-       GetModuleBaseName( hProcess, hMod, szProcessName, MAX_PATH );
+	{
+		GetModuleBaseName( hProcess, hMod, szProcessName, MAX_PATH );
+	}
 
     CloseHandle( hProcess );
 }
