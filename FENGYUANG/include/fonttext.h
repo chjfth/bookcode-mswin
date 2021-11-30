@@ -95,7 +95,7 @@ public:
 		m_gcp.lpDx        = m_dx;
 		m_gcp.lpCaretPos  = m_caret;
 		m_gcp.lpClass     = m_class;
-		m_gcp.lpGlyphs    = m_glyphs;
+		m_gcp.lpGlyphs    = (LPWSTR)m_glyphs; // Chj: VC2010, need a cast, to verify
 		m_gcp.nGlyphs     = maxlength;
 
 		return GetCharacterPlacement(hDC, mess, _tcslen(mess), maxextent, & m_gcp, flags);

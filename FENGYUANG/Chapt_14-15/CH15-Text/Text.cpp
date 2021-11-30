@@ -202,7 +202,7 @@ public:
 
 			case IDM_FILE_SAVE:
 				{
-					HDC hDC = QuerySaveEMFFile("Text EMF Sample\0", NULL, NULL);
+					HDC hDC = QuerySaveEMFFile("Text EMF Sample\0", NULL, NULL, 0);
 
 					if ( hDC )
 					{

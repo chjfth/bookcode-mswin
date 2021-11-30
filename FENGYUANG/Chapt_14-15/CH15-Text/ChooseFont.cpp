@@ -155,16 +155,17 @@ HTREEITEM AddCharWidth(KTreeView & Tree, HDC hDC, const TCHAR * name, HTREEITEM 
 	{
 		TCHAR mess[MAX_PATH];
 
-		sprintf(mess, "%d '%c': ", ch, ch);
+		_sntprintf_s(mess, ARRAYSIZE(mess), _T("%d '%c': "), ch, ch);
 
 		TCHAR * num = mess + _tcslen(mess);
+		int buflen = ARRAYSIZE(mess) - _tcslen(mess);
 
 		switch ( typ )
 		{
-			case 0: sprintf(num, "%d",    intWidth[ch-uFirst]); break;
-			case 1: sprintf(num, "%7.3f", fltWidth[ch-uFirst]); break;
-			case 2: sprintf(num, "%d %d %d", abcWidth[ch-uFirst].abcA, abcWidth[ch-uFirst].abcB, abcWidth[ch-uFirst].abcC); break;
-			case 3: sprintf(num, "%7.3f %7.3f %7.3f", abcfWidth[ch-uFirst].abcfA, abcfWidth[ch-uFirst].abcfB, abcfWidth[ch-uFirst].abcfC); break;
+			case 0: _sntprintf_s(num, buflen, _TRUNCATE, "%d",    intWidth[ch-uFirst]); break;
+			case 1: _sntprintf_s(num, buflen, _TRUNCATE, "%7.3f", fltWidth[ch-uFirst]); break;
+			case 2: _sntprintf_s(num, buflen, _TRUNCATE, "%d %d %d", abcWidth[ch-uFirst].abcA, abcWidth[ch-uFirst].abcB, abcWidth[ch-uFirst].abcC); break;
+			case 3: _sntprintf_s(num, buflen, _TRUNCATE, "%7.3f %7.3f %7.3f", abcfWidth[ch-uFirst].abcfA, abcfWidth[ch-uFirst].abcfB, abcfWidth[ch-uFirst].abcfC); break;
 		}
 
 		Tree.InsertItem(TVI_LAST, hLast, mess);

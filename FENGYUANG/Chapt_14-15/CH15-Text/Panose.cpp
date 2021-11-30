@@ -86,7 +86,7 @@ public:
 };
 
 // 'Arial Bold Italic' -> PANOSE
-bool GetPANOSE(HDC hDC, const TCHAR * fullname, PANOSE * panose, TCHAR facename[])
+bool GetPANOSE(HDC hDC, const TCHAR * fullname, PANOSE * panose, TCHAR facename[], int bufsize)
 {
 	TCHAR name[MAX_PATH];
 
@@ -94,7 +94,7 @@ bool GetPANOSE(HDC hDC, const TCHAR * fullname, PANOSE * panose, TCHAR facename[
 	while (fullname[0]==' ')
 		fullname ++;
 
-	_tcscpy(name, fullname);
+	_tcscpy_s(name, ARRAYSIZE(name), fullname);
 
 	// remove space after
 	for (int i=_tcslen(name)-1; (i>=0) && (name[i]==' '); i--)
@@ -112,7 +112,7 @@ bool GetPANOSE(HDC hDC, const TCHAR * fullname, PANOSE * panose, TCHAR facename[
 	if ( strstr(name, "Bold") )
 		lf.lfWeight = FW_BOLD;
 
-	_tcscpy(lf.lfFaceName, name);
+	_tcscpy_s(lf.lfFaceName, ARRAYSIZE(lf.lfFaceName), name);
 	
 	HFONT hFont = CreateFontIndirect(& lf);
 
@@ -126,7 +126,7 @@ bool GetPANOSE(HDC hDC, const TCHAR * fullname, PANOSE * panose, TCHAR facename[
 	
 		if ( otm.GetName(otm.m_pOtm->otmpFaceName) )
 		{
-			_tcscpy(facename, otm.GetName(otm.m_pOtm->otmpFaceName) ); 
+			_tcscpy_s(facename, bufsize, otm.GetName(otm.m_pOtm->otmpFaceName) ); 
 	
 			* panose = otm.m_pOtm->otmPanoseNumber;
 		}
@@ -300,13 +300,13 @@ void KPanoseView::AddFont(const TCHAR * fullname, HDC hDC)
 	PANOSE panose;
 	TCHAR  facename[MAX_PATH];
 
-	if ( GetPANOSE(hDC, fullname, & panose, facename) )
+	if ( GetPANOSE(hDC, fullname, & panose, facename, ARRAYSIZE(facename)) )
 	{
 		assert(m_nFonts<MAX_FONTS);
 
 		if ( m_nFonts < MAX_FONTS )
 		{
-			_tcscpy(m_TypeFace[m_nFonts], facename);
+			_tcscpy_s(m_TypeFace[m_nFonts], ARRAYSIZE(m_TypeFace[m_nFonts]), facename);
 			m_Panose[m_nFonts] = panose;
 
 			m_nFonts ++;
