@@ -38,8 +38,8 @@ public:
 
 	void Query(TCHAR speed[], TCHAR overhead[])
 	{
-		wsprintf(speed, "%d.%d Mhz", cpuspeed10 / 10,  cpuspeed10 % 10);
-		wsprintf(overhead, "%d ns", (unsigned) m_overhead);
+		wsprintf(speed, _T("%d.%d MHz"), cpuspeed10 / 10,  cpuspeed10 % 10);
+		wsprintf(overhead, _T("%d ns"), (unsigned) m_overhead);
 	}
 };
 
@@ -72,10 +72,10 @@ class KSpeedTest : public KDialog
 
 				report.FromDlgItem(hWnd, IDC_REPORT);
 
-				report.AddColumn(0, 180, "Primitive");
-				report.AddColumn(1,  80, "clock/oper");
-				report.AddColumn(2,  80, "ns/oper");
-				report.AddColumn(3,  78, "oper/sec");
+				report.AddColumn(0, 180, _T("Primitive"));
+				report.AddColumn(1,  80, _T("clock/oper"));
+				report.AddColumn(2,  80, _T("ns/oper"));
+				report.AddColumn(3,  78, _T("oper/sec"));
 				
 				{
 					TCHAR speed[32], overhead[32];
@@ -85,11 +85,11 @@ class KSpeedTest : public KDialog
 				}
 
 				Measure();
-				Report(measurement[0]/10000, "SetPixel(hDC, RGB)");
-				Report(measurement[1]/10000, "SetPixel(hDC, PALETTERGB)");
-				Report(measurement[2]/10000, "SetPixel(hDC, PALETTEINDEX)");
-				Report(measurement[3]/10000, "SetPixelV(hDC, RGB)");
-				Report(measurement[4]/10000, "GetPixel(hDC)");
+				Report(measurement[0]/10000, _T("SetPixel(hDC, RGB)"));
+				Report(measurement[1]/10000, _T("SetPixel(hDC, PALETTERGB)"));
+				Report(measurement[2]/10000, _T("SetPixel(hDC, PALETTEINDEX)"));
+				Report(measurement[3]/10000, _T("SetPixelV(hDC, RGB)"));
+				Report(measurement[4]/10000, _T("GetPixel(hDC)"));
 	
 				return TRUE;
 

@@ -299,7 +299,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 	TCHAR title [MAX_PATH];
 
 	_sntprintf_s(title, ARRAYSIZE(title), 
-		"Mandelbrot Set (%f %f) zoom %d:%d unit %f", 
+		_T("Mandelbrot Set (%f %f) zoom %d:%d unit %f"), 
 		m_x, m_y, m_zoommul, m_zoomdiv, m_unit);
 	SetWindowText(GetParent(m_hWnd), title);
 
@@ -352,7 +352,7 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 
 	tick = GetTickCount() - tick;
 
-	_sntprintf_s(title, ARRAYSIZE(title), "millisec used: %d", tick);
+	_sntprintf_s(title, ARRAYSIZE(title), _T("millisec used: %d"), tick);
 	m_pStatus->SetText(1, title);
 }
 
@@ -385,7 +385,7 @@ void KMyCanvas::OnMouseMove(WPARAM wParam, LPARAM lParam)
 	int x = GetScrollPos(m_hWnd, SB_HORZ) + LOWORD(lParam);
 	int y = GetScrollPos(m_hWnd, SB_VERT) + HIWORD(lParam);
 				
-	_sntprintf_s(temp, MAX_PATH, "(%f, %f) %d", m_x + x * m_unit,
+	_sntprintf_s(temp, MAX_PATH, _T("(%f, %f) %d"), m_x + x * m_unit,
 		                         m_y + y * m_unit,
 								 MandelCount(NULL, x, y, m_limit));
 
@@ -408,7 +408,7 @@ BOOL KMyCanvas::OnCommand(WPARAM wParam, LPARAM lParam)
 		case  IDM_OPT_512: SetLimit(  512, TRUE); return TRUE;
 		case IDM_OPT_1024: SetLimit( 1024, TRUE); return TRUE;
 		case IDM_OPT_4096: SetLimit( 2048, TRUE); return TRUE;
- 	   case IDM_OPT_16384: SetLimit(16384, TRUE); return TRUE;
+ 		case IDM_OPT_16384: SetLimit(16384, TRUE); return TRUE;
 	}
 
 	return FALSE;
