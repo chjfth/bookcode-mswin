@@ -88,8 +88,8 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				COLORREF color = GetPixel(m_hDC, LOWORD(lParam), HIWORD(lParam));
 
 				TCHAR temp[32];
-
-				wsprintf(temp, "%d RGB(%d,%d,%d)", color>>24, GetRValue(color), GetGValue(color), GetBValue(color));
+				_sntprintf_s(temp, ARRAYSIZE(temp), _T("%d RGB(%d,%d,%d)"), 
+					color>>24, GetRValue(color), GetGValue(color), GetBValue(color));
 
 				m_pStatus->SetText(0, temp);
 			}
@@ -172,9 +172,9 @@ void RGBCube(HDC hDC)
 	LineTo(hDC, 128+256+30, 128);
 	MoveToEx(hDC, 128, 128, NULL);
 	LineTo(hDC, 128, 128+256+30);
-	TextOut(hDC, -20, -20, "Red COLORREF(255,0,0)", 3+18);
-	TextOut(hDC, 128+256+30, 128, "Green COLORREF(0,255,0)", 5+18);
-	TextOut(hDC, 128, 128+256+30, "Blue COLORREF(0,0,255)", 4+18);
+	TextOut(hDC, -20, -20, _T("Red COLORREF(255,0,0)"), 3+18);
+	TextOut(hDC, 128+256+30, 128, _T("Green COLORREF(0,255,0)"), 5+18);
+	TextOut(hDC, 128, 128+256+30, _T("Blue COLORREF(0,0,255)"), 4+18);
 
 	// Red = 255
 	ColorRect(hDC, PALETTERGB(0xFF, 0, 0), RGB(0, 1, 0), RGB(0, 0, 1));
@@ -208,9 +208,9 @@ void RGBCube_Affine(HDC hDC)
 	LineTo(hDC, 128+256+30, 128);
 	MoveToEx(hDC, 128, 128, NULL);
 	LineTo(hDC, 128, 128+256+30);
-	TextOut(hDC, -20, -20, "Red COLORREF(255,0,0)", 3+18);
-	TextOut(hDC, 128+256+30, 128, "Green COLORREF(0,255,0)", 5+18);
-	TextOut(hDC, 128, 128+256+30, "Blue COLORREF(0,0,255)", 4+18);
+	TextOut(hDC, -20, -20, _T("Red COLORREF(255,0,0)"), 3+18);
+	TextOut(hDC, 128+256+30, 128, _T("Green COLORREF(0,255,0)"), 5+18);
+	TextOut(hDC, 128, 128+256+30, _T("Blue COLORREF(0,0,255)"), 4+18);
 
 	// Red = 255
 	ColorRect(hDC, PALETTERGB(0xFF, 0, 0), RGB(0, 1, 0), RGB(0, 0, 1));

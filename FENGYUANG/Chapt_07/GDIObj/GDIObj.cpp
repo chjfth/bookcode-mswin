@@ -21,9 +21,9 @@
 #include <psapi.h> 
 #include <tchar.h>
 
-void GetProcessName(DWORD processID, TCHAR szProcessName[])
+void GetProcessName(DWORD processID, TCHAR szProcessName[], int bufchars)
 {
-    _tcscpy(szProcessName, _T("unknown"));
+    _tcscpy_s(szProcessName, bufchars, _T("unknown"));
 
     // Get a handle to the process.
     HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
@@ -79,17 +79,17 @@ class KGDIObjectTable : public KDialog
 
 				m_process.FromDlgItem(hWnd, IDC_PROCESS);
 
-				m_process.AddColumn(0, 40,  "PID");
-				m_process.AddColumn(1, 100, "Process");
+				m_process.AddColumn(0, 40,  _T("PID"));
+				m_process.AddColumn(1, 100, _T("Process"));
 
-				m_process.AddColumn(2, 50, "Total");
-				m_process.AddColumn(3, 40, "DC");
-				m_process.AddColumn(4, 50, "Region");
-				m_process.AddColumn(5, 45, "Bitmap");
-				m_process.AddColumn(6, 50, "Palette");
-				m_process.AddColumn(7, 40, "Font");
-				m_process.AddColumn(8, 45, "Brush");
-				m_process.AddColumn(9, 45, "Other");
+				m_process.AddColumn(2, 50, _T("Total"));
+				m_process.AddColumn(3, 40, _T("DC"));
+				m_process.AddColumn(4, 50, _T("Region"));
+				m_process.AddColumn(5, 45, _T("Bitmap"));
+				m_process.AddColumn(6, 50, _T("Palette"));
+				m_process.AddColumn(7, 40, _T("Font"));
+				m_process.AddColumn(8, 45, _T("Brush"));
+				m_process.AddColumn(9, 45, _T("Other"));
 
 				UpdateTable();
 				SetTimer(hWnd, 101, 1000, NULL);
@@ -205,7 +205,7 @@ void KGDIObjectTable::UpdateTable(void)
 			m_info[k].processid = cell._nProcess;
 		
 			TCHAR szPath[MAX_PATH];
-			GetProcessName(m_info[k].processid, szPath);
+			GetProcessName(m_info[k].processid, szPath, MAX_PATH);
 			// new process in listview
 			m_process.AddItem(0, m_info[k].processid);
 			m_process.AddItem(1, szPath);
@@ -254,8 +254,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 	if(LOBYTE(LOWORD(dwVersion))>=6)
 	{
 		MessageBox(NULL, 
-			"This program runs correctly only on Windows XP(NT 5.x), not Vista or Win7+.",
-			"KGDITable", MB_OK|MB_ICONSTOP);
+			_T("This program runs correctly only on Windows XP(NT 5.x), not Vista or Win7+."),
+			_T("KGDITable"), MB_OK|MB_ICONSTOP);
 		return 4;
 	}
 

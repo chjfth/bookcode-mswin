@@ -32,8 +32,9 @@ public:
 		if ( (m_gdi==gdi) && (m_user==user) )
 			return;
 		
-		char temp[64];
-		wsprintf(temp, "ResourceDifference: gdi(%d->%d) user(%d->%d)\n", m_gdi, gdi, m_user, user);
+		TCHAR temp[64];
+		_sntprintf_s(temp, ARRAYSIZE(temp),
+			_T("ResourceDifference: gdi(%d->%d) user(%d->%d)\n"), m_gdi, gdi, m_user, user);
 		OutputDebugString(temp);
 	}
 };
