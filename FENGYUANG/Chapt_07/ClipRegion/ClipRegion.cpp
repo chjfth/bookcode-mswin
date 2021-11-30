@@ -208,7 +208,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if(m_isLogClipbox)
 				{
 					hDC = GetDC(hWnd);
-					LogClipBox(hDC, ">>>");
+					LogClipBox(hDC, _T(">>>"));
 					ReleaseDC(hWnd, hDC);
 					hDC = NULL;
 				}
@@ -219,7 +219,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				if(m_isLogClipbox)
 				{
-					LogClipBox(hDC, "!!!");
+					LogClipBox(hDC, _T("!!!"));
 				}
 
 			//	HRGN hRgn1 = CreateRectRgn(0, 0, 100, 100);
@@ -237,7 +237,7 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				if(m_isLogClipbox)
 				{
-					LogClipBox(hDC, "<<<");
+					LogClipBox(hDC, _T("<<<"));
 				}
 				
 				DrawRegions(hDC);
@@ -282,15 +282,15 @@ void KMyCanvas::DumpRegions(HDC hDC)
 				break;
 
 			case -1:
-				m_Log.Log("RandomRgn(%d=%s) Error\r\n", i, rgi2text(i));
+				m_Log.Log(_T("RandomRgn(%d=%s) Error\r\n"), i, rgi2text(i));
 				break;
 
 			case 0:
-				m_Log.Log("RandomRgn(%d=%s) no region\r\n", i, rgi2text(i));
+				m_Log.Log(_T("RandomRgn(%d=%s) no region\r\n"), i, rgi2text(i));
 				break;
 
 			default:
-				m_Log.Log("Unexpected\r\n");
+				m_Log.Log(_T("Unexpected\r\n"));
 		}
 	}
 }
@@ -368,10 +368,10 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 			int x = (pRect[i].left + pRect[i].right)/2;
 			int y = (pRect[i].top + pRect[i].bottom)/2;
 
-			wsprintf(mess, "WM_PAINT #%d, rects=%d", m_nRepaint, i+1);
+			_sntprintf_s(mess, ARRAYSIZE(mess), _T("WM_PAINT #%d, rects=%d"), m_nRepaint, i+1);
 			::TextOut(hDC, x, y - lineheight, mess, _tcslen(mess));
 
-			wsprintf(mess, "(%d, %d, %d, %d)", pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
+			_sntprintf_s(mess, ARRAYSIZE(mess), _T("(%d, %d, %d, %d)"), pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 			::TextOut(hDC, x, y, mess, _tcslen(mess));
 
 			m_Log.Log(_T("SYSRGN-rect#%d (%d,%d, %d,%d) [%dx%d]"), i+1,
@@ -403,7 +403,7 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 	HRGN hRgn = NULL;
 
 	if(m_test!=IDM_TEST_DEFAULT)
-		m_Log.Log("Apply DC user-clipping");
+		m_Log.Log(_T("Apply DC user-clipping"));
 
 	switch ( m_test )
 	{
@@ -437,7 +437,7 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 
 	if(m_isLogClipbox)
 	{
-		LogClipBox(hDC, "###");
+		LogClipBox(hDC, _T("###"));
 	}
 
 	// Chj: Wield our big brush trying to paint the whole client area,
@@ -452,25 +452,25 @@ void KMyCanvas::TestClipMeta(HDC hDC, const RECT & rect)
 	DumpRegions(hDC);
 	// -- The implicit input to DumpRegions(), is the region we've "selected" into hDC.
 
-	char mess[64] = {};
+	TCHAR mess[64] = {};
 	//
-	strcat_s(mess, ARRAYSIZE(mess), "Clip: ");
+	_tcscat_s(mess, ARRAYSIZE(mess), _T("Clip: "));
 	if ( m_bValid[Rgi_CLIPRGN] ) 
-		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+		_tcscat_s(mess, ARRAYSIZE(mess), _T("Y")); 
 	else 
-		strcat_s(mess, ARRAYSIZE(mess), "N");
+		_tcscat_s(mess, ARRAYSIZE(mess), _T("N"));
 	//	
-	strcat_s(mess, ARRAYSIZE(mess), ",  Meta: ");
+	_tcscat_s(mess, ARRAYSIZE(mess), _T(",  Meta: "));
 	if ( m_bValid[Rgi_METARGN] ) 
-		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+		_tcscat_s(mess, ARRAYSIZE(mess), _T("Y")); 
 	else 
-		strcat_s(mess, ARRAYSIZE(mess), "N");
+		_tcscat_s(mess, ARRAYSIZE(mess), _T("N"));
 	//
-	strcat_s(mess, ARRAYSIZE(mess), ", API: ");
+	_tcscat_s(mess, ARRAYSIZE(mess), _T(", API: "));
 	if ( m_bValid[Rgi_APIRGN] ) 
-		strcat_s(mess, ARRAYSIZE(mess), "Y"); 
+		_tcscat_s(mess, ARRAYSIZE(mess), _T("Y")); 
 	else 
-		strcat_s(mess, ARRAYSIZE(mess), "N");
+		_tcscat_s(mess, ARRAYSIZE(mess), _T("N"));
 	//
 	m_pStatus->SetText(0, mess);
 }

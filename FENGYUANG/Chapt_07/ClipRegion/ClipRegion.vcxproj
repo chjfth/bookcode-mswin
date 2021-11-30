@@ -28,10 +28,10 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+  <PropertyGroup Condition="$(Configuration.EndsWith('Debug'))" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+  <PropertyGroup Condition="$(Configuration.EndsWith('Release'))" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -45,10 +45,10 @@
   <!-- 
   	Debug or Release 
   -->
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+  <PropertyGroup Condition="$(Configuration.EndsWith('Debug'))">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+  <PropertyGroup Condition="$(Configuration.EndsWith('Release'))">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <!-- 
@@ -59,11 +59,23 @@
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.IndexOf('Unicode'))==-1">
     <CharacterSet>MultiByte</CharacterSet>
+    <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
   </PropertyGroup>
+  <!--  -->
+  <ItemDefinitionGroup Condition="$(Configuration.IndexOf('Unicode'))==0">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="$(Configuration.IndexOf('Unicode'))==-1">
+    <ClCompile>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <!-- 
   	~ 
   -->
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+  <ItemDefinitionGroup Condition="$(Configuration.EndsWith('Debug'))">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -77,7 +89,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+  <ItemDefinitionGroup Condition="$(Configuration.EndsWith('Release'))">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
