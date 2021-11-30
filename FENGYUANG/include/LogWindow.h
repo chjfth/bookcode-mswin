@@ -53,5 +53,5 @@ public:
 	void Create(HINSTANCE hInst, const TCHAR * pTitle, HICON hIcon=NULL);
 	
 	void Log(const TCHAR * format, ...);
-	void DumpRegion(const char * mess, HRGN hRgn, bool detail, int p1=0);
+	void DumpRegion(const TCHAR * mess, HRGN hRgn, bool detail, int p1=0);
 };

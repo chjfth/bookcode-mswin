@@ -124,13 +124,13 @@ void KLogWindow::Log(const TCHAR * format, ...)
 }
 
 
-void KLogWindow::DumpRegion(const char * mess, HRGN hRgn, bool detail, int p1)
+void KLogWindow::DumpRegion(const TCHAR * mess, HRGN hRgn, bool detail, int p1)
 {
 	if ( mess )
 		Log(mess, p1);
 
 	if ( hRgn==NULL )
-		Log(" NULL");
+		Log(_T(" NULL"));
 	else
 	{
 		RECT rect;
@@ -140,19 +140,19 @@ void KLogWindow::DumpRegion(const char * mess, HRGN hRgn, bool detail, int p1)
 		switch ( GetRgnBox(hRgn, & rect) )
 		{
 			case NULLREGION: 
-				Log(" NULLREGION "); break;
+				Log(_T(" NULLREGION ")); break;
 
 			case SIMPLEREGION:
-				Log(" SIMPLEREGION "); break;
+				Log(_T(" SIMPLEREGION ")); break;
 
 			case COMPLEXREGION:
-				Log(" COMPLEXREGION "); break;
+				Log(_T(" COMPLEXREGION ")); break;
 
 			default:
-				Log(" Error "); break;
+				Log(_T(" Error ")); break;
 		}
 
-		Log(" RgnBox=[%d,%d, %d,%d) [%dx%d]", 
+		Log(_T(" RgnBox=[%d,%d, %d,%d) [%dx%d]"), 
 			rect.left, rect.top, rect.right, rect.bottom,
 			RectW(rect), RectH(rect));
 
@@ -167,20 +167,22 @@ void KLogWindow::DumpRegion(const char * mess, HRGN hRgn, bool detail, int p1)
 			const RECT * pRect = (const RECT *) & pRegion->Buffer;
 			rectcount = pRegion->rdh.nCount;
 
-			Log("%d rectangles", rectcount);
+			Log(_T("%d rectangles"), rectcount);
 
 			if ( detail )
 			{
-				Log("\r\n");
+				Log(_T("\r\n"));
 				for (unsigned i=0; i<pRegion->rdh.nCount; i++)
-					Log("rect %d [%d, %d, %d, %d)\r\n", i, pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
+				{
+					Log(_T("rect %d [%d, %d, %d, %d)\r\n"), i, pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
+				}
 			}
 
 			delete [] (char *) pRegion;
 		}
 		else
-			Log("0 rectangle");
+			Log(_T("0 rectangle"));
 	}
 
-	Log("\r\n");
+	Log(_T("\r\n"));
 }

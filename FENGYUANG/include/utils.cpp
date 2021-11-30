@@ -40,7 +40,7 @@ void vaSetDlgItemText(HWND hwnd, UINT ctrlid, const TCHAR *fmt, ...)
 	va_start(args, fmt);
 
 	TCHAR buf[1000] = _T("");
-	_vsnprintf_s(buf, ARRAYSIZE(buf), fmt, args);
+	_vsntprintf_s(buf, ARRAYSIZE(buf), fmt, args);
 
 	SetDlgItemText(hwnd, ctrlid, buf);
 
@@ -53,7 +53,7 @@ void vaMsgBox(HWND hwndParent, const TCHAR *title, const TCHAR *fmt, ...)
 	va_start(args, fmt);
 
 	TCHAR buf[1000] = _T("");
-	_vsnprintf_s(buf, ARRAYSIZE(buf), fmt, args);
+	_vsntprintf_s(buf, ARRAYSIZE(buf), fmt, args);
 
 	::MessageBox(hwndParent, buf, title, MB_OK);
 
