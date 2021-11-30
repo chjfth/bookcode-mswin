@@ -22,7 +22,7 @@
     RootNamespace' value is referenced later in cpp file list and VSPG. 
     -->
   <PropertyGroup Label="Globals">
-    <RootNamespace>ColorSpace</RootNamespace>
+    <RootNamespace>FontEmbed</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
