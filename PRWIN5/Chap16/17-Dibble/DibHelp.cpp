@@ -284,7 +284,7 @@ void * DibBitsPtr (HDIB hdib)
 }
 
 /*------------------------------------------------------
-   DibSetColor:  Obtains entry from the DIB color table
+   DibGetColor:  Obtains entry from the DIB color table
   ------------------------------------------------------*/
 
 BOOL DibGetColor (HDIB hdib, int index, RGBQUAD * prgb)
@@ -305,7 +305,7 @@ BOOL DibGetColor (HDIB hdib, int index, RGBQUAD * prgb)
 }
 
 /*----------------------------------------------------
-   DibGetColor:  Sets an entry in the DIB color table
+   DibSetColor:  Sets an entry in the DIB color table
   ----------------------------------------------------*/
  
 BOOL DibSetColor (HDIB hdib, int index, RGBQUAD * prgb)

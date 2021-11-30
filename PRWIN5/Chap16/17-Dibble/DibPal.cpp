@@ -268,25 +268,27 @@ HPALETTE DibPalPopularity (HDIB hdib, int iRes)
 	for (iEntry = 0 ; iEntry < 236 ; iEntry++)
 	{
 		for (i = 0, iCount = 0 ; i < iArraySize ; i++)
+		{
 			if (piCount[i] > iCount)
 			{
 				iCount = piCount[i] ;
 				iIndex = i ;
 			}
+		}
 
-			if (iCount == 0)
-				break ;
+		if (iCount == 0)
+			break ;
 
-			R = (iMask &  iIndex                  ) << (8 - iRes) ;
-			G = (iMask & (iIndex >>         iRes )) << (8 - iRes) ;
-			B = (iMask & (iIndex >> (iRes + iRes))) << (8 - iRes) ;
+		R = (iMask &  iIndex                  ) << (8 - iRes) ;
+		G = (iMask & (iIndex >>         iRes )) << (8 - iRes) ;
+		B = (iMask & (iIndex >> (iRes + iRes))) << (8 - iRes) ;
 
-			plp->palPalEntry[iEntry].peRed   = (BYTE) R ; 
-			plp->palPalEntry[iEntry].peGreen = (BYTE) G ; 
-			plp->palPalEntry[iEntry].peBlue  = (BYTE) B ; 
-			plp->palPalEntry[iEntry].peFlags = 0 ;
+		plp->palPalEntry[iEntry].peRed   = (BYTE) R ; 
+		plp->palPalEntry[iEntry].peGreen = (BYTE) G ; 
+		plp->palPalEntry[iEntry].peBlue  = (BYTE) B ; 
+		plp->palPalEntry[iEntry].peFlags = 0 ;
 
-			piCount [iIndex] = 0 ;
+		piCount [iIndex] = 0 ;
 	}
 	// On exit from the loop iEntry will be the number of stored entries
 

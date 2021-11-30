@@ -100,18 +100,19 @@ int DisplayDib (HDC hdc, HBITMAP hBitmap, int x, int y,
 	{
 	case IDM_SHOW_NORMAL:
 		if (fHalftonePalette)
-			iReturn = StretchBlt (hdc,    0, 0, 
-			min (cxClient, cxBitmap - x), 
-			min (cyClient, cyBitmap - y), 
-			hdcMem, x, y, 
-			min (cxClient, cxBitmap - x), 
-			min (cyClient, cyBitmap - y), 
-			SRCCOPY);
+		{
+			iReturn = StretchBlt (hdc,    
+				0, 0, min (cxClient, cxBitmap-x), min (cyClient, cyBitmap-y), 
+				hdcMem, 
+				x, y, min (cxClient, cxBitmap-x), min (cyClient, cyBitmap-y), 
+				SRCCOPY);
+		}
 		else
-			iReturn = BitBlt (hdc,    0, 0, 
-			min (cxClient, cxBitmap - x), 
-			min (cyClient, cyBitmap - y),
-			hdcMem, x, y, SRCCOPY) ;
+		{
+			iReturn = BitBlt (hdc,    
+				0, 0, min (cxClient, cxBitmap-x), min (cyClient, cyBitmap-y),
+				hdcMem, x, y, SRCCOPY) ;
+		}
 		break ;
 
 	case IDM_SHOW_CENTER:
@@ -139,8 +140,11 @@ int DisplayDib (HDC hdc, HBITMAP hBitmap, int x, int y,
 		SetWindowOrgEx (hdc, cxBitmap / 2, cyBitmap / 2, NULL) ;
 		SetViewportOrgEx (hdc, cxClient / 2, cyClient / 2, NULL) ;
 
-		iReturn = StretchBlt (hdc,    0, 0, cxBitmap, cyBitmap, 
-			hdcMem, 0, 0, cxBitmap, cyBitmap, SRCCOPY) ;
+		iReturn = StretchBlt (hdc,    
+			0, 0, cxBitmap, cyBitmap, 
+			hdcMem, 
+			0, 0, cxBitmap, cyBitmap, 
+			SRCCOPY) ;
 		break ;
 	}
 	DeleteDC (hdcMem) ;
