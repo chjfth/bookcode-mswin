@@ -194,4 +194,4 @@ public:
 };
 
 
-BOOL LogTableDirectory(KTrueType & tt, HINSTANCE hInstance, const char * FaceName);
+BOOL LogTableDirectory(KTrueType & tt, HINSTANCE hInstance, const TCHAR* FaceName);

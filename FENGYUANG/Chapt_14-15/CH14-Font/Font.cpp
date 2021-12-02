@@ -147,10 +147,10 @@ class KTrueTypeFontView : public KView
 				    HFONT hFont = CreateFont(- 36 /** GetDeviceCaps(hDC, LOGPIXELSY) / 72*/,
 							 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, 
 							 ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, 
-							 PROOF_QUALITY, VARIABLE_PITCH, "Times New Roman");
+							 PROOF_QUALITY, VARIABLE_PITCH, _T("Times New Roman"));
 					HGDIOBJ hOld = SelectObject(hDC, hFont);
 
-					TextOut(hDC, 20, 145,"ABC", 3);
+					TextOut(hDC, 20, 145, _T("ABC"), 3);
 					SelectObject(hDC, hOld);
 					DeleteObject(hFont);
 				}
@@ -274,42 +274,42 @@ public:
 };
 
 
-const char * TypeFaces[] =
+const TCHAR* TypeFaces[] =
 {
-	"Georgia",
-	"Times New Roman",
-	"Clarendon",
-	"Bodoni Black",
+	_T("Georgia"),
+	_T("Times New Roman"),
+	_T("Clarendon"),
+	_T("Bodoni Black"),
 
-	"Arial",
-	"Microsoft Sans Serif",
-	"Verdana",
-	"Eras Demi ITC",
+	_T("Arial"),
+	_T("Microsoft Sans Serif"),
+	_T("Verdana"),
+	_T("Eras Demi ITC"),
 
-	"Curier New",
-	"Dark Courier",
-	"Lucica Console",
-	"Letter Gothic",
+	_T("Curier New"),
+	_T("Dark Courier"),
+	_T("Lucica Console"),
+	_T("Letter Gothic"),
 
-	"Vivaldi",
-	"Tempus Sans ITC",
-	"Viner Hand ITC",
-	"Comic Sans MS",
+	_T("Vivaldi"),
+	_T("Tempus Sans ITC"),
+	_T("Viner Hand ITC"),
+	_T("Comic Sans MS"),
 
-	"Old English",
-	"BD Renaissance",
-	"TreeHouse",
-	"Unicorn"
+	_T("Old English"),
+	_T("BD Renaissance"),
+	_T("TreeHouse"),
+	_T("Unicorn")
 };
 
 
-const char * TypeFamily[]=
+const TCHAR * TypeFamily[]=
 {
-	"Roman",
-	"Swiss",
-	"Modern",
-	"Script",
-	"Decorative"
+	_T("Roman"),
+	_T("Swiss"),
+	_T("Modern"),
+	_T("Script"),
+	_T("Decorative")
 };
 
 
@@ -342,18 +342,18 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 		SelectObject(hDC, hFont);
 
 		int width = 0 ;
-		GetCharWidth(hDC, 'A', 'A', & width);
+		GetCharWidth(hDC, _T('A'), _T('A'), & width);
 
-		TextOut(hDC, xx, 50, "A", 1);
+		TextOut(hDC, xx, 50, _T("A"), 1);
 		xx += width + 5;
 
-		TextOut(hDC, 20+(i%4)*220, 100+(i/4)*50, TypeFamily[i/4], strlen(TypeFamily[i/4]));
+		TextOut(hDC, 20+(i%4)*220, 100+(i/4)*50, TypeFamily[i/4], _tcslen(TypeFamily[i/4]));
 		SelectObject(hDC, GetStockObject(SYSTEM_FONT));
 		DeleteObject(hFont);
 	}
 
 	{
-		KLogFont logfont(52, "MingLiu");
+		KLogFont logfont(52, _T("MingLiu"));
 		logfont.SetCharSet(GB2312_CHARSET);
 
 		HFONT hFont = logfont.Create();
@@ -389,7 +389,7 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 	}
 
 	{
-		KLogFont logfont(52, "Tahoma");
+		KLogFont logfont(52, _T("Tahoma"));
 		logfont.SetCharSet(ARABIC_CHARSET);
 
 		HFONT hFont = logfont.Create();
@@ -411,12 +411,12 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 
 void KGlyphView::TestGlyphDesign(HDC hDC, const RECT * rcPaint)
 {
-	KLogFont logfont(200, "Times New Roman");
+	KLogFont logfont(200, _T("Times New Roman"));
 
 	HFONT hFont = logfont.Create();
 	SelectObject(hDC, hFont);
 
-	TextOut(hDC, 10, 10, "Glyph Design", 12);
+	TextOut(hDC, 10, 10, _T("Glyph Design"), 12);
 
 	SelectObject(hDC, GetStockObject(SYSTEM_FONT));
 	DeleteObject(hFont);
@@ -537,10 +537,10 @@ class KMyMDIFrame : public KMDIFrame
 	virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if ( uMsg == WM_USER+1 )
-			CreateCanvas(new KRasterFontView((const TCHAR *) lParam), "Raster Font");
+			CreateCanvas(new KRasterFontView((const TCHAR *) lParam), _T("Raster Font"));
 
 		if ( uMsg == WM_USER+2 )
-			CreateCanvas(new KTrueTypeFontView((const LOGFONT *) lParam, m_hInst), "TrueType Font");
+			CreateCanvas(new KTrueTypeFontView((const LOGFONT *) lParam, m_hInst), _T("TrueType Font"));
 
 		return KMDIFrame::WndProc(hWnd, uMsg, wParam, lParam);
 	}

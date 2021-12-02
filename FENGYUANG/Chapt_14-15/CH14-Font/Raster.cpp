@@ -170,8 +170,8 @@ int CharOut(HDC hDC, int x, int y, int ch, KFontHeader20 * pH, int sx=1, int sy=
 
 int Disp20(HDC hDC, int x0, int y0, KFontHeader20 * pH)
 {
-	char desp[MAX_PATH];
-	wsprintf(desp, "%d pts, %dx%d dpi, %dx%d pixel, avgw %d, maxw %d, charset %d",
+	TCHAR desp[MAX_PATH];
+	_sntprintf_s(desp, ARRAYSIZE(desp), _T("%d pts, %dx%d dpi, %dx%d pixel, avgw %d, maxw %d, charset %d"),
 		pH->Points, pH->VertRes, pH->HorizRes, pH->PixWidth, pH->PixHeight, pH->AvgWidth, pH->MaxWidth,
 		pH->CharSet);
 	TextOut(hDC, x0, y0+10, desp, _tcslen(desp));

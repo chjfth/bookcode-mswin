@@ -269,7 +269,7 @@ KCharSetView::KCharSetView(void)
 
 	EnumSystemCodePages(EnumCodePagesProc, CP_SUPPORTED);
 
-	KLogFont ansifont(26, "Times New Roman");
+	KLogFont ansifont(26, _T("Times New Roman"));
 	ansifont.SetCharSet(DEFAULT_CHARSET);
 				
 	m_hAnsiFont = ansifont.Create();
@@ -353,18 +353,18 @@ void KCharSetView::DispRow(HDC hDC, int x0, int y0, int y, WCHAR ch, int length)
 	if ( ! RectVisible(hDC, & rect) )
 		return;
 
-	char temp[10];
+	TCHAR temp[10];
 
 	if ( length==1 )
-		wsprintf(temp, "%02X", ch & 0xFF);
+		wsprintf(temp, _T("%02X"), ch & 0xFF);
 	else 
-		wsprintf(temp, "%04X", ch & 0xFFFF);
+		wsprintf(temp, _T("%04X"), ch & 0xFFFF);
 	
 	int align = SetTextAlign(hDC, TA_RIGHT);
 
 	HGDIOBJ hOld = SelectObject(hDC, m_hAnsiFont);
 
-	TextOut(hDC, rect.left-5, rect.top, temp, strlen(temp));
+	TextOut(hDC, rect.left-5, rect.top, temp, _tcslen(temp));
 	SelectObject(hDC, hOld);
 
 	SetTextAlign(hDC, align);
@@ -399,7 +399,7 @@ void KCharSetView::DispRow(HDC hDC, int x0, int y0, int y, WCHAR ch, int length)
 
 int KCharSetView::OnDraw(HDC hdc, const RECT * rcPaint)
 {
-	KLogFont logfont(m_font, "Times New Roman");
+	KLogFont logfont(m_font, _T("Times New Roman"));
 
 	if ( m_nCharSet!=UNICODE_CHARSET )
 		logfont.SetCharSet(m_nCharSet);

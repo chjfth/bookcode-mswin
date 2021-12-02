@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontEmbed", "CH14-FontEmbed\FontEmbed.vcxproj", "{A59F9724-A146-A614-B17A-99BB64366A37}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Font", "CH14-Font\Font.vcxproj", "{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CH14-Font", "CH14-Font\CH14-Font.vcxproj", "{3EBC8D36-8824-1515-B6BE-8427D812DB65}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wingraph", "..\include\wingraph\wingraph.vcxproj", "{227E3A6E-D602-241F-9C67-C45C9E248700}"
 EndProject
@@ -25,14 +25,14 @@ Global
 		{A59F9724-A146-A614-B17A-99BB64366A37}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
 		{A59F9724-A146-A614-B17A-99BB64366A37}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
 		{A59F9724-A146-A614-B17A-99BB64366A37}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
-		{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}.Debug|Win32.ActiveCfg = Debug|Win32
-		{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}.Debug|Win32.Build.0 = Debug|Win32
-		{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}.Release|Win32.ActiveCfg = Release|Win32
-		{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}.Release|Win32.Build.0 = Release|Win32
-		{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
-		{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
-		{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
-		{348AA6F7-9D3D-41E4-945D-6BC6B8BD83E3}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+		{3EBC8D36-8824-1515-B6BE-8427D812DB65}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3EBC8D36-8824-1515-B6BE-8427D812DB65}.Debug|Win32.Build.0 = Debug|Win32
+		{3EBC8D36-8824-1515-B6BE-8427D812DB65}.Release|Win32.ActiveCfg = Release|Win32
+		{3EBC8D36-8824-1515-B6BE-8427D812DB65}.Release|Win32.Build.0 = Release|Win32
+		{3EBC8D36-8824-1515-B6BE-8427D812DB65}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{3EBC8D36-8824-1515-B6BE-8427D812DB65}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
+		{3EBC8D36-8824-1515-B6BE-8427D812DB65}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{3EBC8D36-8824-1515-B6BE-8427D812DB65}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Debug|Win32.ActiveCfg = Debug|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Debug|Win32.Build.0 = Debug|Win32
 		{227E3A6E-D602-241F-9C67-C45C9E248700}.Release|Win32.ActiveCfg = Release|Win32

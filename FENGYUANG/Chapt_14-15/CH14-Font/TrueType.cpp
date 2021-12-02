@@ -521,7 +521,7 @@ public:
 		if ( mark )
 		{
 			TCHAR temp[64];
-			wsprintf(temp, "Glyph: %d, Size %d Inst %d EM square %d", 
+			wsprintf(temp, _T("Glyph: %d, Size %d Inst %d EM square %d"), 
 				m_glyphindex, m_glyphsize, m_instrsize, emsquare);
 			TextOut(hDC, x, (int)(y-emsquare*scale)-40, temp, _tcslen(temp));
 
@@ -613,7 +613,7 @@ public:
 					if ( mark==3 )
 					{
 						TCHAR temp[4];
-						wsprintf(temp, "%d", seq);
+						wsprintf(temp, _T("%d"), seq);
 
 						TextOut(hDC, m_Point[i].x+5, m_Point[i].y-5, temp, _tcslen(temp));
 					}
@@ -782,23 +782,23 @@ void KTrueType::DrawTTGlyph(HDC hDC, int x, int y, int index, double scale, int 
 
 
 
-BOOL LogTableDirectory(KTrueType & tt, HINSTANCE hInstance, const char * FaceName)
+BOOL LogTableDirectory(KTrueType & tt, HINSTANCE hInstance, const TCHAR* FaceName)
 {
 	KLogWindow * pLog = new KLogWindow;
 
 	if ( pLog==NULL )
 		return FALSE;
 
-	pLog->Create(hInstance, "Table Directory", LoadIcon(hInstance, MAKEINTRESOURCE(IDI_FONT)));
+	pLog->Create(hInstance, _T("Table Directory"), LoadIcon(hInstance, MAKEINTRESOURCE(IDI_FONT)));
 
-	pLog->Log("%s \r\n", FaceName);
+	pLog->Log(_T("%s \r\n"), FaceName);
 		
     int no = tt.GetTableNo();
 
-	pLog->Log("%d tables\r\n\r\n", no);
+	pLog->Log(_T("%d tables\r\n\r\n"), no);
 
-	pLog->Log("Tag           CheckSum   Offset   Length\r\n");
-	pLog->Log("----------------------------------------\r\n");
+	pLog->Log(_T("Tag           CheckSum   Offset   Length\r\n"));
+	pLog->Log(_T("----------------------------------------\r\n"));
 
     for (int i=0; i<no; i++)
     {
@@ -807,7 +807,7 @@ BOOL LogTableDirectory(KTrueType & tt, HINSTANCE hInstance, const char * FaceNam
         unsigned long offset = reverse(pEntry->offset);
         unsigned long length = reverse(pEntry->length);
 			
-		pLog->Log("%c%c%c%c %08X %08X %8x %8x\r\n", 
+		pLog->Log(_T("%c%c%c%c %08X %08X %8x %8x\r\n"), 
 				pEntry->tag[0], pEntry->tag[1], 
 				pEntry->tag[2], pEntry->tag[3], 
 				* ((DWORD *) pEntry->tag),
