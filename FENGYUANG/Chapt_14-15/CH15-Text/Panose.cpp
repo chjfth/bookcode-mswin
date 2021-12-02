@@ -106,10 +106,10 @@ bool GetPANOSE(HDC hDC, const TCHAR * fullname, PANOSE * panose, TCHAR facename[
 	lf.lfCharSet = DEFAULT_CHARSET;
 	lf.lfWeight  = FW_REGULAR;
 
-	if ( strstr(name, "Italic") )
+	if ( _tcsstr(name, _T("Italic")) )
 		lf.lfItalic = TRUE;
 
-	if ( strstr(name, "Bold") )
+	if ( _tcsstr(name, _T("Bold")) )
 		lf.lfWeight = FW_BOLD;
 
 	_tcscpy_s(lf.lfFaceName, ARRAYSIZE(lf.lfFaceName), name);
@@ -143,155 +143,155 @@ bool GetPANOSE(HDC hDC, const TCHAR * fullname, PANOSE * panose, TCHAR facename[
 
 const TCHAR * PAN_FAMILY[] = 
 {
-	"Any",
-	"No Fit",
-	"Text and Display",
-	"Script",
-	"Decorative",
-	"Pictorial"
+	_T("Any"),
+	_T("No Fit"),
+	_T("Text and Display"),
+	_T("Script"),
+	_T("Decorative"),
+	_T("Pictorial")
 };
 
 const TCHAR * PAN_SERIF[] = 
 {
-	"Any",
-	"No Fit",
-	"Cove",
-	"Obtuse Cove",
-	"Square Cove",
-	"Obtuse Square Cove",
-	"Square",
-	"Thin",
-	"Bone",
-	"Exaggerated",
-	"Triangle",
-	"Normal Sans",
-	"Obtuse Sans",
-	"Prep Sans",
-	"Flared",
-	"Rounded"
+	_T("Any"),
+	_T("No Fit"),
+	_T("Cove"),
+	_T("Obtuse Cove"),
+	_T("Square Cove"),
+	_T("Obtuse Square Cove"),
+	_T("Square"),
+	_T("Thin"),
+	_T("Bone"),
+	_T("Exaggerated"),
+	_T("Triangle"),
+	_T("Normal Sans"),
+	_T("Obtuse Sans"),
+	_T("Prep Sans"),
+	_T("Flared"),
+	_T("Rounded")
 };
 
 const TCHAR * PAN_WEIGHT[] =
 {
-	"Any",
-	"No Fit",
-	"Very Light",
-	"Light",
-	"Thin",
-	"Book",
-	"Medium",
-	"Demi",
-	"Bold",
-	"Heavy",
-	"Black",
-	"Nord"
+	_T("Any"),
+	_T("No Fit"),
+	_T("Very Light"),
+	_T("Light"),
+	_T("Thin"),
+	_T("Book"),
+	_T("Medium"),
+	_T("Demi"),
+	_T("Bold"),
+	_T("Heavy"),
+	_T("Black"),
+	_T("Nord")
 };
 
 const TCHAR * PAN_PROP[] =
 {
-	"Any",
-	"Not Fit",
-	"Old Style",
-	"Modern",
-	"Even Width",
-	"Expanded",
-	"Condensed",
-	"Very Expanded",
-	"Very Condensed",
-	"Monospaced"
+	_T("Any"),
+	_T("Not Fit"),
+	_T("Old Style"),
+	_T("Modern"),
+	_T("Even Width"),
+	_T("Expanded"),
+	_T("Condensed"),
+	_T("Very Expanded"),
+	_T("Very Condensed"),
+	_T("Monospaced")
 };
 
 const TCHAR * PAN_CONTRAST[] =
 {
-	"Any",
-	"Not Fit",
-	"None",
-	"Very Low",
-	"Low",
-	"Medium Low",
-	"Medium",
-	"Mediim High",
-	"High",
-	"Very High"
+	_T("Any"),
+	_T("Not Fit"),
+	_T("None"),
+	_T("Very Low"),
+	_T("Low"),
+	_T("Medium Low"),
+	_T("Medium"),
+	_T("Mediim High"),
+	_T("High"),
+	_T("Very High")
 };
 
 const TCHAR * PAN_STROKE [] =
 {
-	"Any",
-	"Not Fit",
-	"Gradual/Diagonal",
-	"Gradual/Transitional",
-	"Gradual/Vertical",
-	"Gradual/Horizontal",
-	"Rapid/Vertical",
-	"Rapid/Horizontal",
-	"Instant/Vertical"
+	_T("Any"),
+	_T("Not Fit"),
+	_T("Gradual/Diagonal"),
+	_T("Gradual/Transitional"),
+	_T("Gradual/Vertical"),
+	_T("Gradual/Horizontal"),
+	_T("Rapid/Vertical"),
+	_T("Rapid/Horizontal"),
+	_T("Instant/Vertical")
 };
 
 const TCHAR * PAN_ARM [] =
 {
-	"Any",
-	"Not Fit",
-	"Straight Arms/Horizontal",
-	"Straight Arms/Wedge",
-	"Straight Arms/Vertical",
-	"Straight Arms/Single-Serif",
-	"Straight Arms/Double-Serif",
-	"Non-Straight Arms/Horizontal",
-	"Non-Straight Arms/Wedge",
-	"Non-Straight Arms/Vertical",
-	"Non-Straight Arms/Single-Serif",
-	"Non-Straight Arms/Double-Serif"
+	_T("Any"),
+	_T("Not Fit"),
+	_T("Straight Arms/Horizontal"),
+	_T("Straight Arms/Wedge"),
+	_T("Straight Arms/Vertical"),
+	_T("Straight Arms/Single-Serif"),
+	_T("Straight Arms/Double-Serif"),
+	_T("Non-Straight Arms/Horizontal"),
+	_T("Non-Straight Arms/Wedge"),
+	_T("Non-Straight Arms/Vertical"),
+	_T("Non-Straight Arms/Single-Serif"),
+	_T("Non-Straight Arms/Double-Serif")
 };
 
 const TCHAR * PAN_LETT [] =
 {
-	"Any",
-	"Not Fit",
-	"Normal/Contact",
-	"Normal/Weighted",
-	"Normal/Boxed",
-	"Normal/Flattened",
-	"Normal/Rounded",
-	"Normal/Off Center",
-	"Normal/Square",
-	"Oblique/Contact",
-	"Oblique/Weighted",
-	"Oblique/Boxed",
-	"Oblique/Flattened",
-	"Oblique/Rounded",
-	"Oblique/Off Center",
-	"Oblique/Square"
+	_T("Any"),
+	_T("Not Fit"),
+	_T("Normal/Contact"),
+	_T("Normal/Weighted"),
+	_T("Normal/Boxed"),
+	_T("Normal/Flattened"),
+	_T("Normal/Rounded"),
+	_T("Normal/Off Center"),
+	_T("Normal/Square"),
+	_T("Oblique/Contact"),
+	_T("Oblique/Weighted"),
+	_T("Oblique/Boxed"),
+	_T("Oblique/Flattened"),
+	_T("Oblique/Rounded"),
+	_T("Oblique/Off Center"),
+	_T("Oblique/Square")
 };
 
 const TCHAR * PAN_MIDLINE [] =
 {
-	"Any",
-	"Not Fit",
-	"Standard/Trimmed",
-	"Standard/Pointed",
-	"Standard/Serifed",
-	"High/Trimmed",
-	"High/Pointed",
-	"High/Serifed",
-	"Constant/Trimmed",
-	"Constant/Pointed",
-	"Constant/Serifed",
-	"Low/Trimmed",
-	"Low/Pointed",
-	"Low/Serifed"
+	_T("Any"),
+	_T("Not Fit"),
+	_T("Standard/Trimmed"),
+	_T("Standard/Pointed"),
+	_T("Standard/Serifed"),
+	_T("High/Trimmed"),
+	_T("High/Pointed"),
+	_T("High/Serifed"),
+	_T("Constant/Trimmed"),
+	_T("Constant/Pointed"),
+	_T("Constant/Serifed"),
+	_T("Low/Trimmed"),
+	_T("Low/Pointed"),
+	_T("Low/Serifed")
 };
 
 const TCHAR * PAN_XHEIGHT [] = 
 {
-	"Any",
-	"Not Fit",
-	"Constant/Small",
-	"Constant/Standard",
-	"Constant/Large",
-	"Ducking/Small",
-	"Ducking/Standard",
-	"Ducking/Large"
+	_T("Any"),
+	_T("Not Fit"),
+	_T("Constant/Small"),
+	_T("Constant/Standard"),
+	_T("Constant/Large"),
+	_T("Ducking/Small"),
+	_T("Ducking/Standard"),
+	_T("Ducking/Large")
 };
 
 
@@ -428,19 +428,19 @@ LRESULT KPanoseView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				m_Fonts.Create(hWnd, 101, 0, 0, rect.right, rect.bottom, m_hInst);
 			}
 
-			m_Fonts.AddColumn( 0, 100, "Original");
-			m_Fonts.AddColumn( 1, 100, "Typeface");
+			m_Fonts.AddColumn( 0, 100, _T("Original"));
+			m_Fonts.AddColumn( 1, 100, _T("Typeface"));
 
-			m_Fonts.AddColumn( 2, 100, "Family");
-			m_Fonts.AddColumn( 3, 100, "Serif");
-			m_Fonts.AddColumn( 4, 100, "Weight");
-			m_Fonts.AddColumn( 5, 100, "Proportion");
-			m_Fonts.AddColumn( 6, 100, "Contract");
-			m_Fonts.AddColumn( 7, 100, "Stroke");
-			m_Fonts.AddColumn( 8, 100, "Arm");
-			m_Fonts.AddColumn( 9, 100, "Letterform");
-			m_Fonts.AddColumn(10, 100, "Midline");
-			m_Fonts.AddColumn(11, 100, "XHeight");
+			m_Fonts.AddColumn( 2, 100, _T("Family"));
+			m_Fonts.AddColumn( 3, 100, _T("Serif"));
+			m_Fonts.AddColumn( 4, 100, _T("Weight"));
+			m_Fonts.AddColumn( 5, 100, _T("Proportion"));
+			m_Fonts.AddColumn( 6, 100, _T("Contract"));
+			m_Fonts.AddColumn( 7, 100, _T("Stroke"));
+			m_Fonts.AddColumn( 8, 100, _T("Arm"));
+			m_Fonts.AddColumn( 9, 100, _T("Letterform"));
+			m_Fonts.AddColumn(10, 100, _T("Midline"));
+			m_Fonts.AddColumn(11, 100, _T("XHeight"));
 
 			ListPANOSE();
 			return 0;
@@ -482,11 +482,9 @@ LRESULT KPanoseView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 						int result = mapper.PickFonts(& m_Panose[pInfo->iItem], Order, Score, 10);
 
-						char temp[MAX_PATH];
-
-						temp[0] = 0;
+						TCHAR temp[MAX_PATH] = {};
 						for (int i=0; i<result; i++)
-							wsprintf( temp + _tcslen(temp), "%d\t%d\t%s\n", i, Score[i], m_TypeFace[Order[i]]);
+							wsprintf( temp + _tcslen(temp), _T("%d\t%d\t%s\n"), i, Score[i], m_TypeFace[Order[i]]);
 
 						MyMessageBox(NULL, temp, fontname, MB_OK, IDI_TEXT);
 

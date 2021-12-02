@@ -116,7 +116,8 @@ int Demo_Font(HDC hDC, int x, int y, HFONT hFont, const TCHAR * name)
 //	GetTextFace(hDC, MAX_PATH, face);
 
 	TCHAR mess[MAX_PATH];
-	wsprintf(mess, "{%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, """"%s""""}", 
+	_sntprintf_s(mess, ARRAYSIZE(mess),
+		_T("{%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, \"%s\"}"), 
 		lf.lfHeight, lf.lfWidth, lf.lfEscapement, lf.lfOrientation, lf.lfWeight,
 		lf.lfItalic, lf.lfUnderline, lf.lfStrikeOut, lf.lfCharSet, lf.lfOutPrecision,
 		lf.lfClipPrecision, lf.lfQuality, lf.lfPitchAndFamily, lf.lfFaceName);
@@ -144,23 +145,23 @@ void Demo_StockFonts(HDC hDC, const RECT * rcPaint)
 
 	int base = GetDialogBaseUnits();
 	TCHAR temp[64];
-	wsprintf(temp, "DialogBaseUnits: baseunixX=%d, baseunitY=%d", LOWORD(base), HIWORD(base));
+	_sntprintf_s(temp, ARRAYSIZE(temp), _T("DialogBaseUnits: baseunixX=%d, baseunitY=%d"), LOWORD(base), HIWORD(base));
 	TextOut(hDC, 10, y, temp, _tcslen(temp));
 	y+= 30;
 
-	wsprintf(temp, "GetDeviceCaps(LOGPIXELSX)=%d, GetDeviceCaps(LOGPIXELSX)=%d",
+	_sntprintf_s(temp, ARRAYSIZE(temp), _T("GetDeviceCaps(LOGPIXELSX)=%d, GetDeviceCaps(LOGPIXELSX)=%d"),
 		GetDeviceCaps(hDC, LOGPIXELSX), GetDeviceCaps(hDC, LOGPIXELSY));
 	TextOut(hDC, 10, y, temp, _tcslen(temp));
 
 	y += 30;
 
-	y = Demo_Font(hDC, 10, y, DEFAULT_GUI_FONT,	   "GetStockObject(DEFAULT_GUI_FONT)")    + 5;
-	y = Demo_Font(hDC, 10, y, OEM_FIXED_FONT,	   "GetStockObject(OEM_FIXED_FONT)")      + 5;
-	y = Demo_Font(hDC, 10, y, ANSI_FIXED_FONT,	   "GetStockObject(ANSI_FIXED_FONT)")     + 5;
-	y = Demo_Font(hDC, 10, y, ANSI_VAR_FONT,	   "GetStockObject(ANSI_VAR_FONT)")       + 5;
-	y = Demo_Font(hDC, 10, y, SYSTEM_FONT,		   "GetStockObject(SYSTEM_FONT)")         + 5;
-	y = Demo_Font(hDC, 10, y, DEVICE_DEFAULT_FONT, "GetStockObject(DEVICE_DEFAULT_FONT)") + 5;
-	y = Demo_Font(hDC, 10, y, SYSTEM_FIXED_FONT,   "GetStockObject(SYSTEM_FIXED_FONT)")   + 5;
+	y = Demo_Font(hDC, 10, y, DEFAULT_GUI_FONT,	   _T("GetStockObject(DEFAULT_GUI_FONT)"))    + 5;
+	y = Demo_Font(hDC, 10, y, OEM_FIXED_FONT,	   _T("GetStockObject(OEM_FIXED_FONT)"))      + 5;
+	y = Demo_Font(hDC, 10, y, ANSI_FIXED_FONT,	   _T("GetStockObject(ANSI_FIXED_FONT)"))     + 5;
+	y = Demo_Font(hDC, 10, y, ANSI_VAR_FONT,	   _T("GetStockObject(ANSI_VAR_FONT)"))       + 5;
+	y = Demo_Font(hDC, 10, y, SYSTEM_FONT,		   _T("GetStockObject(SYSTEM_FONT)"))         + 5;
+	y = Demo_Font(hDC, 10, y, DEVICE_DEFAULT_FONT, _T("GetStockObject(DEVICE_DEFAULT_FONT)")) + 5;
+	y = Demo_Font(hDC, 10, y, SYSTEM_FIXED_FONT,   _T("GetStockObject(SYSTEM_FIXED_FONT)"))   + 5;
 
 
 /*	{
@@ -208,7 +209,7 @@ void Demo_Term(HDC hDC, const RECT * rcPaint)
 	HFONT hFont = CreateFont( point * GetDeviceCaps(hDC, LOGPIXELSY) / 72,
 						 0, 0, 0, FW_NORMAL, TRUE, FALSE, FALSE, 
 						 ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, 
-						 ANTIALIASED_QUALITY, VARIABLE_PITCH, "Times New Roman");
+						 ANTIALIASED_QUALITY, VARIABLE_PITCH, _T("Times New Roman"));
 	SetTextAlign(hDC, TA_BASELINE | TA_LEFT);
 	SetBkMode(hDC, TRANSPARENT);
 
@@ -230,11 +231,11 @@ void Demo_Term(HDC hDC, const RECT * rcPaint)
 					   y - otm.m_pOtm->otmrcFontBox.bottom);
 
 		// draw the character(s)
-		TextOut(hDC, x, y, "@", 1);
+		TextOut(hDC, x, y, _T("@"), 1);
 
 		SIZE size;
 
-		GetTextExtentPoint(hDC, "@" /*"Ç"*/, 1, & size); // <<A>>
+		GetTextExtentPoint(hDC, _T("@") /*"Ç"*/, 1, & size); // <<A>>
 
 		// vertical metrics lines
 		HPEN hPen = CreatePen(PS_DOT, 0, RGB(0, 0, 0));
@@ -253,11 +254,11 @@ void Demo_Term(HDC hDC, const RECT * rcPaint)
 
 		DeleteObject(hFont);
 
-		disp(hDC, 10,  30, "tmHeight          %d", tm.tmHeight);
-		disp(hDC, 10,  55, "tmAscent          %d", tm.tmAscent);
-		disp(hDC, 10,  80, "tmDescent         %d", tm.tmDescent);
-		disp(hDC, 10, 105, "tmInternalLeading %d", tm.tmInternalLeading);
-		disp(hDC, 10, 130, "tmExternalLeading %d", tm.tmExternalLeading);
+		disp(hDC, 10,  30, _T("tmHeight          %d"), tm.tmHeight);
+		disp(hDC, 10,  55, _T("tmAscent          %d"), tm.tmAscent);
+		disp(hDC, 10,  80, _T("tmDescent         %d"), tm.tmDescent);
+		disp(hDC, 10, 105, _T("tmInternalLeading %d"), tm.tmInternalLeading);
+		disp(hDC, 10, 130, _T("tmExternalLeading %d"), tm.tmExternalLeading);
 
 		Line(hDC, x+500, y-otm.m_pOtm->otmMacAscent-otm.m_pOtm->otmMacLineGap,  x+600, 
 			y-otm.m_pOtm->otmMacAscent-otm.m_pOtm->otmMacLineGap);
@@ -265,9 +266,9 @@ void Demo_Term(HDC hDC, const RECT * rcPaint)
 		Line(hDC, x+500, y,									    x+660, y);
 		Line(hDC, x+500, y-otm.m_pOtm->otmMacDescent,					x+680, y-otm.m_pOtm->otmMacDescent);
 	
-		disp(hDC, 510,  30, "otmAscent   %d", otm.m_pOtm->otmMacAscent);
-		disp(hDC, 510,  55, "otmDescent  %d", otm.m_pOtm->otmMacDescent);
-		disp(hDC, 510,  80, "otmLineGap  %d", otm.m_pOtm->otmMacLineGap);
+		disp(hDC, 510,  30, _T("otmAscent   %d"), otm.m_pOtm->otmMacAscent);
+		disp(hDC, 510,  55, _T("otmDescent  %d"), otm.m_pOtm->otmMacDescent);
+		disp(hDC, 510,  80, _T("otmLineGap  %d"), otm.m_pOtm->otmMacLineGap);
 
 		// strikeout
 		SelectObject(hDC, GetStockObject(LTGRAY_BRUSH));
@@ -304,7 +305,7 @@ int e_externalleading;
 
 int LinesPerPage(HDC hDC, int nPointSize, int nPageHeight)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, nPointSize), "Times New Roman");
+	KLogFont lf(-PointSizetoLogical(hDC, nPointSize), _T("Times New Roman"));
 
 	HFONT hFont  = lf.CreateFont();
 	HGDIOBJ hOld = SelectObject(hDC, hFont);
@@ -367,7 +368,8 @@ void Demo_Metrics(HDC hDisp, HDC hDC, int x, int y, int mapmode, int point, int 
 	RestoreDC(hDC, -1);
 
 	TCHAR temp[MAX_PATH];
-	wsprintf(temp, _T("%d dpi, %d:%d, Page height %d, linespace %d, external leading %d, Lines per page %d"), 
+	_sntprintf_s(temp, ARRAYSIZE(temp),
+		_T("%d dpi, %d:%d, Page height %d, linespace %d, external leading %d, Lines per page %d"), 
 		GetDeviceCaps(hDC, LOGPIXELSY),
 		wndext.cx, viewext.cx,
 		e_pageheight, e_linespace, 
@@ -392,20 +394,20 @@ void Test_LC(void)
 	{
 		SetWindowExtEx(hDC, i, i, NULL);
 
-		KLogFont lf(-PointSizetoLogical(hDC, 24), "Times New Roman"); // 24-point
+		KLogFont lf(-PointSizetoLogical(hDC, 24), _T("Times New Roman")); // 24-point
 		HFONT hFont = lf.CreateFont();
 		SelectObject(hDC, hFont);
 
 		TEXTMETRIC tm; 
 		GetTextMetrics(hDC, & tm);
-		wsprintf(mess + _tcslen(mess), "%d:1 lfHeight=%d, tmHeight=%d\n", i, lf.m_lf.lfHeight, tm.tmHeight);
+		wsprintf(mess + _tcslen(mess), _T("%d:1 lfHeight=%d, tmHeight=%d\n"), i, lf.m_lf.lfHeight, tm.tmHeight);
 
 		SelectObject(hDC, GetStockObject(ANSI_VAR_FONT));
 		DeleteObject(hFont);
 	}
 	ReleaseDC(NULL, hDC);
 
-	MyMessageBox(NULL, mess, "LCS vs. TEXTMETRIC", MB_OK, IDI_TEXT);
+	MyMessageBox(NULL, mess, _T("LCS vs. TEXTMETRIC"), MB_OK, IDI_TEXT);
 }
 
 
@@ -419,20 +421,21 @@ void Test_Point(void)
 
 	for (int i=1; i<=64; i*=2)
 	{
-		KLogFont lf(-PointSizetoLogical(hDC, 24*i), "Times New Roman"); 
+		KLogFont lf(-PointSizetoLogical(hDC, 24*i), _T("Times New Roman")); 
 		HFONT hFont = lf.CreateFont();
 		SelectObject(hDC, hFont);
 
 		TEXTMETRIC tm; 
 		GetTextMetrics(hDC, & tm);
-		wsprintf(mess + _tcslen(mess), "%d point lfHeight=%d, tmHeight=%d\n", 24*i, lf.m_lf.lfHeight, tm.tmHeight);
+		wsprintf(mess + _tcslen(mess), _T("%d point lfHeight=%d, tmHeight=%d\n"), 
+			24*i, lf.m_lf.lfHeight, tm.tmHeight);
 
 		SelectObject(hDC, GetStockObject(ANSI_VAR_FONT));
 		DeleteObject(hFont);
 	}
 	ReleaseDC(NULL, hDC);
 
-	MyMessageBox(NULL, mess, "Point Size vs. TEXTMETRIC", MB_OK, IDI_TEXT);
+	MyMessageBox(NULL, mess, _T("Point Size vs. TEXTMETRIC"), MB_OK, IDI_TEXT);
 }
 
 
@@ -489,10 +492,12 @@ void Demo_CoordinateSystem(HDC hDC, const RECT * rcPaint)
 
 void Demo_TextAlignment(HDC hDC, const RECT * rcPaint)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 48), "Georgia");
+	KLogFont lf(-PointSizetoLogical(hDC, 48), _T("Georgia"));
 
 	{
-		const TCHAR * mess[] = { "TA_TOP | TA_LEFT", "TA_BASELINE | TA_CENTER", "TA_BOTTOM | TA_RIGHT" };
+		const TCHAR * mess[] = { _T("TA_TOP | TA_LEFT"), 
+			_T("TA_BASELINE | TA_CENTER"), 
+			_T("TA_BOTTOM | TA_RIGHT") };
 
 		TextOut(hDC,  50, 10, mess[0], _tcslen(mess[0]));
 		TextOut(hDC, 200, 10, mess[1], _tcslen(mess[1]));
@@ -508,7 +513,7 @@ void Demo_TextAlignment(HDC hDC, const RECT * rcPaint)
 	int x = 50; 
 	int y = 110;
 	
-	const TCHAR * mess = "Align";
+	const TCHAR * mess = _T("Align");
 
 	for (int i=0; i<3; i++, x+=250)
 	{
@@ -540,7 +545,7 @@ void Demo_RTL(HDC hDC, const RECT * rcPaint)
 //	LCID lcid = GetThreadLocale();
 //	SetThreadLocale(MAKELCID(MAKELANGID(LANG_ARABIC, SUBLANG_ARABIC_EGYPT), SORT_DEFAULT));
 	
-	KLogFont lf(-PointSizetoLogical(hDC, 36), "Lucida Sans Unicode");
+	KLogFont lf(-PointSizetoLogical(hDC, 36), _T("Lucida Sans Unicode"));
 	lf.m_lf.lfCharSet = ARABIC_CHARSET;
 	lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
@@ -549,7 +554,7 @@ void Demo_RTL(HDC hDC, const RECT * rcPaint)
 	GetTextMetrics(hDC, & tm);
 	int linespace = tm.tmHeight + tm.tmExternalLeading;
 
-	const TCHAR * mess = "1-360-212-0000 \xD0\xD1\xD2";
+	const TCHAR * mess = _T("1-360-212-0000 \xD0\xD1\xD2");
 	
 	for (int i=0; i<4; i++)
 	{
@@ -577,13 +582,13 @@ void Demo_Justification(HDC hDC, const RECT * rcPaint)
 	SetBkMode(hDC,    OPAQUE);			      // opaque
 
 	{
-		KLogFont   lf(-PointSizetoLogical(hDC, 48), "Georgia");
+		KLogFont   lf(-PointSizetoLogical(hDC, 48), _T("Georgia"));
 		KGDIObject font(hDC, lf.CreateFont());
 
 		int x = 50; 
 		int y = 50;
 	
-		const TCHAR * mess = "Extra";
+		const TCHAR * mess = _T("Extra");
 
 		SetTextAlign(hDC, TA_LEFT | TA_TOP);
 
@@ -603,7 +608,7 @@ void Demo_Justification(HDC hDC, const RECT * rcPaint)
 	}
 
 	{
-		KLogFont   lf(-PointSizetoLogical(hDC, 16), "Times New Roman");
+		KLogFont   lf(-PointSizetoLogical(hDC, 16), _T("Times New Roman"));
 		KGDIObject font(hDC, lf.CreateFont());
 
 		int left  = 300;
@@ -614,7 +619,7 @@ void Demo_Justification(HDC hDC, const RECT * rcPaint)
 		GetTextMetrics(hDC, & tm);
 		int ls = tm.tmHeight + tm.tmExternalLeading;
 
-		const TCHAR * line = "The quick brown fox jumps over the lazy dog.";
+		const TCHAR * line = _T("The quick brown fox jumps over the lazy dog.");
 		const TCHAR * pend = line;
 
 		while ( pend )
@@ -646,7 +651,7 @@ void Demo_Justification(HDC hDC, const RECT * rcPaint)
 
 void Demo_CharacterWidth(HDC hDC, const RECT * rcPaint)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 144), "Georgia");
+	KLogFont lf(-PointSizetoLogical(hDC, 144), _T("Georgia"));
 	lf.m_lf.lfItalic = TRUE;
 	lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
@@ -657,7 +662,7 @@ void Demo_CharacterWidth(HDC hDC, const RECT * rcPaint)
 	int x = 100; 
 	int y =  80;
 	
-	const TCHAR * mess = "font";
+	const TCHAR * mess = _T("font");
 	ABC abc[128];
 	SIZE size;
 
@@ -718,15 +723,15 @@ void Demo_CharacterWidth(HDC hDC, const RECT * rcPaint)
 
 		sum += ch.abcA + ch.abcB + ch.abcC;
 
-		wsprintf(temp, "'%c'(0x%02x): %d %d %d", mess[i], mess[i], ch.abcA, ch.abcB, ch.abcC);
+		wsprintf(temp, _T("'%c'(0x%02x): %d %d %d"), mess[i], mess[i], ch.abcA, ch.abcB, ch.abcC);
 		TextOut(hDC, x, y, temp, _tcslen(temp));
 		y+= 25;
 	}
 
-	wsprintf(temp, "ABC widths sum: %d", sum);
+	wsprintf(temp, _T("ABC widths sum: %d"), sum);
 	TextOut(hDC, x, y, temp, _tcslen(temp)); y+= 25;
 
-	wsprintf(temp, "GetTextExtent %d %d", size.cx, size.cy);
+	wsprintf(temp, _T("GetTextExtent %d %d"), size.cx, size.cy);
 	TextOut(hDC, x, y, temp, _tcslen(temp)); y+= 25;
 
 	{
@@ -734,7 +739,7 @@ void Demo_CharacterWidth(HDC hDC, const RECT * rcPaint)
 		long height;
 
 		{
-			KLogFont lf(-PointSizetoLogical(hDC, 144), "Georgia");
+			KLogFont lf(-PointSizetoLogical(hDC, 144), _T("Georgia"));
 			lf.m_lf.lfItalic = TRUE;
 
 			KGDIObject font(hDC, lf.CreateFont());
@@ -742,12 +747,12 @@ void Demo_CharacterWidth(HDC hDC, const RECT * rcPaint)
 			GetTextABCExtent(hDC, mess, _tcslen(mess), & height, & abc);
 		}
 
-		wsprintf(temp, "GetTextABCExtent %d %d %d", abc.abcA, abc.abcB, abc.abcC);
+		wsprintf(temp, _T("GetTextABCExtent %d %d %d"), abc.abcA, abc.abcB, abc.abcC);
 		TextOut(hDC, x, y, temp, _tcslen(temp)); y+= 25;
 	}
 
 	{
-		KLogFont lf(-PointSizetoLogical(hDC, 48), "Georgia");
+		KLogFont lf(-PointSizetoLogical(hDC, 48), _T("Georgia"));
 		lf.m_lf.lfItalic = TRUE;
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
@@ -755,7 +760,7 @@ void Demo_CharacterWidth(HDC hDC, const RECT * rcPaint)
 		SetBkColor(hDC,   RGB(0xD0, 0xD0, 0xD0)); // gray
 		SetBkMode(hDC,    OPAQUE);			      // opaque
 
-		const TCHAR * mess = "faroff";
+		const TCHAR * mess = _T("faroff");
 		int           len  = _tcslen(mess);
 		
 		SIZE size;
@@ -806,7 +811,7 @@ void dispsmall(HDC hDC, int x, int y, int row, const TCHAR * mess)
 
 void Demo_CharacterPlacement(HDC hDC, const RECT * rcPaint)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 60), "Times New Roman");
+	KLogFont lf(-PointSizetoLogical(hDC, 60), _T("Times New Roman"));
 	lf.m_lf.lfItalic  = TRUE;
 	lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
@@ -819,9 +824,9 @@ void Demo_CharacterPlacement(HDC hDC, const RECT * rcPaint)
 	
 	KGDIObject font(hDC, lf.CreateFont());
 
-	const TCHAR mess [] = "AVOWAL";
+	const TCHAR mess [] = _T("AVOWAL");
 
-	// originl text out
+	// original text out
 	TextOut(hDC, x, y, mess, _tcslen(mess));
 
 	KPlacement<MAX_PATH> placement;
@@ -859,12 +864,12 @@ void Demo_CharacterPlacement(HDC hDC, const RECT * rcPaint)
 		{
 			Line(hDC, xx, y, xx, y + linespace);
 
-			wsprintf(temp, "gi('%c')=%3d, dx[%2d]=%3d", 
+			wsprintf(temp, _T("gi('%c')=%3d, dx[%2d]=%3d"), 
 				placement.m_strOut[i], placement.m_glyphs[i],
 				i, placement.m_dx[placement.m_order[i]]);
 
 			if ( (test==1) && mess[i+1] )
-				wsprintf(temp+_tcslen(temp), ", kern('%c','%c')=%3d", 
+				wsprintf(temp+_tcslen(temp), _T(", kern('%c','%c')=%3d"), 
 					mess[i], mess[i+1], kerning.GetKerning(mess[i], mess[i+1]));
 
 		//	if ( (test==2) && (i==0) )
@@ -875,7 +880,7 @@ void Demo_CharacterPlacement(HDC hDC, const RECT * rcPaint)
 			xx += placement.m_dx[placement.m_order[i]];
 		}
 
-		wsprintf(temp, "extent %d, sum dx=%d", size.cx*11/10, xx-x);
+		wsprintf(temp, _T("extent %d, sum dx=%d"), size.cx*11/10, xx-x);
 		dispsmall(hDC, x + size.cx * 12/10, y, _tcslen(mess), temp);
 		
 		Line(hDC, xx, y, xx, y + linespace);
@@ -884,20 +889,20 @@ void Demo_CharacterPlacement(HDC hDC, const RECT * rcPaint)
 
 	// RTL reading
 	{
-		KLogFont lf(-PointSizetoLogical(hDC, 48), "Andalus");
+		KLogFont lf(-PointSizetoLogical(hDC, 48), _T("Andalus"));
 		lf.m_lf.lfCharSet = ARABIC_CHARSET;
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
 		KGDIObject font(hDC, lf.CreateFont());
 		
 		if ( GetFontLanguageInfo(hDC) & GCP_REORDER )
-			disp(hDC, 500, 410, "GCP_REORDER supported");
+			disp(hDC, 500, 410, _T("GCP_REORDER supported"));
 		else
-			disp(hDC, 500, 410, "GCP_REORDER not supported");
+			disp(hDC, 500, 410, _T("GCP_REORDER not supported"));
 
 		KPlacement<MAX_PATH> placement;
 				
-		const TCHAR * mess = "abc \xC7\xC8\xC9\xCA";
+		const TCHAR * mess = _T("abc \xC7\xC8\xC9\xCA");
 	
 		SIZE size;
 		GetTextExtentPoint32(hDC, mess, _tcslen(mess), & size);
@@ -920,7 +925,7 @@ void Demo_CharacterPlacement(HDC hDC, const RECT * rcPaint)
 		
 			for (unsigned i=0; mess[i]; i++)
 			{
-				wsprintf(temp, "order[%d]=%d, gi(0x%02x)=%3d, dx[%d]=%3d", 
+				wsprintf(temp, _T("order[%d]=%d, gi(0x%02x)=%3d, dx[%d]=%3d"), 
 					i, placement.m_order[i],
 					placement.m_strOut[i] & 0xFF, placement.m_glyphs[i] & 0xFFFF,
 					i, placement.m_dx[placement.m_order[i]]);
@@ -932,15 +937,15 @@ void Demo_CharacterPlacement(HDC hDC, const RECT * rcPaint)
 
 	// extra kerning samples
 	{
-		KLogFont lf(-PointSizetoLogical(hDC, 48), "Tahoma");
+		KLogFont lf(-PointSizetoLogical(hDC, 48), _T("Tahoma"));
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
 		KGDIObject font(hDC, lf.CreateFont());
 
-		const TCHAR mess1[] = "F,) Ta r.";  
-		const TCHAR mess2[] = "’‘ f] f}";
+		const TCHAR mess1[] = _T("F,) Ta r.");  
+		const TCHAR mess2[] = _T("’‘ f] f}");
 
-		// originl text out
+		// original text out
 		int x = 50;
 		int y = 420;
 		TEXTMETRIC tm;
@@ -967,7 +972,7 @@ void Demo_CharacterPlacement(HDC hDC, const RECT * rcPaint)
 
 void Demo_GlyphIndex(HDC hDC, const RECT *)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 12), "Courier New");
+	KLogFont lf(-PointSizetoLogical(hDC, 12), _T("Courier New"));
 	lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
 	KGDIObject font(hDC, lf.CreateFont());
@@ -990,7 +995,7 @@ void Demo_GlyphIndex(HDC hDC, const RECT *)
 	for (unsigned i=0; i<min(16, pGlyphSet->cRanges); i++)
 	{
 		TCHAR text[MAX_PATH];
-		wsprintf(text, "%3d 0x%04X %3d", i, pGlyphSet->ranges[i].wcLow, pGlyphSet->ranges[i].cGlyphs);
+		wsprintf(text, _T("%3d 0x%04X %3d"), i, pGlyphSet->ranges[i].wcLow, pGlyphSet->ranges[i].cGlyphs);
 		TextOut(hDC, x, y, text, _tcslen(text));
 		
 		WCHAR sample[8];
@@ -1009,7 +1014,7 @@ void Demo_GlyphIndex(HDC hDC, const RECT *)
 		text[0] = 0;
 		for (j=0; j<cGlyph; j++)
 		{
-			wsprintf(text + _tcslen(text), "%4d ", glyphindex[j]);
+			wsprintf(text + _tcslen(text), _T("%4d "), glyphindex[j]);
 		}
 			
 		TextOut(hDC, x+300, y, text, _tcslen(text));
@@ -1028,7 +1033,7 @@ void Demo_GlyphIndex(HDC hDC, const RECT *)
 		x = 50;
 		y = 350;
 
-		KLogFont lf(-PointSizetoLogical(hDC, 36), "Tahoma");
+		KLogFont lf(-PointSizetoLogical(hDC, 36), _T("Tahoma"));
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 		lf.m_lf.lfCharSet = GB2312_CHARSET;
 
@@ -1036,7 +1041,7 @@ void Demo_GlyphIndex(HDC hDC, const RECT *)
 		TEXTMETRIC tm;
 		GetTextMetrics(hDC, & tm);
 
-		const TCHAR * mess = "3.14159";
+		const TCHAR * mess = _T("3.14159");
 
 		RECT rect = { x-10, y+40, x+250, y+20 };
 
@@ -1072,7 +1077,7 @@ void Demo_GlyphIndex(HDC hDC, const RECT *)
 
 void Demo_GlyphOutline(HDC hDC)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 96), "Times New Roman");
+	KLogFont lf(-PointSizetoLogical(hDC, 96), _T("Times New Roman"));
 	lf.m_lf.lfItalic  = TRUE;
 	lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
@@ -1095,7 +1100,7 @@ void Demo_GlyphOutline(HDC hDC)
 
 	KGlyph glyph;
 
-	TextOut(hDC, x, y, "1248", 4); y+= 150;
+	TextOut(hDC, x, y, _T("1248"), 4); y+= 150;
 
 	glyph.GetGlyph(hDC, '1', GGO_BITMAP); // , & mat2);
 	glyph.DrawGlyph(hDC, x, y, dx, dy);	x+=dx;
@@ -1109,12 +1114,12 @@ void Demo_GlyphOutline(HDC hDC)
 	glyph.GetGlyph(hDC, '8', GGO_GRAY8_BITMAP); // , & mat2);
 	glyph.DrawGlyph(hDC, x, y, dx, dy); x+=dx;
 
-	OutlineTextOut(hDC, x+50, 130, "Outline", -1);
+	OutlineTextOut(hDC, x+50, 130, _T("Outline"), -1);
 
 	SetBkColor(hDC, RGB(0xFF, 0xFF, 0xFF));
 	SetTextColor(hDC, RGB(0, 0, 0));
 	
-	TextOut(hDC, x+50, 250, "Outline", 7);
+	TextOut(hDC, x+50, 250, _T("Outline"), 7);
 }
 
 
@@ -1125,9 +1130,9 @@ void Demo_TabbedTextOut(HDC hDC)
 
 	const TCHAR * lines[] = 
 	{ 
-		"Group" "\t"  "Result" "\t" "Function"    "\t" "Parameters",
-		"Font"  "\t"  "DWORD"  "\t" "GetFontData" "\t" "(HDC hdc, ...)",
-		"Text"  "\t"  "BOOL"   "\t" "TextOut"     "\t" "(HDC hdc, ...)"
+		_T("Group") _T("\t")  _T("Result") _T("\t") _T("Function")    _T("\t") _T("Parameters"),
+		_T("Font")  _T("\t")  _T("DWORD")  _T("\t") _T("GetFontData") _T("\t") _T("(HDC hdc, ...)"),
+		_T("Text")  _T("\t")  _T("BOOL")   _T("\t") _T("TextOut")     _T("\t") _T("(HDC hdc, ...)")
 	};
 
 	int x=50, y=50, i;
@@ -1142,16 +1147,16 @@ void Demo_TabbedTextOut(HDC hDC)
 //		Line(hDC, x + abs(tabstop[i]), 0, x + abs(tabstop[i]), 100);
 
 	{
-		KLogFont lf(-PointSizetoLogical(hDC, 10), "MS Shell Dlg");
+		KLogFont lf(-PointSizetoLogical(hDC, 10), _T("MS Shell Dlg"));
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
 		KGDIObject font(hDC, lf.CreateFont());
 
 		{
 			const TCHAR * mess = 
-				"The DrawText function draws formatted text in the specified rectangle. "
-				"It formats the text according to the specified method (expanding tabs, "
-				"justifying characters, breaking lines, and so forth).";
+				_T("The DrawText function draws formatted text in the specified rectangle. ")
+				_T("It formats the text according to the specified method (expanding tabs, ")
+				_T("justifying characters, breaking lines, and so forth).");
 
 			int width = 170;
 			int x     = 220;
@@ -1174,7 +1179,7 @@ void Demo_TabbedTextOut(HDC hDC)
 
 			x += width + 10;
 			{
-				KLogFont lf(-PointSizetoLogical(hDC, 20), "MS Shell Dlg");
+				KLogFont lf(-PointSizetoLogical(hDC, 20), _T("MS Shell Dlg"));
 				lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
 				KGDIObject font(hDC, lf.CreateFont());
@@ -1186,8 +1191,7 @@ void Demo_TabbedTextOut(HDC hDC)
 		}
 
 		{
-			const TCHAR * mess =
-				"&Open \tc:\\Win\\system32\\gdi32.dll";
+			const TCHAR * mess = _T("&Open \tc:\\Win\\system32\\gdi32.dll");
 
 			RECT rect = { 20, 120, 20+180, 120 + 32 };
 
@@ -1214,9 +1218,9 @@ void Demo_TabbedTextOut(HDC hDC)
 void Demo_Paragraph(HDC hDC, bool bPrecise)
 {
 	const TCHAR * mess = 
-		"The DrawText function draws formatted text in the specified rectangle. "
-    	"It formats the text according to the specified method (expanding tabs, "
-		"justifying characters, breaking lines, and so forth).";
+		_T("The DrawText function draws formatted text in the specified rectangle. ")
+    	_T("It formats the text according to the specified method (expanding tabs, ")
+		_T("justifying characters, breaking lines, and so forth).");
 
 	int x = 20;
 	int y = 20;
@@ -1228,7 +1232,7 @@ void Demo_Paragraph(HDC hDC, bool bPrecise)
 		int width  = size * 42;
 		int height = size *  5;
 
-		KLogFont lf(-PointSizetoLogical(hDC, size), "MS Shell Dlg");
+		KLogFont lf(-PointSizetoLogical(hDC, size), _T("MS Shell Dlg"));
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
 		KGDIObject font(hDC, lf.CreateFont());
@@ -1256,7 +1260,7 @@ void Demo_Paragraph(HDC hDC, bool bPrecise)
 
 void Demo_TextColor(HDC hDC, HINSTANCE hInst)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 16), "Times New Roman");
+	KLogFont lf(-PointSizetoLogical(hDC, 16), _T("Times New Roman"));
 	lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 	KGDIObject font(hDC, lf.CreateFont());
 
@@ -1279,7 +1283,7 @@ void Demo_TextColor(HDC hDC, HINSTANCE hInst)
 		SetTextColor(hDC, Color[ci]);
 		SetBkColor(hDC,   Color[ci+1]);
 
-		wsprintf(temp, "0x%06X 0x%06X", Color[ci], Color[ci+1]);
+		wsprintf(temp, _T("0x%06X 0x%06X"), Color[ci], Color[ci+1]);
 
 		TextOut(hDC, x, y, temp, _tcslen(temp));
 
@@ -1289,10 +1293,10 @@ void Demo_TextColor(HDC hDC, HINSTANCE hInst)
 	{
 		HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0xFF));
 
-		const TCHAR * mess = "GrayString";
+		const TCHAR * mess = _T("GrayString");
 		x = 260; y = 10;
 	
-		KLogFont lf(-PointSizetoLogical(hDC, 64), "Times New Roman");
+		KLogFont lf(-PointSizetoLogical(hDC, 64), _T("Times New Roman"));
 		lf.m_lf.lfItalic  = TRUE;
 		lf.m_lf.lfWeight  = FW_BOLD;
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
@@ -1306,20 +1310,20 @@ void Demo_TextColor(HDC hDC, HINSTANCE hInst)
 
 		hBrush = CreateHatchBrush(HS_DIAGCROSS, RGB(0xFF, 0, 0));
 		SetBkColor(hDC, RGB(0, 0xFF, 0xFF));
-		ColorText(hDC, x, y, "ColorText", 9, hBrush);
+		ColorText(hDC, x, y, _T("ColorText"), 9, hBrush);
 		DeleteObject(hBrush);
 		y+= 80;
 
 		{
-			KLogFont lf(-PointSizetoLogical(hDC, 72), "Tahoma");
+			KLogFont lf(-PointSizetoLogical(hDC, 72), _T("Tahoma"));
 			lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 			lf.m_lf.lfWeight  = FW_BOLD;
 			KGDIObject font(hDC, lf.CreateFont());
 
 			HBITMAP hBmp = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_TIGER));
-			    BitmapText(hDC, x, y, "TIGER", 5, hBmp);
+			    BitmapText(hDC, x, y, _T("TIGER"), 5, hBmp);
 
-			BitmapText2(hDC, x, y+100, "TIGER", 5, hBmp);
+			BitmapText2(hDC, x, y+100, _T("TIGER"), 5, hBmp);
 			
 			DeleteObject(hBmp);
 		}
@@ -1410,7 +1414,7 @@ void Demo_TextStyle(HDC hDC)
 	{
 		for (int i=0; i<11; i++)
 		{
-			KLogFont lf(-PointSizetoLogical(hDC, 48), "Times New Roman");
+			KLogFont lf(-PointSizetoLogical(hDC, 48), _T("Times New Roman"));
 
 			if ( f==1 )
 				_tcscpy_s(lf.m_lf.lfFaceName, ARRAYSIZE(lf.m_lf.lfFaceName), _T("Colonna MT"));
@@ -1448,28 +1452,28 @@ void Demo_TextStyle(HDC hDC)
 		
 			KGDIObject font(hDC, lf.CreateFont());
 
-			const TCHAR * mess = "Style";
+			const TCHAR * mess = _T("Style");
 
 			SetBkMode(hDC, OPAQUE);
 
 			switch ( i+2 )
 			{
 				case 10: 
-					OffsetTextOut(hDC, x, y, "Shadow", 6, 4, 4, 
+					OffsetTextOut(hDC, x, y, _T("Shadow"), 6, 4, 4, 
 						GetSysColor(COLOR_3DSHADOW), 0, 0, 0);
 					break;
 
 				case 11: 
 					SetTextColor(hDC, RGB(0xFF, 0xFF, 0));
 					SetBkColor(hDC, RGB(0xD0, 0xD0, 0));
-					OffsetTextOut(hDC, x, y, "Emboss", 6, 
+					OffsetTextOut(hDC, x, y, _T("Emboss"), 6, 
 						-1, -1, GetSysColor(COLOR_3DLIGHT),
 						 1,  1, GetSysColor(COLOR_3DDKSHADOW));
 					break;
 
 				case 12: 
 					SetTextColor(hDC, RGB(0xD0, 0xD0, 0));
-					OffsetTextOut(hDC, x, y, "Engrave", 7,
+					OffsetTextOut(hDC, x, y, _T("Engrave"), 7,
 						-1, -1, GetSysColor(COLOR_3DDKSHADOW),
 						 1,  1, GetSysColor(COLOR_3DLIGHT));
 					break;
@@ -1500,7 +1504,7 @@ HFONT ScaleFont(HDC hDC, int percent)
 
 void Demo_TextGeometry(HDC hDC)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 16), "MS Shell Dlg");
+	KLogFont lf(-PointSizetoLogical(hDC, 16), _T("MS Shell Dlg"));
 	lf.m_lf.lfQuality    = ANTIALIASED_QUALITY;
 
 	SetBkColor(hDC, RGB(0xFF, 0xFF, 0));
@@ -1520,7 +1524,7 @@ void Demo_TextGeometry(HDC hDC)
 		KGDIObject font(hDC, lf.CreateFont());
 
 		TCHAR mess[32];
-		wsprintf(mess, "%02d° deg", degree);
+		wsprintf(mess, _T("%02d° deg"), degree);
 
 		int x =  x0 + (int)( r * cos(degree*pi/180) );
 		int y =  y0 - (int)( r * sin(degree*pi/180) );
@@ -1546,7 +1550,7 @@ void Demo_TextGeometry(HDC hDC)
 	x0 = 400;
 	y0 =  20;
 	{
-		KLogFont lf(-PointSizetoLogical(hDC, 24), "@SimSun");
+		KLogFont lf(-PointSizetoLogical(hDC, 24), _T("@SimSun"));
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 		lf.m_lf.lfCharSet = GB2312_CHARSET;
 		lf.m_lf.lfEscapement  = 2700;
@@ -1561,7 +1565,7 @@ void Demo_TextGeometry(HDC hDC)
 
 		TextOutW(hDC, x0, y0, line1, 7);  x0 -= 45;
 		TextOutW(hDC, x0, y0, line2, 7);  x0 -= 50;
-		TextOut (hDC, x0, y0, "270 degree", 10);
+		TextOut (hDC, x0, y0, _T("270 degree"), 10);
 	}
 
 	
@@ -1569,7 +1573,7 @@ void Demo_TextGeometry(HDC hDC)
 	y0 = 20;
 
 	{
-		KLogFont lf(-PointSizetoLogical(hDC, 24), "Times New Roman");
+		KLogFont lf(-PointSizetoLogical(hDC, 24), _T("Times New Roman"));
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 
 		int linespace;
@@ -1587,7 +1591,7 @@ void Demo_TextGeometry(HDC hDC)
 			
 			TCHAR temp[64];
 
-			wsprintf(temp, "%d%c W", ratio, '%');
+			wsprintf(temp, _T("%d%c W"), ratio, _T('%'));
 			TextOut(hDC, x0, y0, temp, _tcslen(temp));
 
 			SIZE size; 
@@ -1604,14 +1608,14 @@ void Demo_TextGeometry(HDC hDC)
 		PolyBezierTo(hDC, p, 3);
 		EndPath(hDC);
 
-		KLogFont lf(-PointSizetoLogical(hDC, 22), "Times New Roman");
+		KLogFont lf(-PointSizetoLogical(hDC, 22), _T("Times New Roman"));
 		lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 		KGDIObject font(hDC, lf.CreateFont());
 
 		SetTextAlign(hDC, TA_LEFT | TA_BASELINE);
 //		SetBkMode(hDC, TRANSPARENT);
 
-		PathTextOut(hDC, "Text on a curve is possible with some simple math.");
+		PathTextOut(hDC, _T("Text on a curve is possible with some simple math."));
 	}
 
 }
@@ -1619,7 +1623,7 @@ void Demo_TextGeometry(HDC hDC)
 
 void Demo_TextasBitmap(HDC hDC)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 48), "Times New Roman");
+	KLogFont lf(-PointSizetoLogical(hDC, 48), _T("Times New Roman"));
 	lf.m_lf.lfWeight  = FW_BOLD;
 	lf.m_lf.lfItalic  = TRUE;
 	lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
@@ -1646,7 +1650,7 @@ void Demo_TextasBitmap(HDC hDC)
 
 		int x= 0, y = 0;
 
-		const TCHAR * mess = "Reflection";
+		const TCHAR * mess = _T("Reflection");
 	
 		SetTextAlign(hDC, TA_LEFT | TA_BASELINE);
 		SetTextColor(hDC, RGB(0, 0, 0xFF)); // blue ( dark )
@@ -1662,12 +1666,12 @@ void Demo_TextasBitmap(HDC hDC)
 		int x = 20;
 		int y = 70;
 
-		KLogFont lf(-PointSizetoLogical(hDC, 48), "Times New Roman");
+		KLogFont lf(-PointSizetoLogical(hDC, 48), _T("Times New Roman"));
 		lf.m_lf.lfWeight = FW_BOLD;
 		lf.m_lf.lfQuality= ANTIALIASED_QUALITY;
 		KGDIObject font(hDC, lf.CreateFont());
 
-		const TCHAR * mess = "Raster";
+		const TCHAR * mess = _T("Raster");
 
 		SetBkColor(hDC, RGB(0xFF, 0xFF, 0xFF));
 		SetTextColor(hDC, RGB(0xFF, 0, 0));
@@ -1687,7 +1691,7 @@ void Demo_TextasBitmap(HDC hDC)
 			SetBkColor(hDC, RGB(0xFF, 0xFF, 0xFF));
 			SetTextColor(hDC, RGB(0, 0, 0xFF));
 
-			const TCHAR * mess = "fuzzy";
+			const TCHAR * mess = _T("fuzzy");
 			bmp.Convert(hDC, mess, _tcslen(mess), 7);
 			
 			for (int i=0; i<3; i++)
@@ -1711,7 +1715,7 @@ void Demo_TextasBitmap(HDC hDC)
 			SetBkColor(hDC, RGB(0xFF, 0xFF, 0xFF));   // white
 			SetTextColor(hDC, RGB(0x80, 0x80, 0x80)); // gray
 
-			const TCHAR * mess = "Soft-Shadow";
+			const TCHAR * mess = _T("Soft-Shadow");
 			bmp.Convert(hDC, mess, _tcslen(mess), 7);
 			
 			for (int i=0; i<8; i++)
@@ -1777,7 +1781,7 @@ void Demo_TextasBitmap2(HDC hDC)
 	int x = 50;
 	int y = 50;
 
-	KLogFont lf(-PointSizetoLogical(hDC, 36), "Times New Roman");
+	KLogFont lf(-PointSizetoLogical(hDC, 36), _T("Times New Roman"));
 	KGDIObject font(hDC, lf.CreateFont());
 
 	for (int i=0; i<2; i++)
@@ -1786,17 +1790,17 @@ void Demo_TextasBitmap2(HDC hDC)
 
 		DispResBitmap(hDC, x, y, IDB_FULLTIGER, width, height);
 
-		const TCHAR * mess = "Siberian Tiger";
+		const TCHAR * mess = _T("Siberian Tiger");
 		TransparentEmboss(hDC, mess, _tcslen(mess), 
 			RGB(0x80, 0x80, 0), RGB(0xFF, 0xFF, 0xFF),
 			// RGB(0x80, 0x80, 0x40), RGB(0xE0, 0xE0, 0xE0), 
 			2, x+260, y-5);
 
 		{
-			KLogFont lf(-PointSizetoLogical(hDC, 20), "Impact");
+			KLogFont lf(-PointSizetoLogical(hDC, 20), _T("Impact"));
 			KGDIObject font(hDC, lf.CreateFont());
 
-			const TCHAR * mess1 = "http://mercury.spaceports.com/~schmode/";
+			const TCHAR * mess1 = _T("http://mercury.spaceports.com/~schmode/");
 			TransparentEmboss(hDC, mess1, _tcslen(mess1), 
 				RGB(0xFF, 0xFF, 0xFF), RGB(0, 0, 0),
 				// RGB(0xE0, 0xE0, 0xE0), RGB(0xC0, 0xC0, 0x40), 
@@ -1810,12 +1814,12 @@ void Demo_TextasBitmap2(HDC hDC)
 
 void Demo_TextasCurve(HDC hDC)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 72), "BookMan Old Style");
+	KLogFont lf(-PointSizetoLogical(hDC, 72), _T("BookMan Old Style"));
 	lf.m_lf.lfWeight  = FW_BOLD;
 	lf.m_lf.lfQuality = ANTIALIASED_QUALITY;
 	KGDIObject font(hDC, lf.CreateFont());
 
-	const TCHAR * mess = "gdi";
+	const TCHAR * mess = _T("gdi");
 	SetBkMode(hDC, TRANSPARENT);
 
 	KGDIObject yellowbrush(hDC, CreateSolidBrush(RGB(0xFF, 0xFF, 0))); 
@@ -1828,7 +1832,7 @@ void Demo_TextasCurve(HDC hDC)
 		int y = 10 + (test / 3) *  95;
 
 		TCHAR num[16];
-		wsprintf(num, "%d", test+1);
+		wsprintf(num, _T("%d"), test+1);
 
 		dispsmall(hDC, x, y+20, 0, num);
 
@@ -2056,10 +2060,10 @@ public:
 
 void Demo_TextasCurve2(HDC hDC)
 {
-	KLogFont lf(-PointSizetoLogical(hDC, 96), "Impact");
+	KLogFont lf(-PointSizetoLogical(hDC, 96), _T("Impact"));
 	KGDIObject font(hDC, lf.CreateFont());
 
-	const TCHAR * mess = "CURVE";
+	const TCHAR * mess = _T("CURVE");
 	SetBkMode(hDC, TRANSPARENT);
 	int x = 10, y= 0;
 
@@ -2106,7 +2110,7 @@ void Demo_TextasCurve2(HDC hDC)
 	// text to region
 	{
 		BeginPath(hDC);
-		TextOut(hDC, 30, 290, "Tiger", 5);
+		TextOut(hDC, 30, 290, _T("Tiger"), 5);
 		EndPath(hDC);
 
 		SelectClipPath(hDC, RGN_COPY);
@@ -2118,12 +2122,12 @@ void Demo_TextasCurve2(HDC hDC)
 	}
 
 	{
-		KLogFont lf(-PointSizetoLogical(hDC, 512), "Wingdings");
+		KLogFont lf(-PointSizetoLogical(hDC, 512), _T("Wingdings"));
 		lf.m_lf.lfCharSet = SYMBOL_CHARSET;
 
 		KGDIObject font(hDC, lf.CreateFont());
 
-		const TCHAR * mess = "\x43";
+		const TCHAR * mess = _T("\x43");
 		SetBkMode(hDC, OPAQUE);
 		int x = 600, y = 10;
 		

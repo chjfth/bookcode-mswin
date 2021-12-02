@@ -152,57 +152,57 @@ public:
 
 			case IDM_VIEW_TABBEDTEXTOUT:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "TabbledTextOut/DrawText");
+				SetWindowText(hWnd, _T("TabbledTextOut/DrawText"));
 				return View_Redraw;
 
 			case IDM_VIEW_DRAWTEXT:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Formatting - DrawText");
+				SetWindowText(hWnd, _T("Text Formatting - DrawText"));
 				return View_Redraw;
 
 			case IDM_VIEW_PARAGRAPH:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Formatting - High Precision");
+				SetWindowText(hWnd, _T("Text Formatting - High Precision"));
 				return View_Redraw;
 
 			case IDM_VIEW_TEXTCOLOR:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Effects - Color");
+				SetWindowText(hWnd, _T("Text Effects - Color"));
 				return View_Redraw;
 
 			case IDM_VIEW_TEXTSTYLE:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Effects - Style");
+				SetWindowText(hWnd, _T("Text Effects - Style"));
 				return View_Redraw;
 
 			case IDM_VIEW_TEXTGEOMETRY:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Effects - Geometry");
+				SetWindowText(hWnd, _T("Text Effects - Geometry"));
 				return View_Redraw;
 
 			case IDM_VIEW_TEXTASBITMAP:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Effects - Text as Bitmap");
+				SetWindowText(hWnd, _T("Text Effects - Text as Bitmap"));
 				return View_Redraw;
 
 			case IDM_VIEW_TEXTASBITMAP2:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Effects - Text as Bitmap - Transparent Embossing");
+				SetWindowText(hWnd, _T("Text Effects - Text as Bitmap - Transparent Embossing"));
 				return View_Redraw;
 
 			case IDM_VIEW_TEXTASCURVE:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Effects - Text as Curve");
+				SetWindowText(hWnd, _T("Text Effects - Text as Curve"));
 				return View_Redraw;
 
 			case IDM_VIEW_TEXTCURVE2:
 				m_nCommand = cmd;
-				SetWindowText(hWnd, "Text Effects - Text Curve Transformation");
+				SetWindowText(hWnd, _T("Text Effects - Text Curve Transformation"));
 				return View_Redraw;
 
 			case IDM_FILE_SAVE:
 				{
-					HDC hDC = QuerySaveEMFFile("Text EMF Sample\0", NULL, NULL, 0);
+					HDC hDC = QuerySaveEMFFile(_T("Text EMF Sample\0"), NULL, NULL, 0);
 
 					if ( hDC )
 					{
