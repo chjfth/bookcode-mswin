@@ -323,7 +323,10 @@ void TextOutWH(HDC hDC, int x, int y, WCHAR text[], int len)
 	{
 		TextOutW(hDC, x, y, & text[i], 1);
 	
-		if (i==0) y+=40; else y+= 45;
+		if (i==0) 
+			y+=40; 
+		else 
+			y+= 45;
 	}
 }
 
@@ -334,7 +337,7 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 
 	SetTextAlign(hDC, TA_BASELINE);
 
-	for (int i=0; i<sizeof(TypeFaces)/sizeof(TypeFaces[i]); i++)
+	for (int i=0; i<ARRAYSIZE(TypeFaces); i++)
 	{
 		KLogFont logfont(52, TypeFaces[i]);
 		HFONT hFont = logfont.Create();
