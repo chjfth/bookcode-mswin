@@ -15,7 +15,7 @@
 
 class KEnumFontFamily
 {
-	typedef enum	{ MAX_LOGFONT = 256 };
+	typedef enum	{ MAX_LOGFONT = 2560 };
 
 	KListView * m_pList;
 

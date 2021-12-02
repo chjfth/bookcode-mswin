@@ -206,16 +206,18 @@ void UnicodeRange(LOGFONT * pLogFont, HINSTANCE hInstance)
 
 	pLog->Log(_T("%s \r\n"), pLogFont->lfFaceName);
 
-	pLog->Log(_T("cbSize   %d\r\n"),			pGlyphSet->cbThis);
-	pLog->Log(_T("flAccel  %d\r\n"),			pGlyphSet->flAccel);
-	pLog->Log(_T("cGlyphsSupported %d\r\n"),  pGlyphSet->cGlyphsSupported);
-	pLog->Log(_T("cRanges          %d\r\n"),  pGlyphSet->cRanges);
+	pLog->Log(_T("cbSize   %d\r\n"), pGlyphSet->cbThis);
+	pLog->Log(_T("flAccel  %d\r\n"), pGlyphSet->flAccel);
+	pLog->Log(_T("cGlyphsSupported %d\r\n"), pGlyphSet->cGlyphsSupported);
+	pLog->Log(_T("cRanges          %d\r\n"), pGlyphSet->cRanges);
 
 	for (unsigned i=0; i<pGlyphSet->cRanges; i++)
+	{
 		pLog->Log(_T("%3d %04x..%04x (%d)\r\n"), i, 
 			pGlyphSet->ranges[i].wcLow, 
 			pGlyphSet->ranges[i].wcLow + pGlyphSet->ranges[i].cGlyphs -1,
 			pGlyphSet->ranges[i].cGlyphs);
+	}
 
 	WORD gi[10];
 	size = GetGlyphIndices(hDC, _T("A Quick Brown Fox"), 10, gi, GGI_MARK_NONEXISTING_GLYPHS);
@@ -233,15 +235,14 @@ LRESULT KListViewCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	switch( uMsg )
 	{
 		case WM_CREATE:
+		{
 			m_hWnd		= hWnd;
 			m_hViewMenu = LoadMenu(m_hInst, MAKEINTRESOURCE(IDR_DIBVIEW));
 
-			{
-				RECT rect;
+			RECT rect;
 
-				GetClientRect(m_hWnd, & rect);
-				m_Fonts.Create(hWnd, 101, 0, 0, rect.right, rect.bottom, m_hInst);
-			}
+			GetClientRect(m_hWnd, & rect);
+			m_Fonts.Create(hWnd, 101, 0, 0, rect.right, rect.bottom, m_hInst);
 
 //			m_Fonts.AddIcon(LVSIL_SMALL, m_hInst, IDI_EMPTY);
 //          m_Fonts.AddIcon(LVSIL_SMALL, m_hInst, IDI_EQUAL);
@@ -260,11 +261,9 @@ LRESULT KListViewCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 				m_Fonts.AddColumn(7, 130, _T("Flags"));
 				m_Fonts.AddColumn(8, 130, _T("Family"));
 
-				{
-					HDC hdc = GetDC(NULL);
-					enumfont.EnumFontFamilies(hdc, & m_Fonts, DEFAULT_CHARSET, NULL);
-					ReleaseDC(NULL, hdc);
-				}
+				HDC hdc = GetDC(NULL);
+				enumfont.EnumFontFamilies(hdc, & m_Fonts, DEFAULT_CHARSET, NULL);
+				ReleaseDC(NULL, hdc);
 			}
 			else 
 			{
@@ -275,6 +274,7 @@ LRESULT KListViewCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			}
 
 			return 0;
+		}
 
 		case WM_SIZE:
 			MoveWindow(m_Fonts.GetHWND(), 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);	

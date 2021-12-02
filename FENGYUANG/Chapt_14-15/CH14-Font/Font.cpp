@@ -435,8 +435,8 @@ void KGlyphView::TestGlyphDesign(HDC hDC, const RECT * rcPaint)
 
 	SelectObject(hDC, GetStockObject(SYSTEM_FONT));
 	DeleteObject(hFont);
-
-/*	HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0xFF, 0, 0));
+#if 0
+	HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0xFF, 0, 0));
 	SelectObject(hDC, hPen);
 	MoveToEx(hDC, 0, 200, NULL);
 	LineTo(hDC, 100, 200);
@@ -446,7 +446,7 @@ void KGlyphView::TestGlyphDesign(HDC hDC, const RECT * rcPaint)
 	LineTo(hDC, 12, 200);
 	LineTo(hDC, 14, 0);
 	LineTo(hDC, 10, 0);
-*/
+#endif
 }
 
 
