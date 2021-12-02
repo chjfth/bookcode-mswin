@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------------//
+﻿//-----------------------------------------------------------------------------------//
 //              Windows Graphics Programming: Win32 GDI and DirectDraw               //
 //                             ISBN  0-13-086985-6                                   //
 //                                                                                   //
@@ -378,16 +378,21 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 
 		// ligature
 		WCHAR Ligature[] = { 'A', '+', 'E', '=', 0xC6, ' ', ' ',
-			'C', '+', 'E', '=', 0x152, ' ', ' ', // Chj: 0x8C was probably old Unicode standard
+			'C', '+', 'E', '=', 0x152, ' ', ' ', // 'Œ' 0x8C was probably old Unicode standard
 			'f', '+', 'i', '=', 0xFB01, ' ', ' ',
 			'f', '+', 'l', '=', 0xFB02, 0 };
 
 		TextOutW(hDC, 10, 460, Ligature, wcslen(Ligature));
 
 		// context
+
+		// "(横) 【横】"
 		WCHAR Context[] = { '(', 0x6A2A, ')', ' ', 	0x3010, 0x6A2A, 0x3011, 0 };
 
+		// "︵竖︶"
 		WCHAR Context2[] = { 0xFE35, 0x7AD6, 0xFE36, 0 };
+		
+		// "︻竖︼"
 		WCHAR Context3[] = { 0xFE3B, 0x7AD6, 0xFE3C, 0 };
 		
 		TextOutW(hDC,   10, 540, Context, wcslen(Context));
