@@ -69,17 +69,20 @@ const WordDef NTM_Family[] =
 };
 
 
-void DecodeFlag(unsigned flag, const WordDef * dic, TCHAR * result)
+void DecodeFlag(unsigned flag, const WordDef * dic, TCHAR * result, int bufsize)
 {
 	result[0] = 0;
 
 	for (; dic->name; dic ++)
+	{
 		if ( (flag & dic->mask)==dic->flag )
 		{
 			if ( result[0] )
-				_tcscat(result, _T(", "));
-			_tcscat(result, dic->name);
+				_tcscat_s(result, bufsize, _T(", "));
+
+			_tcscat_s(result, bufsize, dic->name);
 		}
+	}
 }
 
 
@@ -131,10 +134,10 @@ int KEnumFontFamily::EnumProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, in
 
 	TCHAR Result[MAX_PATH];
 
-	DecodeFlag(lpntme->ntmTm.ntmFlags, NTM_Flags, Result);
+	DecodeFlag(lpntme->ntmTm.ntmFlags, NTM_Flags, Result, ARRAYSIZE(Result));
 	m_pList->AddItem(7, Result);
 
-	DecodeFlag(lpelfe->elfLogFont.lfPitchAndFamily, NTM_Family, Result);
+	DecodeFlag(lpelfe->elfLogFont.lfPitchAndFamily, NTM_Family, Result, ARRAYSIZE(Result));
 	m_pList->AddItem(8, Result);
 
 	return TRUE;
@@ -154,7 +157,7 @@ void KEnumFontFamily::EnumFontFamilies(HDC hdc, KListView * pList, BYTE charset,
 	lf.lfFaceName[0]	= 0;
 
 	if ( FaceName )
-		_tcscpy(lf.lfFaceName, FaceName);
+		_tcscpy_s(lf.lfFaceName, sizeof(lf.lfFaceName), FaceName);
 
 	lf.lfPitchAndFamily = 0;
 
@@ -167,12 +170,12 @@ void KListViewCanvas::DecodeFontFile(const TCHAR * fontfile)
 	TCHAR fullname[MAX_PATH];
 
 	if ( _tcschr(fontfile, ':') )
-		_tcscpy(fullname, fontfile);
+		_tcscpy_s(fullname, ARRAYSIZE(fullname), fontfile);
 	else
 	{
 		GetWindowsDirectory(fullname, MAX_PATH);
-		_tcscat(fullname, "\\Fonts\\");
-		_tcscat(fullname, fontfile);
+		_tcscat_s(fullname, ARRAYSIZE(fullname), "\\Fonts\\");
+		_tcscat_s(fullname, ARRAYSIZE(fullname), fontfile);
 	}
 
 	// ask frame window to create a new MDI child window to decode a font
