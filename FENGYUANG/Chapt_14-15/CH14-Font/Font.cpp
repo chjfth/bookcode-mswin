@@ -340,12 +340,13 @@ void TextOutWH(HDC hDC, int x, int y, WCHAR text[], int len)
 void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 {
 	int xx = 10;
+	const int _4 = 4;
 
 	SetTextAlign(hDC, TA_BASELINE);
 
 	for (int i=0; i<ARRAYSIZE(TypeFaces); i++)
 	{
-		KLogFont logfont(52, TypeFaces[i]);
+		KLogFont1 logfont(52, TypeFaces[i]);
 		HFONT hFont = logfont.Create();
 
 		SelectObject(hDC, hFont);
@@ -354,15 +355,15 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 		GetCharWidth(hDC, _T('A'), _T('A'), & width);
 
 		TextOut(hDC, xx, 50, _T("A"), 1);
-		xx += width + 5;
+		xx += width + 5 + (i%_4==(_4-1) ? 10 : 0);
 
-		TextOut(hDC, 20+(i%4)*220, 100+(i/4)*50, TypeFamily[i/4], _tcslen(TypeFamily[i/4]));
+		TextOut(hDC, 20+(i%_4)*220, 100+(i/_4)*50, TypeFamily[i/_4], _tcslen(TypeFamily[i/_4]));
 		SelectObject(hDC, GetStockObject(SYSTEM_FONT));
 		DeleteObject(hFont);
 	}
 
 	{
-		KLogFont logfont(52, _T("MingLiu"));
+		KLogFont1 logfont(52, _T("MingLiu"));
 		logfont.SetCharSet(GB2312_CHARSET);
 
 		HFONT hFont = logfont.Create();
@@ -398,7 +399,7 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 	}
 
 	{
-		KLogFont logfont(52, _T("Tahoma"));
+		KLogFont1 logfont(52, _T("Tahoma"));
 		logfont.SetCharSet(ARABIC_CHARSET);
 
 		HFONT hFont = logfont.Create();
@@ -420,7 +421,7 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 
 void KGlyphView::TestGlyphDesign(HDC hDC, const RECT * rcPaint)
 {
-	KLogFont logfont(200, _T("Times New Roman"));
+	KLogFont1 logfont(200, _T("Times New Roman"));
 
 	HFONT hFont = logfont.Create();
 	SelectObject(hDC, hFont);
@@ -584,6 +585,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nShow)
 
     frame.ShowWindow(nShow);
     frame.UpdateWindow();
+
+	GdiSetBatchLimit(1); // Chj: to ease debugging
 
     frame.MessageLoop();
 

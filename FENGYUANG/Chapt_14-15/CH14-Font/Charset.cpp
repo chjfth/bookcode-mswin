@@ -269,7 +269,7 @@ KCharSetView::KCharSetView(void)
 
 	EnumSystemCodePages(EnumCodePagesProc, CP_SUPPORTED);
 
-	KLogFont ansifont(26, _T("Times New Roman"));
+	KLogFont1 ansifont(26, _T("Times New Roman"));
 	ansifont.SetCharSet(DEFAULT_CHARSET);
 				
 	m_hAnsiFont = ansifont.Create();
@@ -399,7 +399,7 @@ void KCharSetView::DispRow(HDC hDC, int x0, int y0, int y, WCHAR ch, int length)
 
 int KCharSetView::OnDraw(HDC hdc, const RECT * rcPaint)
 {
-	KLogFont logfont(m_font, _T("Times New Roman"));
+	KLogFont1 logfont(m_font, _T("Times New Roman"));
 
 	if ( m_nCharSet!=UNICODE_CHARSET )
 		logfont.SetCharSet(m_nCharSet);

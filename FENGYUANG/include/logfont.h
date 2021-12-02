@@ -11,13 +11,13 @@
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
-class KLogFont
+class KLogFont1
 {
 public:
 
-	LOGFONTA		m_LogFont;
+	LOGFONT		m_LogFont;
 
-	KLogFont(int height, const TCHAR * FaceName )
+	KLogFont1(int height, const TCHAR * FaceName )
 	{
 		m_LogFont.lfHeight	       = height;
 		m_LogFont.lfWidth	       = 0;
@@ -32,6 +32,7 @@ public:
 		m_LogFont.lfClipPrecision  = CLIP_DEFAULT_PRECIS;
 		m_LogFont.lfQuality        = ANTIALIASED_QUALITY;
 		m_LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+		
 		_tcscpy_s(m_LogFont.lfFaceName, ARRAYSIZE(m_LogFont.lfFaceName), FaceName);
 	}
 
