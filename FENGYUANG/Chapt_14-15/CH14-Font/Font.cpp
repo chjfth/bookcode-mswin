@@ -36,6 +36,7 @@
 #include "Raster.h"
 #include "TrueType.h"
 #include "FontFamily.h"
+#include "appshare.h"
 
 ///////////////// Raster Font View /////////////////
 
@@ -551,10 +552,10 @@ class KMyMDIFrame : public KMDIFrame
 
 	virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if ( uMsg == WM_USER+1 )
+		if ( uMsg == WM_USER_RasterFontView )
 			CreateCanvas(new KRasterFontView((const TCHAR *) lParam), _T("Raster Font"));
 
-		if ( uMsg == WM_USER+2 )
+		if ( uMsg == WM_USER_TrueTypeFontView )
 			CreateCanvas(new KTrueTypeFontView((const LOGFONT *) lParam, m_hInst), _T("TrueType Font"));
 
 		return KMDIFrame::WndProc(hWnd, uMsg, wParam, lParam);

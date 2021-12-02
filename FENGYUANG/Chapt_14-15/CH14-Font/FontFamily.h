@@ -50,7 +50,7 @@ class KListViewCanvas : public KCanvas
 
 	KListView		m_Fonts;
 	KEnumFontFamily enumfont;
-	int				m_bFamily;
+	int				m_bShowFontFamily;
 	HWND			m_hFrame;
 
 	void GetWndClassEx(WNDCLASSEX & wc)
@@ -64,7 +64,7 @@ public:
 	KListViewCanvas(bool bFamily)
 	{
 		m_hViewMenu    = NULL;
-		m_bFamily	   = bFamily;
+		m_bShowFontFamily	   = bFamily;
 	}
 
 	bool Initialize(HINSTANCE hInstance, KStatusWindow * pStatus, HWND hWndFrame)

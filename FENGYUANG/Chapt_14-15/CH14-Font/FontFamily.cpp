@@ -28,6 +28,7 @@
 #include "Resource.h"
 #include "TrueType.h"
 #include "FontFamily.h"
+#include "appshare.h"
 
 typedef struct
 {
@@ -178,8 +179,10 @@ void KListViewCanvas::DecodeFontFile(const TCHAR * fontfile)
 		_tcscat_s(fullname, ARRAYSIZE(fullname), fontfile);
 	}
 
+	// BUG! BUGGY CODE below: We should only pass .FON to WM_USER_RasterFontView.
+
 	// ask frame window to create a new MDI child window to decode a font
-	SendMessage(m_hFrame, WM_USER+1, 0, (LPARAM) fullname);
+	SendMessage(m_hFrame, WM_USER_RasterFontView, 0, (LPARAM) fullname); 
 }
 
 
@@ -248,7 +251,7 @@ LRESULT KListViewCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 //          m_Fonts.AddIcon(LVSIL_SMALL, m_hInst, IDI_EQUAL);
 //          m_Fonts.AddIcon(LVSIL_SMALL, m_hInst, IDI_CHANGE);
 
-			if ( m_bFamily )
+			if ( m_bShowFontFamily )
 			{
 				m_Fonts.AddColumn(0, 100, _T("Full Name"));
 				m_Fonts.AddColumn(1, 100, _T("Script"));
@@ -300,10 +303,10 @@ LRESULT KListViewCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 					if ( id==IDM_POP_DECODE )
 					{
-						if ( m_bFamily )
+						if ( m_bShowFontFamily )
 						{
 							// ask frame window to create a new MDI child window to decode a font
-							SendMessage(m_hFrame, WM_USER+2, 0, (LPARAM) & enumfont.m_LogFont[pInfo->iItem]);
+							SendMessage(m_hFrame, WM_USER_TrueTypeFontView, 0, (LPARAM) & enumfont.m_LogFont[pInfo->iItem]);
 						}
 						else
 						{
@@ -319,7 +322,7 @@ LRESULT KListViewCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 					if ( id==IDM_POP_UNICODERANGE )
 					{
-						if ( m_bFamily )
+						if ( m_bShowFontFamily )
 							UnicodeRange(& enumfont.m_LogFont[pInfo->iItem], m_hInst);
 					
 						return TRUE;

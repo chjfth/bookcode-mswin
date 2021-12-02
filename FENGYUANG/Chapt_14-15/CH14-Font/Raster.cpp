@@ -18,6 +18,7 @@
 #include <windows.h>
 #include <assert.h>
 #include <tchar.h>
+#include <stdio.h>
 
 #include "..\..\include\mmfile.h"
 #include "raster.h"
@@ -297,7 +298,7 @@ int DecodeRasterFont(HDC hDC, const TCHAR * filename)
 
 					TYPEINFO * pTypeInfo = pResTable->rscTypes;
 
-					// search fir RT_FONT resource
+					// search for RT_FONT resource
 					while ( pTypeInfo->rtTypeID!=0 )
 					{
 						if ( (pTypeInfo->rtTypeID & 0xFFF) == (WORD) RT_FONT )
@@ -323,7 +324,7 @@ int DecodeRasterFont(HDC hDC, const TCHAR * filename)
 								}
 							}
 
-						pTypeInfo = (TYPEINFO *) & pTypeInfo[pTypeInfo->rtResourceCount];
+						pTypeInfo = (TYPEINFO *) & pTypeInfo[pTypeInfo->rtResourceCount]; // BUG! pTypeInfo does NOT advance
 					}
 				}
 		}
