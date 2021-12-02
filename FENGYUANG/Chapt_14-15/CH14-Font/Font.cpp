@@ -276,30 +276,36 @@ public:
 
 const TCHAR* TypeFaces[] =
 {
+	// Roman
 	_T("Georgia"),
 	_T("Times New Roman"),
-	_T("Clarendon"),
-	_T("Bodoni Black"),
+	_T("Bitstream Vera Serif"),
+	_T("Bodoni Bold BT"), // https://www.wfonts.com/font/bodoni
 
+	// Swiss
 	_T("Arial"),
-	_T("Microsoft Sans Serif"),
-	_T("Verdana"),
-	_T("Eras Demi ITC"),
+	_T("Tahoma"),
+	_T("Ubuntu Light"),
+	_T("Eras Demi ITC"), // https://blogfonts.com/eras-demi-itc-1.font
 
-	_T("Curier New"),
-	_T("Dark Courier"),
+	// Modern
+	_T("Courier New"),
 	_T("Lucica Console"),
-	_T("Letter Gothic"),
+	_T("MS Gothic"),
+	_T("Ubuntu Mono"),
 
-	_T("Vivaldi"),
-	_T("Tempus Sans ITC"),
-	_T("Viner Hand ITC"),
+	// Script
+	_T("Vivaldi"),// https://fontsgeek.com/fonts/Vivaldi-Regular
+	_T("Tempus Sans ITC"), // https://www.dafontfree.net/tempus-sans-itc-regular/f102943.htm
+		// -- but "Tempus Sans ITC" is marked "Decorative"
+	_T("Caveat"), // https://fonts.google.com/specimen/Caveat
 	_T("Comic Sans MS"),
 
-	_T("Old English"),
-	_T("BD Renaissance"),
-	_T("TreeHouse"),
-	_T("Unicorn")
+	// Decorative. Seems no Windows stock ttf is marked as "Decorative"
+	_T("Magnific Chaos Personal Use"),
+	_T("BD Renaissance"), // https://fontsgeek.com/fonts/BD-Renaissance-Regular
+	_T("TreeHouse"), // https://fontsgeek.com/treehouse-font
+	_T("Special Elite") // https://fonts.google.com/specimen/Special+Elite
 };
 
 
