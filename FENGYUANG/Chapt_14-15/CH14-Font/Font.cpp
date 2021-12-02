@@ -378,7 +378,7 @@ void KGlyphView::TestCharGlyph(HDC hDC, const RECT * rcPaint)
 
 		// ligature
 		WCHAR Ligature[] = { 'A', '+', 'E', '=', 0xC6, ' ', ' ',
-			'C', '+', 'E', '=', 0x8C, ' ', ' ',
+			'C', '+', 'E', '=', 0x152, ' ', ' ', // Chj: 0x8C was probably old Unicode standard
 			'f', '+', 'i', '=', 0xFB01, ' ', ' ',
 			'f', '+', 'l', '=', 0xFB02, 0 };
 
