@@ -42,93 +42,93 @@
 //          &     // address of input data
 
 const TCHAR Format_LOGFONT [] =
-    "4lfHeight: %d\0"
-	"4lfWidth:  %d\0"
-	"4lfEscapement: %d\0"
-	"4lfOrientation: %d\0"
-	"4lfWeight: %d\0"
-    "1lfItalic: %d\0"
-	"1lfUnderline: %d\0"
-	"1lfStrikeOut: %d\0"
-	"1lfCharSet: %d\0"
-	"1lfOutPrecision: %d\0"
-	"1lfClipPrecision: %d\0"
-	"1lfQuality: %d\0"
-	"1lfPitchAndFamily: 0x%x\0"
-	"&lfFaceName: %s\0";
+    _T("4lfHeight: %d\0")
+	_T("4lfWidth:  %d\0")
+	_T("4lfEscapement: %d\0")
+	_T("4lfOrientation: %d\0")
+	_T("4lfWeight: %d\0")
+    _T("1lfItalic: %d\0")
+	_T("1lfUnderline: %d\0")
+	_T("1lfStrikeOut: %d\0")
+	_T("1lfCharSet: %d\0")
+	_T("1lfOutPrecision: %d\0")
+	_T("1lfClipPrecision: %d\0")
+	_T("1lfQuality: %d\0")
+	_T("1lfPitchAndFamily: 0x%x\0")
+	_T("&lfFaceName: %s\0");
 
 
 const TCHAR Format_TEXTMETRIC [] =
-	"4tmHeight: %d\0"
-    "4tmAscent: %d\0"
-    "4tmDescent: %d\0"
-    "4tmInternalLeading: %d\0"
-    "4tmExternalLeading: %d\0"
-    "4tmAveCharWidth: %d\0"
-    "4tmMaxCharWidth: %d\0"
-    "4tmWeight: %d\0"
-    "4tmOverhang: %d\0"
-    "4tmDigitizedAspectX: %d\0"
-    "4tmDigitizedAspectY: %d\0"
-    "1tmFirstChar: %d\0"
-    "1tmLastChar: %d\0"
-    "1tmDefaultChar: %d\0"
-    "1tmBreakChar: %d\0"
-    "1tmItalic: %d\0"
-    "1tmUnderlined: %d\0"
-    "1tmStruckOut: %d\0"
-    "1tmPitchAndFamily: 0x%x\0"
-    "1tmCharSet: %d\0";
+	_T("4tmHeight: %d\0")
+    _T("4tmAscent: %d\0")
+    _T("4tmDescent: %d\0")
+    _T("4tmInternalLeading: %d\0")
+    _T("4tmExternalLeading: %d\0")
+    _T("4tmAveCharWidth: %d\0")
+    _T("4tmMaxCharWidth: %d\0")
+    _T("4tmWeight: %d\0")
+    _T("4tmOverhang: %d\0")
+    _T("4tmDigitizedAspectX: %d\0")
+    _T("4tmDigitizedAspectY: %d\0")
+    _T("1tmFirstChar: %d\0")
+    _T("1tmLastChar: %d\0")
+    _T("1tmDefaultChar: %d\0")
+    _T("1tmBreakChar: %d\0")
+    _T("1tmItalic: %d\0")
+    _T("1tmUnderlined: %d\0")
+    _T("1tmStruckOut: %d\0")
+    _T("1tmPitchAndFamily: 0x%x\0")
+    _T("1tmCharSet: %d\0");
 
 const TCHAR Format_PANOSE [] = 
-	"1bFamilyType: %d\0"
-	"1bSerifStyle: %d\0"
-	"1bWeight: %d\0"
-	"1bProportion: %d\0"
-	"1bContrast: %d\0"
-    "1bStrokeVariation: %d\0"
-    "1bArmStyle: %d\0"
-    "1bLetterform: %d\0"
-    "1bMidline: %d\0"
-    "1bXHeight: %d\0";
+	_T("1bFamilyType: %d\0")
+	_T("1bSerifStyle: %d\0")
+	_T("1bWeight: %d\0")
+	_T("1bProportion: %d\0")
+	_T("1bContrast: %d\0")
+    _T("1bStrokeVariation: %d\0")
+    _T("1bArmStyle: %d\0")
+    _T("1bLetterform: %d\0")
+    _T("1bMidline: %d\0")
+    _T("1bXHeight: %d\0");
 
 // partial
 const TCHAR Format_OUTLINETEXTMETRIC1 [] =
-    "4otmSize: %d\n";
+    _T("4otmSize: %d\n");
 
 const TCHAR Format_OUTLINETEXTMETRIC4 [] =
-    "4otmfsSelection: 0x%x\0"
-    "4otmfsType: %d\0"
-	"4otmsCharSlopeRise: %d\0"
-	"4otmsCharSlopeRun: %d\0"
-	"4otmItalicAngle: %d\0"
-	"4otmEMSquare: %d\0"
-	"4otmAscent: %d\0"
-	"4otmDescent: %d\0"
-	"4otmLineGap: %d\0"
-	"4otmsCapEmHeight: %d\0"
-	"4otmsXHeight: %d\0"
-	"gotmrcFontBox: {%d,%d,%d,%d}\0"
-	"4otmMacAscent: %d\0"
-	"4otmMacDescent: %d\0"
-    "4otmMacLineGap: %d\0"
-    "4otmusMinimumPPEM: %d\0"
-    "8otmptSubscriptSize: {%d,%d}\0"
-    "8otmptSubscriptOffset: {%d,%d}\0"
-    "8otmptSuperscriptSize: (%d,%d}\0"
-    "8otmptSuperscriptOffset: (%d,%d}\0"
-    "4otmsStrikeoutSize: %d\0"
-	"4otmsStrikeoutPosition: %d\0"
-	"4otmsUnderscoreSize: %d\0"
-	"4otmsUnderscorePosition: %d\0";
+    _T("4otmfsSelection: 0x%x\0")
+    _T("4otmfsType: %d\0")
+	_T("4otmsCharSlopeRise: %d\0")
+	_T("4otmsCharSlopeRun: %d\0")
+	_T("4otmItalicAngle: %d\0")
+	_T("4otmEMSquare: %d\0")
+	_T("4otmAscent: %d\0")
+	_T("4otmDescent: %d\0")
+	_T("4otmLineGap: %d\0")
+	_T("4otmsCapEmHeight: %d\0")
+	_T("4otmsXHeight: %d\0")
+	_T("gotmrcFontBox: {%d,%d,%d,%d}\0")
+	_T("4otmMacAscent: %d\0")
+	_T("4otmMacDescent: %d\0")
+    _T("4otmMacLineGap: %d\0")
+    _T("4otmusMinimumPPEM: %d\0")
+    _T("8otmptSubscriptSize: {%d,%d}\0")
+    _T("8otmptSubscriptOffset: {%d,%d}\0")
+    _T("8otmptSuperscriptSize: (%d,%d}\0")
+    _T("8otmptSuperscriptOffset: (%d,%d}\0")
+    _T("4otmsStrikeoutSize: %d\0")
+	_T("4otmsStrikeoutPosition: %d\0")
+	_T("4otmsUnderscoreSize: %d\0")
+	_T("4otmsUnderscorePosition: %d\0");
  
 const TCHAR Format_FONTSIGNATURE [] =
-	"4fsUsb[0]: 0x%08X\0"
-	"4fsUsb[1]: 0x%08X\0"
-	"4fsUsb[2]: 0x%08X\0"
-	"4fsUsb[3]: 0x%08X\0"
-	"4fsCsb[0]: 0x%08X\0"
-	"4fsCsb[1]: 0x%08X\0";
+	_T("4fsUsb[0]: 0x%08X\0")
+	_T("4fsUsb[1]: 0x%08X\0")
+	_T("4fsUsb[2]: 0x%08X\0")
+	_T("4fsUsb[3]: 0x%08X\0")
+	_T("4fsCsb[0]: 0x%08X\0")
+	_T("4fsCsb[1]: 0x%08X\0");
 
 
 HTREEITEM AddCharWidth(KTreeView & Tree, HDC hDC, const TCHAR * name, HTREEITEM hLast, int typ)
@@ -162,10 +162,10 @@ HTREEITEM AddCharWidth(KTreeView & Tree, HDC hDC, const TCHAR * name, HTREEITEM 
 
 		switch ( typ )
 		{
-			case 0: _sntprintf_s(num, buflen, _TRUNCATE, "%d",    intWidth[ch-uFirst]); break;
-			case 1: _sntprintf_s(num, buflen, _TRUNCATE, "%7.3f", fltWidth[ch-uFirst]); break;
-			case 2: _sntprintf_s(num, buflen, _TRUNCATE, "%d %d %d", abcWidth[ch-uFirst].abcA, abcWidth[ch-uFirst].abcB, abcWidth[ch-uFirst].abcC); break;
-			case 3: _sntprintf_s(num, buflen, _TRUNCATE, "%7.3f %7.3f %7.3f", abcfWidth[ch-uFirst].abcfA, abcfWidth[ch-uFirst].abcfB, abcfWidth[ch-uFirst].abcfC); break;
+			case 0: _sntprintf_s(num, buflen, _TRUNCATE, _T("%d"),    intWidth[ch-uFirst]); break;
+			case 1: _sntprintf_s(num, buflen, _TRUNCATE, _T("%7.3f"), fltWidth[ch-uFirst]); break;
+			case 2: _sntprintf_s(num, buflen, _TRUNCATE, _T("%d %d %d"), abcWidth[ch-uFirst].abcA, abcWidth[ch-uFirst].abcB, abcWidth[ch-uFirst].abcC); break;
+			case 3: _sntprintf_s(num, buflen, _TRUNCATE, _T("%7.3f %7.3f %7.3f"), abcfWidth[ch-uFirst].abcfA, abcfWidth[ch-uFirst].abcfB, abcfWidth[ch-uFirst].abcfC); break;
 		}
 
 		Tree.InsertItem(TVI_LAST, hLast, mess);
@@ -177,16 +177,16 @@ HTREEITEM AddCharWidth(KTreeView & Tree, HDC hDC, const TCHAR * name, HTREEITEM 
 
 const term Dic_GCP [] =
 {
-	{	GCP_DBCS,		"GCP_DBCS"			},
-	{	GCP_REORDER,	"GCP_REORDER"		},
-	{	GCP_USEKERNING, "GCP_USEKERNING"	},
-	{	GCP_GLYPHSHAPE, "GCP_GLYPHSHARE"	},
-	{	GCP_LIGATE,		"GCP_LIGATE"		},
-	{	GCP_DIACRITIC,	"GCP_DIACRITIC"		},
-	{	GCP_KASHIDA,	"GCP_KASHIDA"		},
-	{	GCP_ERROR,		"GCP_ERROR"			},
-	{	GCP_JUSTIFY,	"GCP_JUSTIFY"		},
-	{	FLI_GLYPHS,		"FLI_GLYPHS"		},
+	{	GCP_DBCS,		_T("GCP_DBCS")			},
+	{	GCP_REORDER,	_T("GCP_REORDER")		},
+	{	GCP_USEKERNING, _T("GCP_USEKERNING")	},
+	{	GCP_GLYPHSHAPE, _T("GCP_GLYPHSHARE")	},
+	{	GCP_LIGATE,		_T("GCP_LIGATE")		},
+	{	GCP_DIACRITIC,	_T("GCP_DIACRITIC")		},
+	{	GCP_KASHIDA,	_T("GCP_KASHIDA")		},
+	{	GCP_ERROR,		_T("GCP_ERROR")			},
+	{	GCP_JUSTIFY,	_T("GCP_JUSTIFY")		},
+	{	FLI_GLYPHS,		_T("FLI_GLYPHS")		},
 	{	0,				NULL				}
 };
 
@@ -203,12 +203,12 @@ void DecodeFont(KTreeView & Tree, LOGFONT * pLf, int dpi)
 	HTREEITEM hLast, h1;
 
 	// LOGFONT
-	hLast = Tree.InsertTree(TVI_LAST, TVI_ROOT, "LOGFONT", Format_LOGFONT, pLf);
+	hLast = Tree.InsertTree(TVI_LAST, TVI_ROOT, _T("LOGFONT"), Format_LOGFONT, pLf);
 
 	SelectObject(hDC, hFont);
 
 	GetTextFace(hDC, MAX_PATH, t1);
-	wsprintf(t2, "GetTextFace: %s", t1);
+	wsprintf(t2, _T("GetTextFace: %s"), t1);
 
 	// GetTextFace
     hLast = Tree.InsertItem(hLast,    TVI_ROOT, t2);
@@ -216,26 +216,26 @@ void DecodeFont(KTreeView & Tree, LOGFONT * pLf, int dpi)
 	// GetFontLangageInfo
 	DWORD langinfo = GetFontLanguageInfo(hDC);
 
-	wsprintf(t1, "GetFontLanguageInfo: 0x%x", langinfo);
+	wsprintf(t1, _T("GetFontLanguageInfo: 0x%x"), langinfo);
 	hLast = Tree.InsertItem(hLast, TVI_ROOT, t1);
 	Tree.AddFlags(hLast, langinfo, Dic_GCP);
 
 	// GetTextCharset
-	wsprintf(t1, "GetTextCharset: 0x%x", GetTextCharset(hDC));
+	wsprintf(t1, _T("GetTextCharset: 0x%x"), GetTextCharset(hDC));
 	hLast = Tree.InsertItem(hLast, TVI_ROOT, t1);
 
 	{
 		FONTSIGNATURE fs;
 		GetTextCharsetInfo(hDC, & fs, 0);
 
-		hLast = Tree.InsertTree(hLast, TVI_ROOT, "FONTSIGNATURE", Format_FONTSIGNATURE, & fs);
+		hLast = Tree.InsertTree(hLast, TVI_ROOT, _T("FONTSIGNATURE"), Format_FONTSIGNATURE, & fs);
 	}
 	
 	// TEXTMETRIC
 	{
 		TEXTMETRIC tm;
 		GetTextMetrics(hDC, & tm);
-		hLast = Tree.InsertTree(hLast, TVI_ROOT, "TEXTMETRIC", Format_TEXTMETRIC, & tm);
+		hLast = Tree.InsertTree(hLast, TVI_ROOT, _T("TEXTMETRIC"), Format_TEXTMETRIC, & tm);
 	}
 
 	// OUTLINETEXTMETIRC
@@ -245,47 +245,47 @@ void DecodeFont(KTreeView & Tree, LOGFONT * pLf, int dpi)
 		if ( otm.m_pOtm )
 		{
 			// first field of OUTLINTTEXTMETRIC
-			hLast = Tree.InsertTree(hLast, TVI_ROOT, "OUTLINETEXTMETRIC", Format_OUTLINETEXTMETRIC1, otm.m_pOtm);
+			hLast = Tree.InsertTree(hLast, TVI_ROOT, _T("OUTLINETEXTMETRIC"), Format_OUTLINETEXTMETRIC1, otm.m_pOtm);
 	
 			// otmTextMetrics
-			h1    =	Tree.InsertTree(TVI_LAST, hLast, "otmTextMetrics: TEXTMETRIC", Format_TEXTMETRIC, & otm.m_pOtm->otmTextMetrics);
+			h1    =	Tree.InsertTree(TVI_LAST, hLast, _T("otmTextMetrics: TEXTMETRIC"), Format_TEXTMETRIC, & otm.m_pOtm->otmTextMetrics);
 
 			// otmPanseNumber
-			h1    =	Tree.InsertTree(h1,       hLast, "otmPanoseNumber: PANOSE",    Format_PANOSE,     & otm.m_pOtm->otmPanoseNumber);
+			h1    =	Tree.InsertTree(h1,       hLast, _T("otmPanoseNumber: PANOSE"),    Format_PANOSE,     & otm.m_pOtm->otmPanoseNumber);
 
 			// main fields after PANOSE
 			h1    = Tree.InsertTree(h1,       hLast, NULL,                         Format_OUTLINETEXTMETRIC4, & otm.m_pOtm->otmfsSelection);
 	
-			wsprintf(t1, "otmpFamilyName: %s", otm.GetName(otm.m_pOtm->otmpFamilyName));
+			wsprintf(t1, _T("otmpFamilyName: %s"), otm.GetName(otm.m_pOtm->otmpFamilyName));
 			h1 = Tree.InsertItem(h1, hLast, t1);
 
-			wsprintf(t1, "otmpFaceName: %s", otm.GetName(otm.m_pOtm->otmpFaceName));
+			wsprintf(t1, _T("otmpFaceName: %s"), otm.GetName(otm.m_pOtm->otmpFaceName));
 			h1 = Tree.InsertItem(h1, hLast, t1);
 
-			wsprintf(t1, "otmpStyleName: %s", otm.GetName(otm.m_pOtm->otmpStyleName));
+			wsprintf(t1, _T("otmpStyleName: %s"), otm.GetName(otm.m_pOtm->otmpStyleName));
 			h1 = Tree.InsertItem(h1, hLast, t1);
 
-			wsprintf(t1, "otmpFullName: %s", otm.GetName(otm.m_pOtm->otmpFullName));
+			wsprintf(t1, _T("otmpFullName: %s"), otm.GetName(otm.m_pOtm->otmpFullName));
 			h1 = Tree.InsertItem(h1, hLast, t1);
 		}
 	}
 
-	hLast = AddCharWidth(Tree, hDC, "GetCharWidth32",        hLast, 0);
-	hLast = AddCharWidth(Tree, hDC, "GetCharWidthFloat",     hLast, 1);
-	hLast = AddCharWidth(Tree, hDC, "GetCharABCWidths",      hLast, 2);
-	hLast = AddCharWidth(Tree, hDC, "GetCharABCWidthsFloat", hLast, 3);
+	hLast = AddCharWidth(Tree, hDC, _T("GetCharWidth32"),        hLast, 0);
+	hLast = AddCharWidth(Tree, hDC, _T("GetCharWidthFloat"),     hLast, 1);
+	hLast = AddCharWidth(Tree, hDC, _T("GetCharABCWidths"),      hLast, 2);
+	hLast = AddCharWidth(Tree, hDC, _T("GetCharABCWidthsFloat"), hLast, 3);
 
 	// Kerning pairs
 	{
 		KKerningPair kerning(hDC);
 
-		wsprintf(t1, "GetKerningPairs: %d pairs", kerning.m_nPairs);
+		wsprintf(t1, _T("GetKerningPairs: %d pairs"), kerning.m_nPairs);
 
 		hLast = Tree.InsertItem(hLast, TVI_ROOT, t1);
 
 		for (int i=0; i<kerning.m_nPairs; i++)
 		{
-			wsprintf(t1, "'%c' (%02x) '%c' (%02x) -> %d", 
+			wsprintf(t1, _T("'%c' (%02x) '%c' (%02x) -> %d"), 
 				kerning.m_pKerningPairs[i].wFirst,  kerning.m_pKerningPairs[i].wFirst, 
 				kerning.m_pKerningPairs[i].wSecond, kerning.m_pKerningPairs[i].wSecond, 
 				kerning.m_pKerningPairs[i].iKernAmount);
@@ -404,9 +404,9 @@ class KChooseFont
 						rect.bottom += 30;
 					
 						TCHAR temp[32];
-						wsprintf(temp, "%d dpi", m_nDPI[i]);
+						wsprintf(temp, _T("%d dpi"), m_nDPI[i]);
 						
-						m_hButton[i] = CreateWindow("BUTTON", temp,
+						m_hButton[i] = CreateWindow(_T("BUTTON"), temp,
 							WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
 							rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
 							hDlg, (HMENU) (1234+i), (HINSTANCE) GetWindowLong(hDlg, GWL_HINSTANCE), NULL);
