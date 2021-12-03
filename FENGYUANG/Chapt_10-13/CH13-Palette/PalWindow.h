@@ -11,6 +11,8 @@
 //  Version    : 1.00.000, May 31, 2000                                              //
 //-----------------------------------------------------------------------------------//
 
+#include <windows.h>
+#include <windowsx.h>
 #include "..\..\include\utils.h"
 
 void AnalyzePalette(PALETTEENTRY entry[], int no, TCHAR mess[], int bufsize);
@@ -40,9 +42,23 @@ class KPaletteWnd : public KWindow
 
 			case WM_MOUSEMOVE:
 			{
+				int mousex = GET_X_LPARAM(lParam);
+				int mousey = GET_Y_LPARAM(lParam);
+				int cellx = (mousex-10)/16;
+				int celly = (mousey-45)/16;
+				int palslot = -1;
+				TCHAR str_palslot[10] = {};
+				if(cellx>=0 && cellx<16 && celly>=0 && celly<16)
+				{
+					palslot = celly*16 + cellx;
+					_sntprintf_s(str_palslot, ARRAYSIZE(str_palslot), _T("#%02X "), palslot);
+				}
+
 				COLORREF cr = GetPixel(m_hDC, LOWORD(lParam), HIWORD(lParam));
 				TCHAR temp[32];
-				wsprintf(temp, "RGB(%02X, %02X, %02X)   ", GetRValue(cr), GetGValue(cr), GetBValue(cr));
+				_sntprintf_s(temp, ARRAYSIZE(temp), 
+					"%sRGB(%02X, %02X, %02X)        ", str_palslot,
+					GetRValue(cr), GetGValue(cr), GetBValue(cr));
 				TextOut(m_hDC, 10, 310, temp, _tcslen(temp));
 				return 0;
 			}
