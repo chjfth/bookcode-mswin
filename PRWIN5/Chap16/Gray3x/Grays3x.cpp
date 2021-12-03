@@ -13,6 +13,7 @@ Chj: Use this .cpp for experimental purpose. For example:
 #include <stdio.h>
 #include "..\set-256color-mode.h"
 
+#define ID_TIMER    1
 bool g_isUpdateColors = true;
 
 void UpdateMyWinTitle(HWND hwnd)
@@ -102,6 +103,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		hPalette = CreatePalette (plp) ;
 		free (plp) ;
+
+		SetTimer (hwnd, ID_TIMER, 1000, NULL) ;
+
 		return 0 ;
 
 	case WM_SIZE:
@@ -164,12 +168,18 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		ReleaseDC (hwnd, hdc) ;
 		break ;
 
+	case WM_TIMER:
+		// Set a breakpoint here to tweak g_isUpdateColors's value.
+		UpdateMyWinTitle(hwnd);
+		return 0 ;
+
 	case WM_RBUTTONDOWN:
 		g_isUpdateColors = !g_isUpdateColors;
 		UpdateMyWinTitle(hwnd);
 		return 0;
 
 	case WM_DESTROY:
+		KillTimer (hwnd, ID_TIMER) ;
 		DeleteObject (hPalette) ;
 		PostQuitMessage (0) ;
 		return 0 ;
