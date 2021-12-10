@@ -119,7 +119,12 @@ void ListFonts(KListView * pList)
 int KEnumFontFamily::EnumProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, int FontType)
 {
 	if ( (FontType & m_nType)==0 )
-		return TRUE;
+	{
+		// [2021-12-02] Chj: No reason to return TRUE here.
+		// [WinXP] I see that ENUMLOGFONTEX.elfFullName[] "Roman", "Script", "Modern" reach here.
+
+		// return TRUE;
+	}
 
 	if ( m_nLogFont < MAX_LOGFONT )
 		m_LogFont[m_nLogFont ++] = lpelfe->elfLogFont;
@@ -140,6 +145,27 @@ int KEnumFontFamily::EnumProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, in
 
 	DecodeFlag(lpelfe->elfLogFont.lfPitchAndFamily, NTM_Family, Result, ARRAYSIZE(Result));
 	m_pList->AddItem(8, Result);
+
+	// Chj test:
+	//
+	assert( (0xF0 & lpelfe->elfLogFont.lfPitchAndFamily) == (0xF0 & lpntme->ntmTm.tmPitchAndFamily) );
+	// -- FF_ROMAN, FF_SWISS, FF_MODERN, FF_SCRIPT, FF_DECORATIVE should match
+	if((lpelfe->elfLogFont.lfPitchAndFamily & 0xF)==FIXED_PITCH) {
+		// MSDN: TMPF_FIXED_PITCH's literal meaning is opposite.
+		assert( (lpntme->ntmTm.tmPitchAndFamily & TMPF_FIXED_PITCH)==0 );
+	}
+	if((lpelfe->elfLogFont.lfPitchAndFamily & 0xF)==VARIABLE_PITCH) {
+		assert( (lpntme->ntmTm.tmPitchAndFamily & TMPF_FIXED_PITCH)==1 );
+	}
+	assert(lpelfe->elfLogFont.lfCharSet==lpntme->ntmTm.tmCharSet);
+	//
+	assert(lpelfe->elfLogFont.lfItalic==lpntme->ntmTm.tmItalic);
+	assert(lpelfe->elfLogFont.lfUnderline==lpntme->ntmTm.tmUnderlined);
+	assert(lpelfe->elfLogFont.lfStrikeOut==lpntme->ntmTm.tmStruckOut);
+	//
+	assert(lpelfe->elfLogFont.lfWeight==lpntme->ntmTm.tmWeight);
+	assert(lpelfe->elfLogFont.lfHeight==lpntme->ntmTm.tmHeight); // eg 20
+	//assert(lpelfe->elfLogFont.lfWidth==lpntme->ntmTm.tmAveCharWidth); // eg 9, not necc
 
 	return TRUE;
 }

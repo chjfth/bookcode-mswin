@@ -117,7 +117,7 @@ void Draw_16x16_PaletteArray(HDC hdcShow, int x, int y, int width, int height)
 	{
 		for (int j=0; j<80; j++)
 		{
-			// Chj: every "cell" is 5 pixels
+			// Chj: every "cell" is 5 logical unit
 			data[i][j] = (i/5) * 16 + (j/5);
 
 			// Chj: Left-most and top-most pixels are white, to act as gap
