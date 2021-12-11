@@ -122,7 +122,8 @@ int KEnumFontFamily::EnumProc(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, in
 	{
 		// [2021-12-02] Chj: No reason to return TRUE here.
 		// [WinXP] I see that ENUMLOGFONTEX.elfFullName[] "Roman", "Script", "Modern" reach here.
-
+		// [2021-12-11] Tech note: Typeface "Roman", "Script", "Modern" are different things
+		// to FF_ROMAN, FF_SCRIPT and FF_MODERN.
 		// return TRUE;
 	}
 
