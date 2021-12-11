@@ -32,7 +32,7 @@ DLGPARAMS ;
 HWND  hdlg ;
 TCHAR szAppName[] = TEXT ("PickFont") ;
 
-TCHAR g_params[100] = {};
+TCHAR g_params[100] = {0};
 
 // Forward declarations of functions
 
