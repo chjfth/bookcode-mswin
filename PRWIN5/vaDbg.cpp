@@ -34,3 +34,20 @@ void vaDbg(const TCHAR *fmt, ...)
 
 	OutputDebugString(buf);
 }
+
+void vaSetDlgItemText(HWND hdlg, int ctrlid, const TCHAR *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+
+	TCHAR buf[1000] = {0};
+#if _MSC_VER >= 1400 // VS2005+
+	_vsntprintf_s(buf, ARRAYSIZE(buf), fmt, args);
+#else
+	_vsntprintf(buf, ARRAYSIZE(buf), fmt, args);
+#endif
+
+	SetDlgItemText(hdlg, ctrlid, buf);
+
+	va_end(args);
+}
