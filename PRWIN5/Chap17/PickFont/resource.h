@@ -68,6 +68,7 @@
 #define IDC_TM_FAMILY                   1063
 #define IDC_TM_CHARSET                  1064
 #define IDC_TM_FACENAME                 1065
+#define IDC_REFRESH_COUNT               1066
 #define IDM_DEVICE_SCREEN               40001
 #define IDM_DEVICE_PRINTER              40002
 
@@ -77,7 +78,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40003
-#define _APS_NEXT_CONTROL_VALUE         1066
+#define _APS_NEXT_CONTROL_VALUE         1067
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

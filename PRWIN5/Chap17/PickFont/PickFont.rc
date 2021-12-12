@@ -193,6 +193,8 @@ BEGIN
     LTEXT           "Character Set:",IDC_STATIC,207,242,64,8
     LTEXT           "0",IDC_TM_CHARSET,281,242,44,8
     LTEXT           "0",IDC_TM_FACENAME,207,262,128,8
+
+    LTEXT           "#RefreshCount",IDC_REFRESH_COUNT,201,276,128,8
 END
 
 

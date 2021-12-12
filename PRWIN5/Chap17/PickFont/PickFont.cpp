@@ -41,6 +41,7 @@ HWND  hdlg ;
 TCHAR szAppName[] = TEXT ("PickFont") ;
 
 TCHAR g_params[100] = {0};
+int g_refreshcount = 0;
 
 // Forward declarations of functions
 
@@ -109,6 +110,17 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return (int)msg.wParam ;
 }
 
+void Set_WindowSizeByClientSize(HWND hwnd, int clicx, int clicy)
+{
+	RECT rowin, rocli;
+	GetWindowRect(hwnd, &rowin);
+	GetClientRect(hwnd, &rocli);
+	int nccx = (rowin.right-rowin.left) - (rocli.right-rocli.left);
+	int nccy = (rowin.bottom-rowin.top) - (rocli.bottom-rocli.top); // nc: non-client
+
+	MoveWindow(hwnd, rowin.left, rowin.top, clicx+nccx, clicy+nccy, TRUE);
+}
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static DLGPARAMS dp ;
@@ -138,11 +150,18 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{{
 	case WM_CREATE:
+	{
 		dp.iDevice = IDM_DEVICE_SCREEN ;
 
 		hdlg = CreateDialogParam (((LPCREATESTRUCT) lParam)->hInstance, 
 			szAppName, hwnd, DlgProc, (LPARAM) &dp) ;
+
+		// Chj: adjust main window size accordingly.
+		RECT rcli;
+		GetClientRect (hdlg, &rcli) ;
+		Set_WindowSizeByClientSize(hwnd, rcli.right+16, rcli.bottom+64);
 		return 0 ;
+	}
 
 	case WM_SETFOCUS:
 		SetFocus (hdlg) ;
@@ -520,6 +539,8 @@ void SetFieldsFromTextMetric (HWND hdlg, DLGPARAMS * pdp)
 
 	SetDlgItemInt  (hdlg, IDC_TM_CHARSET,   pdp->tm.tmCharSet, FALSE) ;
 	SetDlgItemText (hdlg, IDC_TM_FACENAME, pdp->szFaceName) ;
+
+	vaSetDlgItemText(hdlg, IDC_REFRESH_COUNT, _T("#%d"), ++g_refreshcount);
 }
 
 void MySetMapMode (HDC hdc, int iMapMode)
@@ -532,11 +553,17 @@ void MySetMapMode (HDC hdc, int iMapMode)
 	case IDC_MM_LOENGLISH:  SetMapMode (hdc, MM_LOENGLISH) ;  break ;
 	case IDC_MM_HIENGLISH:  SetMapMode (hdc, MM_HIENGLISH) ;  break ;
 	case IDC_MM_TWIPS:      SetMapMode (hdc, MM_TWIPS) ;      break ;
+	
 	case IDC_MM_LOGTWIPS:
 		SetMapMode (hdc, MM_ANISOTROPIC) ;
 		SetWindowExtEx (hdc, 1440, 1440, NULL) ;
-		SetViewportExtEx (hdc, GetDeviceCaps (hdc, LOGPIXELSX),
-			GetDeviceCaps (hdc, LOGPIXELSY), NULL) ;
+		SetViewportExtEx (hdc, 
+			GetDeviceCaps (hdc, LOGPIXELSX), // typical: 96 or 120
+			GetDeviceCaps (hdc, LOGPIXELSY), // typical: 96 or 120
+			NULL) ;
+		// -- Chj memo: 
+		// When system DPI-scaling is 100%,  "96 pixels" is considered one inch in user's eye.
+		// When system DPI-scaling is 125%, "120 pixels" is considered one inch in user's eye.
 		break ;
 	}
 }
