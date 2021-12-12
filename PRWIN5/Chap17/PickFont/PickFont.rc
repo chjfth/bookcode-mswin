@@ -89,9 +89,9 @@ BEGIN
                     WS_TABSTOP,8,118,48,12
     CONTROL         "Match Aspect",IDC_MATCH_ASPECT,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,60,104,62,8
-    CONTROL         "Adv Grfx Mode",IDC_ADV_GRAPHICS,"Button",
+    CONTROL         "&Adv Grfx Mode",IDC_ADV_GRAPHICS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,60,118,62,8
-    LTEXT           "Character Set:",IDC_STATIC,8,137,46,8
+    LTEXT           "&Character Set:",IDC_STATIC,8,137,46,8
     EDITTEXT        IDC_LF_CHARSET,58,135,24,12,ES_AUTOHSCROLL
     PUSHBUTTON      "?",IDC_CHARSET_HELP,90,135,14,14
     GROUPBOX        "Quality",IDC_STATIC,132,98,62,48,WS_GROUP
@@ -101,7 +101,7 @@ BEGIN
                     136,122,40,8
     CONTROL         "Proof",IDC_PROOF_QUALITY,"Button",BS_AUTORADIOBUTTON,
                     136,134,40,8
-    LTEXT           "Face Name:",IDC_STATIC,8,154,44,8
+    LTEXT           "&Face Name:",IDC_STATIC,8,154,44,8
     EDITTEXT        IDC_LF_FACENAME,58,152,136,12,ES_AUTOHSCROLL
     GROUPBOX        "Output Precision",IDC_STATIC,8,166,118,133,WS_GROUP
     CONTROL         "OUT_DEFAULT_PRECIS",IDC_OUT_DEFAULT,"Button",
