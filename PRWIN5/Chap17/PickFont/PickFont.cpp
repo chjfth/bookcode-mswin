@@ -1,9 +1,17 @@
 /*-----------------------------------------
    PICKFONT.C -- Create Logical Font
                  (c) Charles Petzold, 1998
-  -----------------------------------------*/
+
+VC6 SP6 command-line compile:
+
+cl /c PickFont.cpp ..\..\vaDbg.cpp
+rc PickFont.rc
+link PickFont.obj vaDbg.obj user32.lib gdi32.lib comctl32.lib 
+
+-----------------------------------------*/
 
 #include <windows.h>
+#include "..\..\vaDbg.h"
 #include "resource.h"
 
 // Structure shared between main window and dialog box
@@ -56,7 +64,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hInstance     = hInstance ;
 	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
+	wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1); //(HBRUSH) GetStockObject (WHITE_BRUSH) ;
 	wndclass.lpszMenuName  = szAppName ; 
 	wndclass.lpszClassName = szAppName ;
 
@@ -128,7 +136,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		pszText = g_params;
 
 	switch (message)
-	{
+	{{
 	case WM_CREATE:
 		dp.iDevice = IDM_DEVICE_SCREEN ;
 
@@ -154,6 +162,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break ;
 
 	case WM_PAINT:
+	{
 		hdc = BeginPaint (hwnd, &ps) ;
 
 		// Set graphics mode so escapement works in Windows NT
@@ -174,16 +183,30 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Create and select the font; display the text
 
 		SelectObject (hdc, CreateFontIndirect (&dp.lf)) ;
+
+		int textlen = lstrlen(pszText);
 		TextOut (hdc, rect.left, rect.bottom, pszText, lstrlen (pszText)) ;
+
+		SIZE rsize = {0};
+		BOOL succ = GetTextExtentPoint32(hdc, pszText, textlen, &rsize);
+		vaDbg(TEXT("PickFont text dimension: %dx%d"), rsize.cx, rsize.cy);
 
 		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT))) ;
 		EndPaint (hwnd, &ps) ;
 		return 0 ;
+	}
 
+	case WM_SYSCOLORCHANGE :
+	{
+		InvalidateRect (hwnd, NULL, TRUE) ;
+		break ;
+	}
 	case WM_DESTROY:
-		PostQuitMessage (0) ;
+	{	PostQuitMessage (0) ;
 		return 0 ;
 	}
+
+	}}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
@@ -195,7 +218,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 	HFONT              hFont ;
 
 	switch (message)
-	{
+	{{
 	case WM_INITDIALOG:
 		// Save pointer to dialog-parameters structure in WndProc
 
@@ -418,9 +441,9 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			SetFieldsFromTextMetric (hdlg, pdp) ;
 			InvalidateRect (GetParent (hdlg), NULL, TRUE) ;
 			return TRUE ;
-		}
+		} // switch WM_COMMAND done
 		break ;
-	}
+	}}
 	return FALSE ;
 }
 void SetLogFontFromFields (HWND hdlg, DLGPARAMS * pdp)
