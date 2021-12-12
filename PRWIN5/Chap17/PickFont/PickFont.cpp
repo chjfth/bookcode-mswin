@@ -6,7 +6,7 @@ VC6 SP6 command-line compile:
 
 cl /c PickFont.cpp ..\..\vaDbg.cpp
 rc PickFont.rc
-link PickFont.obj vaDbg.obj user32.lib gdi32.lib comctl32.lib 
+link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj user32.lib gdi32.lib comdlg32.lib 
 
 -----------------------------------------*/
 
