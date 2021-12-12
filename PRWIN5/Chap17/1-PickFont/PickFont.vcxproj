@@ -48,10 +48,10 @@
     <TargetName>$(ProjectName)U</TargetName>
     <TargetName Condition="$(Configuration.Contains('ANSI'))">$(ProjectName)A</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Debug'" Label="Configuration">
+  <PropertyGroup Condition="$(Configuration.StartsWith('Debug'))" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Relea'" Label="Configuration">
+  <PropertyGroup Condition="$(Configuration.StartsWith('Release'))" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -62,13 +62,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Debug'">
+  <PropertyGroup Condition="$(Configuration.StartsWith('Debug'))">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration.Substring(0,5))'=='Relea'">
+  <PropertyGroup Condition="$(Configuration.StartsWith('Release'))">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration.Substring(0,5))'=='Debug'">
+  <ItemDefinitionGroup Condition="$(Configuration.StartsWith('Debug'))">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -82,7 +82,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration.Substring(0,5))'=='Relea'">
+  <ItemDefinitionGroup Condition="$(Configuration.StartsWith('Release'))">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
