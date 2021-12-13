@@ -5,7 +5,7 @@
 
 #include <windows.h>
 #include <math.h>
-#include "ezfont.h"
+#include "EZFont.h"
 
 HFONT EzCreateFont (HDC hdc, TCHAR * szFaceName, int iDeciPtHeight,
                     int iDeciPtWidth, int iAttributes, BOOL fLogRes)

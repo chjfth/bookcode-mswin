@@ -4,7 +4,7 @@
   ---------------------------------------*/
 
 #include <windows.h>
-#include "ezfont.h"
+#include "..\EZFont.h"
 
 TCHAR szAppName [] = TEXT ("EZTest") ;
 TCHAR szTitle   [] = TEXT ("EZTest: Test of EZFONT") ;

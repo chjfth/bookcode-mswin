@@ -102,7 +102,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(RootNamespace).cpp" />
-    <ClCompile Include="EZFont.cpp" />
+    <ClCompile Include="..\EZFont.cpp" />
     <ClCompile Include="FontDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
