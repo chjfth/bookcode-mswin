@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PickFont", "1-PickFont\Pick
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChosFont", "ChosFont\ChosFont.vcxproj", "{A68E9A47-8393-DF88-06B6-D5A1EFACC8E0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EZTest", "2-EZTest\EZTest.vcxproj", "{0A2BC038-3653-714D-A299-D08B6EA81864}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug ANSI Char|Win32 = Debug ANSI Char|Win32
@@ -44,6 +46,22 @@ Global
 		{A68E9A47-8393-DF88-06B6-D5A1EFACC8E0}.Release|Win32.Build.0 = Release|Win32
 		{A68E9A47-8393-DF88-06B6-D5A1EFACC8E0}.Release|x64.ActiveCfg = Release|x64
 		{A68E9A47-8393-DF88-06B6-D5A1EFACC8E0}.Release|x64.Build.0 = Release|x64
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Debug ANSI Char|Win32.ActiveCfg = Debug ANSI Char|Win32
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Debug ANSI Char|Win32.Build.0 = Debug ANSI Char|Win32
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Debug ANSI Char|x64.ActiveCfg = Debug ANSI Char|x64
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Debug ANSI Char|x64.Build.0 = Debug ANSI Char|x64
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Debug|Win32.Build.0 = Debug|Win32
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Debug|x64.ActiveCfg = Debug|x64
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Debug|x64.Build.0 = Debug|x64
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Release ANSI Char|Win32.ActiveCfg = Release ANSI Char|Win32
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Release ANSI Char|Win32.Build.0 = Release ANSI Char|Win32
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Release ANSI Char|x64.ActiveCfg = Release ANSI Char|x64
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Release ANSI Char|x64.Build.0 = Release ANSI Char|x64
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Release|Win32.ActiveCfg = Release|Win32
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Release|Win32.Build.0 = Release|Win32
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Release|x64.ActiveCfg = Release|x64
+		{0A2BC038-3653-714D-A299-D08B6EA81864}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
