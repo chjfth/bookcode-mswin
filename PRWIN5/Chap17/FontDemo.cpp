@@ -4,7 +4,7 @@
   ------------------------------------------------*/
 
 #include <windows.h>
-#include "..\EZFont.h"
+#include "EZFont.h"
 #include "resource.h"
 
 extern  void     PaintRoutine (HWND, HDC, int, int) ;
