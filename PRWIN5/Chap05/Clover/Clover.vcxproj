@@ -18,8 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+
+  <!-- Modify RootNamespace's value in your NEW copy of this vcxproj. 
+    RootNamespace' value is referenced later in cpp file list and VSPG. 
+    -->
   <PropertyGroup Label="Globals">
-    <Keyword>Win32Proj</Keyword>
     <RootNamespace>Clover</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
