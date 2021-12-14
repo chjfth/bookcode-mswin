@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EZTest", "2-EZTest\EZTest.v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontRot", "3-FontRot\FontRot.vcxproj", "{2A7A4476-7E66-449D-A675-518251E7C2B6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Unichars", "5-Unichars\Unichars.vcxproj", "{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug ANSI Char|Win32 = Debug ANSI Char|Win32
@@ -78,6 +80,20 @@ Global
 		{2A7A4476-7E66-449D-A675-518251E7C2B6}.Release|Win32.Build.0 = Release|Win32
 		{2A7A4476-7E66-449D-A675-518251E7C2B6}.Release|x64.ActiveCfg = Release|x64
 		{2A7A4476-7E66-449D-A675-518251E7C2B6}.Release|x64.Build.0 = Release|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Debug ANSI Char|Win32.ActiveCfg = Debug|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Debug ANSI Char|x64.ActiveCfg = Debug|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Debug ANSI Char|x64.Build.0 = Debug|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Debug|Win32.Build.0 = Debug|Win32
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Debug|x64.ActiveCfg = Debug|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Debug|x64.Build.0 = Debug|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Release ANSI Char|Win32.ActiveCfg = Release|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Release ANSI Char|x64.ActiveCfg = Release|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Release ANSI Char|x64.Build.0 = Release|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Release|Win32.ActiveCfg = Release|Win32
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Release|Win32.Build.0 = Release|Win32
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Release|x64.ActiveCfg = Release|x64
+		{C99CDCEE-FF4A-09CD-2C30-BBC610DE46A5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
