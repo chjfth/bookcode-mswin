@@ -40,12 +40,13 @@ void PaintRoutine (HWND hwnd, HDC hdc, int cxArea, int cyArea)
 		SelectObject (hdc, hFont) ;
 		GetTextMetrics (hdc, &tm) ;
 
-		TextOut (hdc, 0, y, szBuffer, 
-			wsprintf (szBuffer, 
+		int nChars = wsprintf (szBuffer, 
 			TEXT ("Times New Roman font of %i.%i points, ")
 			TEXT ("lf.lfHeight = %i, tm.tmHeight = %i"),
 			iPointSize / 10, iPointSize % 10,
-			lf.lfHeight, tm.tmHeight)) ;
+			lf.lfHeight, tm.tmHeight);
+
+		TextOut (hdc, 0, y, szBuffer, nChars);
 
 		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT))) ;
 		y += tm.tmHeight ;
