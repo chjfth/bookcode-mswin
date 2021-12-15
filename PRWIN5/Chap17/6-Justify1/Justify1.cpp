@@ -6,6 +6,8 @@
 #include <windows.h>
 #include "resource.h"
 
+#include "..\..\BeginPaint_NoFlicker.h"
+
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 TCHAR szAppName[] = TEXT ("Justify1") ;
@@ -24,7 +26,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hInstance     = hInstance ;
 	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
+	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of BeginPaint_NoFlicker
 	wndclass.lpszMenuName  = szAppName ;
 	wndclass.lpszClassName = szAppName ;
 
@@ -210,157 +212,166 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		TEXT ("Polly, she is -- and Mary, and the Widow ")
 		TEXT ("Douglas, is all told about in that book ")
 		TEXT ("-- which is mostly a true book; with ")
-		TEXT ("some stretchers, as I said before.") } ;
-		BOOL              fSuccess ;
-		HDC               hdc, hdcPrn ;
-		HMENU             hMenu ;
-		int               iSavePointSize ;
-		PAINTSTRUCT       ps ;
-		RECT              rect ;
+		TEXT ("some stretchers, as I said before.") 
+	} ;
 
-		switch (message)
+	BOOL              fSuccess ;
+	HDC               hdc, hdcPrn ;
+	HMENU             hMenu ;
+	int               iSavePointSize ;
+	PAINTSTRUCT       ps ;
+	RECT              rect ;
+
+	switch (message)
+	{{
+	case WM_CREATE:
+		// Initialize the CHOOSEFONT structure
+
+		GetObject (GetStockObject (SYSTEM_FONT), sizeof (lf), &lf) ;
+
+		cf.lStructSize    = sizeof (CHOOSEFONT) ;
+		cf.hwndOwner      = hwnd ;
+		cf.hDC            = NULL ;
+		cf.lpLogFont      = &lf ;
+		cf.iPointSize     = 0 ;
+		cf.Flags          = CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS | CF_EFFECTS ;
+		cf.rgbColors      = 0 ;
+		cf.lCustData      = 0 ;
+		cf.lpfnHook       = NULL ;
+		cf.lpTemplateName = NULL ;
+		cf.hInstance      = NULL ;
+		cf.lpszStyle      = NULL ;
+		cf.nFontType      = 0 ;      
+		cf.nSizeMin       = 0 ;
+		cf.nSizeMax       = 0 ;
+
+		return 0 ;
+
+	case WM_COMMAND:
+	{
+		hMenu = GetMenu (hwnd) ;
+
+		switch (LOWORD (wParam))
 		{
-		case WM_CREATE:
-			// Initialize the CHOOSEFONT structure
+		case IDM_FILE_PRINT:
+			// Get printer DC
 
-			GetObject (GetStockObject (SYSTEM_FONT), sizeof (lf), &lf) ;
+			pd.lStructSize = sizeof (PRINTDLG) ;
+			pd.hwndOwner   = hwnd ;
+			pd.Flags       = PD_RETURNDC | PD_NOPAGENUMS | PD_NOSELECTION ;
 
-			cf.lStructSize    = sizeof (CHOOSEFONT) ;
-			cf.hwndOwner      = hwnd ;
-			cf.hDC            = NULL ;
-			cf.lpLogFont      = &lf ;
-			cf.iPointSize     = 0 ;
-			cf.Flags          = CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS | CF_EFFECTS ;
-			cf.rgbColors      = 0 ;
-			cf.lCustData      = 0 ;
-			cf.lpfnHook       = NULL ;
-			cf.lpTemplateName = NULL ;
-			cf.hInstance      = NULL ;
-			cf.lpszStyle      = NULL ;
-			cf.nFontType      = 0 ;      
-			cf.nSizeMin       = 0 ;
-			cf.nSizeMax       = 0 ;
+			if (!PrintDlg (&pd))
+				return 0 ;
 
-			return 0 ;
-
-		case WM_COMMAND:
-			hMenu = GetMenu (hwnd) ;
-
-			switch (LOWORD (wParam))
+			if (NULL == (hdcPrn = pd.hDC))
 			{
-			case IDM_FILE_PRINT:
-				// Get printer DC
-
-				pd.lStructSize = sizeof (PRINTDLG) ;
-				pd.hwndOwner   = hwnd ;
-				pd.Flags       = PD_RETURNDC | PD_NOPAGENUMS | PD_NOSELECTION ;
-
-				if (!PrintDlg (&pd))
-					return 0 ;
-
-				if (NULL == (hdcPrn = pd.hDC))
-				{
-					MessageBox (hwnd, TEXT ("Cannot obtain Printer DC"),
-						szAppName, MB_ICONEXCLAMATION | MB_OK) ;
-					return 0 ;
-				}
-				// Set margins of 1 inch
-
-				rect.left   = GetDeviceCaps (hdcPrn, LOGPIXELSX) -
-					GetDeviceCaps (hdcPrn, PHYSICALOFFSETX) ;
-
-				rect.top    = GetDeviceCaps (hdcPrn, LOGPIXELSY) -
-					GetDeviceCaps (hdcPrn, PHYSICALOFFSETY) ;
-
-				rect.right  = GetDeviceCaps (hdcPrn, PHYSICALWIDTH) -
-					GetDeviceCaps (hdcPrn, LOGPIXELSX) -
-					GetDeviceCaps (hdcPrn, PHYSICALOFFSETX) ;
-
-				rect.bottom = GetDeviceCaps (hdcPrn, PHYSICALHEIGHT) - 
-					GetDeviceCaps (hdcPrn, LOGPIXELSY) -
-					GetDeviceCaps (hdcPrn, PHYSICALOFFSETY) ;
-
-				// Display text on printer
-
-				SetCursor (LoadCursor (NULL, IDC_WAIT)) ;
-				ShowCursor (TRUE) ;
-
-				fSuccess = FALSE ;
-
-				if ((StartDoc (hdcPrn, &di) > 0) && (StartPage (hdcPrn) > 0))
-				{
-					// Select font using adjusted lfHeight
-
-					iSavePointSize = lf.lfHeight ;
-					lf.lfHeight = -(GetDeviceCaps (hdcPrn, LOGPIXELSY) *
-						cf.iPointSize) / 720 ;
-
-					SelectObject (hdcPrn, CreateFontIndirect (&lf)) ;
-					lf.lfHeight = iSavePointSize ;
-
-					// Set text color 
-
-					SetTextColor (hdcPrn, cf.rgbColors) ;
-
-					// Display text
-
-					Justify (hdcPrn, szText, &rect, iAlign) ;
-
-					if (EndPage (hdcPrn) > 0)
-					{
-						fSuccess = TRUE ;
-						EndDoc (hdcPrn) ;
-					}
-				}
-				ShowCursor (FALSE) ;
-				SetCursor (LoadCursor (NULL, IDC_ARROW)) ;
-
-				DeleteDC (hdcPrn) ;
-
-				if (!fSuccess)
-					MessageBox (hwnd, TEXT ("Could not print text"),
+				MessageBox (hwnd, TEXT ("Cannot obtain Printer DC"),
 					szAppName, MB_ICONEXCLAMATION | MB_OK) ;
 				return 0 ;
-
-			case IDM_FONT:
-				if (ChooseFont (&cf))
-					InvalidateRect (hwnd, NULL, TRUE) ;
-				return 0 ;
-
-			case IDM_ALIGN_LEFT:
-			case IDM_ALIGN_RIGHT:
-			case IDM_ALIGN_CENTER:
-			case IDM_ALIGN_JUSTIFIED:
-				CheckMenuItem (hMenu, iAlign, MF_UNCHECKED) ;
-				iAlign = LOWORD (wParam) ;
-				CheckMenuItem (hMenu, iAlign, MF_CHECKED) ;
-				InvalidateRect (hwnd, NULL, TRUE) ;
-				return 0 ;
 			}
+			// Set margins of 1 inch
+
+			rect.left   = GetDeviceCaps (hdcPrn, LOGPIXELSX) -
+				GetDeviceCaps (hdcPrn, PHYSICALOFFSETX) ;
+
+			rect.top    = GetDeviceCaps (hdcPrn, LOGPIXELSY) -
+				GetDeviceCaps (hdcPrn, PHYSICALOFFSETY) ;
+
+			rect.right  = GetDeviceCaps (hdcPrn, PHYSICALWIDTH) -
+				GetDeviceCaps (hdcPrn, LOGPIXELSX) -
+				GetDeviceCaps (hdcPrn, PHYSICALOFFSETX) ;
+
+			rect.bottom = GetDeviceCaps (hdcPrn, PHYSICALHEIGHT) - 
+				GetDeviceCaps (hdcPrn, LOGPIXELSY) -
+				GetDeviceCaps (hdcPrn, PHYSICALOFFSETY) ;
+
+			// Display text on printer
+
+			SetCursor (LoadCursor (NULL, IDC_WAIT)) ;
+			ShowCursor (TRUE) ;
+
+			fSuccess = FALSE ;
+
+			if ((StartDoc (hdcPrn, &di) > 0) && (StartPage (hdcPrn) > 0))
+			{
+				// Select font using adjusted lfHeight
+
+				iSavePointSize = lf.lfHeight ;
+				lf.lfHeight = -(GetDeviceCaps (hdcPrn, LOGPIXELSY) *
+					cf.iPointSize) / 720 ;
+
+				SelectObject (hdcPrn, CreateFontIndirect (&lf)) ;
+				lf.lfHeight = iSavePointSize ;
+
+				// Set text color 
+
+				SetTextColor (hdcPrn, cf.rgbColors) ;
+
+				// Display text
+
+				Justify (hdcPrn, szText, &rect, iAlign) ;
+
+				if (EndPage (hdcPrn) > 0)
+				{
+					fSuccess = TRUE ;
+					EndDoc (hdcPrn) ;
+				}
+			}
+			ShowCursor (FALSE) ;
+			SetCursor (LoadCursor (NULL, IDC_ARROW)) ;
+
+			DeleteDC (hdcPrn) ;
+
+			if (!fSuccess)
+				MessageBox (hwnd, TEXT ("Could not print text"),
+				szAppName, MB_ICONEXCLAMATION | MB_OK) ;
 			return 0 ;
 
-		case WM_PAINT:
-			hdc = BeginPaint (hwnd, &ps) ;
-
-			GetClientRect (hwnd, &rect) ;
-			DrawRuler (hdc, &rect) ;
-
-			rect.left  += GetDeviceCaps (hdc, LOGPIXELSX) / 2 ;
-			rect.top   += GetDeviceCaps (hdc, LOGPIXELSY) / 2 ;
-			rect.right -= GetDeviceCaps (hdc, LOGPIXELSX) / 4 ;
-
-			SelectObject (hdc, CreateFontIndirect (&lf)) ;
-			SetTextColor (hdc, cf.rgbColors) ;
-
-			Justify (hdc, szText, &rect, iAlign) ;
-
-			DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT)));
-			EndPaint (hwnd, &ps) ;
+		case IDM_FONT:
+			if (ChooseFont (&cf))
+				InvalidateRect (hwnd, NULL, TRUE) ;
 			return 0 ;
 
-		case WM_DESTROY:
-			PostQuitMessage (0) ;
+		case IDM_ALIGN_LEFT:
+		case IDM_ALIGN_RIGHT:
+		case IDM_ALIGN_CENTER:
+		case IDM_ALIGN_JUSTIFIED:
+			CheckMenuItem (hMenu, iAlign, MF_UNCHECKED) ;
+			iAlign = LOWORD (wParam) ;
+			CheckMenuItem (hMenu, iAlign, MF_CHECKED) ;
+			InvalidateRect (hwnd, NULL, TRUE) ;
 			return 0 ;
 		}
-		return DefWindowProc (hwnd, message, wParam, lParam) ;
+		return 0 ;
+	}
+
+	case WM_PAINT:
+	{
+		hdc = BeginPaint_NoFlicker (hwnd, &ps) ;
+
+		GetClientRect (hwnd, &rect) ;
+		FillRect(hdc, &rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
+
+		DrawRuler (hdc, &rect) ;
+
+		rect.left  += GetDeviceCaps (hdc, LOGPIXELSX) / 2 ;
+		rect.top   += GetDeviceCaps (hdc, LOGPIXELSY) / 2 ;
+		rect.right -= GetDeviceCaps (hdc, LOGPIXELSX) / 4 ;
+
+		SelectObject (hdc, CreateFontIndirect (&lf)) ;
+		SetTextColor (hdc, cf.rgbColors) ;
+
+		Justify (hdc, szText, &rect, iAlign) ;
+
+		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT)));
+		EndPaint_NoFlicker (hwnd, &ps) ;
+		return 0 ;
+	}
+
+	case WM_DESTROY:
+		PostQuitMessage (0) ;
+		return 0 ;
+	}}
+	
+	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }

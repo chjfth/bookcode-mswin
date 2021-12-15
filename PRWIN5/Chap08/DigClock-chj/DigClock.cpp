@@ -17,36 +17,8 @@ DigClock.cpp -- Updated by Chj, 2021.11.
 #include <windowsx.h>
 #include "resource.h"
 
-#include "BeginPaint_NoFlicker.h"
-
-void dbgprint(const TCHAR *fmt, ...)
-{
-	static int count = 0;
-	TCHAR buf[1000] = {0};
-
-#if _MSC_VER >= 1400 // VS2005+, avoid warning of deprecated _sntprintf()
-	_sntprintf_s(buf, ARRAYSIZE(buf)-3, _TRUNCATE, TEXT("[%d] "), ++count); // prefix seq
-#else
-	_sntprintf(buf, ARRAYSIZE(buf)-3, TEXT("[%d] "), ++count); // prefix seq
-#endif
-
-	int prefixlen = (int)_tcslen(buf);
-
-	va_list args;
-	va_start(args, fmt);
-#if _MSC_VER >= 1400 // VS2005+
-	_vsntprintf_s(buf+prefixlen, ARRAYSIZE(buf)-3-prefixlen, _TRUNCATE, fmt, args);
-	prefixlen = (int)_tcslen(buf);
-	_tcsncpy_s(buf+prefixlen, 2, TEXT("\r\n"), _TRUNCATE); // add trailing \r\n
-#else
-	_vsntprintf(buf+prefixlen, ARRAYSIZE(buf)-3-prefixlen, fmt, args);
-	prefixlen = _tcslen(buf);
-	_tcsncpy(buf+prefixlen, TEXT("\r\n"), 2); // add trailing \r\n
-#endif
-	va_end(args);
-
-	OutputDebugString(buf);
-}
+#include "..\..\vaDbg.h"
+#include "..\..\BeginPaint_NoFlicker.h"
 
 void ShowHelp(HWND hwndParent)
 {
@@ -85,7 +57,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hInstance     = hInstance ;
 	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of no-flickering
+	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of BeginPaint_NoFlicker
 	wndclass.lpszMenuName  = NULL ;
 	wndclass.lpszClassName = szAppName ;
 
