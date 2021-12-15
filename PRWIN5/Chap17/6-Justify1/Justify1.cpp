@@ -170,12 +170,15 @@ void Justify (HDC hdc, PTSTR pText, RECT * prc, int iAlign)
 
 		case IDM_ALIGN_JUSTIFIED:
 			if (*pText != '\0' && cSpaceChars > 0)
+			{
 				SetTextJustification (hdc,
-				prc->right - prc->left - size.cx,
-				cSpaceChars) ;
+					prc->right - prc->left - size.cx,
+					cSpaceChars) ;
+			}
 			xStart = prc->left ;
 			break ;
 		}
+
 		// display the text
 
 		TextOut (hdc, xStart, yStart, pBegin, pEnd - pBegin) ;
@@ -254,6 +257,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD (wParam))
 		{
 		case IDM_FILE_PRINT:
+		{
 			// Get printer DC
 
 			pd.lStructSize = sizeof (PRINTDLG) ;
@@ -297,8 +301,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				// Select font using adjusted lfHeight
 
 				iSavePointSize = lf.lfHeight ;
-				lf.lfHeight = -(GetDeviceCaps (hdcPrn, LOGPIXELSY) *
-					cf.iPointSize) / 720 ;
+				lf.lfHeight = 
+					- (GetDeviceCaps(hdcPrn, LOGPIXELSY) * cf.iPointSize) / 720 ;
 
 				SelectObject (hdcPrn, CreateFontIndirect (&lf)) ;
 				lf.lfHeight = iSavePointSize ;
@@ -317,15 +321,19 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					EndDoc (hdcPrn) ;
 				}
 			}
+
 			ShowCursor (FALSE) ;
 			SetCursor (LoadCursor (NULL, IDC_ARROW)) ;
 
 			DeleteDC (hdcPrn) ;
 
 			if (!fSuccess)
+			{
 				MessageBox (hwnd, TEXT ("Could not print text"),
-				szAppName, MB_ICONEXCLAMATION | MB_OK) ;
+					szAppName, MB_ICONEXCLAMATION | MB_OK) ;
+			}
 			return 0 ;
+		}
 
 		case IDM_FONT:
 			if (ChooseFont (&cf))
