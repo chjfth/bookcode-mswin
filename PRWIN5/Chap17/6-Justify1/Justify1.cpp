@@ -308,6 +308,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				lf.lfHeight = 
 					- (GetDeviceCaps(hdcPrn, LOGPIXELSY) * cf.iPointSize) / 720 ;
 
+				// [2021-12-15]Chj: We should set lf.lfWidth=0 here, otherwise,
+				// lf.lfWidth remains 7, which was set by `GetStockObject(SYSTEM_FONT)` 
+				// back in WM_CREATE. It will cause print-out characters to be very narrow.
+
 				SelectObject (hdcPrn, CreateFontIndirect (&lf)) ;
 				lf.lfHeight = iSavePointSize ;
 
