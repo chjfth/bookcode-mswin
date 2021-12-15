@@ -22,7 +22,7 @@
     <!-- Modify RootNamespace's value in your NEW copy of this vcxproj. 
     RootNamespace' value is referenced later in cpp file list and VSPG. 
     -->
-    <RootNamespace>Unichars</RootNamespace>
+    <RootNamespace>Justify1</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
