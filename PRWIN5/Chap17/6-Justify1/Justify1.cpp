@@ -8,6 +8,8 @@
 
 #include "..\..\BeginPaint_NoFlicker.h"
 
+TCHAR szfontface[LF_FACESIZE] = {};
+
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 TCHAR szAppName[] = TEXT ("Justify1") ;
@@ -315,6 +317,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				SelectObject (hdcPrn, CreateFontIndirect (&lf)) ;
 				lf.lfHeight = iSavePointSize ;
 
+				GetTextFace(hdcPrn, LF_FACESIZE, szfontface); // Chj: Input "System", output "Arial"
+
 				// Set text color 
 
 				SetTextColor (hdcPrn, cf.rgbColors) ;
@@ -376,6 +380,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		SelectObject (hdc, CreateFontIndirect (&lf)) ;
 		SetTextColor (hdc, cf.rgbColors) ;
+
+		GetTextFace(hdc, LF_FACESIZE, szfontface); // Chj test: Input "System", output "System"
 
 		Justify (hdc, szText, &rect, iAlign) ;
 
