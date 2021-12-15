@@ -90,13 +90,17 @@ void DrawRuler (HDC hdc, RECT * prc)
 	MoveToEx (hdc, -360,          0, NULL) ;
 	LineTo   (hdc, -360, ptClient.y) ;
 
-	for (i = 0, j = 0 ; i <= ptClient.x ; i += 1440 / 16, j++)
+	for (i = 0, j = 0 ; 
+		i <= ptClient.x ; 
+		i += 1440 / 16, j++)
 	{
 		MoveToEx (hdc, i, -360, NULL) ;
 		LineTo   (hdc, i, -360 - iRuleSize [j % 16]) ;
 	}
 
-	for (i = 0, j = 0 ; i <= ptClient.y ; i += 1440 / 16, j++)
+	for (i = 0, j = 0 ; 
+		i <= ptClient.y ; 
+		i += 1440 / 16, j++)
 	{
 		MoveToEx (hdc, -360, i, NULL) ;
 		LineTo   (hdc, -360 - iRuleSize [j % 16], i) ;

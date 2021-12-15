@@ -100,8 +100,8 @@ void DrawRuler (HDC hdc, RECT * prc)
 	}
 
 	for (i = 0, j = 0 ; 
-		i <= ptClient.y ; i += 1440 / 16, 
-		j++)
+		i <= ptClient.y ; 
+		i += 1440 / 16, j++)
 	{
 		MoveToEx (hdc, -360, i, NULL) ;
 		LineTo   (hdc, -360 - iRuleSize [j % 16], i) ;
@@ -276,9 +276,11 @@ void Justify (HDC hdc, PTSTR pText, RECT * prc, int iAlign)
 
 		case IDM_ALIGN_JUSTIFIED:
 			if (*pText != '\0' && cSpaceChars > 0)
+			{
 				SetTextJustification (hdc,
-				prc->right - prc->left - size.cx,
-				cSpaceChars) ;
+					prc->right - prc->left - size.cx,
+					cSpaceChars) ;
+			}
 			xStart = prc->left ;
 			break ;
 		}
@@ -348,7 +350,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Initialize the CHOOSEFONT structure
 
 		hdc = GetDC (hwnd) ;
-		lf.lfHeight = - GetDeviceCaps (hdc, LOGPIXELSY) / 6 ;
+		lf.lfHeight = - GetDeviceCaps (hdc, LOGPIXELSY) / 6 ; // ~ need 1/6 inch height
 		lf.lfOutPrecision = OUT_TT_ONLY_PRECIS ;
 		lstrcpy (lf.lfFaceName, TEXT ("Times New Roman")) ;
 		ReleaseDC (hwnd, hdc) ;
@@ -402,7 +404,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			int paper_width = GetDeviceCaps (hdcPrn, PHYSICALWIDTH);
 			int text_width = GetDeviceCaps (hdcPrn, LOGPIXELSX) * OUTWIDTH;
 			rect.left  = (paper_width - text_width) / 2 
-				- GetDeviceCaps (hdcPrn, PHYSICALOFFSETX) ;
+				- GetDeviceCaps (hdcPrn, PHYSICALOFFSETX) ; // align center
 
 			rect.right = rect.left + 
 				GetDeviceCaps (hdcPrn, LOGPIXELSX) * OUTWIDTH ;
@@ -428,8 +430,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				// Select font using adjusted lfHeight
 
 				iSavePointSize = lf.lfHeight ;
-				lf.lfHeight = -(GetDeviceCaps (hdcPrn, LOGPIXELSY) *
-					cf.iPointSize) / 720 ;
+				lf.lfHeight = 
+					- (GetDeviceCaps (hdcPrn, LOGPIXELSY) * cf.iPointSize) / 720 ;
 
 				SelectObject (hdcPrn, CreateFontIndirect (&lf)) ;
 				lf.lfHeight = iSavePointSize ;
@@ -477,6 +479,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_PAINT:
+	{
 		hdc = BeginPaint (hwnd, &ps) ;
 
 		GetClientRect (hwnd, &rect) ;
@@ -494,6 +497,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT)));
 		EndPaint (hwnd, &ps) ;
 		return 0 ;
+	}
 
 	case WM_DESTROY:
 		PostQuitMessage (0) ;
