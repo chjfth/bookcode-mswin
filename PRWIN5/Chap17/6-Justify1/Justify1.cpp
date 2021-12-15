@@ -230,8 +230,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			cf.hDC            = NULL ;
 			cf.lpLogFont      = &lf ;
 			cf.iPointSize     = 0 ;
-			cf.Flags          = CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS | 
-				CF_EFFECTS ;
+			cf.Flags          = CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS | CF_EFFECTS ;
 			cf.rgbColors      = 0 ;
 			cf.lCustData      = 0 ;
 			cf.lpfnHook       = NULL ;

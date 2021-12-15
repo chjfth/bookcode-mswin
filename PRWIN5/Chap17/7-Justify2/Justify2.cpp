@@ -359,8 +359,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			// Set flags for TrueType only!
 
-			cf.Flags          = CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS | 
-				CF_TTONLY | CF_EFFECTS ;
+			cf.Flags = CF_TTONLY | CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS | CF_EFFECTS ;
 			cf.rgbColors      = 0 ;
 			cf.lCustData      = 0 ;
 			cf.lpfnHook       = NULL ;
@@ -377,8 +376,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			hMenu = GetMenu (hwnd) ;
 
 			switch (LOWORD (wParam))
-			{
+			{{
 			case IDM_FILE_PRINT:
+			{
 				// Get printer DC
 
 				pd.lStructSize = sizeof (PRINTDLG) ;
@@ -394,10 +394,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						szAppName, MB_ICONEXCLAMATION | MB_OK) ;
 					return 0 ;
 				}
+
 				// Set margins for OUTWIDTH inches wide
 
-				rect.left  = (GetDeviceCaps (hdcPrn, PHYSICALWIDTH) -
-					GetDeviceCaps (hdcPrn, LOGPIXELSX) * OUTWIDTH) / 2 
+				int paper_width = GetDeviceCaps (hdcPrn, PHYSICALWIDTH);
+				int text_width = GetDeviceCaps (hdcPrn, LOGPIXELSX) * OUTWIDTH;
+				rect.left  = (paper_width - text_width) / 2 
 					- GetDeviceCaps (hdcPrn, PHYSICALOFFSETX) ;
 
 				rect.right = rect.left + 
@@ -453,6 +455,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					MessageBox (hwnd, TEXT ("Could not print text"),
 					szAppName, MB_ICONEXCLAMATION | MB_OK) ;
 				return 0 ;
+			}
 
 			case IDM_FONT:
 				if (ChooseFont (&cf))
@@ -468,7 +471,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				CheckMenuItem (hMenu, iAlign, MF_CHECKED) ;
 				InvalidateRect (hwnd, NULL, TRUE) ;
 				return 0 ;
-			}
+			}}
 			return 0 ;
 
 		case WM_PAINT:
