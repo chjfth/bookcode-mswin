@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Unichars", "5-Unichars\Unic
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Justify1", "6-Justify1\Justify1.vcxproj", "{66B73633-A16C-A8F9-81DE-36B07D1A8A38}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Justify2", "7-Justify2\Justify2.vcxproj", "{4239528F-5304-94A5-6888-37E14C83359C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug ANSI Char|Win32 = Debug ANSI Char|Win32
@@ -110,6 +112,20 @@ Global
 		{66B73633-A16C-A8F9-81DE-36B07D1A8A38}.Release|Win32.Build.0 = Release|Win32
 		{66B73633-A16C-A8F9-81DE-36B07D1A8A38}.Release|x64.ActiveCfg = Release|x64
 		{66B73633-A16C-A8F9-81DE-36B07D1A8A38}.Release|x64.Build.0 = Release|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Debug ANSI Char|Win32.ActiveCfg = Debug|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Debug ANSI Char|x64.ActiveCfg = Debug|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Debug ANSI Char|x64.Build.0 = Debug|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4239528F-5304-94A5-6888-37E14C83359C}.Debug|Win32.Build.0 = Debug|Win32
+		{4239528F-5304-94A5-6888-37E14C83359C}.Debug|x64.ActiveCfg = Debug|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Debug|x64.Build.0 = Debug|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Release ANSI Char|Win32.ActiveCfg = Release|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Release ANSI Char|x64.ActiveCfg = Release|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Release ANSI Char|x64.Build.0 = Release|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Release|Win32.ActiveCfg = Release|Win32
+		{4239528F-5304-94A5-6888-37E14C83359C}.Release|Win32.Build.0 = Release|Win32
+		{4239528F-5304-94A5-6888-37E14C83359C}.Release|x64.ActiveCfg = Release|x64
+		{4239528F-5304-94A5-6888-37E14C83359C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
