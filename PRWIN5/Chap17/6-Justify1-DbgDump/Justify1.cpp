@@ -120,7 +120,9 @@ void Justify (HDC hdc, PTSTR pText, RECT * prc, int iAlign)
 
 	int idxline = 0;
 	int pixels_per_inch = GetDeviceCaps(hdc, LOGPIXELSX);
-	vaDbg(_T("==== Justify with %d pixels per inch ===="), pixels_per_inch);
+	vaDbg(_T("==== Justify() width %.2f inch (%d dpi) ===="), 
+		(double)(prc->right-prc->left)/pixels_per_inch, 
+		pixels_per_inch);
 
 	yStart = prc->top ;
 	do                            // for each text line
@@ -152,7 +154,7 @@ void Justify (HDC hdc, PTSTR pText, RECT * prc, int iAlign)
 
 			double inch_adv = (double)size.cx / pixels_per_inch;
 
-			vaDbg(_T("[%d chars][%.3f inch]%.*s ... %.*s"), 
+			vaDbg(_T("[%d chars][%.2f inch]%.*s ... %.*s"), 
 				pText-1-pBegin, inch_adv,
 				8, pBegin, 
 				pText-1-pEnd, pEnd
