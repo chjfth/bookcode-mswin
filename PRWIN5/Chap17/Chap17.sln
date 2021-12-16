@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Justify1-DbgDump", "6-Justi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EndJoin", "8-EndJoin\EndJoin.vcxproj", "{BFD3D70E-3D31-F392-31CD-B252FF234AE7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontOut1", "9-FontOut1\FontOut1.vcxproj", "{60F2FE19-864D-E79A-4566-0A219854A986}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug ANSI Char|Win32 = Debug ANSI Char|Win32
@@ -158,6 +160,20 @@ Global
 		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release|Win32.Build.0 = Release|Win32
 		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release|x64.ActiveCfg = Release|x64
 		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release|x64.Build.0 = Release|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Debug ANSI Char|Win32.ActiveCfg = Debug|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Debug ANSI Char|x64.ActiveCfg = Debug|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Debug ANSI Char|x64.Build.0 = Debug|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Debug|Win32.ActiveCfg = Debug|Win32
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Debug|Win32.Build.0 = Debug|Win32
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Debug|x64.ActiveCfg = Debug|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Debug|x64.Build.0 = Debug|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Release ANSI Char|Win32.ActiveCfg = Release|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Release ANSI Char|x64.ActiveCfg = Release|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Release ANSI Char|x64.Build.0 = Release|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Release|Win32.ActiveCfg = Release|Win32
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Release|Win32.Build.0 = Release|Win32
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Release|x64.ActiveCfg = Release|x64
+		{60F2FE19-864D-E79A-4566-0A219854A986}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
