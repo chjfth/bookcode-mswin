@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Justify2", "7-Justify2\Just
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Justify1-DbgDump", "6-Justify1-DbgDump\Justify1-DbgDump.vcxproj", "{72028B2F-7BAF-70AD-854A-D0945929D047}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EndJoin", "8-EndJoin\EndJoin.vcxproj", "{BFD3D70E-3D31-F392-31CD-B252FF234AE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug ANSI Char|Win32 = Debug ANSI Char|Win32
@@ -142,6 +144,20 @@ Global
 		{72028B2F-7BAF-70AD-854A-D0945929D047}.Release|Win32.Build.0 = Release|Win32
 		{72028B2F-7BAF-70AD-854A-D0945929D047}.Release|x64.ActiveCfg = Release|x64
 		{72028B2F-7BAF-70AD-854A-D0945929D047}.Release|x64.Build.0 = Release|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Debug ANSI Char|Win32.ActiveCfg = Debug|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Debug ANSI Char|x64.ActiveCfg = Debug|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Debug ANSI Char|x64.Build.0 = Debug|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Debug|Win32.Build.0 = Debug|Win32
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Debug|x64.ActiveCfg = Debug|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Debug|x64.Build.0 = Debug|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release ANSI Char|Win32.ActiveCfg = Release|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release ANSI Char|x64.ActiveCfg = Release|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release ANSI Char|x64.Build.0 = Release|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release|Win32.ActiveCfg = Release|Win32
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release|Win32.Build.0 = Release|Win32
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release|x64.ActiveCfg = Release|x64
+		{BFD3D70E-3D31-F392-31CD-B252FF234AE7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
