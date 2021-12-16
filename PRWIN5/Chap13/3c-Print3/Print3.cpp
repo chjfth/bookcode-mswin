@@ -12,8 +12,8 @@ HINSTANCE hInst ;
 TCHAR     szAppName[] = TEXT ("Print3") ;
 TCHAR     szCaption[] = TEXT ("Print Program 3 (Dialog Box)") ;
 
-BOOL bUserAbort ;
-HWND hDlgPrint ;
+BOOL g_bUserAbort ;
+HWND g_hDlgPrint ;
 
 BOOL CALLBACK PrintDlgProc (HWND hDlg, UINT message, 
 	WPARAM wParam, LPARAM lParam)
@@ -26,10 +26,10 @@ BOOL CALLBACK PrintDlgProc (HWND hDlg, UINT message,
 		return TRUE ;
 
 	case WM_COMMAND:
-		bUserAbort = TRUE ;
+		g_bUserAbort = TRUE ;
 		EnableWindow (GetParent (hDlg), TRUE) ;
 		DestroyWindow (hDlg) ;
-		hDlgPrint = NULL ;
+		g_hDlgPrint = NULL ;
 		return TRUE ;
 	}
 	return FALSE ;
@@ -39,15 +39,15 @@ BOOL CALLBACK AbortProc (HDC hdcPrn, int iCode)
 {
 	MSG msg ;
 
-	while (!bUserAbort && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
+	while (!g_bUserAbort && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
 	{
-		if (!hDlgPrint || !IsDialogMessage (hDlgPrint, &msg))
+		if (!g_hDlgPrint || !IsDialogMessage (g_hDlgPrint, &msg))
 		{
 			TranslateMessage (&msg) ;
 			DispatchMessage (&msg) ;
 		}
 	}
-	return !bUserAbort ;
+	return !g_bUserAbort ;
 }
 
 BOOL PrintMyPage (HWND hwnd)
@@ -65,8 +65,8 @@ BOOL PrintMyPage (HWND hwnd)
 
 	EnableWindow (hwnd, FALSE) ;
 
-	bUserAbort = FALSE ;
-	hDlgPrint = CreateDialog (hInst, TEXT ("PrintDlgBox"), 
+	g_bUserAbort = FALSE ;
+	g_hDlgPrint = CreateDialog (hInst, TEXT ("PrintDlgBox"), 
 		hwnd, PrintDlgProc) ;
 
 	SetAbortProc (hdcPrn, AbortProc) ;
@@ -86,13 +86,13 @@ BOOL PrintMyPage (HWND hwnd)
 	else
 		bSuccess = FALSE ;
 
-	if (!bUserAbort)
+	if (!g_bUserAbort)
 	{
 		EnableWindow (hwnd, TRUE) ;
-		DestroyWindow (hDlgPrint) ;
+		DestroyWindow (g_hDlgPrint) ;
 	}
 
 	DeleteDC (hdcPrn) ;
 
-	return bSuccess && !bUserAbort ;
+	return bSuccess && !g_bUserAbort ;
 }
