@@ -66,8 +66,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static TCHAR            szDevice[32], szWindowText[64] ;
-	static int              cxChar, cyChar, nCurrentDevice = IDM_SCREEN,
-		nCurrentInfo   = IDM_BASIC ;
+	static int              cxChar, cyChar;
+	static int              nCurrentDevice = IDM_SCREEN;
+	static int              nCurrentInfo   = IDM_BASIC ;
 	static DWORD            dwNeeded, dwReturned ;
 	static PRINTER_INFO_4 * pinfo4 ;
 	static PRINTER_INFO_5 * pinfo5 ;
@@ -94,7 +95,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hMenu = GetSubMenu (GetMenu (hwnd), 0) ;
 
 		while (GetMenuItemCount (hMenu) > 1)
+		{
 			DeleteMenu (hMenu, 1, MF_BYPOSITION) ;
+		}
 
 		// Get a list of all local and remote printers
 		// 
@@ -177,8 +180,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_INITMENUPOPUP :
 		if (lParam == 0)
+		{
 			EnableMenuItem (GetMenu (hwnd), IDM_DEVMODE,
-			nCurrentDevice == IDM_SCREEN ? MF_GRAYED : MF_ENABLED) ;
+				nCurrentDevice == IDM_SCREEN ? MF_GRAYED : MF_ENABLED) ;
+		}
 		return 0 ;
 
 	case WM_PAINT :
@@ -247,8 +252,8 @@ void DoBasicInfo (HDC hdc, HDC hdcInfo, int cxChar, int cyChar)
 	{
 		HORZSIZE,        TEXT ("HORZSIZE        Width in millimeters:"),
 		VERTSIZE,        TEXT ("VERTSIZE        Height in millimeters:"),
-		DESKTOPHORZRES,  TEXT ("*DESKTOPHORZRES Physical width  pixels:"),
-		DESKTOPVERTRES,  TEXT ("*DESKTOPVERTRES Physical height pixels:"),
+		DESKTOPHORZRES,  TEXT ("*DESKTOPHORZRES Physical width  pixels:"),    // Win7+
+		DESKTOPVERTRES,  TEXT ("*DESKTOPVERTRES Physical height pixels:"),    // Win7+
 		HORZRES,         TEXT ("HORZRES         Width  pixels(app virtual):"),
 		VERTRES,         TEXT ("VERTRES         Height pixels(app virtual):"),
 		LOGPIXELSX,      TEXT ("LOGPIXELSX      Horizontal dots per inch:"),
@@ -276,9 +281,11 @@ void DoBasicInfo (HDC hdc, HDC hdcInfo, int cxChar, int cyChar)
 	TCHAR szBuffer[80] ;
 
 	for (i = 0 ; i < sizeof (info) / sizeof (info[0]) ; i++)
+	{
 		TextOut (hdc, cxChar, (i + 1) * cyChar, szBuffer,
-		wsprintf (szBuffer, TEXT ("%-45s%8d"), info[i].szDesc,
-		GetDeviceCaps (hdcInfo, info[i].nIndex))) ;
+			wsprintf (szBuffer, TEXT ("%-45s%8d"), info[i].szDesc,
+			GetDeviceCaps (hdcInfo, info[i].nIndex))) ;
+	}
 }
 
 void DoOtherInfo (HDC hdc, HDC hdcInfo, int cxChar, int cyChar)
@@ -326,19 +333,23 @@ void DoOtherInfo (HDC hdc, HDC hdcInfo, int cxChar, int cyChar)
 		wsprintf (szBuffer, TEXT ("CLIPCAPS (Clipping capabilities)"))) ;
 
 	for (i = 0 ; i < sizeof (clip) / sizeof (clip[0]) ; i++)
+	{
 		TextOut (hdc, 9 * cxChar, (i + 6) * cyChar, szBuffer,
-		wsprintf (szBuffer, TEXT ("%-45s %3s"), clip[i].szDesc,
-		GetDeviceCaps (hdcInfo, CLIPCAPS) & clip[i].iMask ?
-		TEXT ("Yes") : TEXT ("No"))) ;
+			wsprintf (szBuffer, TEXT ("%-45s %3s"), clip[i].szDesc,
+			GetDeviceCaps (hdcInfo, CLIPCAPS) & clip[i].iMask ?
+			TEXT ("Yes") : TEXT ("No"))) ;
+	}
 
 	TextOut (hdc, cxChar, 8 * cyChar, szBuffer,
 		wsprintf (szBuffer, TEXT ("RASTERCAPS (Raster capabilities)"))) ;
 
 	for (i = 0 ; i < sizeof (raster) / sizeof (raster[0]) ; i++)
+	{
 		TextOut (hdc, 9 * cxChar, (i + 10) * cyChar, szBuffer,
-		wsprintf (szBuffer, TEXT ("%-45s %3s"), raster[i].szDesc,
-		GetDeviceCaps (hdcInfo, RASTERCAPS) & raster[i].iMask ?
-		TEXT ("Yes") : TEXT ("No"))) ;
+			wsprintf (szBuffer, TEXT ("%-45s %3s"), raster[i].szDesc,
+			GetDeviceCaps (hdcInfo, RASTERCAPS) & raster[i].iMask ?
+			TEXT ("Yes") : TEXT ("No"))) ;
+	}
 }
 
 void DoBitCodedCaps (HDC hdc, HDC hdcInfo, int cxChar, int cyChar, int iType)
@@ -368,41 +379,28 @@ void DoBitCodedCaps (HDC hdc, HDC hdcInfo, int cxChar, int cyChar, int iType)
 
 	static BITS poly[] =
 	{
-		PC_POLYGON,     
-		TEXT ("PC_POLYGON     Can do alternate fill polygon:"),
+		PC_POLYGON,     TEXT ("PC_POLYGON     Can do alternate fill polygon:"),
 		PC_RECTANGLE,   TEXT ("PC_RECTANGLE   Can do rectangle:"),
-		PC_WINDPOLYGON, 
-		TEXT ("PC_WINDPOLYGON Can do winding number fill polygon:"),
+		PC_WINDPOLYGON, TEXT ("PC_WINDPOLYGON Can do winding number fill polygon:"),
 		PC_SCANLINE,    TEXT ("PC_SCANLINE    Can do scanlines:"),
 		PC_WIDE,        TEXT ("PC_WIDE        Can do wide borders:"),
 		PC_STYLED,      TEXT ("PC_STYLED      Can do styled borders:"),
-		PC_WIDESTYLED,  
-		TEXT ("PC_WIDESTYLED  Can do wide and styled borders:"),
+		PC_WIDESTYLED,  TEXT ("PC_WIDESTYLED  Can do wide and styled borders:"),
 		PC_INTERIORS,   TEXT ("PC_INTERIORS   Can do interiors:")
 	} ;
 
 	static BITS text[] =
 	{
-		TC_OP_CHARACTER, 
-		TEXT ("TC_OP_CHARACTER Can do character output precision:"),
-		TC_OP_STROKE,    
-		TEXT ("TC_OP_STROKE    Can do stroke output precision:"),
-		TC_CP_STROKE,    
-		TEXT ("TC_CP_STROKE    Can do stroke clip precision:"),
-		TC_CR_90,        
-		TEXT ("TC_CP_90        Can do 90 degree character rotation:"),
-		TC_CR_ANY,       
-		TEXT ("TC_CR_ANY       Can do any character rotation:"),
-		TC_SF_X_YINDEP,  
-		TEXT ("TC_SF_X_YINDEP  Can do scaling independent of X and Y:"),
-		TC_SA_DOUBLE,    
-		TEXT ("TC_SA_DOUBLE    Can do doubled character for scaling:"),
-		TC_SA_INTEGER,   
-		TEXT ("TC_SA_INTEGER   Can do integer multiples for scaling:"),
-		TC_SA_CONTIN,    
-		TEXT ("TC_SA_CONTIN    Can do any multiples for exact scaling:"),
-		TC_EA_DOUBLE,    
-		TEXT ("TC_EA_DOUBLE    Can do double weight characters:"),
+		TC_OP_CHARACTER, TEXT ("TC_OP_CHARACTER Can do character output precision:"),
+		TC_OP_STROKE,    TEXT ("TC_OP_STROKE    Can do stroke output precision:"),
+		TC_CP_STROKE,    TEXT ("TC_CP_STROKE    Can do stroke clip precision:"),
+		TC_CR_90,        TEXT ("TC_CP_90        Can do 90 degree character rotation:"),
+		TC_CR_ANY,       TEXT ("TC_CR_ANY       Can do any character rotation:"),
+		TC_SF_X_YINDEP,  TEXT ("TC_SF_X_YINDEP  Can do scaling independent of X and Y:"),
+		TC_SA_DOUBLE,    TEXT ("TC_SA_DOUBLE    Can do doubled character for scaling:"),
+		TC_SA_INTEGER,   TEXT ("TC_SA_INTEGER   Can do integer multiples for scaling:"),
+		TC_SA_CONTIN,    TEXT ("TC_SA_CONTIN    Can do any multiples for exact scaling:"),
+		TC_EA_DOUBLE,    TEXT ("TC_EA_DOUBLE    Can do double weight characters:"),
 		TC_IA_ABLE,      TEXT ("TC_IA_ABLE      Can do italicizing:"),
 		TC_UA_ABLE,      TEXT ("TC_UA_ABLE      Can do underlining:"),
 		TC_SO_ABLE,      TEXT ("TC_SO_ABLE      Can do strikeouts:"),
@@ -419,14 +417,10 @@ void DoBitCodedCaps (HDC hdc, HDC hdcInfo, int cxChar, int cyChar, int iType)
 	}
 	bitinfo[] =
 	{
-		CURVECAPS,  TEXT ("CURVCAPS (Curve Capabilities)"),
-		(BITS (*)[]) curves, sizeof (curves) / sizeof (curves[0]),
-		LINECAPS,   TEXT ("LINECAPS (Line Capabilities)"),
-		(BITS (*)[]) lines, sizeof (lines) / sizeof (lines[0]),
-		POLYGONALCAPS, TEXT ("POLYGONALCAPS (Polygonal Capabilities)"),
-		(BITS (*)[]) poly, sizeof (poly) / sizeof (poly[0]),
-		TEXTCAPS,   TEXT ("TEXTCAPS (Text Capabilities)"),
-		(BITS (*)[]) text, sizeof (text) / sizeof (text[0])
+		CURVECAPS,  TEXT ("CURVCAPS (Curve Capabilities)"),	(BITS (*)[])curves, sizeof(curves)/sizeof(curves[0]),
+		LINECAPS,   TEXT ("LINECAPS (Line Capabilities)"), 	(BITS (*)[])lines, sizeof(lines)/sizeof(lines[0]),
+		POLYGONALCAPS, TEXT ("POLYGONALCAPS (Polygonal Capabilities)"),	(BITS (*)[])poly, sizeof(poly)/sizeof(poly[0]),
+		TEXTCAPS,   TEXT ("TEXTCAPS (Text Capabilities)"),	(BITS (*)[])text, sizeof(text)/sizeof(text[0])
 	} ;
 
 	static TCHAR szBuffer[80] ;
@@ -437,8 +431,10 @@ void DoBitCodedCaps (HDC hdc, HDC hdcInfo, int cxChar, int cyChar, int iType)
 		lstrlen (bitinfo[iType].szTitle)) ;
 
 	for (i = 0 ; i < bitinfo[iType].iSize ; i++)
+	{
 		TextOut (hdc, cxChar, (i + 3) * cyChar, szBuffer,
-		wsprintf (szBuffer, TEXT ("%-55s %3s"), (*pbits)[i].szDesc,
-		iDevCaps & (*pbits)[i].iMask ? TEXT ("Yes") : TEXT ("No")));
+			wsprintf (szBuffer, TEXT ("%-55s %3s"), (*pbits)[i].szDesc,
+			iDevCaps & (*pbits)[i].iMask ? TEXT ("Yes") : TEXT ("No")));
+	}
 }
 
