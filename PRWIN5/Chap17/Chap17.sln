@@ -23,6 +23,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontOut1", "9a-FontOut1\Fon
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontOut2", "9b-FontOut2\FontOut2.vcxproj", "{E5EDBD41-6FA8-FF2A-DFFB-D65C1224C815}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontFill", "9c-FontFill\FontFill.vcxproj", "{E221C61E-ADFA-557A-7CD0-C7C102AC1219}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontClip", "9d-FontClip\FontClip.vcxproj", "{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug ANSI Char|Win32 = Debug ANSI Char|Win32
@@ -190,6 +194,34 @@ Global
 		{E5EDBD41-6FA8-FF2A-DFFB-D65C1224C815}.Release|Win32.Build.0 = Release|Win32
 		{E5EDBD41-6FA8-FF2A-DFFB-D65C1224C815}.Release|x64.ActiveCfg = Release|x64
 		{E5EDBD41-6FA8-FF2A-DFFB-D65C1224C815}.Release|x64.Build.0 = Release|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Debug ANSI Char|Win32.ActiveCfg = Debug|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Debug ANSI Char|x64.ActiveCfg = Debug|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Debug ANSI Char|x64.Build.0 = Debug|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Debug|Win32.Build.0 = Debug|Win32
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Debug|x64.ActiveCfg = Debug|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Debug|x64.Build.0 = Debug|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Release ANSI Char|Win32.ActiveCfg = Release|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Release ANSI Char|x64.ActiveCfg = Release|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Release ANSI Char|x64.Build.0 = Release|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Release|Win32.ActiveCfg = Release|Win32
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Release|Win32.Build.0 = Release|Win32
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Release|x64.ActiveCfg = Release|x64
+		{E221C61E-ADFA-557A-7CD0-C7C102AC1219}.Release|x64.Build.0 = Release|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Debug ANSI Char|Win32.ActiveCfg = Debug|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Debug ANSI Char|x64.ActiveCfg = Debug|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Debug ANSI Char|x64.Build.0 = Debug|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Debug|Win32.Build.0 = Debug|Win32
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Debug|x64.ActiveCfg = Debug|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Debug|x64.Build.0 = Debug|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Release ANSI Char|Win32.ActiveCfg = Release|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Release ANSI Char|x64.ActiveCfg = Release|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Release ANSI Char|x64.Build.0 = Release|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Release|Win32.ActiveCfg = Release|Win32
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Release|Win32.Build.0 = Release|Win32
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Release|x64.ActiveCfg = Release|x64
+		{319D686E-F3AC-2921-C0FC-09A5D34A8BAA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
