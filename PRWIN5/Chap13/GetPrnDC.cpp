@@ -27,7 +27,7 @@ HDC GetPrinterDC (void)
 
 		free (pinfo5) ;
 	}
-	else if( (dver&0xff)==5 )              // Win2000+
+	else if( (dver&0xff)>=5 )              // Win2000+
 	{
 		// Chj: EnumPrinters()'s first output element is not necessary 
 		// the *default* printer. So we'd better use GetDefaultPrinter().
