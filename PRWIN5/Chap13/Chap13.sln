@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DevCaps2", "1-DevCaps2\DevCaps2.vcxproj", "{2A7247AC-32CB-BCB3-CA3E-7E761842A8A7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FormFeed", "2-FormFeed\FormFeed.vcxproj", "{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,14 @@ Global
 		{2A7247AC-32CB-BCB3-CA3E-7E761842A8A7}.Release|Win32.Build.0 = Release|Win32
 		{2A7247AC-32CB-BCB3-CA3E-7E761842A8A7}.Release|x64.ActiveCfg = Release|x64
 		{2A7247AC-32CB-BCB3-CA3E-7E761842A8A7}.Release|x64.Build.0 = Release|x64
+		{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}.Debug|Win32.Build.0 = Debug|Win32
+		{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}.Debug|x64.ActiveCfg = Debug|x64
+		{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}.Debug|x64.Build.0 = Debug|x64
+		{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}.Release|Win32.ActiveCfg = Release|Win32
+		{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}.Release|Win32.Build.0 = Release|Win32
+		{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}.Release|x64.ActiveCfg = Release|x64
+		{4FF8DD8C-9124-E427-9CF4-F9E70F2A3DA8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
