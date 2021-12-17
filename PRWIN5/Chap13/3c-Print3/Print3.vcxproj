@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(RootNamespace).cpp" />
+    <ClCompile Include="..\..\vaDbg.cpp" />
     <ClCompile Include="..\GetPrnDC.cpp" />
     <ClCompile Include="..\Print-WinMain.cpp" />
   </ItemGroup>

@@ -105,8 +105,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (wParam == 1)
 		{
 			if (!PrintMyPage (hwnd))
+			{
+				// [2021-12-17]Chj: On Win7, if the "Print Spooler" service is stopped,
+				// CreateDC(NULL,"Some Printer Name",NULL,NULL); would fail and we get this.
 				MessageBox (hwnd, TEXT ("Could not print page!"),
-				szAppName, MB_OK | MB_ICONEXCLAMATION) ;
+					szAppName, MB_OK | MB_ICONEXCLAMATION) ;
+			}
 			return 0 ;
 		}
 		break ;

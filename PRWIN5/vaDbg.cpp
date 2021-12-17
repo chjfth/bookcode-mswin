@@ -51,3 +51,27 @@ void vaSetDlgItemText(HWND hdlg, int ctrlid, const TCHAR *fmt, ...)
 
 	va_end(args);
 }
+
+TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd)
+{
+	SYSTEMTIME st = {0};
+	GetLocalTime(&st);
+	buf[0]=_T('['); buf[1]=_T('\0'); buf[bufchars-1] = _T('\0');
+	if(ymd) {
+#if _MSC_VER >= 1400 // VS2005+
+		_sntprintf_s(buf, bufchars-1, _TRUNCATE, _T("%s%04d-%02d-%02d "), buf, 
+			st.wYear, st.wMonth, st.wDay);
+#else
+		_sntprintf(buf, bufchars-1, _T("%s%04d-%02d-%02d "), buf, 
+			st.wYear, st.wMonth, st.wDay);
+#endif
+	}
+#if _MSC_VER >= 1400 // VS2005+
+	_sntprintf_s(buf, bufchars-1, _TRUNCATE, _T("%s%02d:%02d:%02d]"), buf,
+		st.wHour, st.wMinute, st.wSecond);
+#else
+	_sntprintf(buf, bufchars-1, _T("%s%02d:%02d:%02d]"), buf,
+		st.wHour, st.wMinute, st.wSecond);
+#endif
+	return buf;
+}

@@ -73,9 +73,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static PRINTER_INFO_4 * pinfo4 ;
 	static PRINTER_INFO_5 * pinfo5 ;
 	DWORD                   i ;
-	HDC                     hdc, hdcInfo ;
+	HDC                     hdc=NULL, hdcInfo=NULL;
 	HMENU                   hMenu ;
-	HANDLE                  hPrint ;
+	HANDLE                  hPrint=NULL;
 	PAINTSTRUCT             ps ;
 	TEXTMETRIC              tm ;
 
@@ -88,6 +88,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		cxChar = tm.tmAveCharWidth ;
 		cyChar = tm.tmHeight + tm.tmExternalLeading ;
 		ReleaseDC (hwnd, hdc) ;
+		hdc = NULL;
 		
 		// fall through
 

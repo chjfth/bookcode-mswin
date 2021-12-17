@@ -4,6 +4,7 @@
   ---------------------------------------*/
 
 #include <windows.h>
+#include "..\..\vaDbg.h"
 
 HDC  GetPrinterDC (void) ;              // in GETPRNDC.C
 void PageGDICalls (HDC, int, int) ;     // in PRINT.C
@@ -18,6 +19,10 @@ HWND g_hDlgPrint ;
 BOOL CALLBACK PrintDlgProc (HWND hDlg, UINT message, 
 	WPARAM wParam, LPARAM lParam)
 {
+	TCHAR sznow[40];
+	now_timestr(sznow, ARRAYSIZE(sznow));
+	vaDbg(_T("%s PrintDlgProc, message=%d(0x%X)"), sznow, message, message);
+
 	switch (message)
 	{
 	case WM_INITDIALOG:
@@ -35,8 +40,12 @@ BOOL CALLBACK PrintDlgProc (HWND hDlg, UINT message,
 	return FALSE ;
 }
 
-BOOL CALLBACK AbortProc (HDC hdcPrn, int iCode)
+BOOL CALLBACK AbortProc (HDC hdcPrn, int iError)
 {
+	TCHAR sznow[40];
+	now_timestr(sznow, ARRAYSIZE(sznow));
+	vaDbg(_T("%s AbortProc, iError=%d"), sznow, iError);
+
 	MSG msg ;
 
 	while (!g_bUserAbort && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
