@@ -44,7 +44,7 @@ BOOL PopPrntPrintFile (HINSTANCE, HWND, HWND, PTSTR) ;
      // Global variables
 
 static HWND  hDlgModeless ;
-static TCHAR szAppName[] = TEXT ("PopPad") ;
+static TCHAR szAppName[] = TEXT ("CH13-PopPad") ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
