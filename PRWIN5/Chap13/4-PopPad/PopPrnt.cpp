@@ -62,8 +62,7 @@ BOOL PopPrntPrintFile (HINSTANCE hInst, HWND hwnd, HWND hwndEdit,
 	pd.hDevMode            = NULL ;
 	pd.hDevNames           = NULL ;
 	pd.hDC                 = NULL ;
-	pd.Flags               = PD_ALLPAGES | PD_COLLATE | 
-		PD_RETURNDC | PD_NOSELECTION ;
+	pd.Flags = PD_ALLPAGES | PD_COLLATE | PD_RETURNDC | PD_NOSELECTION;
 	pd.nFromPage           = 0 ;
 	pd.nToPage             = 0 ;
 	pd.nMinPage            = 0 ;
