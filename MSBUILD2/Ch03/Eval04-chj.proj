@@ -1,0 +1,18 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         ToolsVersion="4.0">
+  <ItemGroup>
+    <MyArray1 Include="ele1" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <MyProp>@(MyArray1)</MyProp>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <MyArray1 Include="ele2" />
+  </ItemGroup>
+
+  <Target Name="PrintInfo">
+    <Message Text="MyProp: $(MyProp)" />
+  </Target>
+</Project>
