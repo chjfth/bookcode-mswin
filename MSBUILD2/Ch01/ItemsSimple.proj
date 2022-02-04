@@ -25,7 +25,7 @@
   <Target Name="PrintCompileInfo">
     <Message Text="Compile: @(Compile)"/>
   </Target>
-  
+
   <Target Name="PrintCompileInfo2">
     <Message Text="Compile: @(Compile->'%(Filename)')"/>
     <Message Text=" "/>
