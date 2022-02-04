@@ -1,0 +1,30 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         ToolsVersion="4.0">
+
+  <Target Name="CustomBuild" BeforeTargets="Prebuild1;Prebuild2">
+    <Message Text="CustomBuild: Copy self to livedir"/>
+    <Copy SourceFiles="$(MSBuildThisFile)" DestinationFolder="livedir" />
+  </Target>
+
+  <!-- Chj note: The Exists() Condition is checked and remembered before "CustomBuild" is executed. 
+   So, the first time we run with `/t:Prebuild1`, Prebuild1 Task will not execute.
+  -->
+  <Target Name="Prebuild1" Condition="Exists('livedir\$(MSBuildThisFile)')">
+    <Message Text="Prebuild1 target"/>
+  </Target>
+  
+  <Target Name="Prebuild2" Condition="!Exists('livedir\$(MSBuildThisFile)')">
+    <Message Text="Prebuild2 target"/>
+  </Target>
+  
+</Project>
+
+<!-- [2022-02-04] Chj:
+Run with `/t:Prebuild1` and `/t:Prebuild2` multiple times, to see the difference.
+
+We'll see that, "CustomBuild" will ALWAYS be executed, regardless of Condition result.
+
+So, 
+	Condition="..." determines whether involved Task statements are to be executed,
+	but it does not affect Target-graph generation.
+-->
