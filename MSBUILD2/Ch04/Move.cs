@@ -90,11 +90,12 @@
                 return false;
             }
 
+            this.FileLengths = new long[this.SourceFiles.Length];
+
             if (this.DestinationFiles == null)
             {
                 //populate from DestinationFolder
                 this.DestinationFiles = new ITaskItem[this.SourceFiles.Length];
-                this.FileLengths = new long[this.SourceFiles.Length];
 
                 for (int i = 0; i < this.SourceFiles.Length; i++)
                 {
@@ -136,6 +137,7 @@
                     }
                     File.Move(sourcePath, destPath);
                     MovedFiles[i] = new TaskItem(destPath);
+                    this.FileLengths[i] = destFile.Length; // chj adds this
                 }
                 catch (Exception ex)
                 {
