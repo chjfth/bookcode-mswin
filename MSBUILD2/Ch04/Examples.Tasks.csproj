@@ -156,6 +156,12 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetDir)$(TargetName)$(TargetExt) $(ProjectDir)
+if errorlevel 1 exit /b 4
+copy $(TargetDir)$(TargetName).pdb $(ProjectDir)
+if errorlevel 1 exit /b 4</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
