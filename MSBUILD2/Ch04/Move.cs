@@ -14,12 +14,14 @@
     public class Move : Task
     {
         #region MSBuild properties
+
         /// <summary>
         /// Contains the list of files to move
         /// </summary>
         [Required]
         public ITaskItem[] SourceFiles
         { get; set; }
+        
         /// <summary>
         /// Item that contains where to move the files to.
         /// Either this or the <code>DestinationFolder</code> parameter should be used.
@@ -27,6 +29,7 @@
         /// </summary>
         public ITaskItem[] DestinationFiles
         { get; set; }
+        
         /// <summary>
         /// This is the folder where the files should be moved to.
         /// This can be used instead of the <code>DestinationFiles</code> parameter.
@@ -35,12 +38,14 @@
         /// </summary>
         public ITaskItem DestinationFolder
         { get; set; }
+        
         /// <summary>
         /// This contains the list of files that were actually moved.
         /// </summary>
         [Output]
         public ITaskItem[] MovedFiles
         { get; private set; }
+        
         /// <summary>
         /// This contains the length of the files moved.
         /// This really should be placed as Metadata on the <c>MovedFiles</c>
@@ -50,6 +55,7 @@
         [Output]
         public long[] FileLengths
         { get; private set; }
+
         #endregion
 
         public override bool Execute()
