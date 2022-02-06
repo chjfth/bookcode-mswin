@@ -46,6 +46,7 @@
     <Message Text=
       "%25(Test1.a): %(Test1.a) || %25(Test2.a): %(Test2.a)"/>
   </Target>
+  
   <Target Name="Target01"
           Outputs="%(Test1.a)%(Test2.a)">
     <Message Text="%25(Test1.a): %(Test1.a) "/>
@@ -56,7 +57,7 @@
   </Target>
 
   <Target Name="Task02">
-    <Message Text="@(Test1)@(Test2) %25(a):%(a)"/>
+    <Message Text="@(Test1) @(Test2) %25(a):%(a)"/>
   </Target>
 
   <Target Name="All" DependsOnTargets="Task01;Target01"/>
