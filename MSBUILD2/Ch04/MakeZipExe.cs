@@ -30,6 +30,7 @@
                 base.Log.LogError(message, null);
                 return false;
             }
+
             if (File.Exists(OutputFile.GetMetadata("FullPath")) && !Overwrite)
             {
                 string message = string.Format("Output file {0}, Overwrite false.",
@@ -41,29 +42,29 @@
             return base.ValidateParameters();
         }
 
-protected override string GenerateFullPathToTool()
-{
-    Log.LogMessage("ToolPath = " + ToolPath);
-
-    string path = ToolPath;
-    // If ToolPath was not provided by the MSBuild script try to find it.
-    if (string.IsNullOrEmpty(path))
-    {
-        using (RegistryKey key = Registry.LocalMachine.OpenSubKey(
-            @"SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS"))
+        protected override string GenerateFullPathToTool()
         {
-            if (key != null)
+            Log.LogMessage("ToolPath = " + ToolPath);
+
+            string path = ToolPath;
+            // If ToolPath was not provided by the MSBuild script try to find it.
+            if (string.IsNullOrEmpty(path))
             {
-                string keyValue =
-                    key.GetValue("EnvironmentDirectory", null).ToString();
-                path = keyValue;
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS"))
+                {
+                    if (key != null)
+                    {
+                        string keyValue =
+                            key.GetValue("EnvironmentDirectory", null).ToString();
+                        path = keyValue;
+                    }
+                }
             }
-        }
-    }
-    if (string.IsNullOrEmpty(path))
-    {
-        using (RegistryKey key = Registry.LocalMachine.OpenSubKey(
-            @"SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS"))
+            if (string.IsNullOrEmpty(path))
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS"))
                 {
                     if (key != null)
                     {
@@ -121,6 +122,7 @@ protected override string GenerateFullPathToTool()
             Log.LogMessage("command-line = " + sb.ToString());
             return sb.ToString();
         }
+
         protected override string ToolName
         {
             get { return ExeName; }
