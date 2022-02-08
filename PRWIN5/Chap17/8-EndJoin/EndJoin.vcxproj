@@ -84,11 +84,15 @@
   <ItemGroup>
     <ClCompile Include="$(RootNamespace).cpp" />
   </ItemGroup>
+  <!-- import VSPG start -->
   <PropertyGroup>
     <VSPG_BatDir_NoTBS>..\..\_VSPG</VSPG_BatDir_NoTBS>
     <VSPG_FeedbackFile>$(RootNamespace).cpp</VSPG_FeedbackFile>
   </PropertyGroup>
-  <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+  </ImportGroup>
+  <!-- import VSPG end -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

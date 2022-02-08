@@ -68,10 +68,19 @@
   <PropertyGroup Condition="$(Configuration.StartsWith('Release'))">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
+
+  <!-- Enable FxCop Code Analysis -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <EnablePREfast>true</EnablePREfast>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <PropertyGroup Label="Globals">
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  
   <ItemDefinitionGroup Condition="$(Configuration.StartsWith('Debug'))">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -85,8 +94,6 @@
   <ItemDefinitionGroup Condition="$(Configuration.StartsWith('Release'))">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -110,11 +117,15 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
+  <!-- import VSPG start -->
   <PropertyGroup>
     <VSPG_BatDir_NoTBS>..\..\_VSPG</VSPG_BatDir_NoTBS>
     <VSPG_FeedbackFile>$(RootNamespace).cpp</VSPG_FeedbackFile>
   </PropertyGroup>
-  <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+  </ImportGroup>
+  <!-- import VSPG end -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

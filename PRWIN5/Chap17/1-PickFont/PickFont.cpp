@@ -37,7 +37,7 @@ DLGPARAMS ;
 
 // Global variables
 
-HWND  hdlg ;
+HWND  g_hdlg ;
 TCHAR szAppName[] = TEXT ("PickFont") ;
 
 TCHAR g_params[100] = {0};
@@ -101,7 +101,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	while (GetMessage (&msg, NULL, 0, 0))
 	{
-		if (hdlg == 0 || !IsDialogMessage (hdlg, &msg))
+		if (g_hdlg == 0 || !IsDialogMessage (g_hdlg, &msg))
 		{
 			TranslateMessage (&msg) ;
 			DispatchMessage (&msg) ;
@@ -153,18 +153,18 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		dp.iDevice = IDM_DEVICE_SCREEN ;
 
-		hdlg = CreateDialogParam (((LPCREATESTRUCT) lParam)->hInstance, 
+		g_hdlg = CreateDialogParam (((LPCREATESTRUCT) lParam)->hInstance, 
 			szAppName, hwnd, DlgProc, (LPARAM) &dp) ;
 
 		// Chj: adjust main window size accordingly.
 		RECT rcli;
-		GetClientRect (hdlg, &rcli) ;
+		GetClientRect (g_hdlg, &rcli) ;
 		Set_WindowSizeByClientSize(hwnd, rcli.right+16, rcli.bottom+64);
 		return 0 ;
 	}
 
 	case WM_SETFOCUS:
-		SetFocus (hdlg) ;
+		SetFocus (g_hdlg) ;
 		return 0 ;
 
 	case WM_COMMAND:
@@ -195,7 +195,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// Find the point to begin drawing text
 
-		GetClientRect (hdlg, &rect) ;
+		GetClientRect (g_hdlg, &rect) ;
 		rect.bottom += 1 ;
 		DPtoLP (hdc, (PPOINT) &rect, 2) ;
 
