@@ -1,0 +1,25 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+  	<esc0>file1.cs;file2.cs</esc0>
+  	<esc1>$([MSBuild]::Escape($(esc0)))</esc1>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(esc0)" /> <!-- two elements -->
+    <Compile Include="$(esc1)" /> <!-- one element -->
+  </ItemGroup>
+  
+  <Target Name="PrintCompileInfoBatch">
+    <Message Text ="Compile: %(Compile.Identity)"/>
+
+    <Message Text =" "/>
+
+    <Message Text ="esc0=$(esc0)"/>
+    <Message Text ="esc1=$(esc1)"/>
+    
+    <Message Text ="Text same."      Condition="'$(esc0)'=='$(esc1)'" />
+    <Message Text ="Text different." Condition="'$(esc0)'!='$(esc1)'" />
+    
+  </Target>
+
+</Project>

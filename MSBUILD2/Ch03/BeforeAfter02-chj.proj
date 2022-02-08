@@ -1,0 +1,20 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         ToolsVersion="4.0">
+
+  <Target Name="CustomBuild" BeforeTargets="Prebuild1;Prebuild2">
+    <Message Text="CustomBuild target"/>
+  </Target>
+
+  <Target Name="Prebuild1">
+    <Message Text="Prebuild1 target"/>
+  </Target>
+  
+  <Target Name="Prebuild2">
+    <Message Text="Prebuild2 target"/>
+  </Target>
+  
+  <!-- Chj -->
+  <Target Name="Both1" DependsOnTargets="Prebuild1;Prebuild2" />
+  <Target Name="Both2" DependsOnTargets="Prebuild2;Prebuild1" />
+  
+</Project>
