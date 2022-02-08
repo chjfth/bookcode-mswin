@@ -42,6 +42,15 @@
     <Message Text="unitTestBuildOutputs:%0a%0d@(unitTestBuildOutputs,'%0a%0d')" />
   </Target>
 
+  <Target Name="Clean">
+    <MSBuild Projects="@(UnitTestProjects)"
+             Targets="Clean"
+             Properties="Configuration=Release"
+             BuildInParallel="$(DoParallel)"
+             >
+    </MSBuild>
+  </Target>
+
   <Target Name="BeforeBuildAll">
     <Message Text="Before BuildAll" Importance="high" />
   </Target>

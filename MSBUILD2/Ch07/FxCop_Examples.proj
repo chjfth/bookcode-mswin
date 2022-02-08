@@ -18,6 +18,7 @@
       Include="$(_TaskOutputRoot)Examples.Tasks.csproj">
       <Outputs>$(_TaskOutputRoot)bin\$(Configuration)\Examples.Tasks.dll</Outputs>
     </FxCopProjects>
+
     <FxCopProjects 
       Include="$(_LoggerOutputRoot)Examples.Loggers.csproj">
       <Outputs>$(_LoggerOutputRoot)bin\$(Configuration)\Examples.Loggers.dll</Outputs>
@@ -37,11 +38,15 @@
       $(BuildDependsOn)
     </RebuildDependsOn>
   </PropertyGroup>
+  
   <Target Name="Rebuild" DependsOnTargets="$(RebuildDependsOn)"/>
+  
   <Target Name="Build" DependsOnTargets="$(BuildDependsOn)" />
+  
   <Target Name="Clean">
     <MSBuild Projects="@(FxCopProjects)" Targets="Clean" />
   </Target>
+  
   <Target Name="CoreBuild"
           Inputs="@(FxCopProjects)"
           Outputs="@(FxCopAssemblies)">
@@ -57,17 +62,20 @@
       CleanFxCop;
     </CleanDependsOn>
   </PropertyGroup>
+  
   <Target Name="Clean" DependsOnTargets="$(CleanDependsOn)">
     <MSBuild Projects="@(FxCopProjects)" Targets="Clean" />
   </Target>
+  
   <!-- Extension Pack required for fxcop.targets file -->
-<PropertyGroup>
-  <ExtensionTasksPath>$(MSBuildThisFileDirectory)\..\Contrib\ExtensionPack\4.0\</ExtensionTasksPath>
-</PropertyGroup>
-<Import Project="$(ExtensionTasksPath)MSBuild.ExtensionPack.tasks"/>
+  <PropertyGroup>
+    <ExtensionTasksPath>$(MSBuildThisFileDirectory)\..\Contrib\ExtensionPack\4.0\</ExtensionTasksPath>
+  </PropertyGroup>
+  
+  <Import Project="$(ExtensionTasksPath)MSBuild.ExtensionPack.tasks"/>
+  
   <!-- The MSBuild Community Tasks must be imported for the nunit.targets file -->
-  <Import 
-    Project="fxcop.targets"/>
+  <Import Project="fxcop.targets"/>
 
   <PropertyGroup>
     <RunFxCopDependsOn>
@@ -77,8 +85,13 @@
     </RunFxCopDependsOn>
   </PropertyGroup>
 
-    <Target Name="CustomAfterFxCop">
-    <Message Text="FxCop executed." 
-             Importance="high" />
+  <Target Name="CustomAfterFxCop">
+    <Message Text="FxCop executed." Importance="high" />
   </Target>
+
+  <Target Name="mydebug">
+    <Message Text="FxCopProjects=$(FxCopProjects)"/>
+    <Message Text="FxCopAssemblies=@(FxCopAssemblies)"/>
+  </Target>
+
 </Project>

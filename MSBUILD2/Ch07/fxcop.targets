@@ -21,41 +21,42 @@
     </RunFxCopDependsOn>
   </PropertyGroup>
 
-
   <Target Name="RunFxcop"
           DependsOnTargets="$(RunFxCopDependsOn)"/>
-<Target Name="CoreFxcop"
+  
+  <Target Name="CoreFxcop"
         Inputs="@(FxCopAssemblies)"
         Outputs="$(FxCopReportFile)">
-  <Message Text="FxCop begin analysis on: @(FxCopAssemblies)"
+    <Message Text="FxCop begin analysis on: @(FxCopAssemblies)"
            Importance="high"/>
-  <Message Text="FxCopReportFile: $(FxCopReportFile)"
+    <Message Text="FxCopReportFile: $(FxCopReportFile)"
            Importance="low"/>
 
-  <MSBuild.ExtensionPack.CodeQuality.FxCop
-    TaskAction="Analyse"
-    Files="@(FxCopAssemblies)"
+    <MSBuild.ExtensionPack.CodeQuality.FxCop
+      TaskAction="Analyse"
+      Files="@(FxCopAssemblies)"
+      ShowSummary="true"
+      FxCopPath="$(MSBuildThisFileDirectory)\..\Contrib\Microsoft FxCop 1.36\FxCopCmd.exe"
+      OutputFile="$(FxCopReportFile)" />
+
+    <ItemGroup>
+      <_FxCopReportFileItem Include="$(FxCopReportFile)"/>
+    </ItemGroup>
   
-    ShowSummary="true"
-    FxCopPath="$(MSBuildThisFileDirectory)\..\Contrib\Microsoft FxCop 1.36\FxCopCmd.exe"
-    OutputFile="$(FxCopReportFile)" />
+    <PropertyGroup>
+      <_FxCopHtmlReportFile>@(_FxCopReportFileItem->'%(Fullpath).html')</_FxCopHtmlReportFile>
+    </PropertyGroup>
 
+    <!-- Create human friendly version -->
+    <XslTransformation
+      XmlInputPaths="$(FxCopReportFile)"
+      XslInputPath="$(FxCopTransformFile)"
+      OutputPaths="$(_FxCopHtmlReportFile)" />
 
-  <ItemGroup>
-    <_FxCopReportFileItem Include="$(FxCopReportFile)"/>
-  </ItemGroup>
-  <PropertyGroup>
-    <_FxCopHtmlReportFile>@(_FxCopReportFileItem->'%(Fullpath).html')</_FxCopHtmlReportFile>
-  </PropertyGroup>
+  </Target>
 
-  <!-- Create human friendly version -->
-  <XslTransformation
-    XmlInputPaths="$(FxCopReportFile)"
-    XslInputPath="$(FxCopTransformFile)"
-    OutputPaths="$(_FxCopHtmlReportFile)" />
-
-</Target>
   <Target Name="BeforeFxcop"/>
+  
   <Target Name="AfterFxcop"/>
 
   <Target Name="CopySourceFiles" Outputs="%(AllConfigurations.Configuration)">
@@ -145,7 +146,6 @@
 
   <PropertyGroup>
     <SetupFxCopPropertiesDependsOn Condition="'$(SetupFxCopPropertiesDependsOn)'==''"></SetupFxCopPropertiesDependsOn>
-
   </PropertyGroup>
 
   <Target Name="SetupFxCopProperties" DependsOnTargets="$(SetupFxCopPropertiesDependsOn)">
@@ -171,6 +171,7 @@
     <ItemGroup>
       <CustomFxCopRuleAssemblies Include="$(FxCopContribRoot)Rules\*.dll" />
     </ItemGroup>
+
     <Message
       Text="%40(CustomFxCopRuleAssemblies): @(CustomFxCopRuleAssemblies)"
       Importance="low"/>
