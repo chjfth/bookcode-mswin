@@ -33,7 +33,7 @@ void ShowHelp(HWND hwndParent)
 		_T("(1) Left click on the clock for next color.\r\n")
 		_T("(2) Shift+click to cycle back.\r\n")
 		_T("\r\n")
-		_T("Compiled on: ") _T(__DATE__) _T(" ") _T(__TIME__)
+		_T("Compiled on: ") _T(__DATE__) _T(", ") _T(__TIME__)
 		;
 	MessageBox(hwndParent, s_help, _T("Help"), MB_OK);
 }
@@ -96,6 +96,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 static COLORREF s_colors[] = 
 {
 	RGB(0x40, 0xA0, 0xFF), // sky blue
+	RGB(0x00, 0xA8, 0x58), // pond green
 	RGB(0xD4, 0x62, 0x62), // dark red
 	RGB(0xC0, 0x30, 0xFF), // shining purple
 	RGB(0x70, 0x42, 0x14), // brown
