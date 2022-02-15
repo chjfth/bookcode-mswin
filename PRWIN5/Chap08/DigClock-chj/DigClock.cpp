@@ -23,7 +23,7 @@ DigClock.cpp -- Updated by Chj, 2021.11.
 void ShowHelp(HWND hwndParent)
 {
 	static TCHAR *s_help =
-		_T("DigClock from Charles Petzold [PRWIN5] Chap08, with improvements from Chj.\r\n")
+		_T("DigClock from Charles Petzold [PRWIN5] Chap08, with improvements from Jimm Chen.\r\n")
 		_T("\r\n")
 		_T("To Move the clock window:\r\n")
 		_T("(1) Click and drag with mouse left button.\r\n")
@@ -31,7 +31,9 @@ void ShowHelp(HWND hwndParent)
 		_T("\r\n")
 		_T("To change digit color: \r\n")
 		_T("(1) Left click on the clock for next color.\r\n")
-		_T("(2) Ctrl + Left-click to cycle back.\r\n")
+		_T("(2) Shift+click to cycle back.\r\n")
+		_T("\r\n")
+		_T("Compiled on: ") _T(__DATE__) _T(" ") _T(__TIME__)
 		;
 	MessageBox(hwndParent, s_help, _T("Help"), MB_OK);
 }
@@ -93,12 +95,12 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 static COLORREF s_colors[] = 
 {
-	RGB(0x54, 0x84, 0x14), // swamp green
-	RGB(0x30, 0xA0, 0xD0), // dyeing blue
+	RGB(0x40, 0xA0, 0xFF), // sky blue
 	RGB(0xD4, 0x62, 0x62), // dark red
 	RGB(0xC0, 0x30, 0xFF), // shining purple
 	RGB(0x70, 0x42, 0x14), // brown
 	RGB(0xF8, 0x60, 0x30), // deep orange
+	RGB(0x30, 0xA0, 0xD0), // dyeing blue
 	RGB(0xff, 0x00, 0xff), // magenta
 	RGB(0xff, 0x00, 0x00), // full red
 };
@@ -258,6 +260,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	static HMENU s_popmenu;
 	static bool s_is_always_on_top = true;
+	static bool s_is_change_color = false;
 
 	static POINT s_pos_mousedown; // client-area position
 	static bool s_is_dragging = false;
@@ -265,6 +268,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static int s_idxcolor = 0;
 
 	bool isCtrl = GetKeyState(VK_CONTROL)<0;
+	bool isShift = GetKeyState(VK_SHIFT)<0;
 
 	switch (message)
 	{{
@@ -360,8 +364,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if(s_is_moved==false)
 		{
-			s_idxcolor = Get_NewColorIdx(s_idxcolor, isCtrl ? -1 : 1);
-			InvalidateRect(hwnd, NULL, TRUE);
+			if(s_is_change_color)
+			{
+				s_idxcolor = Get_NewColorIdx(s_idxcolor, (isCtrl||isShift) ? -1 : 1);
+				InvalidateRect(hwnd, NULL, TRUE);
+			}
 		}
 
 		return 0;
@@ -403,6 +410,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
 			s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
 
+		CheckMenuItem(hmenuPopup, IDM_CLICK_CHANGE_COLOR, 
+			s_is_change_color ? MF_CHECKED : MF_UNCHECKED);
+
 		return 0;
 	}
 
@@ -414,6 +424,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			s_is_always_on_top = !s_is_always_on_top;
 			Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
+		}
+		else if(cmdid==IDM_CLICK_CHANGE_COLOR)
+		{
+			s_is_change_color = !s_is_change_color;
 		}
 		else if(cmdid==IDM_HELP)
 		{
