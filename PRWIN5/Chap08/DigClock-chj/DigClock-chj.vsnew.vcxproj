@@ -31,7 +31,8 @@
     -->
   <PropertyGroup Label="Globals">
     <RootNamespace>DigClock</RootNamespace>
-    <ProjectGuid>{41D45A9C-DEFC-816F-2D89-79134577F11A}</ProjectGuid>
+    <ProjectGuid>{9BD5D62B-D7AA-A925-811C-89D3CC1EDF66}</ProjectGuid>
+    <TargetName>DigClock-chj</TargetName>
     <OutDir>$(SolutionDir)vsnew-output\$(Platform)\$(Configuration)\</OutDir>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <PlatformToolset>v142</PlatformToolset>
@@ -95,6 +96,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(RootNamespace).cpp" />
+    <ClCompile Include="..\..\BeginPaint_NoFlicker.cpp" />
+    <ClCompile Include="..\..\vaDbg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="App.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DigClock.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\BeginPaint_NoFlicker.h" />
+    <ClInclude Include="..\..\vaDbg.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <!-- import VSPG start -->
   <PropertyGroup>
