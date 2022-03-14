@@ -91,11 +91,10 @@
   </ItemGroup>
   <!-- import VSPG start -->
   <PropertyGroup>
-    <VSPG_BatDir_NoTBS>..\..\_VSPG</VSPG_BatDir_NoTBS>
-    <VSPG_FeedbackFile>$(RootNamespace).cpp</VSPG_FeedbackFile>
+    <VSPG_BootsDir_NoTBS>..\..\..\_VSPG\boots</VSPG_BootsDir_NoTBS>
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+    <Import Project="$(VSPG_BootsDir_NoTBS)\_VSPG.props" />
   </ImportGroup>
   <!-- import VSPG end -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
