@@ -38,7 +38,8 @@ REM
 REM (2) Tell what file patterns to copy, separate each pattern by a space.
 REM     (But don't surround them with quotes.)
 REM
-set POSTBUILD_COPY_PATTERNS=*.exe *.dll
+rem set POSTBUILD_COPY_PATTERNS=%ExeDllDir%\%TargetFilenam%
+set POSTBUILD_COPY_PATTERNS="*.exe" "*.zzz"
 REM 
 REM You can modify .bat files directly, or set them as env-vars.
 REM =========================================================================
@@ -73,32 +74,36 @@ for %%d in (%POSTBUILD_COPY_TO_DIRS%) do (
 )
 
 
+exit /b 0
 
-goto :END
 
 REM =============================
 REM ====== Functions Below ======
 REM =============================
 
 :Echos
+  REM This function preserves %ERRORLEVEL% for the caller,
+  REM and, LastError does NOT pollute the caller.
+  setlocal & set LastError=%ERRORLEVEL%
   echo %_vspgINDENTS%[%batfilenam%] %*
-exit /b
+exit /b %ERRORLEVEL%
 
 :EchoAndExec
   echo %_vspgINDENTS%[%batfilenam%] EXEC: %*
-  %*
+  call %*
 exit /b %ERRORLEVEL%
 
 :EchoVar
   REM Env-var double expansion trick from: https://stackoverflow.com/a/1200871/151453
   set _Varname=%1
   for /F %%i in ('echo %_Varname%') do echo %_vspgINDENTS%[%batfilenam%] %_Varname% = !%%i!
-exit /b
+exit /b 0
 
 :SetErrorlevel
   REM Usage example:
   REM call :SetErrorlevel 4
 exit /b %1
+
 
 :CopyFilePatterns
 REM Copy files of various patterns to destination directory.
@@ -123,30 +128,59 @@ REM Params remain: Each one is a pattern, like: *.exe *.dll . (can not in quotes
   set AllPatterns=%AllPatterns% %pattern%
   
   if "%pattern%" == "" (
-    REM Pattern finished. Do we really copy any files? If none, assert error.
+    REM All patterns finished. Do we really copy any files? If none, assert error.
     
     if "%isFileMet%" == "false" (
-      call :Echos [VSPG-Error] No files are found by your pattern: %AllPatterns%
+      call :Echos [VSPG-Error] No files are found by your patterns: %AllPatterns%
       exit /b 4
     ) else (
-      endlocal
       exit /b 0
     )
   )
   
-  set seefile=
-  for %%g in ("%DirSrc%\%pattern%") do set seefile=%%g
+:process_pattern
+
+  REM Prompt the user the currently processing pattern
+  call "%bootsdir%\IsSubStr.bat" hasAsterisk "%pattern%" *
+  call "%bootsdir%\IsSubStr.bat" hasQuesmark "%pattern%" ?
+  call "%bootsdir%\IsSubStr.bat" has1 "%hasAsterisk%%hasQuesmark%" 1
+  if "%has1%" == "1" (
+    call :Echos Copying files matching pattern "%pattern%" ...
+  )
   
-  if not "%seefile%" == "" (
+  REM If %pattern% has no backslash in it, prepend %DirSrc% to make a pattern with dir-prefix.
+  call "%bootsdir%\IsSubStr.bat" hasBkSlash "%pattern%" \
+  if "%hasBkSlash%" == "1" (
+    set dirpfx_pattern=%pattern%
+  ) else (
+    set dirpfx_pattern=%DirSrc%\%pattern%
+  )
+  
+  set seefile=
+  for %%g in ("%dirpfx_pattern%") do (
+    set seefile=%%g
+    
+    REM ---- call :EchoAndExec copy "%%g" "%DirDst%"
+    REM ---- Use following instead:
+    call "%bootsdir%\PathSplit.bat" "!seefile!" __thisdir thisfilenam
+    call "%bootsdir%\LoopExecUntilSucc.bat" #5# "%bootsdir%\vspg_copy1file.bat" "!seefile!" "%DirDst%\!thisfilenam!"
+    REM
+    if errorlevel 1 (
+      call :Echos [ERROR] Copy file failed after multiple retries!
+      exit /b 4
+    )
+  )
+  
+  if "%seefile%" == "" (
+    call :Echos No files matching "%dirpfx_pattern%", no file copied.
+  ) else (
     set isFileMet=true
-    call :EchoAndExec copy "%DirSrc%\%pattern%" "%DirDst%"
-    if errorlevel 1 exit /b 4
   )
   
   shift
   goto :loop_CopyFilePatterns
 
-REM -- End of CopyFilePatterns
+REM -- End of :CopyFilePatterns
 
-:END
-exit /b %ERRORLEVEL%
+echo [VSPG-INTERNAL-ERROR] SHOULD NOT REACH HERE.
+exit /b 444
