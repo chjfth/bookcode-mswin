@@ -38,7 +38,7 @@ REM
 REM (2) Tell what file patterns to copy, separate each pattern by a space.
 REM     (But don't surround them with quotes.)
 REM
-set POSTBUILD_COPY_PATTERNS=%ExeDllDir%\%TargetFilenam%
+set POSTBUILD_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%"
 REM or
 rem set POSTBUILD_COPY_PATTERNS="*.exe" "*.zzz"
 REM 
