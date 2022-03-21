@@ -38,7 +38,7 @@ REM
 REM (2) Tell what file patterns to copy, separate each pattern by a space.
 REM     (But don't surround them with quotes.)
 REM
-set POSTBUILD_COPY_PATTERNS=%ExeDllDir%\%TargetFilenam%
+set POSTBUILD_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%"
 REM or
 REM set POSTBUILD_COPY_PATTERNS=*.exe *.dll
 REM 
@@ -55,14 +55,18 @@ if not defined POSTBUILD_COPY_PATTERNS (
 	exit /b 4
 )
 
-REM Escape double-quotes for wrapping into a single bat-parameter.
-set __ExeDllDir__=%ExeDllDir:"=""%
-set __SourcePatterns__=%POSTBUILD_COPY_PATTERNS:"=""%
-set __DestDirs__=%POSTBUILD_COPY_TO_DIRS:"=""%
-set DestSubdir=__%BuildConf%\%PlatformName%
-set __DestSubdir__=%DestSubdir:"=""%
+REM For the special two vars, escape double-quotes for wrapping into a single bat-parameter.
+call :PackDoubleQuotes %POSTBUILD_COPY_PATTERNS%
+set __SourcePatterns__=%_vspg_dqpacked%
+rem
+call :PackDoubleQuotes %POSTBUILD_COPY_TO_DIRS%
+set __DestDirs__=%_vspg_dqpacked%
+rem call :EchoVar __SourcePatterns__ @@@@@@@@@@@@@@
+rem call :EchoVar __DestDirs__       @@@@@@@@@@@@@@
 
-call :AgileCopy  "%__ExeDllDir__%"  "%__SourcePatterns__%"  "%__DestDirs__%"  "%__DestSubdir__%"
+set DestSubdir=__%BuildConf%\%PlatformName%
+
+call :AgileCopy  "%ExeDllDir%"  "%__SourcePatterns__%"  "%__DestDirs__%"  "%DestSubdir%"
 exit /b %ERRORLEVEL%
 
 
@@ -103,17 +107,10 @@ REM   source files from different BuildConf/Platform into different subdirs.
 
   setlocal EnableDelayedExpansion
   
-  set SourceDir=%~1
-  set SourceDir=%SourceDir:""="%
-  rem 
-  set SourcePatterns=%~2
-  set SourcePatterns=%SourcePatterns:""="%
-  rem
-  set DestDirs=%~3
-  set DestDirs=%DestDirs:""="%
-  rem
-  set DestSubdir=%~4
-  set DestSubdir=%DestSubdir:""="%
+  call :UnpackDoubleQuotes SourceDir "%~1"
+  call :UnpackDoubleQuotes SourcePatterns "%~2"
+  call :UnpackDoubleQuotes DestDirs "%~3"
+  call :UnpackDoubleQuotes DestSubdir "%~4"
   
   if "%DestSubdir%" == "" (
     call :Echos [ERROR] Calling AgileCopy function, missing parameters, 4 parameters required.
@@ -138,8 +135,8 @@ REM   source files from different BuildConf/Platform into different subdirs.
 		)
 	)
 	
-	set __SourcePatterns__=%SourcePatterns:"=""%
-	call "%bootsdir%\CopyFilePatterns.bat" "%SourceDir%" "!d_final!" "%__SourcePatterns__%"
+
+	call "%bootsdir%\CopyFilePatterns.bat" "%SourceDir%" "!d_final!" %SourcePatterns%
 	if errorlevel 1 ( 
 		call :Echos [ERROR] Error occurred when copying file to "!d_final!" .
 		exit /b 4 
@@ -163,11 +160,24 @@ exit /b %ERRORLEVEL%
 
 :EchoVar
   setlocal & set Varname=%~1
-  call echo %_vspgINDENTS%[%batfilenam%] %Varname% = %%%Varname%%%
+  call echo %_vspgINDENTS%[%batfilenam%]%~2 %Varname% = %%%Varname%%%
 exit /b 0
 
 :SetErrorlevel
   REM Usage example:
   REM call :SetErrorlevel 4
 exit /b %1
+
+:PackDoubleQuotes
+  REM Take whole %* as input, replace each " with "" and return the result string.
+  REM The return value is put in global var _vspg_dqpacked .
+  set allparams=%*
+  set _vspg_dqpacked=%allparams:"=""%
+exit /b 0
+
+:UnpackDoubleQuotes
+  setlocal & set allparams=%~2
+  set unpacked=%allparams:""="%
+  endlocal & (set %~1=%unpacked%)
+exit /b 0
 
