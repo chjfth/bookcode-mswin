@@ -40,6 +40,11 @@ call :EchoVar TargetName
 
 REM Try to call some PostBuild bat-s  from one of five predefined directories,
 REM whichever is encountered first. But if none found, just do nothing.
+REM We do non-greedy calling of these bat-s, from narrow(project level) to
+REM wide(global level), because user (probably) wants to override 
+REM outer env's sub-work with his own one.
+REM But if user wants outer bat-s as well, he should call the outer bat-s explicitly.
+
 
 set SubbatSearchDirs=^
   "%ProjectDir%"^
@@ -86,9 +91,8 @@ exit /b %LastError%
 exit /b %ERRORLEVEL%
 
 :EchoVar
-  REM Env-var double expansion trick from: https://stackoverflow.com/a/1200871/151453
-  set _Varname=%1
-  for /F %%i in ('echo %_Varname%') do echo %_vspgINDENTS%[%batfilenam%] %_Varname% = !%%i!
+  setlocal & set Varname=%~1
+  call echo %_vspgINDENTS%[%batfilenam%] %Varname% = %%%Varname%%%
 exit /b 0
 
 :SetErrorlevel

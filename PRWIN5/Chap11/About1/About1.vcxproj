@@ -152,11 +152,14 @@
     <ResourceCompile Include="About1.rc" />
   </ItemGroup>
 
+  <!-- import VSPG start -->
   <PropertyGroup>
-    <VSPG_BatDir_NoTBS>$(SolutionDir)..\_VSPG</VSPG_BatDir_NoTBS>
-    <VSPG_FeedbackFile>$(ProjectDir)About1.cpp</VSPG_FeedbackFile>
+    <VSPG_BootsDir_NoTBS>..\..\..\_VSPG\boots</VSPG_BootsDir_NoTBS>
   </PropertyGroup>
-  <Import Project="$(VSPG_BatDir_NoTBS)\_VSPG.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(VSPG_BootsDir_NoTBS)\_VSPG.props" />
+  </ImportGroup>
+  <!-- import VSPG end -->
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
