@@ -43,23 +43,15 @@ REM whichever is encountered first. But if none found, just do nothing.
 REM If you need this PreBuild-SubWCRev1.bat to run, just copy and tune it from
 REM PreBuild-SubWCRev1.bat.sample .
 
-set SubbatSearchDirs=^
-  "%ProjectDir%"^
-  "%ProjectDir%\_VSPG"^
-  "%SolutionDir%"^
-  "%SolutionDir%\_VSPG"^
-  "%SolutionDir%\.."^
-  "%userbatdir%"
-
-call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 PreBuild-SubWCRev1.bat %SubbatSearchDirs%
+call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 PreBuild-SubWCRev1.bat %SubbatSearchDirsNarrowToWide%
 if errorlevel 1 exit /b 4
 
 REM ==== Call Team-Prebuild8.bat if exist. ====
-call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 Team-PreBuild8.bat %VSPG_VSIDE_ParamsPack% %SubbatSearchDirs%
+call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 Team-PreBuild8.bat %VSPG_VSIDE_ParamsPack% %SubbatSearchDirsNarrowToWide%
 if errorlevel 1 exit /b 4
 
 REM ==== Call Personal-Prebuild8.bat if exist. ====
-call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 Personal-PreBuild8.bat %VSPG_VSIDE_ParamsPack% %SubbatSearchDirs%
+call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 Personal-PreBuild8.bat %VSPG_VSIDE_ParamsPack% %SubbatSearchDirsNarrowToWide%
 if errorlevel 1 exit /b 4
 
 
