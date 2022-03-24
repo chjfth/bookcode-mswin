@@ -134,6 +134,10 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\UseDirectX.props" />
+  </ImportGroup>
+  
   <!-- import VSPG start -->
   <PropertyGroup>
     <VSPG_BootsDir_NoTBS>..\..\..\_VSPG\boots</VSPG_BootsDir_NoTBS>
