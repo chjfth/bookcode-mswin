@@ -5,18 +5,8 @@
     <Exec Command="$(MSBuildThisFileDirectory)CheckDirectXSDK.bat" /> 
   </Target>
   
-  <ItemDefinitionGroup>
-
-    <ClCompile>
-    <!-- Chj: Don't do this, bcz the DirectX headers from DXSDK may not be compatible with current VS compiler version.
-    	<AdditionalIncludeDirectories>S:\DXSDK-Jun-2007\Include;</AdditionalIncludeDirectories> 
-    -->
-    </ClCompile>
-
-    <Link>
-      <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(DIR_DXSDK)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(DIR_DXSDK)\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-
-  </ItemDefinitionGroup>
+  <PropertyGroup Condition="'$(PlatformToolsetVersion)' &lt; '140'">
+    <LibraryPath>$(DIR_DXSDK)\Lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  
 </Project>
