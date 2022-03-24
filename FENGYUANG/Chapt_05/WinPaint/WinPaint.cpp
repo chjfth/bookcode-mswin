@@ -251,39 +251,39 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				lr |= m_Redraw;
 			}
 
-			m_Log.Log("WM_NCCALCSIZE returns 0x%x", lr);
+			m_Log.Log(_T("WM_NCCALCSIZE returns 0x%x"), lr);
 
 			break;
 		}
 		case WM_NCPAINT:
 		{
-			m_Log.Log("WM_NCPAINT HRGN %0x\r\n", (HRGN) wParam);
+			m_Log.Log(_T("WM_NCPAINT HRGN %0x\r\n"), (HRGN) wParam);
 			
 			HRGN hUpdateRgn = (HRGN)wParam;
 			(void)hUpdateRgn;
 
 			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
 			
-			m_Log.Log("WN_NCPAINT.Def returns\r\n");
+			m_Log.Log(_T("WN_NCPAINT.Def returns\r\n"));
 			break;
 		}
 
 		case WM_ERASEBKGND:
 		{
-			m_Log.Log("WM_ERASEBKGND HDC %0x\r\n", (HDC) wParam);
+			m_Log.Log(_T("WM_ERASEBKGND HDC %0x\r\n"), (HDC) wParam);
 			
 			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
 			
-			m_Log.Log("WM_ERASEBKGND.Def returns\r\n");
+			m_Log.Log(_T("WM_ERASEBKGND.Def returns\r\n"));
 			break;
 		}
 
 		case WM_SIZE:
-			m_Log.Log("WM_SIZE type %d, width %d, height %d\r\n", wParam, LOWORD(lParam), HIWORD(lParam));
+			m_Log.Log(_T("WM_SIZE type %d, width %d, height %d\r\n"), wParam, LOWORD(lParam), HIWORD(lParam));
 			
 			lr = DefWindowProc(hWnd, uMsg, wParam, lParam);
 			
-			m_Log.Log("WM_SIZE.Def returns\r\n");
+			m_Log.Log(_T("WM_SIZE.Def returns\r\n"));
 			break;
 
 		case WM_PAINT:
@@ -302,20 +302,20 @@ LRESULT KMyCanvas::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			PAINTSTRUCT ps; 
 
-			m_Log.Log("WM_PAINT #%d\r\n", m_nRepaint);
+			m_Log.Log(_T("WM_PAINT #%d\r\n"), m_nRepaint);
 				
-			m_Log.Log("BeginPaint\r\n");
+			m_Log.Log(_T("BeginPaint\r\n"));
 			HDC hDC = BeginPaint(m_hWnd, &ps);
 			DWORD objtype = GetObjectType(hDC);
-			m_Log.Log("BeginPaint returns HDC 0x%08x (objtype=%d)\r\n", hDC, objtype);
+			m_Log.Log(_T("BeginPaint returns HDC 0x%08x (objtype=%d)\r\n"), hDC, objtype);
 
 			OnDraw(hDC, &ps.rcPaint);
 
-			m_Log.Log("EndPaint\r\n");
+			m_Log.Log(_T("EndPaint\r\n"));
 			EndPaint(m_hWnd, &ps);
-			m_Log.Log("EndPaint returns GetObjectType(0x%08x)=%d\r\n", hDC, GetObjectType(hDC));
+			m_Log.Log(_T("EndPaint returns GetObjectType(0x%08x)=%d\r\n"), hDC, GetObjectType(hDC));
 				
-			m_Log.Log("WM_PAINT #%d returns\r\n", m_nRepaint);
+			m_Log.Log(_T("WM_PAINT #%d returns\r\n"), m_nRepaint);
 			return 0;
 		}
 
@@ -363,10 +363,10 @@ void KMyCanvas::OnDraw(HDC hDC, const RECT * rcPaint)
 			int x = (pRect[i].left + pRect[i].right)/2;
 			int y = (pRect[i].top + pRect[i].bottom)/2;
 
-			wsprintf(mess, "WM_PAINT #%d, rect %d", m_nRepaint, i+1);
+			wsprintf(mess, _T("WM_PAINT #%d, rect %d"), m_nRepaint, i+1);
 			::TextOut(hDC, x, y - lineheight, mess, _tcslen(mess));
 
-			wsprintf(mess, "(%d, %d, %d, %d)", pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
+			wsprintf(mess, _T("(%d, %d, %d, %d)"), pRect[i].left, pRect[i].top, pRect[i].right, pRect[i].bottom);
 			::TextOut(hDC, x, y, mess, _tcslen(mess));
 
 			// >>> Chj: draw dotted border around each rect, for better teaching purpose

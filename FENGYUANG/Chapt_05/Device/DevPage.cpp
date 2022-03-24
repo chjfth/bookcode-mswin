@@ -142,36 +142,36 @@ BOOL KDevicePage::OnDeviceChange(HWND hWnd)
 		// -- e.g. "\Registry\Machine\System\CurrentControlSet\Control\Video\{F53FDD4F-2C23-4245-B138-B1667CB4F52F}\0000"
 		// For an RDP screen, "\REGISTRY\Machine\System\CurrentControlSet\Services\RDPDD\Device0" 
 
-		vaSetDlgItemText(hWnd, IDC_TEXT_StateFlags, "StateFlags = 0x%08X", Device.StateFlags);
+		vaSetDlgItemText(hWnd, IDC_TEXT_StateFlags, _T("StateFlags = 0x%08X"), Device.StateFlags);
 
 		SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_RESETCONTENT, 0, 0);
 					
 		if ( Device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "ATTACHED_TO_DESKTOP");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("ATTACHED_TO_DESKTOP"));
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_MULTI_DRIVER )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "MULTI_DRIVER");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("MULTI_DRIVER"));
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "PRIMARY_DEVICE");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("PRIMARY_DEVICE"));
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "MIRRORING_DRIVER");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("MIRRORING_DRIVER"));
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_VGA_COMPATIBLE )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "VGA_COMPATIBLE");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("VGA_COMPATIBLE"));
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_REMOTE )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "REMOTE");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("REMOTE"));
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_DISCONNECT )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "DISCONNECT");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("DISCONNECT"));
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_TS_COMPATIBLE )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "TS_COMPATIBLE");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("TS_COMPATIBLE"));
 
 		if ( Device.StateFlags & DISPLAY_DEVICE_MODESPRUNED )
-			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) "MODESPRUNED");
+			SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_ADDSTRING, 0, (LPARAM) _T("MODESPRUNED"));
 
 		SendDlgItemMessage(hWnd, IDC_STATEFLAGS, CB_SETCURSEL, 0, 0);
 	}

@@ -45,7 +45,7 @@ void Test(HWND hWnd, const TCHAR * mess)
 
 	TCHAR temp[MAX_PATH];
 
-	wsprintf(temp, "%s GetWindowDC=%x, GetDC=%x", mess, hDC1, hDC2);
+	wsprintf(temp, _T("%s GetWindowDC=%x, GetDC=%x"), mess, hDC1, hDC2);
 
 	MyMessageBox(NULL, temp, _T("Window Region"), MB_OK);
 

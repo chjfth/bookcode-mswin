@@ -126,7 +126,7 @@ BOOL KDCAttributes::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				case MAKELONG(IDC_WMF, BN_SETFOCUS):
 					{
-						HDC hDC = CreateMetaFile("c:\\t.wmf");
+						HDC hDC = CreateMetaFile(_T("c:\\t.wmf"));
 
 						DumpDC(hDC);
 						
@@ -138,8 +138,8 @@ BOOL KDCAttributes::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					{
 						RECT rect = { 100, 100, 200, 300 };
 
-						HDC hDC = CreateEnhMetaFile(GetDC(GetDesktopWindow()), "c:\\t.emf", 
-							& rect, "Testing");
+						HDC hDC = CreateEnhMetaFile(GetDC(GetDesktopWindow()), _T("c:\\t.emf"), 
+							& rect, _T("Testing"));
 
 						DumpDC(hDC);
 						

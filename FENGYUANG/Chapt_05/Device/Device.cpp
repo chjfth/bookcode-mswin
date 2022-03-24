@@ -55,7 +55,7 @@ public:
 		m_Device = new KDevicePage(hInst);
 		hPage[0] = m_Device->createPropertySheetPage(hInst, IDD_DEVICEPAGE);
 
-		propertySheet(hInst, NULL, 0, 1, hPage, "Chapt_05 Device");
+		propertySheet(hInst, NULL, 0, 1, hPage, _T("Chapt_05 Device"));
 	}
 };
 
