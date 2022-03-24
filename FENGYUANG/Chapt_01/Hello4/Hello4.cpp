@@ -65,12 +65,15 @@ class KDDrawWindow : public KWindow
 
     void OnDraw(HDC hDC)
     {
+		int xCenter = GetSystemMetrics(SM_CXSCREEN)/2;
+    	int yCenter = GetSystemMetrics(SM_CYSCREEN)/2;
+    	
         TextOut(hDC, 0, 0, szHint, lstrlen(szHint));
         CenterText(hDC, 
-			GetSystemMetrics(SM_CXSCREEN)/2, GetSystemMetrics(SM_CYSCREEN)/2,
+			xCenter, yCenter,
 		    szFace, szMessage, 48);
 
-        Blend(80, 560, 160, 250);
+        Blend(xCenter-240, xCenter+240, yCenter-80, yCenter+10);
     }
 
 public:
@@ -111,7 +114,10 @@ bool KDDrawWindow::CreateSurface(void)
     if (hr!=DD_OK) 
         return false;
 
-    hr = lpdd->SetDisplayMode(640, 480, 32);
+	int fullwidth = GetSystemMetrics( SM_CXSCREEN );
+	int fullheight = GetSystemMetrics( SM_CYSCREEN );
+	
+    hr = lpdd->SetDisplayMode(fullwidth, fullheight, 32);
     if (hr!=DD_OK) 
         return false;
 
