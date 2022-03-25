@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\VSPG.user.props" Condition="exists('$(MSBuildThisFileDirectory)..\VSPG.user.props')" />
 
+  <!-- Define some variables to use later. -->
+
+  <PropertyGroup>
     <ExportEnvvarsForVSPG>
+      set PlatformShortName=$(PlatformShortName)
       set PlatformToolsetVersion=$(PlatformToolsetVersion)
       set PlatformToolset=$(PlatformToolset)
       set TargetExt=$(TargetExt)
-      set ExeDllDir=$(TargetDir)
+      set ExeDllDir=$(TargetDir.TrimEnd('\'))
     </ExportEnvvarsForVSPG>
 
     <!-- Note: Only after Microsoft.Cpp.targets is imported, $(TargetFileName) and $(TargetName) is filled with values. -->
     <VSPG_Start_9params>"$(VSPG_FeedbackFile)" "$(SolutionDir)" "$(ProjectDir)" "$(Configuration)" "$(PlatformName)" "$(TargetDir)" "$(TargetFileName)" "$(TargetName)" "$(IntDir)"</VSPG_Start_9params>
   </PropertyGroup>
+
+  <!-- Define VSPG's Prebuild-Event and PostBuild-Event stub. -->
 
   <ItemDefinitionGroup>
     <PreBuildEvent>
@@ -29,14 +35,32 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
 
+  <!-- A "Clean" Target that helps delete extra copied files by PostBuild-CopyOutput4.bat -->
+
   <Target Name="VSPG_Clean" AfterTargets="Clean">
     <PropertyGroup>
       <VSPG_Clean_cmd>
       $(ExportEnvvarsForVSPG)
+      @REM VSPG-CleanProject.bat will further search VSPU-CleanProject.bat in various folders.
       "$(VSPG_BootsDir_NoTBS)\VSPG-Boots.bat" VSPG-CleanProject.bat $(VSPG_Start_9params)
       </VSPG_Clean_cmd>
     </PropertyGroup>
     <Exec Command="$(VSPG_Clean_cmd)" />
+  </Target>
+
+  <!-- ====================================================================== -->
+  <!-- A MSBuild Target to diagnose variables.                                -->
+  <!--   msbuild xxx.vcxproj /p:showvars="TargetName;TargetPath"              -->
+  <!-- ====================================================================== -->
+
+  <ItemGroup>
+    <ShowVars Include="$(showvars)" />
+  </ItemGroup>
+
+  <Target Name="VSPG_ShowVars" Condition="'$(showvars)'!=''" BeforeTargets="PrepareForBuild">
+    <Message Text="================ [[VSPG_ShowVars]] start ================" />
+    <Message Text="    %(showvars.Identity)=$(%(showvars.Identity))" />
+    <Message Text="================ [[VSPG_ShowVars]] end ================" />
   </Target>
 
 </Project>
