@@ -1,0 +1,62 @@
+﻿<!--
+  This sample demonstrates using task batching to
+  copy a set of files into a set of folders.
+  Copyright 2008, Sayed Ibrahim Hashimi (sayed.hashimi@gmail.com)
+  
+  [2022-03-26] Chj: Modified to show 2 deminsional item combination workaround.
+  It is demonstrated in TargetSeeBoth .
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         ToolsVersion="4.0">
+  <ItemGroup>
+    <TestX Include="One">
+      <a>XA1</a> <b>XB</b> <c>XC</c>
+    </TestX>
+    <TestX Include="Two">
+      <a>XA</a> <b>XB1</b> <c>XC</c>
+    </TestX>
+    <TestX Include="Three">
+      <a>XA1</a> <b>XB1</b> <c>XC1</c>
+    </TestX>
+    <TestY Include="Four">
+      <a>YA</a> <b>YB1</b> <c>YC1</c>
+    </TestY>
+    <TestY Include="Five">
+      <a>YA1</a> <b>YB</b> <c>YC2</c>
+    </TestY>
+    <TestY Include="Six">
+      <a>YA</a> <b>YB</b> <c>YC2</c>
+    </TestY>
+  </ItemGroup>
+
+  <Target Name="Task01">
+    <Message Text="%25(TestX.a): %(TestX.a)"/>
+    <Message Text="---------------------------------------" />
+    <Message Text="%25(TestY.a): %(TestY.a)"/>
+    <Message Text="---------------------------------------" />
+    <Message Text=
+      "%25(TestX.a): %(TestX.a) || %25(TestY.a): %(TestY.a)"/>
+  </Target>
+  
+  <Target Name="Target01"
+          Outputs="%(TestX.a)%(TestY.a)">
+    <Message Text="%25(TestX.a): %(TestX.a) "/>
+    <Message Text="%25(TestX.Identity) %(TestX.Identity)"/>
+    <Message Text="---------------------------------------" />
+    <Message Text="%25(TestY.a): %(TestY.a)"/>
+    <Message Text="%25(TestY.Identity) %(TestY.Identity)"/>
+  </Target>
+
+  <Target Name="Task02">
+    <Message Text="@(TestX) @(TestY) %25(a):%(a)"/>
+  </Target>
+
+  <Target Name="TargetSeeBoth" Outputs="%(TestX.a)">
+    <PropertyGroup>
+      <xaValue>%(TestX.a)</xaValue>
+    </PropertyGroup>
+    <Message Text="$(xaValue) || %(TestY.a)" />
+  </Target>
+
+  <Target Name="All" DependsOnTargets="Task01;Target01"/>
+</Project>
