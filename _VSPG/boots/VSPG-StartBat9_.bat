@@ -39,7 +39,8 @@ set IntrmDir=%~8
 set IntrmDir=%IntrmDir:~0,-1%
 
 call "%bootsdir%\VSPG-version.bat" vspgver
-call :Echos [VSPG version %vspgver%] started as: "%bootsdir%\%batfilenam%"
+
+call :EchosV1 [VSPG version %vspgver%] started as: "%bootsdir%\%batfilenam%"
 
 
 set VSPG_VSIDE_ParamsDiscrete="%SolutionDir%" "%ProjectDir%" "%BuildConf%" "%PlatformName%" "%TargetDir%" "%TargetFilenam%" "%TargetName%" "%IntrmDir%"
@@ -47,9 +48,10 @@ call "%bootsdir%\DQescape_NoTBS.bat" %VSPG_VSIDE_ParamsDiscrete%
 set VSPG_VSIDE_ParamsPack=%DQescape_NoTBS_Output%
 REM -- Note: when expanding VSPG_VSIDE_ParamsPack, do NOT surround extra double-quotes on %VSPG_VSIDE_ParamsPack% .
 
-
-call :EchoVar SubworkBatpath
-call :EchoVar FeedbackFile
+if defined vspg_DO_SHOW_VERBOSE (
+  call :EchoVar SubworkBatpath
+  call :EchoVar FeedbackFile
+)
 
 if not "%FeedbackFile%"=="" (
   if not exist "%FeedbackFile%" (
@@ -64,25 +66,17 @@ if not exist "%SubworkBatpath%" (
   exit /b 4
 )
 
+REM ==== Prepare directory search list for VSPU-StartEnv.bat.
 
-set SubbatSearchDirsNarrowToWide=^
-  "%ProjectDir%\_VSPG"^
-  "%ProjectDir%"^
-  "%ProjectDir%\.."^
-  "%SolutionDir%\_VSPG"^
-  "%SolutionDir%"^
-  "%SolutionDir%\.."^
-  "%userbatdir%"
+call :GetParentDir ProjectDir_up "%ProjectDir%"
+call :GetParentDir ProjectDir_upup "%ProjectDir_up%"
 
 set SubbatSearchDirsWideToNarrow=^
   "%userbatdir%"^
-  "%SolutionDir%\.."^
   "%SolutionDir%"^
-  "%SolutionDir%\_VSPG"^
-  "%ProjectDir%\.."^
-  "%ProjectDir%"^
-  "%ProjectDir%\_VSPG"
-
+  "%ProjectDir_upup%"^
+  "%ProjectDir_up%"^
+  "%ProjectDir%"
 
 REM ======== Loading User Env-vars ======== 
 
@@ -99,6 +93,13 @@ if errorlevel 1 (
   )
   exit /b 4
 )
+
+REM ==== Prepare directory search list for other .bat-s.
+
+REM From VSPU-StartEnv.bat, user can append new search dirs in vspg_USER_BAT_SEARCH_DIRS, so that they will be searched.
+
+set SubbatSearchDirsNarrowToWide=%vspg_USER_BAT_SEARCH_DIRS% "%ProjectDir%" "%SolutionDir%" "%userbatdir%"
+
 
 
 REM ======== call VSPG-Prebuild8.bat or VSPG-Postbuild8.bat ======== 
@@ -128,6 +129,14 @@ REM =============================
   echo %_vspgINDENTS%[%batfilenam%] %*
 exit /b %LastError%
 
+:EchosV1
+  REM echo %* only when vspg_DO_SHOW_VERBOSE=1 .
+  setlocal & set LastError=%ERRORLEVEL%
+  if not defined vspg_DO_SHOW_VERBOSE goto :_EchosV1_done
+  echo %_vspgINDENTS%[%batfilenam%]# %*
+:_EchosV1_done
+exit /b %LastError%
+
 :EchoAndExec
   echo %_vspgINDENTS%[%batfilenam%] EXEC: %*
   call %*
@@ -150,3 +159,17 @@ exit /b %1
 	
 	copy /b "%~1"+,, "%~1" >NUL 2>&1
 exit /b %ERRORLEVEL%
+
+:GetParentDir
+  REM Example
+  REM
+  REM   call :GetParentDir outputvar "c:\program files\d1\d2"
+  REM 
+  REM Return:
+  REM 
+  REM   outputvar=c:\program files\d2
+  setlocal
+  if "%~1"=="" exit /b 4
+  for %%g in ("%~2") do set parentdir=%%~dpg
+  endlocal & ( set "%~1=%parentdir:~0,-1%" )
+exit /b 0
