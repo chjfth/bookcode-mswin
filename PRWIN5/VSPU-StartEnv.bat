@@ -29,16 +29,6 @@ REM ################ KEY CONTENT HERE ################
 
 call :SetEnvVar vspg_USER_BAT_SEARCH_DIRS=%ProjectDir%\..\..
 
-call :SetEnvVar POSTBUILD_COPY_TO_DIRS=D:\barn
-
-CALL :SetEnvVar POSTBUILD_COPY_PATTERNS="%TargetDir%\%TargetFilenam%"
-
-call :SetEnvVar Postbuild_BuildConfSubdir=%PlatformName%\%BuildConf%
-rem -- This is used to distinguish EXE/DLL output from different BuildVariant-s ,
-rem    for example: Win32/x64 in different dir, Debug/Release in different dir.
-
-call :SetEnvVar vspg_DO_SHOW_VERBOSE=1
-
 exit /b 0
 
 REM =============================
