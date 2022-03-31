@@ -1,6 +1,5 @@
 @echo off
 setlocal EnableDelayedExpansion
-
 REM This bat file boots actual VSPG bat files. It should be kept minimalist. 
 REM This file exists to ease VSPG developer to temporarily switch local [boots] dir to [boots-dev].
 REM so that a new VSPG version can be developed in side-by-side with the actual project using VSPG.
