@@ -1,13 +1,14 @@
 /*-----------------------------------------
 DIGCLOCK.c -- Digital Clock(c) Charles Petzold, 1998
 
-DigClock.cpp -- Updated by Chj, 2021.11.
+DigClock.cpp -- Updated by Chj, 2022.05.
 * Thin window border.
 * Drag window by clicking anywhere inside the window.
 * Move window by pressing arrow keys, Ctrl to accelerate.
 * Right-click context menu, toggle always on top.
 * Select different color by mouse clicking.
 * Scale down "second" value display(75%), so to have it stand out.
+* Toggle showing window title, with EXE file name as title text.
 * Eliminate UI flickering by MemDC-double-buffering.
   -----------------------------------------*/
 
@@ -15,6 +16,7 @@ DigClock.cpp -- Updated by Chj, 2021.11.
 #include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
+#include <shlwapi.h>
 #include "resource.h"
 
 #include "..\..\vaDbg.h"
@@ -43,6 +45,22 @@ void ShowHelp(HWND hwndParent)
 SIZE g_init_winsize = {160, 60};
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
+
+void Hwnd_ShowTitle(HWND hwnd, bool istitle);
+
+const TCHAR *GetExeFilename()
+{
+	static TCHAR exepath[MAX_PATH] = _T("Unknown exepath");
+	GetModuleFileName(NULL, exepath, ARRAYSIZE(exepath));
+
+	const TCHAR *pfilename = StrRChr(exepath, NULL, _T('\\'));
+	if(pfilename && pfilename[1])
+		pfilename++;
+	else
+		pfilename = exepath;
+
+	return pfilename;
+}
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
@@ -73,14 +91,18 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	POINT mousepos = {};
 	GetCursorPos(&mousepos);
 
-	hwnd = CreateWindowEx (WS_EX_DLGMODALFRAME,
+	hwnd = CreateWindowEx (0,
 		szAppName, TEXT ("Digital Clock"),
-		WS_POPUPWINDOW|WS_THICKFRAME,  // WS_OVERLAPPEDWINDOW,
+		WS_POPUPWINDOW, // will set more styles in Hwnd_ShowTitle()
 		mousepos.x, mousepos.y,
 		g_init_winsize.cx, g_init_winsize.cy, // CW_USEDEFAULT, CW_USEDEFAULT, 
 		NULL, NULL, hInstance, NULL) ;
 
 	SendMessage(hwnd, WM_SETICON, TRUE, (LPARAM)LoadIcon(hInstance, _T("MYPROGRAM")));
+
+	Hwnd_ShowTitle(hwnd, false);
+
+	SetWindowText(hwnd, GetExeFilename());
 
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
@@ -252,6 +274,62 @@ void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop)
 		);
 }
 
+void Hwnd_ShowTitle(HWND hwnd, bool istitle)
+{
+	struct StyleBits 
+	{ 
+		DWORD bits_on; DWORD bits_on_ex; 
+	} 
+	twownds[2] =
+	{
+		{ WS_POPUPWINDOW|WS_THICKFRAME , WS_EX_DLGMODALFRAME }, // style bits for no-title window
+		{ WS_OVERLAPPEDWINDOW , WS_EX_TOOLWINDOW }, // style bits for has-title window
+	};
+
+	// Save original client-area absolute position first.
+	//
+	RECT rectAbsCli = {}; // client-area absolute position(screen coordinate)
+	GetClientRect(hwnd, &rectAbsCli); // interim result
+	MapWindowPoints(hwnd, HWND_DESKTOP, (POINT*)&rectAbsCli, 2);
+
+	DWORD winstyle = (DWORD)GetWindowLongPtr(hwnd, GWL_STYLE);
+	winstyle &= (~twownds[!istitle].bits_on);
+	winstyle |= twownds[istitle].bits_on;
+	SetWindowLongPtr(hwnd, GWL_STYLE, winstyle);
+
+	DWORD winstyleEx = (DWORD)GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+	winstyleEx &= (~twownds[!istitle].bits_on_ex);
+	winstyleEx |= twownds[istitle].bits_on_ex;
+
+	SetWindowLongPtr(hwnd, GWL_EXSTYLE, winstyleEx);
+
+	// (must) Repaint the window frame, so that we can calculate its *new* border size.
+	SetWindowPos(hwnd, NULL, 0,0,0,0, 
+		SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+	// Now move the window so to keep client-area position & size intact.
+	// We determine final whole-window position by adding window-border size to rectCliAbs.
+	//
+	RECT rectNewFrame = {};
+	GetWindowRect(hwnd, &rectNewFrame); // interim result
+	//RECT rectCliInFrame = GetClientAreaPosiz(hwnd);
+	RECT rectNewCli = {};
+	GetClientRect(hwnd, &rectNewCli); // interim result
+	MapWindowPoints(hwnd, HWND_DESKTOP, (POINT*)&rectNewCli, 2);
+	//
+	rectNewFrame.left += (rectAbsCli.left - rectNewCli.left);
+	rectNewFrame.top += (rectAbsCli.top - rectNewCli.top);
+	rectNewFrame.right += (rectAbsCli.right - rectNewCli.right);
+	rectNewFrame.bottom += (rectAbsCli.bottom - rectNewCli.bottom);
+
+	SetWindowPos(hwnd, NULL, 
+		rectNewFrame.left, rectNewFrame.top, 
+		rectNewFrame.right-rectNewFrame.left, rectNewFrame.bottom-rectNewFrame.top,
+		SWP_NOZORDER | SWP_FRAMECHANGED
+		);
+}
+
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 //	static HBRUSH hBrushRed ;
@@ -262,6 +340,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static HMENU s_popmenu;
 	static bool s_is_always_on_top = true;
 	static bool s_is_change_color = false;
+	static bool s_is_show_title = false;
 
 	static POINT s_pos_mousedown; // client-area position
 	static bool s_is_dragging = false;
@@ -414,6 +493,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		CheckMenuItem(hmenuPopup, IDM_CLICK_CHANGE_COLOR, 
 			s_is_change_color ? MF_CHECKED : MF_UNCHECKED);
 
+		CheckMenuItem(hmenuPopup, IDM_SHOW_TITLE, 
+			s_is_show_title ? MF_CHECKED : MF_UNCHECKED);
+
 		return 0;
 	}
 
@@ -429,6 +511,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else if(cmdid==IDM_CLICK_CHANGE_COLOR)
 		{
 			s_is_change_color = !s_is_change_color;
+		}
+		else if(cmdid==IDM_SHOW_TITLE)
+		{
+			s_is_show_title = !s_is_show_title;
+			Hwnd_ShowTitle(hwnd, s_is_show_title);
 		}
 		else if(cmdid==IDM_HELP)
 		{

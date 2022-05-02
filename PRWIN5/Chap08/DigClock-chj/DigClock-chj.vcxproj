@@ -44,6 +44,9 @@
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20220502-0000-0000-0000-235007000001}</ProjectGuid>
     <ProjectName>DigClock-chj</ProjectName>
+    
+    <TargetName>DigClock-$(PlatformShortName)</TargetName>
+    
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
@@ -106,7 +109,7 @@
       <ImportLibrary>$(OutDir)$(TargetName)--imp.lib</ImportLibrary>
       <GenerateMapFile>true</GenerateMapFile>
       <AdditionalLibraryDirectories>;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ComCtl32.Lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <!-- Better build.log file naming -->
     <BuildLog>
