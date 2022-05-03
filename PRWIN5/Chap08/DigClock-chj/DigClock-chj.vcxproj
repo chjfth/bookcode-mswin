@@ -48,6 +48,8 @@
     <TargetName>DigClock-$(PlatformShortName)</TargetName>
     
     <ConfigurationType>Application</ConfigurationType>
+
+    <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   
   <!-- Debug or Release -->
