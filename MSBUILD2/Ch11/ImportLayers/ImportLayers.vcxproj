@@ -139,6 +139,34 @@
     </Link>
   </ItemDefinitionGroup>
 
+  <!-- ======================================================
+             [START] Book Ch11 p290 test code 
+   ====================================================== -->
+
+  <ImportGroup Label="PropertySheets">
+    <Import Project="p1.props" />
+  </ImportGroup>
+
+  <!-- Book Ch11 p290 test: Assign q=2 -->
+  <ItemDefinitionGroup>
+    <Link>
+      <MapFileName>2.map</MapFileName>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ImportGroup Label="PropertySheets">
+    <Import Project="p2.props" />
+  </ImportGroup>
+
+  <ImportGroup Label="PropertySheets">
+    <Import Project="p3.props" />
+  </ImportGroup>
+
+  <!-- ======================================================
+             [END] Book Ch11 p290 test code 
+   ====================================================== -->
+
+
   <!-- 
     Source file list:
    -->
