@@ -1,0 +1,9 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+    ToolsVersion="3.3">
+
+    <Target Name="HelloWorld">
+    	<Message Text="MSBuildToolsVersion = $(MSBuildToolsVersion)"/>
+        <Message Text="VCTargetsPath       = $(VCTargetsPath)"/>
+    </Target>
+
+</Project>
