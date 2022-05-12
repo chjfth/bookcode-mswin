@@ -2,8 +2,10 @@
     ToolsVersion="3.3">
 
     <Target Name="HelloWorld">
-    	<Message Text="MSBuildToolsVersion = $(MSBuildToolsVersion)"/>
-        <Message Text="VCTargetsPath       = $(VCTargetsPath)"/>
+    	<Message Text="MSBuildToolsVersion    = $(MSBuildToolsVersion)"/>
+        <Message Text="VCTargetsPath          = $(VCTargetsPath)"/>
+        <Message Text="PlatformToolset        = $(PlatformToolset)"/>
+        <Message Text="PlatformToolsetVersion = $(PlatformToolsetVersion)"/>
     </Target>
 
 </Project>
