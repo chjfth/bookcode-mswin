@@ -35,6 +35,7 @@
 //   Description:    General include file used by all modules.
 //                                                                              
 ///////////////////////////////////////////////////////////////////////////////////////////
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commdlg.h>
 #include <winuser.h>

@@ -29,6 +29,9 @@ REM WRITE YOUR CMD/BAT commands here.
 REM Remember to check for error exitcode for each command.
 REM
 
+REM GlobalDev.exe needs global.txt as data file in its [General] Tab.
+call :EchoAndExec copy "%ProjectDir%\global.txt" "%TargetDir%"
+
 if errorlevel 1 exit /b 4
 
 

@@ -4,8 +4,13 @@ setlocal EnableDelayedExpansion
 set batfilenam=%~n0%~x0
 set bootsdir=%~dp0
 set bootsdir=%bootsdir:~0,-1%
-call "%bootsdir%\GetParentDir.bat" userbatdir "%bootsdir%"
 set _vspgINDENTS=%_vspgINDENTS%.
+
+call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 Team-Clean.bat "" %SubbatSearchDirsNarrowToWide%
+if errorlevel 1 exit /b 4
+
+call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 Personal-Clean.bat "" %SubbatSearchDirsNarrowToWide%
+if errorlevel 1 exit /b 4
 
 call "%bootsdir%\SearchAndExecSubbat.bat" Greedy0 VSPU-CopyOrClean.bat 0 %SubbatSearchDirsNarrowToWide%
 

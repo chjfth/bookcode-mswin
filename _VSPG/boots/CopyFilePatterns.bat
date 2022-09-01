@@ -24,7 +24,7 @@ REM * This function currently does not resurce into subdirectory for source file
 REM * If a pattern contains a colon, for example,
 REM      d:\test\foo.exe 
 REM      d:\test\*.dll 
-REM then it is considered absolute path, and Param1 is not userd.
+REM then it is considered absolute path, and Param1 is not used.
 REM 
 REM [Env-var input]
 REM If env-var vspg_COPYORCLEAN_DO_CLEAN=1, target file is actually deleted.
@@ -41,7 +41,7 @@ REM against source folder instead of the target folder.
   set DirDst=%~1
   shift
   
-  if not exist "%DirDst%" mkdir "%DirDst"
+  if not exist "%DirDst%" mkdir "%DirDst%"
   
 :loop_CopyFilePatterns
   set pattern=%~1
@@ -82,6 +82,9 @@ REM against source folder instead of the target folder.
 
   set seefile=
   for %%g in ("%dirpfx_pattern%") do (
+
+	REM Example of a %%g: 
+	REM 	d:\myproj\output\*.exe
 
     set seefile=%%~g
     call "%bootsdir%\PathSplit.bat" "!seefile!" __thisdir thisfilenam
