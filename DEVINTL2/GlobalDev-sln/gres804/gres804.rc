@@ -1,0 +1,193 @@
+// resource script.
+//
+#include "../resource-mui.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_NEUTRAL
+#pragma code_page(936)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+DLG_NLS DIALOG DISCARDABLE  0, 0, 344, 260
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NLS APIs"
+LANGUAGE LANG_CHINESE, 0x2
+FONT 9, "宋体"
+{
+   CONTROL "List2", 1005, "SysListView32", LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 5, 7, 331, 92 
+   CONTROL "大数字: ", -1, BUTTON, BS_GROUPBOX | WS_CHILD | WS_VISIBLE, 6, 105, 144, 47 
+   CONTROL "正数:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 9, 118, 40, 9 
+   CONTROL "负数:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 9, 134, 40, 9 
+   CONTROL "", 1009, EDIT, ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 61, 118, 82, 12 
+   CONTROL "", 1010, EDIT, ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 61, 134, 82, 12 
+   CONTROL "货币制格式: ", -1, BUTTON, BS_GROUPBOX | WS_CHILD | WS_VISIBLE, 5, 156, 144, 47 
+   CONTROL "正数:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 9, 169, 40, 9 
+   CONTROL "负数:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 9, 185, 40, 9 
+   CONTROL "", 1011, EDIT, ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 61, 169, 82, 12 
+   CONTROL "", 1012, EDIT, ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 61, 185, 82, 12 
+   CONTROL "时间: ", -1, BUTTON, BS_GROUPBOX | WS_CHILD | WS_VISIBLE, 5, 206, 144, 47 
+   CONTROL "时间示例:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 9, 220, 55, 9 
+   CONTROL "时间格式:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 9, 236, 55, 9 
+   CONTROL "", 1013, EDIT, ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 71, 220, 72, 12 
+   CONTROL "", 1015, COMBOBOX, CBS_DROPDOWN | CBS_SORT | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP, 71, 236, 72, 49 
+   CONTROL "日期:", -1, BUTTON, BS_GROUPBOX | WS_CHILD | WS_VISIBLE, 158, 105, 178, 124 
+   CONTROL "短日期示例:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 162, 153, 74, 9 
+   CONTROL "短日期格式:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 162, 169, 70, 9 
+   CONTROL "", 1016, EDIT, ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 245, 153, 84, 12 
+   CONTROL "", 1017, COMBOBOX, CBS_DROPDOWN | CBS_SORT | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP, 245, 169, 85, 49 
+   CONTROL "长日期示例:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 162, 193, 74, 9 
+   CONTROL "长日期格式:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 162, 209, 70, 9 
+   CONTROL "", 1018, EDIT, ES_LEFT | ES_AUTOHSCROLL | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 246, 193, 84, 12 
+   CONTROL "", 1019, COMBOBOX, CBS_DROPDOWN | CBS_SORT | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP, 246, 209, 85, 49 
+   CONTROL "日历类型:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 162, 125, 42, 18 
+   CONTROL "", 1020, COMBOBOX, CBS_DROPDOWN | CBS_SORT | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP, 209, 125, 121, 49 
+}
+
+
+
+DLG_TEXT DIALOG DISCARDABLE  0, 0, 344, 260
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "文字 API"
+LANGUAGE LANG_CHINESE, 0x2
+FONT 9, "宋体"
+{
+   CONTROL "", 1018, EDIT, ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 16, 18, 258, 199 
+   CONTROL "清除(&C)", 1019, BUTTON, BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 282, 20, 55, 14 
+   CONTROL "字体(&F)", 1020, BUTTON, BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 282, 36, 55, 14 
+   CONTROL "切换阅读顺序", 1021, BUTTON, BS_PUSHBUTTON | BS_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 282, 52, 55, 25 
+   CONTROL "切换校准", 1022, BUTTON, BS_PUSHBUTTON | BS_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 282, 79, 55, 25 
+}
+
+
+DLG_LCID DIALOG DISCARDABLE  0, 0, 209, 101
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "地域设置信息"
+LANGUAGE LANG_CHINESE, 0x2
+FONT 9, "宋体"
+{
+   CONTROL "确定", 1, BUTTON, BS_DEFPUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 156, 82, 50, 14 
+   CONTROL "本地化语言:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 9, 89, 8 
+   CONTROL "本国(地区)语言:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 22, 74, 8 
+   CONTROL "本国(地区):", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 35, 74, 8 
+   CONTROL "ANSI 代码页:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 48, 74, 8 
+   CONTROL "OEM 代码页:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 11, 61, 74, 8 
+   CONTROL "", 1018, EDIT, ES_LEFT | ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP, 111, 9, 90, 12 
+   CONTROL "", 1019, EDIT, ES_LEFT | ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP, 111, 22, 90, 12 
+   CONTROL "", 1020, EDIT, ES_LEFT | ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP, 111, 35, 90, 12 
+   CONTROL "", 1021, EDIT, ES_LEFT | ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP, 111, 48, 90, 12 
+   CONTROL "", 1022, EDIT, ES_LEFT | ES_AUTOHSCROLL | WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_TABSTOP, 111, 61, 90, 12 
+}
+
+
+DLG_GENERAL DIALOG DISCARDABLE  0, 0, 344, 260
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "一般"
+LANGUAGE LANG_CHINESE, 0x2
+FONT 9, "宋体"
+{
+   CONTROL "用户界面语言:", -1, BUTTON, BS_GROUPBOX | WS_CHILD | WS_VISIBLE, 32, 10, 279, 59 
+   CONTROL "", 1020, COMBOBOX, CBS_DROPDOWN | CBS_SORT | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP, 40, 25, 186, 76 
+   CONTROL "", 1044, EDIT, ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP, 32, 107, 279, 81 
+   CONTROL "由 World-Ready Guides 创建，Microsoft Corporation, Windows Division。请访问我们的站点:", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 32, 214, 221, 19 
+   CONTROL "http://www.microsoft.com/globaldev", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP, 32, 237, 128, 12 }
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+DLG_NLS DLGINIT
+BEGIN
+    IDC_TIMEFORMAT, 0x403, 14, 0
+0x6f43, 0x2c73, 0x4d20, 0x736f, 0x202c, 0x6f4e, 0x0073, 
+    IDC_SDATEFORMAT, 0x403, 14, 0
+0x6f43, 0x2c73, 0x4d20, 0x736f, 0x202c, 0x6f4e, 0x0073, 
+    IDC_LDATEFORMAT, 0x403, 14, 0
+0x6f43, 0x2c73, 0x4d20, 0x736f, 0x202c, 0x6f4e, 0x0073, 
+    IDC_CALFORMAT, 0x403, 14, 0
+0x6f43, 0x2c73, 0x4d20, 0x736f, 0x202c, 0x6f4e, 0x0073, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+LANGUAGE LANG_CHINESE, 0x2
+{
+	1, 	"语言 ID"
+	2, 	"语言"
+	3, 	"本国(地区)语言名"
+	4, 	"本国(地区)名"
+	5, 	"ACP"
+	6, 	"OEM CP"
+	7, 	"重新启动这个应用程序之前，界面语言改动不会生效。"
+	8, 	"http://www.microsoft.com/globaldev/nlsweb/default.asp?submitted="
+	9, 	"http://www.microsoft.com/globaldev/articles/muiapp.asp"
+	10,	"http://www.microsoft.com/globaldev/"
+	11,	"http://www.microsoft.com/globaldev/articles/multilang.asp"
+}
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
