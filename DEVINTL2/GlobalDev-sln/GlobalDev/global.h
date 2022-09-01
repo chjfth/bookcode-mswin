@@ -92,10 +92,10 @@ typedef struct _LOCINFO                   // structure for locale related inform
 } LOCINFO,*LPLOCINFO; 
 
 
-HINSTANCE    g_hInst;                // Handle to this instance
-TCHAR        g_tcsTemp[MAX_STR];
-HMODULE      g_hRes;                 // Handle to our resource dll
-int          g_wCurLang;
+extern HINSTANCE    g_hInst;                // Handle to this instance
+extern TCHAR        g_tcsTemp[MAX_STR];
+extern HMODULE      g_hRes;                 // Handle to our resource dll
+extern int          g_wCurLang;
 
 // Function declarations...
 INT_PTR CALLBACK FontDlgProc(HWND, UINT, WPARAM, LPARAM);

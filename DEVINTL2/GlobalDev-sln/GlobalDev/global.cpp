@@ -45,6 +45,10 @@
 
 #include "global.h"
 
+HINSTANCE    g_hInst;                // Handle to this instance
+TCHAR        g_tcsTemp[MAX_STR];
+HMODULE      g_hRes;                 // Handle to our resource dll
+int          g_wCurLang;
 
 // Declaration of internal functions
 BOOL    CreatePropSheet(HWND);

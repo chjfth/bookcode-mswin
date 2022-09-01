@@ -444,7 +444,7 @@ int		iboundry;
 		iNum = strString[i] - 48;	// 48 being the ASCII number for 0
 		if (iNum > 10)				// if it's over digit range
 			iNum -= 7;
-		iValue += iNum * (int)(pow(16, iboundry-i));
+		iValue += iNum * (int)(pow(16.0, iboundry-i));
 	}
 	return iValue;
 }
