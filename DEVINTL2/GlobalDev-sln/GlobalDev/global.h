@@ -56,7 +56,7 @@
 #include <TCHAR.h>
 
 #include "resource.h"
-#include "res.h"
+#include "../resource-mui.h"
 
 #ifdef __cplusplus
 extern"C"{

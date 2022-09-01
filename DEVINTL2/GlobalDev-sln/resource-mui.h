@@ -45,7 +45,12 @@
 #define IDB_READING                     1021
 #define IDC_OEM                         1022
 #define IDB_ALIGN                       1022
+#define IDC_MUIWEB                      1032
+#define IDC_GLOBALDEV                   1033
+#define IDC_MUIWEB2                     1033
+#define IDC_MULTILINGUAL                1036
 #define IDC_PURPOSE                     1044
+#define IDC_NLSWEB                      1086
 
 // Next default values for new objects
 // 
@@ -53,7 +58,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1050
+#define _APS_NEXT_CONTROL_VALUE         1090
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
