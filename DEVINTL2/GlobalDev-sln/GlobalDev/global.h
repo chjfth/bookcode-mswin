@@ -40,6 +40,7 @@
 #include <commdlg.h>
 #include <winuser.h>
 #include <windowsx.h>
+#include <Shlwapi.h>
 #include <dos.h>
 #include <tchar.h>
 #include <io.h>

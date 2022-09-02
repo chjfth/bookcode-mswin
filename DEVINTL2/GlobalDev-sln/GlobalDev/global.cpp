@@ -223,19 +223,21 @@ HMODULE  LoadLanguageResource(WORD wLangId)
         wLangId = GetUserDefaultUILanguage();
     }
 
+	g_wCurLang = wLangId;
+
     // Our naming convention for satellite DLLs is: gres[langID].dll
-    // Create file name and load the appropriate resource DLL.
-    _sntprintf(g_tcsTemp,MAX_STR,TEXT("gres%x.dll"), wLangId);
-    g_wCurLang = wLangId;
+    // We load this dll from the same dir as the EXE.
 
-    if(NULL == (hRes = LoadLibrary(g_tcsTemp)))
-    {
-        // We didn't find the desired language satellite DLL, lets go with English
-        hRes = LoadLibrary(TEXT("gres409.dll"));
+	TCHAR resdllpath[MAX_PATH]={};
+	GetModuleFileName(NULL, resdllpath, MAX_PATH); // Get EXE path first
+	PathRemoveFileSpec(resdllpath);
+	_sntprintf_s(resdllpath, MAX_PATH, _T("%s\\gres%x.dll"), resdllpath, wLangId);
 
-        // Keep the a copy of our UI language ID (will be handy).
-        g_wCurLang = 409;
-    }
+    hRes = LoadLibrary(resdllpath);
+	if(!hRes)
+	{
+		MessageBox(NULL, resdllpath, L"Resource DLL loading fail!", MB_ICONEXCLAMATION);
+	}
     
      return hRes;
 }
