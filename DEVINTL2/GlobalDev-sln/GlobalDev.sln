@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GlobalDev", "GlobalDev\GlobalDev.vcxproj", "{20220902-0000-0000-0000-000732000001}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD362331-5F85-4F6B-B5F5-72A4EA778CE9} = {AD362331-5F85-4F6B-B5F5-72A4EA778CE9}
+		{CCCCCCCC-0000-0000-0000-202209220001} = {CCCCCCCC-0000-0000-0000-202209220001}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gres409", "gres409\gres409.vcxproj", "{CCCCCCCC-0000-0000-0000-202209220001}"
 EndProject
