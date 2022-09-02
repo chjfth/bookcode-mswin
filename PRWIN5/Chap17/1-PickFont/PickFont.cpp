@@ -4,9 +4,9 @@
 
 VC6 SP6 command-line compile:
 
-cl /c PickFont.cpp ..\..\vaDbg.cpp
+cl /c /D UNICODE /D _UNICODE PickFont.cpp ..\..\vaDbg.cpp
 rc PickFont.rc
-link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32.lib comdlg32.lib
+link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32.lib comdlg32.lib shell32.lib
 
 -----------------------------------------*/
 
@@ -54,6 +54,8 @@ void MySetMapMode (HDC hdc, int iMapMode) ;
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
+	my_parse_cmdparams(g_params, ARRAYSIZE(g_params));
+
 	HWND     hwnd ;
 	MSG      msg ;
 	WNDCLASS wndclass ;
@@ -68,11 +70,6 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1); //(HBRUSH) GetStockObject (WHITE_BRUSH) ;
 	wndclass.lpszMenuName  = szAppName ; 
 	wndclass.lpszClassName = szAppName ;
-
-#ifdef UNICODE
-	if(szCmdLine && szCmdLine[0])
-		MultiByteToWideChar(CP_ACP, 0, szCmdLine, -1, g_params, ARRAYSIZE(g_params));
-#endif
 
 	if (!RegisterClass (&wndclass))
 	{

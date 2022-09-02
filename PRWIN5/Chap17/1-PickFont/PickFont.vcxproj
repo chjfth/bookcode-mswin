@@ -74,6 +74,10 @@
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
     </ClCompile>
+    <BuildLog>
+      <Path>$(IntDir)__$(MSBuildProjectName).build.log</Path>
+    </BuildLog>
+    
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
     <RunCodeAnalysis>true</RunCodeAnalysis>

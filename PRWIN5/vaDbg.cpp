@@ -1,7 +1,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <shellapi.h>
 #include <tchar.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
 
 #include "vaDbg.h"
 
@@ -74,4 +77,75 @@ TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd)
 		st.wHour, st.wMinute, st.wSecond);
 #endif
 	return buf;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+TCHAR *my_parse_cmdparams(TCHAR outbuf[], int outbufchars)
+{
+/* Implicit input: GetCommandLineA()/GetCommandLineW()
+
+	If TCHAR is char (ANSI version), user will get a char array on return.
+	If TCHAR is WCHAR (Unicode version), user will get a WCHAR array on return.
+
+	If user pass more than one parameter, like this:
+
+		EXENAME 41 42 7535 43 44
+
+	Then each parameter will be considered a TCHAR in hex representation, 
+	and user gets 5 TCHARs on return.
+
+	So in ANSI version, user will get sth. equivalent to:
+
+		const char *outbuf = "\x41\x42\x35\x43\x44";
+
+	In Unicode version, user will get sth. equivalent to:
+		
+		const WCHAR *outbuf = "\x0041\x0042\x0043\x0044\x0045";
+
+	If only one parameter is given, like this:
+
+		EXENAME "AB cde"
+
+	The string of "AB cde" (6 TCHARs) will be returned.
+*/
+	TCHAR *T_cmdline = GetCommandLine();
+	WCHAR *W_cmdline = nullptr;
+
+#ifdef UNICODE
+	W_cmdline = T_cmdline;
+#else
+	WCHAR W_buf[1024] = {};
+	W_cmdline = W_buf;
+	MultiByteToWideChar(CP_ACP, 0, T_cmdline, -1, W_buf, ARRAYSIZE(W_buf));		
+#endif
+
+	int argc = 0;
+	WCHAR **argv = CommandLineToArgvW(W_cmdline, &argc);
+	// -- argv[0] is exepath itself.
+
+	if(argc==2)
+	{
+#ifdef UNICODE
+		_tcscpy_s(outbuf, outbufchars, argv[1]);
+#else
+		WideCharToMultiByte(CP_ACP, 0, argv[1], -1, outbuf, outbufchars, NULL, NULL);
+#endif
+		LocalFree(argv);
+		return outbuf;
+	}
+
+	int cycles = min(outbufchars-1, argc-1);
+
+	int i;
+	for(i=1; i<=cycles; i++)
+	{
+		outbuf[i-1] = (TCHAR)wcstoul(argv[i], nullptr, 16);
+	}
+
+	outbuf[cycles] = 0;
+
+	LocalFree(argv);
+
+	return outbuf;
 }
