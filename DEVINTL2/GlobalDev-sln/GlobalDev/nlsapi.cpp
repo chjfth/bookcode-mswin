@@ -430,7 +430,7 @@ int		iboundry;
     __try
     {
         // If strString is not null terminated , this call can cause access violation.
-        iboundry = _tcslen(strString) - 1;
+        iboundry = (int)_tcslen(strString) - 1;
     }
 
     __except(EXCEPTION_EXECUTE_HANDLER)
