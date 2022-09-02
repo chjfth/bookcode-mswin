@@ -70,6 +70,26 @@ BEGIN
                     WS_VSCROLL | WS_TABSTOP
 END
 
+
+
+DLG_GENERAL DIALOG DISCARDABLE  0, 0, 344, 260
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "General"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "User Interface Language:",IDC_STATIC,32,10,279,44
+    COMBOBOX        IDC_LANGUAGES,45,29,186,118,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_PURPOSE,32,85,279,103,ES_MULTILINE | ES_AUTOVSCROLL | 
+                    ES_READONLY | WS_VSCROLL
+    LTEXT           "Created by World-Ready Guides, Microsoft Corporation, Windows Division. Visit us on the web at:",
+                    IDC_STATIC,32,214,221,19
+    LTEXT           "http://www.microsoft.com/globaldev/",IDC_STATIC,32,235,
+                    153,11
+END
+
+
+
 DLG_TEXT DIALOG DISCARDABLE  0, 0, 344, 260
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Text APIs"
@@ -83,6 +103,8 @@ BEGIN
                     BS_MULTILINE
     PUSHBUTTON      "Toggle alignment",IDB_ALIGN,282,79,55,25,BS_MULTILINE
 END
+
+
 
 DLG_LCID DIALOG DISCARDABLE  0, 0, 209, 101
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
@@ -103,21 +125,6 @@ BEGIN
     EDITTEXT        IDC_OEM,111,61,90,12,ES_AUTOHSCROLL | WS_DISABLED
 END
 
-DLG_GENERAL DIALOG DISCARDABLE  0, 0, 344, 260
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "General"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    GROUPBOX        "User Interface Language:",IDC_STATIC,32,10,279,44
-    COMBOBOX        IDC_LANGUAGES,45,29,186,118,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_PURPOSE,32,85,279,103,ES_MULTILINE | ES_AUTOVSCROLL | 
-                    ES_READONLY | WS_VSCROLL
-    LTEXT           "Created by World-Ready Guides, Microsoft Corporation, Windows Division. Visit us on the web at:",
-                    IDC_STATIC,32,214,221,19
-    LTEXT           "http://www.microsoft.com/globaldev/",IDC_STATIC,32,235,
-                    153,11
-END
 
 
 #ifdef APSTUDIO_INVOKED
