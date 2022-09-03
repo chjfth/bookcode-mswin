@@ -109,7 +109,7 @@ void prepare_cmd_params()
 		// Use stock sample-text
 
 		_tcscpy_s(gar_sample_text, ARRAYSIZE(gar_sample_text), szText_stock);
-		g_sample_text_len = _tcslen(gar_sample_text);
+		g_sample_text_len = (int)_tcslen(gar_sample_text);
 
 		_tcscpy_s(g_dlgsamp.literal, ARRAYSIZE(g_dlgsamp.literal), szText_stock);
 
@@ -140,7 +140,7 @@ void prepare_cmd_params()
 			_T("%02X "), // "%02X" so that "<256" WCHAR costs only a width of two 
 			MAKE_TCHAR_UNSIGNED(gar_sample_text[i]));
 
-		int thislen = _tcslen(hexbuf+hexbuf_used);
+		int thislen = (int)_tcslen(hexbuf+hexbuf_used);
 		hexbuf_used += thislen;
 	}
 }
@@ -155,7 +155,7 @@ void reload_sample_text()
 		// g_dlgsamp.literal[] => sample-text
 
 		_tcscpy_s(gar_sample_text, ARRAYSIZE(gar_sample_text), g_dlgsamp.literal);
-		g_sample_text_len = _tcslen(gar_sample_text);
+		g_sample_text_len = (int)_tcslen(gar_sample_text);
 	}
 	else
 	{
