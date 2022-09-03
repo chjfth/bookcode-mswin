@@ -16,6 +16,8 @@ link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32
 #include "..\..\vaDbg.h"
 #include "resource.h"
 
+#define VERSION "2.0"
+
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
 #ifdef UNICODE
@@ -47,7 +49,7 @@ DLGPARAMS ;
 #define RELOAD_SAMPLE_TEXT 5
 
 #define literal_BUFMAX 100
-#define hexform_BUFMAX 500
+#define hexform_BUFMAX (literal_BUFMAX*5)
 
 struct DlgSampleText_st
 {
@@ -203,7 +205,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #else
 	TEXT ("(ANSI) ") 
 #endif
-	TEXT ("PickFont: Create Logical Font (Pass cmdline params to customize text)");
+	TEXT ("PickFont: Create Logical Font - v") TEXT(VERSION);
 
 	hwnd = CreateWindow (szAppName, 
 		wintitle,
@@ -258,11 +260,21 @@ int TextOut_hexdump(HDC hdc, const TCHAR *pText, int Textlen, int xDraw, int yDr
 	}
 
 	SIZE drawsize = {};
+	LOGFONT lf = {};
+	lf.lfHeight = -12;
+	static HFONT s_font = CreateFontIndirect(&lf);
+
+	HFONT prevfont = SelectFont(hdc, s_font);
+	COLORREF prevcolor = SetTextColor(hdc, RGB(128, 128, 128));
+	
+	TextOut(hdc, xDraw, yDraw, szHexdmp, usedlen);
 	BOOL succ = GetTextExtentPoint32(hdc, szHexdmp, usedlen, &drawsize);
 
-	TextOut(hdc, xDraw, yDraw, szHexdmp, usedlen);
+	// restore DC attr
+	SelectFont(hdc, prevfont);
+	SetTextColor(hdc, prevcolor); 
 
-	return drawsize.cy;
+	return succ ? drawsize.cy : 32; // 32 is arbitrary
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
