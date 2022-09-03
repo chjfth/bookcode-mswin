@@ -81,12 +81,14 @@ TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd)
 
 //////////////////////////////////////////////////////////////////////////
 
-TCHAR *my_parse_cmdparams(TCHAR outbuf[], int outbufchars)
+TCHAR *parse_cmdparam_TCHARs(TCHAR outbuf[], int outbuflen, int *p_retlen)
 {
 /* Implicit input: GetCommandLineA()/GetCommandLineW()
 
-	If TCHAR is char (ANSI version), user will get a char array on return.
-	If TCHAR is WCHAR (Unicode version), user will get a WCHAR array on return.
+	If TCHAR is char (ANSI version), outbuf[] will be a char array.
+	If TCHAR is WCHAR (Unicode version), outbuf[] will be a WCHAR array.
+
+	Actual output TCHAR count will be returned in *p_retlen.
 
 	If user pass more than one parameter, like this:
 
@@ -126,16 +128,21 @@ TCHAR *my_parse_cmdparams(TCHAR outbuf[], int outbufchars)
 
 	if(argc==2)
 	{
+		// non-hex form
 #ifdef UNICODE
-		_tcscpy_s(outbuf, outbufchars, argv[1]);
+		_tcscpy_s(outbuf, outbuflen, argv[1]);
+		int retlen = wcslen(argv[1]);
 #else
-		WideCharToMultiByte(CP_ACP, 0, argv[1], -1, outbuf, outbufchars, NULL, NULL);
+		int retlen = WideCharToMultiByte(CP_ACP, 0, argv[1], -1, outbuf, outbuflen, NULL, NULL);
 #endif
+		if(p_retlen)
+			*p_retlen = retlen;
+
 		LocalFree(argv);
 		return outbuf;
 	}
 
-	int cycles = min(outbufchars-1, argc-1);
+	int cycles = min(outbuflen-1, argc-1);
 
 	int i;
 	for(i=1; i<=cycles; i++)
@@ -143,9 +150,12 @@ TCHAR *my_parse_cmdparams(TCHAR outbuf[], int outbufchars)
 		outbuf[i-1] = (TCHAR)wcstoul(argv[i], nullptr, 16);
 	}
 
+	// To make it caller friendly, we always append a NULL char, but don't count it.
 	outbuf[cycles] = 0;
 
-	LocalFree(argv);
+	if(p_retlen)
+		*p_retlen = cycles;
 
+	LocalFree(argv);
 	return outbuf;
 }

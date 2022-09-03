@@ -40,7 +40,9 @@ DLGPARAMS ;
 HWND  g_hdlg ;
 TCHAR szAppName[] = TEXT ("PickFont") ;
 
-TCHAR g_params[100] = {0};
+TCHAR g_sample_text[100] = {0};
+int g_sample_text_len = 0; // in TCHARs
+
 int g_refreshcount = 0;
 
 // Forward declarations of functions
@@ -54,7 +56,7 @@ void MySetMapMode (HDC hdc, int iMapMode) ;
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
-	my_parse_cmdparams(g_params, ARRAYSIZE(g_params));
+	parse_cmdparam_TCHARs(g_sample_text, ARRAYSIZE(g_sample_text), &g_sample_text_len);
 
 	HWND     hwnd ;
 	MSG      msg ;
@@ -136,13 +138,17 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		TEXT ("\x7535\x8111\x771F\x6709\x8DA3") // chj: meaningful Chinese text
 #endif
 		;
-	const TCHAR *pszText = szText;
+	const TCHAR *pText = szText;
+	int Textlen = ARRAYSIZE(szText)-1;
 	HDC              hdc ;
 	PAINTSTRUCT      ps ;
 	RECT             rect ;
 
-	if(g_params[0])
-		pszText = g_params;
+	if(g_sample_text[0])
+	{
+		pText = g_sample_text;
+		Textlen = g_sample_text_len;
+	}
 
 	switch (message)
 	{{
@@ -200,11 +206,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		SelectObject (hdc, CreateFontIndirect (&dp.lf)) ;
 
-		int textlen = lstrlen(pszText);
-		TextOut (hdc, rect.left, rect.bottom, pszText, lstrlen (pszText)) ;
+		TextOut (hdc, rect.left, rect.bottom, pText, Textlen) ;
 
 		SIZE rsize = {0};
-		BOOL succ = GetTextExtentPoint32(hdc, pszText, textlen, &rsize);
+		BOOL succ = GetTextExtentPoint32(hdc, pText, Textlen, &rsize);
 		vaDbg(TEXT("PickFont text dimension: %dx%d"), rsize.cx, rsize.cy);
 
 		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT))) ;
