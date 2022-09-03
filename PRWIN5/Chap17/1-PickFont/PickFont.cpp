@@ -11,6 +11,7 @@ link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32
 -----------------------------------------*/
 
 #include <windows.h>
+#include <windowsx.h>
 #include <stdio.h>
 #include "..\..\vaDbg.h"
 #include "resource.h"
@@ -28,6 +29,16 @@ typedef struct
 }
 DLGPARAMS ;
 
+#define literal_BUFMAX 100
+#define hexform_BUFMAX 500
+
+struct DlgSampleText_st
+{
+	bool usehex;
+	TCHAR literal[literal_BUFMAX];
+	TCHAR hexform[hexform_BUFMAX];
+};
+
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
 #ifdef UNICODE
@@ -44,7 +55,11 @@ TCHAR szAppName[] = TEXT ("PickFont") ;
 TCHAR g_sample_text[100] = {0};
 int g_sample_text_len = 0; // in TCHARs
 
+DlgSampleText_st g_dlgsamp = {};
+
 int g_refreshcount = 0;
+
+HINSTANCE g_hInstanceExe = NULL;
 
 // Forward declarations of functions
 
@@ -58,6 +73,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
 	parse_cmdparam_TCHARs(g_sample_text, ARRAYSIZE(g_sample_text), &g_sample_text_len);
+
+	g_hInstanceExe = hInstance;
 
 	HWND     hwnd ;
 	MSG      msg ;
@@ -268,6 +285,73 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	}}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
+}
+
+void DlgRefresh_ChangeSampleText(HWND hdlg, bool usehex)
+{
+	if(usehex)
+	{
+		CheckDlgButton(hdlg, IDC_RADIO_USE_HEXFORM, TRUE);
+		Edit_Enable(GetDlgItem(hdlg, IDC_EDIT_HEXFORM), TRUE);
+		Edit_Enable(GetDlgItem(hdlg, IDC_EDIT_LITERAL), FALSE);
+	}
+	else
+	{
+		CheckDlgButton(hdlg, IDC_RADIO_USE_LITERAL, TRUE);
+		Edit_Enable(GetDlgItem(hdlg, IDC_EDIT_LITERAL), TRUE);
+		Edit_Enable(GetDlgItem(hdlg, IDC_EDIT_HEXFORM), FALSE);
+	}
+}
+
+INT_PTR CALLBACK DlgProc_ChangeSampleText(HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	static bool s_usehex = false;
+
+	switch (message)
+	{{
+	case WM_INITDIALOG:
+	{
+		SetDlgItemText(hdlg, IDC_EDIT_HEXFORM, g_dlgsamp.hexform);
+		SetDlgItemText(hdlg, IDC_EDIT_LITERAL, g_dlgsamp.literal);
+		s_usehex = g_dlgsamp.usehex;
+
+		DlgRefresh_ChangeSampleText(hdlg, s_usehex);
+		return TRUE;
+	}
+	case WM_COMMAND:
+	{
+		int id = GET_WM_COMMAND_ID(wParam, lParam);
+		HWND hctrl = GET_WM_COMMAND_HWND(wParam, lParam);
+
+		if(id==IDC_RADIO_USE_HEXFORM || id==IDC_RADIO_USE_LITERAL)
+		{
+			s_usehex = (id==IDC_RADIO_USE_HEXFORM);
+			DlgRefresh_ChangeSampleText(hdlg, s_usehex);
+		}
+
+		if(id==IDOK)
+		{
+			GetDlgItemText(hdlg, IDC_EDIT_HEXFORM, g_dlgsamp.hexform, ARRAYSIZE(g_dlgsamp.hexform));
+			GetDlgItemText(hdlg, IDC_EDIT_LITERAL, g_dlgsamp.literal, ARRAYSIZE(g_dlgsamp.literal));				
+
+			g_dlgsamp.usehex = s_usehex;
+
+			// todo
+
+			EndDialog(hdlg, 0);
+		}
+		
+		if(id==IDCANCEL)
+		{
+			EndDialog(hdlg, 0);
+		}
+
+		return TRUE;
+	}
+//		SetDlgItemText(); // xxx
+	}}
+
+	return FALSE;
 }
 
 INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -501,6 +585,12 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			SetFieldsFromTextMetric (hdlg, pdp) ;
 			InvalidateRect (GetParent (hdlg), NULL, TRUE) ;
 			return TRUE ;
+
+		case IDC_BTN_CHANGE_SAMPLE_TEXT:
+			DialogBox(g_hInstanceExe, MAKEINTRESOURCE(IDD_CHANGE_SAMPLE_TEXT), hdlg, 
+				DlgProc_ChangeSampleText);
+			return 0;
+
 		} // switch WM_COMMAND done
 		break ;
 	}}

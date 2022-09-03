@@ -2,7 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by PickFont.rc
 //
-#define IDD_DIALOG1                     103
+#define IDD_CHANGE_SAMPLE_TEXT          103
 #define IDC_LF_HEIGHT                   1000
 #define IDC_LF_WIDTH                    1001
 #define IDC_LF_ESCAPE                   1002
@@ -70,6 +70,14 @@
 #define IDC_TM_CHARSET                  1064
 #define IDC_TM_FACENAME                 1065
 #define IDC_REFRESH_COUNT               1066
+#define IDC_EDIT_SAMPLE_TEXT            1067
+#define IDC_EDIT_HEXFORM                1067
+#define IDC_HELPTEXT                    1068
+#define IDC_BTN_CHANGE_SAMPLE_TEXT      1069
+#define IDC_EDIT_SAMPLE_TEXT2           1069
+#define IDC_EDIT_LITERAL                1069
+#define IDC_RADIO_USE_LITERAL           1070
+#define IDC_RADIO_USE_HEXFORM           1071
 #define IDM_DEVICE_SCREEN               40001
 #define IDM_DEVICE_PRINTER              40002
 
@@ -79,7 +87,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        104
 #define _APS_NEXT_COMMAND_VALUE         40003
-#define _APS_NEXT_CONTROL_VALUE         1067
+#define _APS_NEXT_CONTROL_VALUE         1071
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
