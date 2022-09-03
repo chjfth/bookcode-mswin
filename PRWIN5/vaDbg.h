@@ -12,6 +12,9 @@ TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false);
 void chSETWINDOWICON(HWND hwnd, const TCHAR *icon_resname);
 
 
-TCHAR *parse_cmdparam_TCHARs(TCHAR outbuf[], int outbuflen, int *p_retlen=nullptr);
+TCHAR *parse_cmdparam_TCHARs(
+	const TCHAR *T_cmdline, bool single_param_as_literal,
+	TCHAR outbuf[], int outbuflen, int *p_retlen,
+	TCHAR out_szliteral[], int out_szliteral_buflen);
 
 #endif

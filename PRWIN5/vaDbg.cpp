@@ -91,9 +91,12 @@ void chSETWINDOWICON(HWND hwnd, const TCHAR *icon_resname) {
 
 //////////////////////////////////////////////////////////////////////////
 
-TCHAR *parse_cmdparam_TCHARs(TCHAR outbuf[], int outbuflen, int *p_retlen)
+TCHAR *parse_cmdparam_TCHARs(
+	const TCHAR *T_cmdline, bool single_param_as_literal,
+	TCHAR outbuf[], int outbuflen, int *p_retlen,
+	TCHAR out_szliteral[], int out_szliteral_buflen)
 {
-/* Implicit input: GetCommandLineA()/GetCommandLineW()
+/*  T_cmdline should points to string from GetCommandLineA()/GetCommandLineW().
 
 	If TCHAR is char (ANSI version), outbuf[] will be a char array.
 	If TCHAR is WCHAR (Unicode version), outbuf[] will be a WCHAR array.
@@ -121,8 +124,11 @@ TCHAR *parse_cmdparam_TCHARs(TCHAR outbuf[], int outbuflen, int *p_retlen)
 
 	The string of "AB cde" (6 TCHARs) will be returned.
 */
-	TCHAR *T_cmdline = GetCommandLine();
-	WCHAR *W_cmdline = nullptr;
+	//const TCHAR *T_cmdline = GetCommandLine();
+	const WCHAR *W_cmdline = nullptr;
+
+	if(out_szliteral)
+		out_szliteral[0] = '\0';
 
 #ifdef UNICODE
 	W_cmdline = T_cmdline;
@@ -136,9 +142,9 @@ TCHAR *parse_cmdparam_TCHARs(TCHAR outbuf[], int outbuflen, int *p_retlen)
 	WCHAR **argv = CommandLineToArgvW(W_cmdline, &argc);
 	// -- argv[0] is exepath itself.
 
-	if(argc==2)
+	if(single_param_as_literal && argc==2)
 	{
-		// non-hex form
+		// not hexform
 #ifdef UNICODE
 		_tcscpy_s(outbuf, outbuflen, argv[1]);
 		int retlen = wcslen(argv[1]);
@@ -147,6 +153,9 @@ TCHAR *parse_cmdparam_TCHARs(TCHAR outbuf[], int outbuflen, int *p_retlen)
 #endif
 		if(p_retlen)
 			*p_retlen = retlen;
+
+		if(out_szliteral)
+			_tcscpy_s(out_szliteral, out_szliteral_buflen, outbuf);
 
 		LocalFree(argv);
 		return outbuf;

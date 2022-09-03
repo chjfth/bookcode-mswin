@@ -16,6 +16,21 @@ link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32
 #include "..\..\vaDbg.h"
 #include "resource.h"
 
+// Formatting for BCHAR fields of TEXTMETRIC structure
+
+#ifdef UNICODE
+#define BCHARFORM TEXT ("0x%04X")
+#else
+#define BCHARFORM TEXT ("0x%02X")
+#endif
+
+#ifdef UNICODE
+#define MAKE_TCHAR_UNSIGNED(c) (c)
+#else
+#define MAKE_TCHAR_UNSIGNED(c) ((unsigned char)(c))
+#endif
+
+
 // Structure shared between main window and dialog box
 
 typedef struct
@@ -29,30 +44,24 @@ typedef struct
 }
 DLGPARAMS ;
 
+#define RELOAD_SAMPLE_TEXT 5
+
 #define literal_BUFMAX 100
 #define hexform_BUFMAX 500
 
 struct DlgSampleText_st
 {
 	bool usehex;
-	TCHAR literal[literal_BUFMAX];
-	TCHAR hexform[hexform_BUFMAX];
+	TCHAR literal[literal_BUFMAX+1];
+	TCHAR hexform[hexform_BUFMAX+1];
 };
-
-// Formatting for BCHAR fields of TEXTMETRIC structure
-
-#ifdef UNICODE
-#define BCHARFORM TEXT ("0x%04X")
-#else
-#define BCHARFORM TEXT ("0x%02X")
-#endif
 
 // Global variables
 
 HWND  g_hdlg ;
 TCHAR szAppName[] = TEXT ("PickFont") ;
 
-TCHAR g_sample_text[100] = {0};
+TCHAR gar_sample_text[literal_BUFMAX+1] = {};
 int g_sample_text_len = 0; // in TCHARs
 
 DlgSampleText_st g_dlgsamp = {};
@@ -69,10 +78,100 @@ void SetLogFontFromFields    (HWND hdlg, DLGPARAMS * pdp) ;
 void SetFieldsFromTextMetric (HWND hdlg, DLGPARAMS * pdp) ;
 void MySetMapMode (HDC hdc, int iMapMode) ;
 
+void prepare_cmd_params()
+{
+	static TCHAR  szText_stock[] = TEXT ("\x41\x42\x43\x44\x45 ")
+		TEXT ("\x61\x62\x63\x64\x65 ")
+
+		TEXT ("\xC0\xC1\xC2\xC3\xC4\xC5 ")
+		TEXT ("\xE0\xE1\xE2\xE3\xE4\xE5 ") 
+#ifdef UNICODE
+		TEXT ("\x0390\x0391\x0392\x0393\x0394\x0395 ")
+		TEXT ("\x03B0\x03B1\x03B2\x03B3\x03B4\x03B5 ")
+
+		TEXT ("\x0410\x0411\x0412\x0413\x0414\x0415 ")
+		TEXT ("\x0430\x0431\x0432\x0433\x0434\x0435 ")
+
+		TEXT ("\x7535\x8111\x771F\x6709\x8DA3") // chj: meaningful Chinese text
+#endif
+		;
+
+	parse_cmdparam_TCHARs(
+		GetCommandLine(), true,
+		gar_sample_text, ARRAYSIZE(gar_sample_text), &g_sample_text_len,
+		g_dlgsamp.literal, ARRAYSIZE(g_dlgsamp.literal)
+		);
+
+	if(gar_sample_text[0]=='\0')
+	{
+		// Use stock sample-text
+
+		_tcscpy_s(gar_sample_text, ARRAYSIZE(gar_sample_text), szText_stock);
+		g_sample_text_len = _tcslen(gar_sample_text);
+
+		_tcscpy_s(g_dlgsamp.literal, ARRAYSIZE(g_dlgsamp.literal), szText_stock);
+
+		g_dlgsamp.usehex = false;
+	}
+	else
+	{
+		if(g_dlgsamp.literal[0])
+			g_dlgsamp.usehex = false;
+		else
+			g_dlgsamp.usehex = true;
+	}
+
+
+	// Make a hexdump of g_sample_text[] into g_dlg.samp.hexform[], so that user can later edit it.
+
+	TCHAR *hexbuf = g_dlgsamp.hexform;
+	const int hexbuf_maxlen = ARRAYSIZE(g_dlgsamp.hexform);
+
+	int hexbuf_used = 0;
+	int i;
+	for(i=0; i<g_sample_text_len; i++)
+	{
+		if(hexbuf_used >= hexbuf_maxlen-1)
+			break;
+
+		_sntprintf_s(hexbuf+hexbuf_used, hexbuf_maxlen-1-hexbuf_used, _TRUNCATE,
+			_T("%02X "), // "%02X" so that "<256" WCHAR costs only a width of two 
+			MAKE_TCHAR_UNSIGNED(gar_sample_text[i]));
+
+		int thislen = _tcslen(hexbuf+hexbuf_used);
+		hexbuf_used += thislen;
+	}
+}
+
+void reload_sample_text()
+{
+	// Input: g_dlgsamp
+	// Output gar_sample_text[], g_sample_text_len
+
+	if(!g_dlgsamp.usehex)
+	{
+		// g_dlgsamp.literal[] => sample-text
+
+		_tcscpy_s(gar_sample_text, ARRAYSIZE(gar_sample_text), g_dlgsamp.literal);
+		g_sample_text_len = _tcslen(gar_sample_text);
+	}
+	else
+	{
+		// g_dlgsamp.hexform[] => sample-text
+
+		TCHAR cmdline[10+hexform_BUFMAX]={};
+		_sntprintf_s(cmdline, _TRUNCATE, _T("EXENAME %s"), g_dlgsamp.hexform);
+
+		parse_cmdparam_TCHARs(cmdline, false,
+			gar_sample_text, ARRAYSIZE(gar_sample_text), &g_sample_text_len,
+			NULL, 0);
+	}
+}
+
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
-	parse_cmdparam_TCHARs(g_sample_text, ARRAYSIZE(g_sample_text), &g_sample_text_len);
+	prepare_cmd_params();
 
 	g_hInstanceExe = hInstance;
 
@@ -142,12 +241,7 @@ void Set_WindowSizeByClientSize(HWND hwnd, int clicx, int clicy)
 
 int TextOut_hexdump(HDC hdc, const TCHAR *pText, int Textlen, int xDraw, int yDraw)
 {
-#ifdef UNICODE
-#define MAKE_ME_UNSIGNED(c) (c)
-#else
-#define MAKE_ME_UNSIGNED(c) ((unsigned char)(c))
-#endif
-	const int BUFSIZE_Hexdump = ARRAYSIZE(g_sample_text)*(sizeof(TCHAR)*2+1);
+	const int BUFSIZE_Hexdump = ARRAYSIZE(gar_sample_text)*(sizeof(TCHAR)*2+1);
 	TCHAR szHexdmp[BUFSIZE_Hexdump+1]={};
 	
 	const int steplen = sizeof(TCHAR)*2+1; //  +1 for the "." separator
@@ -160,7 +254,7 @@ int TextOut_hexdump(HDC hdc, const TCHAR *pText, int Textlen, int xDraw, int yDr
 
 		_sntprintf_s(szHexdmp+usedlen, BUFSIZE_Hexdump-usedlen, _TRUNCATE,
 			sizeof(TCHAR)==2 ? _T("%04X.") : _T("%02X."),
-			MAKE_ME_UNSIGNED(pText[i]));
+			MAKE_TCHAR_UNSIGNED(pText[i]));
 	}
 
 	SIZE drawsize = {};
@@ -174,32 +268,11 @@ int TextOut_hexdump(HDC hdc, const TCHAR *pText, int Textlen, int xDraw, int yDr
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static DLGPARAMS dp ;
-	static TCHAR     szText[] = TEXT ("\x41\x42\x43\x44\x45 ")
-		TEXT ("\x61\x62\x63\x64\x65 ")
-
-		TEXT ("\xC0\xC1\xC2\xC3\xC4\xC5 ")
-		TEXT ("\xE0\xE1\xE2\xE3\xE4\xE5 ") 
-#ifdef UNICODE
-		TEXT ("\x0390\x0391\x0392\x0393\x0394\x0395 ")
-		TEXT ("\x03B0\x03B1\x03B2\x03B3\x03B4\x03B5 ")
-
-		TEXT ("\x0410\x0411\x0412\x0413\x0414\x0415 ")
-		TEXT ("\x0430\x0431\x0432\x0433\x0434\x0435 ")
-
-		TEXT ("\x7535\x8111\x771F\x6709\x8DA3") // chj: meaningful Chinese text
-#endif
-		;
-	const TCHAR *pText = szText;
-	int Textlen = ARRAYSIZE(szText)-1;
+	const TCHAR *pText = gar_sample_text;
+	int Textlen = g_sample_text_len;;
 	HDC              hdc ;
 	PAINTSTRUCT      ps ;
 	RECT             rect ;
-
-	if(g_sample_text[0])
-	{
-		pText = g_sample_text;
-		Textlen = g_sample_text_len;
-	}
 
 	switch (message)
 	{{
@@ -282,7 +355,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{	PostQuitMessage (0) ;
 		return 0 ;
 	}
-
 	}}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
@@ -306,11 +378,18 @@ void DlgRefresh_ChangeSampleText(HWND hdlg, bool usehex)
 INT_PTR CALLBACK DlgProc_ChangeSampleText(HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static bool s_usehex = false;
+	static const TCHAR *s_helptext=
+		_T("Hint: You can pass in sample-text from command line.\r\n")
+		_T("If only one parameter is given to the command-line, typically wrapped with a double-quotes, it is considered literal.\r\n")
+		_T("If more than one parameters are given, each one is in hexform represent a TCHAR.")
+		;
 
 	switch (message)
 	{{
 	case WM_INITDIALOG:
 	{
+		SetDlgItemText(hdlg, IDC_HELPTEXT, s_helptext);
+
 		SetDlgItemText(hdlg, IDC_EDIT_HEXFORM, g_dlgsamp.hexform);
 		SetDlgItemText(hdlg, IDC_EDIT_LITERAL, g_dlgsamp.literal);
 		s_usehex = g_dlgsamp.usehex;
@@ -336,19 +415,29 @@ INT_PTR CALLBACK DlgProc_ChangeSampleText(HWND hdlg, UINT message, WPARAM wParam
 
 			g_dlgsamp.usehex = s_usehex;
 
-			// todo
+			if(s_usehex && !g_dlgsamp.hexform[0])
+			{
+				MessageBox(hdlg, _T("Hexform editbox is empty!"), _T("Input Error"), MB_ICONEXCLAMATION);
+				return TRUE;
+			}
+			if(!s_usehex && !g_dlgsamp.literal[0])
+			{
+				MessageBox(hdlg, _T("Literal editbox is empty!"), _T("Input Error"), MB_ICONEXCLAMATION);
+				return TRUE;
+			}
 
-			EndDialog(hdlg, 0);
+			reload_sample_text();
+
+			EndDialog(hdlg, RELOAD_SAMPLE_TEXT);
 		}
 		
 		if(id==IDCANCEL)
 		{
-			EndDialog(hdlg, 0);
+			EndDialog(hdlg, 3);
 		}
 
 		return TRUE;
-	}
-//		SetDlgItemText(); // xxx
+	} // WM_COMMAND
 	}}
 
 	return FALSE;
@@ -587,12 +676,30 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			return TRUE ;
 
 		case IDC_BTN_CHANGE_SAMPLE_TEXT:
-			DialogBox(g_hInstanceExe, MAKEINTRESOURCE(IDD_CHANGE_SAMPLE_TEXT), hdlg, 
-				DlgProc_ChangeSampleText);
-			return 0;
+			{
+				INT_PTR ret = DialogBox(g_hInstanceExe, MAKEINTRESOURCE(IDD_CHANGE_SAMPLE_TEXT), hdlg, 
+					DlgProc_ChangeSampleText);
 
-		} // switch WM_COMMAND done
+				if(ret==RELOAD_SAMPLE_TEXT)
+				{
+					SendMessage (hdlg, WM_COMMAND, IDOK, 0) ;
+				}
+				return 0;
+			}
+
+		} // WM_COMMAND.switch done
 		break ;
+
+	case WM_KEYUP:
+	{
+		// I can NOT get here, why?
+		if(VK_F1==wParam)
+		{	
+			SendMessage (hdlg, WM_COMMAND, IDOK, 0) ;
+			return 0;
+		}
+	}
+
 	}}
 	return FALSE ;
 }
