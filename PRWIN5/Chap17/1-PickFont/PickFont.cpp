@@ -11,6 +11,7 @@ link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32
 -----------------------------------------*/
 
 #include <windows.h>
+#include <stdio.h>
 #include "..\..\vaDbg.h"
 #include "resource.h"
 
@@ -122,6 +123,37 @@ void Set_WindowSizeByClientSize(HWND hwnd, int clicx, int clicy)
 	MoveWindow(hwnd, rowin.left, rowin.top, clicx+nccx, clicy+nccy, TRUE);
 }
 
+int TextOut_hexdump(HDC hdc, const TCHAR *pText, int Textlen, int xDraw, int yDraw)
+{
+#ifdef UNICODE
+#define MAKE_ME_UNSIGNED(c) (c)
+#else
+#define MAKE_ME_UNSIGNED(c) ((unsigned char)(c))
+#endif
+	const int BUFSIZE_Hexdump = ARRAYSIZE(g_sample_text)*(sizeof(TCHAR)*2+1);
+	TCHAR szHexdmp[BUFSIZE_Hexdump+1]={};
+	
+	const int steplen = sizeof(TCHAR)*2+1; //  +1 for the "." separator
+	int usedlen = 0;
+	int i;
+	for(i=0; i<Textlen; i++, usedlen = steplen*i)
+	{
+		if(usedlen>=BUFSIZE_Hexdump)
+			break;
+
+		_sntprintf_s(szHexdmp+usedlen, BUFSIZE_Hexdump-usedlen, _TRUNCATE,
+			sizeof(TCHAR)==2 ? _T("%04X.") : _T("%02X."),
+			MAKE_ME_UNSIGNED(pText[i]));
+	}
+
+	SIZE drawsize = {};
+	BOOL succ = GetTextExtentPoint32(hdc, szHexdmp, usedlen, &drawsize);
+
+	TextOut(hdc, xDraw, yDraw, szHexdmp, usedlen);
+
+	return drawsize.cy;
+}
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static DLGPARAMS dp ;
@@ -204,11 +236,16 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		rect.bottom += 1 ;
 		DPtoLP (hdc, (PPOINT) &rect, 2) ;
 
+		int xText = rect.left;
+		int yText = rect.bottom;
+
 		// Create and select the font; display the text
 
 		SelectObject (hdc, CreateFontIndirect (&dp.lf)) ;
 
-		TextOut (hdc, rect.left, rect.bottom, pText, Textlen) ;
+		int hexdump_height = TextOut_hexdump(hdc, pText, Textlen, xText, yText);
+
+		TextOut (hdc, xText, yText+hexdump_height, pText, Textlen) ;
 
 		SIZE rsize = {0};
 		BOOL succ = GetTextExtentPoint32(hdc, pText, Textlen, &rsize);
