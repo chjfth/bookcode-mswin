@@ -2,9 +2,9 @@
    PICKFONT.C -- Create Logical Font
                  (c) Charles Petzold, 1998
 
-VC6 SP6 command-line compile:
+VC6 SP6 command-line compile, for ANSI version:
 
-cl /c /D UNICODE /D _UNICODE PickFont.cpp ..\..\vaDbg.cpp
+cl /c PickFont.cpp ..\..\vaDbg.cpp
 rc PickFont.rc
 link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32.lib comdlg32.lib shell32.lib
 
