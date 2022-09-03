@@ -95,6 +95,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL) ;
 
+	chSETWINDOWICON(hwnd, _T("MYPROGRAM"));
+
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
 

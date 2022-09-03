@@ -79,6 +79,16 @@ TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd)
 	return buf;
 }
 
+// Sets the dialog box icons
+void chSETWINDOWICON(HWND hwnd, const TCHAR *icon_resname) {
+	SendMessage(hwnd, WM_SETICON, TRUE,  (LPARAM)
+		LoadIcon((HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE), icon_resname)
+		);
+	SendMessage(hwnd, WM_SETICON, FALSE, (LPARAM)
+		LoadIcon((HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE), icon_resname)
+		);
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 TCHAR *parse_cmdparam_TCHARs(TCHAR outbuf[], int outbuflen, int *p_retlen)
@@ -159,3 +169,4 @@ TCHAR *parse_cmdparam_TCHARs(TCHAR outbuf[], int outbuflen, int *p_retlen)
 	LocalFree(argv);
 	return outbuf;
 }
+

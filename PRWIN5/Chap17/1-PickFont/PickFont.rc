@@ -241,6 +241,10 @@ END
 // Generated from the TEXTINCLUDE 3 resource.
 //
 
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+MYPROGRAM                ICON                    "PickFont.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
