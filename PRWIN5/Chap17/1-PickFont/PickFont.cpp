@@ -1,13 +1,9 @@
 /*-----------------------------------------
-   PICKFONT.C -- Create Logical Font
-                 (c) Charles Petzold, 1998
+PICKFONT.C -- Create Logical Font
+       (c) Charles Petzold, 1998
 
-VC6 SP6 command-line compile, for ANSI version:
-
-cl /c PickFont.cpp ..\..\vaDbg.cpp
-rc PickFont.rc
-link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32.lib comdlg32.lib shell32.lib
-
+Updated by Jimm Chen.
+[2022-09-04] v2.0, can be compiled with VC2010, not supporting VC6 any more.
 -----------------------------------------*/
 
 #include <windows.h>
@@ -63,10 +59,10 @@ struct DlgSampleText_st
 HWND  g_hdlg ;
 TCHAR szAppName[] = TEXT ("PickFont") ;
 
-TCHAR gar_sample_text[literal_BUFMAX+1] = {};
+TCHAR gar_sample_text[literal_BUFMAX+1] = {0};
 int g_sample_text_len = 0; // in TCHARs
 
-DlgSampleText_st g_dlgsamp = {};
+DlgSampleText_st g_dlgsamp = {0};
 
 int g_refreshcount = 0;
 
