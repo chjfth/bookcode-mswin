@@ -89,6 +89,20 @@ void chSETWINDOWICON(HWND hwnd, const TCHAR *icon_resname) {
 		);
 }
 
+int vaMsgBox(HWND hwnd, UINT utype, const TCHAR *szTitle, const TCHAR *szfmt, ...)
+{
+	va_list args;
+	va_start(args, szfmt);
+
+	TCHAR msgtext[800] = {};
+	_vsntprintf_s(msgtext, _TRUNCATE, szfmt, args);
+
+	int ret = MessageBox(hwnd, msgtext, szTitle, utype);
+
+	va_end(args);
+	return ret;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 TCHAR *parse_cmdparam_TCHARs(

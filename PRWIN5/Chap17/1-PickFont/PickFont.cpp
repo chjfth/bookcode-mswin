@@ -12,7 +12,9 @@ Updated by Jimm Chen.
 #include "..\..\vaDbg.h"
 #include "resource.h"
 
-#define VERSION "2.0"
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
+#define VERSION "2.1"
 
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
@@ -343,8 +345,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		int hexdump_height = TextOut_hexdump(hdc, pText, Textlen, xText, yText);
 
+		// Display our sample-text
 		TextOut (hdc, xText, yText+hexdump_height, pText, Textlen) ;
 
+		// Write some debug info
+		//
 		SIZE rsize = {0};
 		BOOL succ = GetTextExtentPoint32(hdc, pText, Textlen, &rsize);
 		vaDbg(TEXT("PickFont text dimension: %dx%d"), rsize.cx, rsize.cy);
@@ -492,7 +497,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_COMMAND:
 		switch (LOWORD (wParam))
-		{
+		{{
 		case IDC_CHARSET_HELP:
 			MessageBox (hdlg, 
 				TEXT ("0 = ANSI or West European\n")
@@ -640,6 +645,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			// -----------------
 
 		case IDOK:
+		{
 			// Get LOGFONT structure
 
 			SetLogFontFromFields (hdlg, pdp) ;
@@ -680,6 +686,33 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 			GetTextMetrics (hdcDevice, &pdp->tm) ;
 			GetTextFace (hdcDevice, LF_FULLFACESIZE, pdp->szFaceName) ;
+			
+			// acquire some debug-info >>>
+
+			FONTSIGNATURE fontsig = {}; 
+			int charset2 = GetTextCharsetInfo(hdcDevice, &fontsig, 0);
+			if(fontsig.fsUsb[0]==0)
+			{
+				CHARSETINFO csi = {};
+				BOOL succ = TranslateCharsetInfo((DWORD*)(pdp->lf.lfCharSet), &csi, TCI_SRCCHARSET);
+				vaDbg(TEXT("Used TranslateCharsetInfo(TCI_SRCCHARSET) for fontface \"%s\", return %d."), pdp->szFaceName, succ);
+			}
+
+			if(charset2==pdp->tm.tmCharSet)
+			{
+				vaDbg(TEXT("GetTextCharsetInfo() returns CharSet=%d (match tm.tmCharSet)"), charset2);
+			}
+			else
+			{
+				vaMsgBox(hdlg, MB_ICONEXCLAMATION, TEXT("UNEXPECT!"),
+					TEXT("GetTextCharsetInfo() returns CharSet=%d.\r\n")
+					TEXT("Does NOT match tm.tmCharSet=%d.\r\n")
+					,
+					charset2, pdp->tm.tmCharSet);
+			}			
+
+			// acquire some debug-info <<<
+
 			DeleteDC (hdcDevice) ;
 			DeleteObject (hFont) ;
 
@@ -688,7 +721,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			SetFieldsFromTextMetric (hdlg, pdp) ;
 			InvalidateRect (GetParent (hdlg), NULL, TRUE) ;
 			return TRUE ;
-
+		} // WM_COMMAND.ID_OK
 		case IDC_BTN_CHANGE_SAMPLE_TEXT:
 			{
 				INT_PTR ret = DialogBox(g_hInstanceExe, MAKEINTRESOURCE(IDD_CHANGE_SAMPLE_TEXT), hdlg, 
@@ -701,7 +734,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0;
 			}
 
-		} // WM_COMMAND.switch done
+		}} // WM_COMMAND.switch done
 		break ;
 
 	case WM_KEYUP:
