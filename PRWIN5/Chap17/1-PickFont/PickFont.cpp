@@ -504,35 +504,22 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD (wParam))
 		{{
 		case IDC_CHARSET_HELP:
-			MessageBox (hdlg, 
-				TEXT ("0 = ANSI or West European\n")
-				TEXT ("1 = Default\n")
-				TEXT ("2 = Symbol\n")
-				TEXT ("128 = Shift-JIS (Japanese)\n")
-				TEXT ("129 = Hangul (Korean)\n")
-				TEXT ("130 = Johab (Korean, obsolete)\n")
-				TEXT ("134 = GB2312 - GBK (Simplified Chinese)\n")
-				TEXT ("136 = Big5 (Traditional Chinese)\n")
-				TEXT ("177 = Hebrew\n")
-				TEXT ("178 = Arabic\n")
-				TEXT ("161 = Greek\n")
-				TEXT ("162 = Turkish\n")
-				TEXT ("163 = Vietnamese\n")
-				TEXT ("204 = Russian\n")
-				TEXT ("222 = Thai\n")
-				TEXT ("238 = East European\n")
-				TEXT ("255 = OEM\n")
-				TEXT ("\n")
+		{
+			TCHAR info_charsets[1024]={};
+			vaMsgBox(hdlg, MB_ICONINFORMATION, TEXT("LOGFONT.lfCharSet meaning"), 
+				_T("%s\n%s"),
+
+				charsets_to_codepages_hint(info_charsets, ARRAYSIZE(info_charsets)),
+
 				TEXT ("Chj: Does Charset=0 mean ANSI or West European? MSDN is misleading on this.\n")
 				TEXT ("The fact is: It depends on your font height, and the mapping rule is weird.\n")
 				TEXT ("Please be aware, when it acts as ANSI, it is same as Default (from codepage perspective).\n")
-				,
-				TEXT("LOGFONT.lfCharSet meaning"), 
-				MB_OK | MB_ICONINFORMATION) ;
+
+				);
 			return TRUE ;
 
 			// These radio buttons set the lfOutPrecision field
-
+		}
 		case IDC_OUT_DEFAULT:   
 			pdp->lf.lfOutPrecision = OUT_DEFAULT_PRECIS ;  
 			return TRUE ;

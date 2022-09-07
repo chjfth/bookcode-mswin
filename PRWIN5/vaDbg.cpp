@@ -94,13 +94,59 @@ int vaMsgBox(HWND hwnd, UINT utype, const TCHAR *szTitle, const TCHAR *szfmt, ..
 	va_list args;
 	va_start(args, szfmt);
 
-	TCHAR msgtext[800] = {};
+	TCHAR msgtext[4000] = {};
 	_vsntprintf_s(msgtext, _TRUNCATE, szfmt, args);
 
 	int ret = MessageBox(hwnd, msgtext, szTitle, utype);
 
 	va_end(args);
 	return ret;
+}
+
+TCHAR * charsets_to_codepages_hint(TCHAR *buf, int buflen)
+{
+	const TCHAR *ar_charset_prefix[] =
+	{
+		TEXT ("0   = ANSI or West European"),
+		TEXT ("1   = Default"),
+		TEXT ("2   = Symbol"),
+		TEXT ("128 = Shift-JIS (Japanese)"),
+		TEXT ("129 = Hangul (Korean)"),
+		TEXT ("130 = Johab (Korean, obsolete)"),
+		TEXT ("134 = GB2312 - GBK (Simplified Chinese)"),
+		TEXT ("136 = Big5 (Traditional Chinese)"),
+		TEXT ("177 = Hebrew"),
+		TEXT ("178 = Arabic"),
+		TEXT ("161 = Greek"),
+		TEXT ("162 = Turkish"),
+		TEXT ("163 = Vietnamese"),
+		TEXT ("204 = Russian"),
+		TEXT ("222 = Thai"),
+		TEXT ("238 = East European"),
+		TEXT ("255 = OEM/DOS")
+	};
+
+	buf[0] = '\0';
+
+	for(int i=0; i<ARRAYSIZE(ar_charset_prefix); i++)
+	{
+		TCHAR tmp[80] = {};
+		int charset = _ttoi(ar_charset_prefix[i]);
+
+		CHARSETINFO csi = {};
+		BOOL succ = TranslateCharsetInfo((DWORD*)charset, &csi, TCI_SRCCHARSET);
+		if(succ)
+		{
+			_sntprintf_s(tmp, _TRUNCATE, _T("%-40.40s , ANSI-codepage: %u\n"), ar_charset_prefix[i], csi.ciACP);
+		}
+		else
+		{
+			_sntprintf_s(tmp, _TRUNCATE, _T("%s\n"), ar_charset_prefix[i]);
+		}
+		_tcscat_s(buf, buflen, tmp);
+	}
+
+	return buf;
 }
 
 //////////////////////////////////////////////////////////////////////////
