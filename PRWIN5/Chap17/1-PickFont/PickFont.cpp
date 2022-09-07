@@ -14,7 +14,7 @@ Updated by Jimm Chen.
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#define VERSION "2.1"
+#define VERSION "2.2"
 
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
@@ -197,16 +197,21 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	const TCHAR *wintitle =
+	const TCHAR *wintitle_prefix =
 #ifdef UNICODE
 	TEXT ("(Unicode) ") 
 #else
 	TEXT ("(ANSI) ") 
 #endif
-	TEXT ("PickFont: Create Logical Font - v") TEXT(VERSION);
+	TEXT ("PickFont: Create Logical Font");
+
+	TCHAR szTitle[100]={};
+	_sntprintf_s(szTitle, _TRUNCATE, _T("%s - v%s , GetACP=%u"),
+		wintitle_prefix, TEXT(VERSION), GetACP()
+		);
 
 	hwnd = CreateWindow (szAppName, 
-		wintitle,
+		szTitle,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT,
@@ -520,7 +525,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 				TEXT ("\n")
 				TEXT ("Chj: Does Charset=0 mean ANSI or West European? MSDN is misleading on this.\n")
 				TEXT ("The fact is: It depends on your font height, and the mapping rule is weird.\n")
-				TEXT ("Please be aware, when it acts as ANSI, it is same as Default(from codepage perspective).\n")
+				TEXT ("Please be aware, when it acts as ANSI, it is same as Default (from codepage perspective).\n")
 				,
 				TEXT("LOGFONT.lfCharSet meaning"), 
 				MB_OK | MB_ICONINFORMATION) ;
