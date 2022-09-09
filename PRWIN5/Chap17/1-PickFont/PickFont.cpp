@@ -357,7 +357,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//
 		SIZE rsize = {0};
 		BOOL succ = GetTextExtentPoint32(hdc, pText, Textlen, &rsize);
-		vaDbg(TEXT("PickFont text dimension: %dx%d"), rsize.cx, rsize.cy);
+		vaDbg(TEXT("PickFont sample text dimension: %dx%d"), rsize.cx, rsize.cy);
 
 		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT))) ;
 		EndPaint (hwnd, &ps) ;
@@ -693,6 +693,14 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			if(charset2==pdp->tm.tmCharSet)
 			{
 				vaDbg(TEXT("GetTextCharsetInfo() returns CharSet=%d (match tm.tmCharSet)"), charset2);
+
+				if(fontsig.fsUsb[0])
+				{
+					vaDbg(TEXT("\"%s\" Unicode-subranges: %04X.%04X.%04X.%04X , Codepages: %04X.%04X"),
+						pdp->szFaceName,
+						fontsig.fsUsb[3], fontsig.fsUsb[2], fontsig.fsUsb[1], fontsig.fsUsb[0],
+						fontsig.fsCsb[1], fontsig.fsCsb[0]);
+				}
 			}
 			else
 			{
