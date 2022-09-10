@@ -230,17 +230,13 @@ HMODULE  LoadLanguageResource(WORD wLangId)
     // Our naming convention for satellite DLLs is: gres[langID].dll
     // We load this dll from the same dir as the EXE.
 
-	TCHAR resdlldir[MAX_PATH]={};
 	TCHAR resdllpath[MAX_PATH]={};
-	GetModuleFileName(NULL, resdlldir, MAX_PATH); // Get EXE path first
-	PathRemoveFileSpec(resdlldir);
-
-	_sntprintf_s(resdllpath, MAX_PATH, _T("%s\\gres%x.dll"), resdlldir, wLangId);
+	filepathFromExeDir(resdllpath, MAX_PATH, _T("gres%x.dll"), wLangId);
 
     hRes = LoadLibrary(resdllpath);
 	if(!hRes)
 	{
-		_sntprintf_s(resdllpath, MAX_PATH, _T("%s\\gres%x.dll"), resdlldir, wLangId_fallback);
+		filepathFromExeDir(resdllpath, MAX_PATH, _T("gres%x.dll"), wLangId_fallback);
 		hRes = LoadLibrary(resdllpath);
 
 		if(!hRes)
@@ -250,4 +246,27 @@ HMODULE  LoadLanguageResource(WORD wLangId)
 	}
     
      return hRes;
+}
+
+TCHAR *myGetExeDir(TCHAR outbuf[], int outbufsize)
+{
+	GetModuleFileName(NULL, outbuf, outbufsize); // Get EXE path first
+	PathRemoveFileSpec(outbuf);
+	return outbuf;
+}
+
+TCHAR *filepathFromExeDir(TCHAR outbuf[], int outbufsize, const TCHAR *fmtFilename, ...)
+{
+	TCHAR exedir[MAX_PATH]={};
+	myGetExeDir(exedir, MAX_PATH-2);
+
+	TCHAR exename[MAX_PATH]={};
+
+	va_list args;
+	va_start(args, fmtFilename);
+	_vsntprintf_s(exename, _TRUNCATE, fmtFilename, args);
+	va_end(args);
+
+	_sntprintf_s(outbuf, outbufsize, _TRUNCATE, _T("%s\\%s"), exedir, exename);
+	return outbuf;
 }

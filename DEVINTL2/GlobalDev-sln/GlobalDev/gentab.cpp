@@ -61,117 +61,124 @@ INT_PTR CALLBACK GeneralDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
     BOOL     bSuccess = TRUE;
    
     switch(uMsg)
-    {
-            case WM_INITDIALOG:
-             {
-                   HANDLE hFile = NULL;
-                   LPTSTR lpszText = 0;
-                   DWORD  dwReadByte = 0;
-                   DWORD  dwFileSize = 0;
+    {{
+	case WM_INITDIALOG:
+	{
+		HANDLE hFile = NULL;
+		LPTSTR lpszText = 0;
+		DWORD  dwReadByte = 0;
+		DWORD  dwFileSize = 0;
 
-                    // We are displaying the content of global.txt in an edit control on this page.
-                    // Load the file and set the text.
-                    if((hFile = CreateFile(TEXT("global.txt"), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) != INVALID_HANDLE_VALUE)
-                    {
-                        dwFileSize = GetFileSize(hFile, &dwReadByte);
-                        if(NULL==(lpszText = (LPTSTR)VirtualAlloc(NULL, dwFileSize, MEM_COMMIT, PAGE_READWRITE)))
-                        {
-                            bSuccess = FALSE;
-                            break;
-                        }
+		TCHAR txtpath[MAX_PATH]={};
+		filepathFromExeDir(txtpath, MAX_PATH, _T("global.txt"));
 
-                        ReadFile(hFile, lpszText, dwFileSize, &dwReadByte, NULL); 
-                        if(FALSE == CloseHandle(hFile))
-                        {
-                            bSuccess = FALSE;
-                            VirtualFree(lpszText, dwFileSize, MEM_RELEASE);
-                            break;
-                        }
+		// We are displaying the content of global.txt in an edit control on this page.
+		// Load the file and set the text.
+		if((hFile = CreateFile(txtpath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) != INVALID_HANDLE_VALUE)
+		{
+			dwFileSize = GetFileSize(hFile, &dwReadByte);
+			if(NULL==(lpszText = (LPTSTR)VirtualAlloc(NULL, dwFileSize, MEM_COMMIT, PAGE_READWRITE)))
+			{
+				bSuccess = FALSE;
+				break;
+			}
 
-                        SetWindowText(GetDlgItem(hDlg, IDC_PURPOSE), lpszText);
-                        VirtualFree(lpszText, dwFileSize, MEM_RELEASE);
-                    }
-                    else
-                    {
-                        bSuccess = FALSE;
-                        break;
-                    }
+			ReadFile(hFile, lpszText, dwFileSize, &dwReadByte, NULL); 
+			if(FALSE == CloseHandle(hFile))
+			{
+				bSuccess = FALSE;
+				VirtualFree(lpszText, dwFileSize, MEM_RELEASE);
+				break;
+			}
 
-                    // Create the list of the available languages to be displayed in our
-                    // drop-down menu for UI language selection
-                    InitLangList(hDlg);
-            }
-            break;
+			SetWindowText(GetDlgItem(hDlg, IDC_PURPOSE), lpszText);
+			VirtualFree(lpszText, dwFileSize, MEM_RELEASE);
+		}
+		else
+		{
+			bSuccess = FALSE;
+			break;
+		}
 
-            case WM_COMMAND:
-                switch(LOWORD(wParam))
-                {
-                    case IDCANCEL:  /* fall-through*/
-                    case IDOK:
-                        break;
-                }
+		// Create the list of the available languages to be displayed in our
+		// drop-down menu for UI language selection
+		InitLangList(hDlg);
+		break;
+	}
 
-                switch (HIWORD(wParam)) 
-                {
-                    case CBN_SELCHANGE:  /* fall-through*/
-                    case CBN_DBLCLK:
+	case WM_COMMAND:
+	{
+		switch(LOWORD(wParam))
+		{
+			case IDCANCEL:  /* fall-through*/
+			case IDOK:
+				break;
+		}
 
-                    // track the user changes into the language selection drop-down menu.
-                    nIndex = (int)SendMessage((HWND) lParam, CB_GETCURSEL, (WPARAM) 0, (LPARAM) 0);
+		switch (HIWORD(wParam)) 
+		{
+			case CBN_SELCHANGE:  /* fall-through*/
+			case CBN_DBLCLK:
 
-                    if(CB_ERR == nIndex)
-                    {
-                        bSuccess = FALSE;
-                        break;
-                    }
+			// track the user changes into the language selection drop-down menu.
+			nIndex = (int)SendMessage((HWND) lParam, CB_GETCURSEL, (WPARAM) 0, (LPARAM) 0);
 
-                    wNewLang = (LCID) SendMessage((HWND) lParam, CB_GETITEMDATA, (WPARAM) nIndex, (LPARAM) 0 );
-                    if (wNewLang != (LCID)g_wCurLang)
-                    {
-                        // enable the apply buton...
-                        SendMessage(GetParent(hDlg), PSM_CHANGED, (WPARAM)hDlg, 0L);   // enable Apply
-                    }
-                    else
-                    {
-                        SendMessage(GetParent(hDlg), PSM_UNCHANGED, (WPARAM)hDlg, 0L);   // enable Apply
-                    }
-                    break;
-                }
-                break;
+			if(CB_ERR == nIndex)
+			{
+				bSuccess = FALSE;
+				break;
+			}
 
-            case WM_NOTIFY:
-                switch (((NMHDR *)lParam)->code)
-                {
-                    case PSN_APPLY:
-                    {
-                        PSHNOTIFY *lppsn = NULL;
+			wNewLang = (LCID) SendMessage((HWND) lParam, CB_GETITEMDATA, (WPARAM) nIndex, (LPARAM) 0 );
+			if (wNewLang != (LCID)g_wCurLang)
+			{
+				// enable the apply button...
+				SendMessage(GetParent(hDlg), PSM_CHANGED, (WPARAM)hDlg, 0L);   // enable Apply
+			}
+			else
+			{
+				SendMessage(GetParent(hDlg), PSM_UNCHANGED, (WPARAM)hDlg, 0L);   // enable Apply
+			}
+			break;
+		}
+		break;
+	}
 
-                        lppsn = (LPPSHNOTIFY) lParam; 
-                        if (lppsn->lParam == FALSE)
-                        {
-                            // we have an apply, we need to re-load new langauge resources...
+	case WM_NOTIFY:
+	{
+		switch (((NMHDR *)lParam)->code)
+		{
+			case PSN_APPLY:
+			{
+				PSHNOTIFY *lppsn = NULL;
+
+				lppsn = (LPPSHNOTIFY) lParam; 
+				if (lppsn->lParam == FALSE)
+				{
+					// we have an apply, we need to re-load new langauge resources...
                         
-                            STARTUPINFO         sui = {0};
-                            PROCESS_INFORMATION pi1 = {0};
-                            TCHAR               szProcess[MAX_STR];
+					STARTUPINFO         sui = {0};
+					PROCESS_INFORMATION pi1 = {0};
+					TCHAR               szProcess[MAX_STR];
 
-                            // Create a new instance on ourselve and pass the new language
-                            // dll as a parameter.
-                            sui.cb = sizeof (STARTUPINFO);
-                            _sntprintf(szProcess,MAX_STR,TEXT("global %x"), wNewLang);
-							bSuccess = CreateProcess(NULL, szProcess, 0, 0, 0, 0, 0, 0, &sui, &pi1);
+					// Create a new instance on ourselve and pass the new language
+					// dll as a parameter.
+					sui.cb = sizeof (STARTUPINFO);
+					_sntprintf(szProcess,MAX_STR,TEXT("global %x"), wNewLang);
+					bSuccess = CreateProcess(NULL, szProcess, 0, 0, 0, 0, 0, 0, &sui, &pi1);
 
-                            // close the previous version...
-                            PostMessage(GetParent(hDlg), WM_CLOSE, 0, 0);
-                        }
-                    }
-                    break;
-                }
-                break;
+					// close the previous version...
+					PostMessage(GetParent(hDlg), WM_CLOSE, 0, 0);
+				}
+			}
+			break;
+		}
+		break;
+	} // WM_NOTIFY
 
-        default:
-         bSuccess = FALSE;
-   }
+	default:
+		bSuccess = FALSE;
+	}}
     
     return bSuccess;
 }
@@ -193,7 +200,10 @@ void InitLangList(HWND hDlg)
 
     // Our naming convention for resource DLLs is as follow: gres[langID].dll
     // Find all available resource dlls in the current directory but enumerating gres*.* files
-    hFindFile = FindFirstFile(TEXT("gres*.*"), &wfd);
+	TCHAR wildcardpath[MAX_PATH]={};
+    hFindFile = FindFirstFile(
+		filepathFromExeDir(wildcardpath, ARRAYSIZE(wildcardpath), TEXT("gres*.dll")), 
+		&wfd);
 
     if(NULL != hFindFile)
     {
