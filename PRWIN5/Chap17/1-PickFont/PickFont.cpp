@@ -2,7 +2,7 @@
 PICKFONT.C -- Create Logical Font
        (c) Charles Petzold, 1998
 
-Updated by Jimm Chen.
+Enhancements by Jimm Chen.
 [2022-09-04] v2.0, can be compiled with VC2010, not supporting VC6 any more.
 -----------------------------------------*/
 
@@ -14,7 +14,7 @@ Updated by Jimm Chen.
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#define VERSION "2.2"
+#define VERSION "2.3"
 
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
