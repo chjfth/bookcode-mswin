@@ -28,8 +28,8 @@ REM WRITE YOUR CMD/BAT commands here.
 REM Remember to check for error exitcode for each command.
 REM
 
-if exist "%batdir%\personal-CopyOrClean.bat" (
-	call "%batdir%\personal-CopyOrClean.bat"
+if exist "%ProjectDir%\team-CopyOrClean.bat" (
+	call "%ProjectDir%\team-CopyOrClean.bat"
 	if errorlevel 1 exit /b 4
 )
 
