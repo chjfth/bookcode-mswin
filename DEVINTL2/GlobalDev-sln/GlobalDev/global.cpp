@@ -213,6 +213,7 @@ BOOL CreatePropSheet(HWND hDlg)
 HMODULE  LoadLanguageResource(WORD wLangId)
 {
     HMODULE  hRes = NULL;
+	int wLangId_fallback = 0;
 
     // if wLangId = NULL then load user's language of the UI
     // GetUserDefaltUILanguage only works on WinME, Win2000, and WinXP.
@@ -221,6 +222,7 @@ HMODULE  LoadLanguageResource(WORD wLangId)
     if (wLangId == 0)
     {
         wLangId = GetUserDefaultUILanguage();
+		wLangId_fallback = 0x0409; // will fallback to en-US resource
     }
 
 	g_wCurLang = wLangId;
@@ -229,15 +231,42 @@ HMODULE  LoadLanguageResource(WORD wLangId)
     // We load this dll from the same dir as the EXE.
 
 	TCHAR resdllpath[MAX_PATH]={};
-	GetModuleFileName(NULL, resdllpath, MAX_PATH); // Get EXE path first
-	PathRemoveFileSpec(resdllpath);
-	_sntprintf_s(resdllpath, MAX_PATH, _T("%s\\gres%x.dll"), resdllpath, wLangId);
+	filepathFromExeDir(resdllpath, MAX_PATH, _T("gres%x.dll"), wLangId);
 
     hRes = LoadLibrary(resdllpath);
 	if(!hRes)
 	{
-		MessageBox(NULL, resdllpath, L"Resource DLL loading fail!", MB_ICONEXCLAMATION);
+		filepathFromExeDir(resdllpath, MAX_PATH, _T("gres%x.dll"), wLangId_fallback);
+		hRes = LoadLibrary(resdllpath);
+
+		if(!hRes)
+		{
+			MessageBox(NULL, resdllpath, L"Resource DLL loading fail!", MB_ICONEXCLAMATION);
+		}
 	}
     
      return hRes;
+}
+
+TCHAR *myGetExeDir(TCHAR outbuf[], int outbufsize)
+{
+	GetModuleFileName(NULL, outbuf, outbufsize); // Get EXE path first
+	PathRemoveFileSpec(outbuf);
+	return outbuf;
+}
+
+TCHAR *filepathFromExeDir(TCHAR outbuf[], int outbufsize, const TCHAR *fmtFilename, ...)
+{
+	TCHAR exedir[MAX_PATH]={};
+	myGetExeDir(exedir, MAX_PATH-2);
+
+	TCHAR exename[MAX_PATH]={};
+
+	va_list args;
+	va_start(args, fmtFilename);
+	_vsntprintf_s(exename, _TRUNCATE, fmtFilename, args);
+	va_end(args);
+
+	_sntprintf_s(outbuf, outbufsize, _TRUNCATE, _T("%s\\%s"), exedir, exename);
+	return outbuf;
 }

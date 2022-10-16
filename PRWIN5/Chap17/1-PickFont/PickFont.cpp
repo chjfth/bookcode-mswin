@@ -1,13 +1,9 @@
 /*-----------------------------------------
-   PICKFONT.C -- Create Logical Font
-                 (c) Charles Petzold, 1998
+PICKFONT.C -- Create Logical Font
+       (c) Charles Petzold, 1998
 
-VC6 SP6 command-line compile, for ANSI version:
-
-cl /c PickFont.cpp ..\..\vaDbg.cpp
-rc PickFont.rc
-link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32.lib comdlg32.lib shell32.lib
-
+Enhancements by Jimm Chen.
+[2022-09-04] v2.0, can be compiled with VC2010, not supporting VC6 any more.
 -----------------------------------------*/
 
 #include <windows.h>
@@ -16,7 +12,9 @@ link /out:PickFontA-vc6.exe PickFont.obj vaDbg.obj PickFont.res user32.lib gdi32
 #include "..\..\vaDbg.h"
 #include "resource.h"
 
-#define VERSION "2.0"
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
+#define VERSION "2.3"
 
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
@@ -63,10 +61,10 @@ struct DlgSampleText_st
 HWND  g_hdlg ;
 TCHAR szAppName[] = TEXT ("PickFont") ;
 
-TCHAR gar_sample_text[literal_BUFMAX+1] = {};
+TCHAR gar_sample_text[literal_BUFMAX+1] = {0};
 int g_sample_text_len = 0; // in TCHARs
 
-DlgSampleText_st g_dlgsamp = {};
+DlgSampleText_st g_dlgsamp = {0};
 
 int g_refreshcount = 0;
 
@@ -199,16 +197,21 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	const TCHAR *wintitle =
+	const TCHAR *wintitle_prefix =
 #ifdef UNICODE
 	TEXT ("(Unicode) ") 
 #else
 	TEXT ("(ANSI) ") 
 #endif
-	TEXT ("PickFont: Create Logical Font - v") TEXT(VERSION);
+	TEXT ("PickFont: Create Logical Font");
+
+	TCHAR szTitle[100]={};
+	_sntprintf_s(szTitle, _TRUNCATE, _T("%s - v%s , GetACP=%u"),
+		wintitle_prefix, TEXT(VERSION), GetACP()
+		);
 
 	hwnd = CreateWindow (szAppName, 
-		wintitle,
+		szTitle,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT,
@@ -347,11 +350,14 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		int hexdump_height = TextOut_hexdump(hdc, pText, Textlen, xText, yText);
 
+		// Display our sample-text
 		TextOut (hdc, xText, yText+hexdump_height, pText, Textlen) ;
 
+		// Write some debug info
+		//
 		SIZE rsize = {0};
 		BOOL succ = GetTextExtentPoint32(hdc, pText, Textlen, &rsize);
-		vaDbg(TEXT("PickFont text dimension: %dx%d"), rsize.cx, rsize.cy);
+		vaDbg(TEXT("PickFont sample text dimension: %dx%d"), rsize.cx, rsize.cy);
 
 		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT))) ;
 		EndPaint (hwnd, &ps) ;
@@ -496,31 +502,24 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_COMMAND:
 		switch (LOWORD (wParam))
-		{
+		{{
 		case IDC_CHARSET_HELP:
-			MessageBox (hdlg, 
-				TEXT ("0 = Ansi\n")
-				TEXT ("1 = Default\n")
-				TEXT ("2 = Symbol\n")
-				TEXT ("128 = Shift JIS (Japanese)\n")
-				TEXT ("129 = Hangul (Korean)\n")
-				TEXT ("130 = Johab (Korean)\n")
-				TEXT ("134 = GB 2312 (Simplified Chinese)\n")
-				TEXT ("136 = Chinese Big 5 (Traditional Chinese)\n")
-				TEXT ("177 = Hebrew\n")
-				TEXT ("178 = Arabic\n")
-				TEXT ("161 = Greek\n")
-				TEXT ("162 = Turkish\n")
-				TEXT ("163 = Vietnamese\n")
-				TEXT ("204 = Russian\n")
-				TEXT ("222 = Thai\n")
-				TEXT ("238 = East European\n")
-				TEXT ("255 = OEM"),
-				szAppName, MB_OK | MB_ICONINFORMATION) ;
+		{
+			TCHAR info_charsets[1024]={};
+			vaMsgBox(hdlg, MB_ICONINFORMATION, TEXT("LOGFONT.lfCharSet meaning"), 
+				_T("%s\n%s"),
+
+				charsets_to_codepages_hint(info_charsets, ARRAYSIZE(info_charsets)),
+
+				TEXT ("Chj: Does Charset=0 mean ANSI or West European? MSDN is misleading on this.\n")
+				TEXT ("The fact is: It depends on your font height, and the mapping rule is weird.\n")
+				TEXT ("Please be aware, when it acts as ANSI, it is same as Default (from codepage perspective).\n")
+
+				);
 			return TRUE ;
 
 			// These radio buttons set the lfOutPrecision field
-
+		}
 		case IDC_OUT_DEFAULT:   
 			pdp->lf.lfOutPrecision = OUT_DEFAULT_PRECIS ;  
 			return TRUE ;
@@ -638,6 +637,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			// -----------------
 
 		case IDOK:
+		{
 			// Get LOGFONT structure
 
 			SetLogFontFromFields (hdlg, pdp) ;
@@ -678,6 +678,41 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 			GetTextMetrics (hdcDevice, &pdp->tm) ;
 			GetTextFace (hdcDevice, LF_FULLFACESIZE, pdp->szFaceName) ;
+			
+			// acquire some debug-info >>>
+
+			FONTSIGNATURE fontsig = {}; 
+			int charset2 = GetTextCharsetInfo(hdcDevice, &fontsig, 0);
+			if(fontsig.fsUsb[0]==0)
+			{
+				CHARSETINFO csi = {};
+				BOOL succ = TranslateCharsetInfo((DWORD*)(pdp->lf.lfCharSet), &csi, TCI_SRCCHARSET);
+				vaDbg(TEXT("Used TranslateCharsetInfo(TCI_SRCCHARSET) for fontface \"%s\", return %d."), pdp->szFaceName, succ);
+			}
+
+			if(charset2==pdp->tm.tmCharSet)
+			{
+				vaDbg(TEXT("GetTextCharsetInfo() returns CharSet=%d (match tm.tmCharSet)"), charset2);
+
+				if(fontsig.fsUsb[0])
+				{
+					vaDbg(TEXT("\"%s\" Unicode-subranges: %04X.%04X.%04X.%04X , Codepages: %04X.%04X"),
+						pdp->szFaceName,
+						fontsig.fsUsb[3], fontsig.fsUsb[2], fontsig.fsUsb[1], fontsig.fsUsb[0],
+						fontsig.fsCsb[1], fontsig.fsCsb[0]);
+				}
+			}
+			else
+			{
+				vaMsgBox(hdlg, MB_ICONEXCLAMATION, TEXT("UNEXPECT!"),
+					TEXT("GetTextCharsetInfo() returns CharSet=%d.\r\n")
+					TEXT("Does NOT match tm.tmCharSet=%d.\r\n")
+					,
+					charset2, pdp->tm.tmCharSet);
+			}			
+
+			// acquire some debug-info <<<
+
 			DeleteDC (hdcDevice) ;
 			DeleteObject (hFont) ;
 
@@ -686,7 +721,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			SetFieldsFromTextMetric (hdlg, pdp) ;
 			InvalidateRect (GetParent (hdlg), NULL, TRUE) ;
 			return TRUE ;
-
+		} // WM_COMMAND.ID_OK
 		case IDC_BTN_CHANGE_SAMPLE_TEXT:
 			{
 				INT_PTR ret = DialogBox(g_hInstanceExe, MAKEINTRESOURCE(IDD_CHANGE_SAMPLE_TEXT), hdlg, 
@@ -699,7 +734,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0;
 			}
 
-		} // WM_COMMAND.switch done
+		}} // WM_COMMAND.switch done
 		break ;
 
 	case WM_KEYUP:

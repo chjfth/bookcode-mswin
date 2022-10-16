@@ -11,6 +11,10 @@ TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false);
 
 void chSETWINDOWICON(HWND hwnd, const TCHAR *icon_resname);
 
+int vaMsgBox(HWND hwnd, UINT utype, const TCHAR *szTitle, const TCHAR *szfmt, ...);
+
+TCHAR * charsets_to_codepages_hint(TCHAR *buf, int buflen);
+
 
 TCHAR *parse_cmdparam_TCHARs(
 	const TCHAR *T_cmdline, bool single_param_as_literal,

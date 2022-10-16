@@ -47,6 +47,7 @@
 #include <conio.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <math.h>
 #include <cpl.h>
 #include <time.h>
@@ -116,6 +117,12 @@ do \
         (WPARAM) 0,  (LPARAM) 0) ; \
     if (_hFont) DeleteObject (_hFont) ; \
 }while (0);
+
+
+TCHAR *myGetExeDir(TCHAR outbuf[], int outbufsize);
+
+TCHAR *filepathFromExeDir(TCHAR outbuf[], int outbufsize, const TCHAR *fmtFilename, ...);
+
 
 #ifdef __cplusplus
 } // extern"C"{
