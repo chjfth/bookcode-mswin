@@ -147,7 +147,7 @@ TCHAR *parse_cmdparam_TCHARs(
 		// not hexform
 #ifdef UNICODE
 		_tcscpy_s(outbuf, outbuflen, argv[1]);
-		int retlen = wcslen(argv[1]);
+		int retlen = (int)wcslen(argv[1]);
 #else
 		int retlen = WideCharToMultiByte(CP_ACP, 0, argv[1], -1, outbuf, outbuflen, NULL, NULL);
 #endif

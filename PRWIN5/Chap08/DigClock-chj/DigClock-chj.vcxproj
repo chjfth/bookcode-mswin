@@ -44,11 +44,8 @@
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20220502-0000-0000-0000-235007000001}</ProjectGuid>
     <ProjectName>DigClock-chj</ProjectName>
-    
-    <TargetName>DigClock-$(PlatformShortName)</TargetName>
-    
+    <TargetName>DigClock</TargetName>
     <ConfigurationType>Application</ConfigurationType>
-
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   
@@ -171,13 +168,11 @@
   </ImportGroup>
 
   <!-- import VSPG start -->
-                                        <!-- 
   <PropertyGroup>
-    <VSPG_BootsDir_NoTBS>$(SolutionDir)_VSPG\boots</VSPG_BootsDir_NoTBS>
+    <VSPG_BootsDir_NoTBS>..\..\..\_VSPG\boots</VSPG_BootsDir_NoTBS>
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(VSPG_BootsDir_NoTBS)\_VSPG.props" />
   </ImportGroup>
-                                        -->
   <!-- import VSPG end -->
 </Project>
