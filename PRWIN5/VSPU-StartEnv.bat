@@ -27,7 +27,7 @@ REM you can set it here.
 
 REM ################ KEY CONTENT HERE ################ 
 
-call :SetEnvVar vspg_USER_BAT_SEARCH_DIRS="%ProjectDir%" "%ProjectDir%\..\.."
+call :SetEnvVar vspg_USER_BAT_SEARCH_DIRS="%ProjectDir%\..\.."
 
 exit /b 0
 
