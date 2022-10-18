@@ -47,7 +47,6 @@ Purpose: Common header file containing handy macros and definitions
 #pragma warning(push, 4)
 #include <Windows.h>
 #include <TChar.h>
-#include <stdarg.h>
 
 
 ///////////// Verify that the proper header files are being used //////////////
@@ -195,22 +194,6 @@ inline void chMB(PCSTR s) {
    HWND hwnd = GetActiveWindow();
    MessageBoxA(hwnd, s, szTMP, 
       MB_OK | ((hwnd == NULL ) ? MB_SERVICE_NOTIFICATION : 0));
-}
-
-inline void vaMsgBox(UINT flags, const TCHAR *szfmt, ...)
-{
-	// flags: MB_OK | MB_ICONEXCLAMATION etc
-
-	TCHAR szText[1024] = {};
-	va_list args;
-	va_start(args, szfmt);
-	_vsntprintf_s(szText, _TRUNCATE, szfmt, args);
-	va_end(args);
-
-	TCHAR szPrgname[256] = {};
-	GetModuleFileName(NULL, szPrgname, ARRAYSIZE(szPrgname));
-	HWND hwnd = GetActiveWindow();
-	MessageBox(hwnd, szText, szPrgname, flags);
 }
 
 //////////////////////////// Assert/Verify Macros /////////////////////////////

@@ -156,6 +156,7 @@
  
   <ItemGroup>
     <ClCompile Include="FileCopy.cpp" />
+    <ClCompile Include="..\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FileCopy.rc" />
@@ -165,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="..\vaDbg.h" />
   </ItemGroup>
  
   <!-- MSBuild system stock Cpp.targets -->

@@ -1,11 +1,17 @@
 /******************************************************************************
 Module:  FileCopy.cpp
 Notices: Copyright (c) 2000 Jeffrey Richter
+[2022.10] Updated by Chj:
+* Report file copying speed on success.
+* Report error loudly when error occurs during file-copy. File copying failure
+  can be reproduced easily with a file on a network shared folder.
 ******************************************************************************/
 
 
 #include "..\CmnHdr.h"                    // See Appendix A.
 #include <WindowsX.h>
+
+#include "..\vaDbg.h"
 
 #include "..\ClassLib\IOCP.h"             // See Appendix B.
 #include "..\ClassLib\EnsureCleanup.h"    // See Appendix B.
@@ -73,8 +79,10 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, LARGE_INTEGER &liFileSizeSrc) 
+BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, 
+	LARGE_INTEGER &liFileSizeSrc, DWORD *pWinErr) 
 {
+	*pWinErr = 0; 
 	LARGE_INTEGER liFileSizeDst = { 0 };
 
 	// Open the source file without buffering & get its size
@@ -130,22 +138,52 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, LARGE_INTEGER &liFileSize
 	// Loop while outstanding I/O requests still exist
 	while ((nReadsInProgress > 0) || (nWritesInProgress > 0)) 
 	{
-
 		// Suspend the thread until an I/O completes
 		ULONG_PTR CompKey;
 		DWORD dwNumBytes;
 		CIOReq* pior;
-		iocp.GetStatus(&CompKey, &dwNumBytes, (OVERLAPPED**) &pior, INFINITE);
+		BOOL succ = iocp.GetStatus(&CompKey, &dwNumBytes, (OVERLAPPED**) &pior, INFINITE);
+		
+		TCHAR timebuf[40];
+// #define DEBUG_ALL
+#ifdef DEBUG_ALL
+		vaDbg(_T("%s iocp.GetStatus(%s)=%s"), 
+			now_timestr(timebuf, ARRAYSIZE(timebuf)), 
+			CompKey==CK_READ ? _T("read") : _T("WRITE"),
+			succ ? _T("succ") : _T("fail"));
+#else
+		if(!succ)
+		{
+			DWORD nowerr = GetLastError();
+
+			if(*pWinErr==0)
+				*pWinErr = nowerr; // record first error
+			
+			vaDbg(_T("%s iocp.GetStatus(%s) fail. %s"), 
+				now_timestr(timebuf, ARRAYSIZE(timebuf)), 
+				CompKey==CK_READ ? _T("read") : _T("WRITE"),
+				app_WinErrStr(nowerr));
+		}
+#endif
 
 		switch (CompKey) {
 		case CK_READ:  // Read completed, write to destination
 			nReadsInProgress--;
-			pior->Write(hfileDst);  // Write to same offset read from source
-			nWritesInProgress++;
+
+			if(!*pWinErr)
+			{
+				pior->Write(hfileDst);  // Write to same offset read from source
+				nWritesInProgress++;
+			}
+			
 			break;
 
 		case CK_WRITE: // Write completed, read from source
 			nWritesInProgress--;
+			
+			if(*pWinErr)
+				break;
+			
 			if (liNextReadOffset.QuadPart < liFileSizeDst.QuadPart) {
 				// Not EOF, read the next block of data from the source file.
 				pior->Read(hfileSrc, &liNextReadOffset);
@@ -156,10 +194,11 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, LARGE_INTEGER &liFileSize
 		}
 	}
 
-	return TRUE;
+	return *pWinErr ? FALSE : TRUE;
 }
 
-BOOL FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, __int64 *pFilesize) 
+BOOL FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, 
+	__int64 *pFilesize, DWORD *pWinErr) 
 {
 	BOOL fOk = FALSE;    // Assume file copy fails
 	LARGE_INTEGER liFileSizeSrc = { 0 };
@@ -167,8 +206,8 @@ BOOL FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, __int64 *pFilesize)
 	try 
 	{
 		fOk = in_FileCopy(pszFileSrc, pszFileDst, 
-			liFileSizeSrc // output file size on return
-			);
+			liFileSizeSrc, // output file size on return
+			pWinErr);
 		*pFilesize = liFileSizeSrc.QuadPart;
 	}
 	catch (...) {
@@ -227,7 +266,8 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		DWORD msec_start = GetTickCount();
 
 		__int64 filesize = 0;
-		BOOL succ = FileCopy(szPathname, TEXT("FileCopy.cpy"), &filesize);
+		DWORD winerr = 0;
+		BOOL succ = FileCopy(szPathname, TEXT("FileCopy.cpy"), &filesize, &winerr);
 
 		DWORD msec_used = GetTickCount() - msec_start;
 
@@ -249,7 +289,8 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		}
 		else
 		{
-			chMB("File Copy Failed");
+			vaMsgBox(MB_OK|MB_ICONERROR, 
+				_T("File Copy Failed. %s"), app_WinErrStr(winerr));
 		}
 
 		break;
