@@ -80,7 +80,8 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, LARGE_INTEGER &liFileSize
 	// Open the source file without buffering & get its size
 	CEnsureCloseFile hfileSrc = CreateFile(pszFileSrc, GENERIC_READ, 
 		FILE_SHARE_READ, NULL, OPEN_EXISTING, 
-		FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED, NULL);
+		FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED, 
+		NULL);
 	if (hfileSrc.IsInvalid()) 
 		return FALSE;
 
@@ -94,7 +95,8 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, LARGE_INTEGER &liFileSize
 	// Open the destination file without buffering & set its size
 	CEnsureCloseFile hfileDst = CreateFile(pszFileDst, GENERIC_WRITE, 
 		0, NULL, CREATE_ALWAYS, 
-		FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED, hfileSrc);
+		FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED, 
+		hfileSrc);
 	if (hfileDst.IsInvalid()) 
 		return FALSE;
 
@@ -157,17 +159,17 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, LARGE_INTEGER &liFileSize
 	return TRUE;
 }
 
-BOOL FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst) 
+BOOL FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, __int64 *pFilesize) 
 {
-
 	BOOL fOk = FALSE;    // Assume file copy fails
 	LARGE_INTEGER liFileSizeSrc = { 0 };
 
 	try 
 	{
 		fOk = in_FileCopy(pszFileSrc, pszFileDst, 
-			liFileSizeSrc // as output
+			liFileSizeSrc // output file size on return
 			);
+		*pFilesize = liFileSizeSrc.QuadPart;
 	}
 	catch (...) {
 	}
@@ -209,21 +211,49 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
 	TCHAR szPathname[_MAX_PATH];
 
-	switch (id) {
+	switch (id) 
+	{{
 	case IDCANCEL:
 		EndDialog(hwnd, id);
 		break;
 
 	case IDOK:
+	{
 		// Copy the source file to the destination file.
 		Static_GetText(GetDlgItem(hwnd, IDC_SRCFILE), 
 			szPathname, sizeof(szPathname));
 		SetCursor(LoadCursor(NULL, IDC_WAIT));
-		
-		chMB(FileCopy(szPathname, TEXT("FileCopy.cpy")) 
-			? "File Copy Successful" : "File Copy Failed");
-		
+
+		DWORD msec_start = GetTickCount();
+
+		__int64 filesize = 0;
+		BOOL succ = FileCopy(szPathname, TEXT("FileCopy.cpy"), &filesize);
+
+		DWORD msec_used = GetTickCount() - msec_start;
+
+		if(succ)
+		{
+			// Show time-used and speed.
+			if(msec_used==0)
+			{
+				vaMsgBox(MB_OK, TEXT("File Copy Successful. Time used: 0 msec."));
+			}
+			else
+			{
+				vaMsgBox(MB_OK, TEXT("File Copy Successful. \n\n")
+					TEXT("Time used: %d.%03d seconds, %g MB/s")
+					,
+					msec_used/1000, msec_used%1000, (double)filesize/1000/msec_used
+					);
+			}
+		}
+		else
+		{
+			chMB("File Copy Failed");
+		}
+
 		break;
+	}
 
 	case IDC_PATHNAME:
 		OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
@@ -249,7 +279,7 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		}
 		EnableWindow(GetDlgItem(hwnd, IDOK), fOk);
 		break;
-	}
+	}}
 }
 
 
