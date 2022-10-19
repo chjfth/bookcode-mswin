@@ -55,7 +55,7 @@ public:
    operator TYPE() { 
       // If TYPE is a 32-bit value, cast m_t to 32-bit TYPE
       // If TYPE is a 64-bit value, case m_t to 64-bit TYPE
-      return((sizeof(TYPE) == 4) ? (TYPE) PtrToUint(m_t) : (TYPE) m_t); 
+      return((sizeof(TYPE) == 4) ? (TYPE) PtrToUint((void*)m_t) : (TYPE) m_t); 
    }
 
    // Cleanup the object if the value represents a valid object

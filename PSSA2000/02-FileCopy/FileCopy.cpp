@@ -48,7 +48,7 @@ public:
 			Offset     = pliOffset->LowPart;
 			OffsetHigh = pliOffset->HighPart;
 		}
-		return(::ReadFile(hDevice, m_pvData, m_nBuffSize, NULL, this));
+		return(::ReadFile(hDevice, m_pvData, (DWORD)m_nBuffSize, NULL, this));
 	}
 
 	BOOL Write(HANDLE hDevice, PLARGE_INTEGER pliOffset = NULL) {
@@ -56,7 +56,7 @@ public:
 			Offset     = pliOffset->LowPart;
 			OffsetHigh = pliOffset->HighPart;
 		}
-		return(::WriteFile(hDevice, m_pvData, m_nBuffSize, NULL, this));
+		return(::WriteFile(hDevice, m_pvData, (DWORD)m_nBuffSize, NULL, this));
 	}
 
 private:
