@@ -53,7 +53,7 @@ CPrintBuf::CPrintBuf(SIZE_T nMaxSizeInBytes) {
 
    // This constructor sets initial values of members, and reserves a block
    // of addresses of size nMaxSizeInBytes and commits a single page.
-   m_nMaxSizeInBytes = nMaxSizeInBytes;
+   m_nMaxSizeInBytes = (int)nMaxSizeInBytes;
    m_nCurSize = 0;
    m_pszBuffer = (PTSTR) 
       VirtualAlloc(NULL, m_nMaxSizeInBytes, MEM_RESERVE, PAGE_READWRITE);
@@ -124,7 +124,10 @@ int CPrintBuf::Print(PCTSTR pszFmt , ...) {
    va_start(arglist, pszFmt);   
    __try {
       // Append string to end of buffer
-      nLength = _vstprintf(m_pszBuffer + m_nCurSize, pszFmt, arglist);
+      nLength = _vsntprintf_s(m_pszBuffer+m_nCurSize, 
+		  m_nMaxSizeInBytes-m_nCurSize-1,
+		  _TRUNCATE, // VC2010
+		  pszFmt, arglist);
       if (nLength > 0) 
          m_nCurSize += nLength;
    }

@@ -702,7 +702,7 @@ BOOL EditTrusteeList(HWND hwnd, PTSTR szSystem,
 	tlInfo.m_szSystem      = szSystem;
 
 	// Invoke the edit trustees dialog box
-	BOOL fRet = DialogBoxParam(GetModuleHandle(NULL), 
+	BOOL fRet = (BOOL)DialogBoxParam(GetModuleHandle(NULL), 
 		MAKEINTRESOURCE(IDD_TRUSTEELIST), hwnd, TLDlg_Proc, (LPARAM) &tlInfo);
 	if (fRet) {
 
