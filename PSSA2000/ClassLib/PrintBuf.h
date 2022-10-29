@@ -125,7 +125,7 @@ int CPrintBuf::Print(PCTSTR pszFmt , ...) {
    __try {
       // Append string to end of buffer
       nLength = _vsntprintf_s(m_pszBuffer+m_nCurSize, 
-		  m_nMaxSizeInBytes-m_nCurSize-1,
+		  m_nMaxSizeInBytes/sizeof(TCHAR)-m_nCurSize,
 		  _TRUNCATE, // VC2010
 		  pszFmt, arglist);
       if (nLength > 0) 
