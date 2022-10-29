@@ -329,6 +329,10 @@ void PopulatePrivilegeList(HWND hwndDlg)
 		SE_DENY_NETWORK_LOGON_NAME,
 		SE_DENY_BATCH_LOGON_NAME,
 		SE_DENY_SERVICE_LOGON_NAME,
+		
+		// Chj adds for WinXP:
+		SE_REMOTE_INTERACTIVE_LOGON_NAME,
+		SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME,
 	};
 
 	// Clear the control
