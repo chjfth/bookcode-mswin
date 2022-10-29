@@ -161,12 +161,14 @@ BOOL CUILayout::AnchorControls(ANCHORPOINT apUpperLeft,
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL CUILayout::AdjustControls(int cx, int cy) {
+BOOL CUILayout::AdjustControls(int cx, int cy) 
+{
+	int n;	
    BOOL fOk = FALSE;
 
    // Create region consisting of all areas occupied by controls
    HRGN hrgnPaint = CreateRectRgn(0, 0, 0, 0);
-   for (int n = 0; n < m_nNumControls; n++) {
+   for (n = 0; n < m_nNumControls; n++) {
 
       HWND hwndControl = GetDlgItem(m_hwndParent, m_CtrlInfo[n].m_nID);
       RECT rcControl; 
