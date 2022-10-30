@@ -448,7 +448,7 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 			BOOL fFound = FALSE;
 			while (nIndex2-- != 0) {
 
-				// Use clsastr to ease some of the issues with LSA strings
+				// Use CLSAStr to ease some of the issues with LSA strings
 				lsastrPriv = pustrPrivileges[nIndex2];
 				if (lstrcmpi(szPriv, lsastrPriv) == 0) {
 
@@ -482,8 +482,8 @@ void GrantSelectedPrivileges(HWND hwnd, PTSTR pszName, BOOL fGrant)
 	// Without this handy class, the LSA_UNICODE_STRING would be tough here
 	CLSAStr* plsaString = NULL;
 
-	try { {
-
+	try 
+	{{
 		// Give up if the trustee name is empty
 		if (lstrlen(pszName) == 0)
 			goto leave;
@@ -551,8 +551,7 @@ void GrantSelectedPrivileges(HWND hwnd, PTSTR pszName, BOOL fGrant)
 		else
 			ReportError(TEXT("LsaAdd / RemoveAccountRights"), lErr);
 
-	} leave:;
-	}
+	} leave:; }
 	catch (...) {
 	}
 
@@ -616,7 +615,6 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 	ULONG lIndex = 0;
 	NET_DISPLAY_USER* pnetUsers;
 	do {
-
 		// Because of the potentially many users on a system, this function
 		// is more appropriate than NetUserEnum for UI programs.
 		// We will return no more than 20000 users with this call in 1 k chunks
@@ -647,8 +645,7 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 void UpdatePolicy(HWND hwnd) 
 {
 	// Get state info
-	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE) 
-		GetWindowLongPtr(hwnd, DWLP_USER);
+	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	// Do we already have a valid policy object?
 	if (ptmState->m_hPolicy != NULL) {
@@ -658,7 +655,7 @@ void UpdatePolicy(HWND hwnd)
 	}
 
 	// Get computer name
-	TCHAR szName[256];
+	TCHAR szName[256] = {};
 	//GetComputer(hwnd, szName, chDIMOF(szName));
 	HWND hwndCombo = GetDlgItem(hwnd, IDC_COMPUTER);
 	int nIndex = ComboBox_GetCurSel(hwndCombo);
@@ -779,7 +776,7 @@ BOOL AddUser(HWND hwnd, PTSTR pszName)
 	USER_INFO_1 userInfo = { 0 };
 	userInfo.usri1_name = pszName;
 
-	// Trusteeman creates user accounts with a password of "Pass2000"
+	// TrusteeMan creates user accounts with a password of "Pass2000"
 	userInfo.usri1_password = TEXT("Pass2000");
 	userInfo.usri1_comment = TEXT("[Add User Comments Here]");
 	userInfo.usri1_home_dir = NULL;
@@ -794,7 +791,7 @@ BOOL AddUser(HWND hwnd, PTSTR pszName)
 
 BOOL RemoveTrustee(HWND hwnd, PTSTR szTrustee, TRUSTEE tType) 
 {
-	TCHAR          szComputer[256];
+	TCHAR          szComputer[256] = {};
 	NET_API_STATUS netStatus = NERR_Success;
 
 	// Get computer name
