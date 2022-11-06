@@ -31,13 +31,16 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void ReportError(PTSTR szFunction, ULONG lErr) {
-
-   CPrintBuf prntBuf;
-   prntBuf.Print(TEXT("The Function:  %s\r\n"), szFunction);
-   prntBuf.Print(TEXT("Caused the following error - \r\n"));
-   prntBuf.PrintError(lErr);
-   MessageBox(NULL, prntBuf, TEXT("AccessMaster Error"), MB_OK);
+void ReportError(PTSTR szFunction, ULONG lErr) 
+{
+	CPrintBuf prntBuf;
+	prntBuf.Print(TEXT("The Function:  %s\r\n"), szFunction);
+	prntBuf.Print(TEXT("Caused the following error - \r\n"));
+	prntBuf.Print(TEXT("\r\n"));
+   
+	prntBuf.PrintError(lErr);
+   
+	MessageBox(NULL, prntBuf, TEXT("AccessMaster Error"), MB_OK);
 }
 
 
@@ -430,10 +433,14 @@ HRESULT CSecurityInformation::GetSecurity(
 	{ 
 		// Failure produces an empty SD
 		ReportError(TEXT("GetNamedSecurityInfo"), lErr);
-		MessageBox(NULL, TEXT("An error occurred retrieving security ")
-			TEXT("information for this object, \npossibly due to insufficient")
-			TEXT(" access rights.  AccessMaster \nhas created an empty security")
-			TEXT(" descriptor for editing."), TEXT("AccessMaster Notice"), MB_OK);
+		MessageBox(NULL, 
+			TEXT("An error occurred retrieving security information for this object,\r\n")
+			TEXT("possibly due to insufficient access rights.\r\n")
+			TEXT("\r\n")
+			TEXT("AccessMaster has created an empty security descriptor for editing.\r\n")
+			,
+			TEXT("AccessMaster Notice"), 
+			MB_OK);
 	}
 	else {
 		hr = S_OK;
