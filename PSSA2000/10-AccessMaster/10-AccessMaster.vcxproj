@@ -156,6 +156,7 @@
  
   <ItemGroup>
     <ClCompile Include="AccessMaster.cpp" />
+    <ClCompile Include="..\InterpretConst.cpp" />
     <ClCompile Include="..\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="AccessData.h" />
+    <ClInclude Include="..\InterpretConst.h" />
     <ClInclude Include="..\vaDbg.h" />
   </ItemGroup>
  
