@@ -246,10 +246,14 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 	{ 
 		// Is it a handle and or process id we are dealing with?
 
-		BOOL fTrans;
 		// Get the actual numbers
+		BOOL fTrans = 0;
 		ULONG lPid = GetDlgItemInt(hwnd, IDE_PID, &fTrans, FALSE);
-		HANDLE hHandle = (HANDLE) GetDlgItemInt(hwnd, IDE_HANDLE, &fTrans, FALSE);
+		
+		TCHAR edtext[20] = {};
+		GetDlgItemText(hwnd, IDE_HANDLE, edtext, ARRAYSIZE(edtext)-1);
+		HANDLE hHandle = (HANDLE)_tcstoui64(edtext, NULL, 0);
+		
 		HANDLE hObj = NULL;
 
 		switch (pInfo->m_pEntry->m_nSpecificType) 
