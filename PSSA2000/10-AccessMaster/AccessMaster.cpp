@@ -153,7 +153,8 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 		{
 
 		case AM_WINDOWSTATION:
-			{ // If windowstation, we must translate the name to a handle
+			{ 
+				// If windowstation, we must translate the name to a handle
 				HWINSTA hwinsta = NULL;
 				GetDlgItemText(hwnd, IDE_NAME, pInfo->m_szName, 
 					chDIMOF(pInfo->m_szName));
@@ -174,7 +175,8 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 			break;
 
 		case AM_DESKTOP:
-			{ // If desktop, we must translate the name to a handle
+			{ 
+				// If desktop, we must translate the name to a handle
 				HWINSTA hwinstaOld;
 				HWINSTA hwinstaTemp;
 				HDESK hdesk=NULL;
@@ -188,8 +190,8 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 				nIndex = lstrlen(pInfo->m_szName);
 
 				// Parse the text for windowstation and desktop
-				while (nIndex-- != 0) {
-
+				while (nIndex-- != 0) 
+				{
 					if (pInfo->m_szName[nIndex] == TEXT('\\') 
 						|| pInfo->m_szName[nIndex] == TEXT('/')) {
 
@@ -204,7 +206,8 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 				// Open the windowstation
 				hwinstaTemp = OpenWindowStation(pszWinSta, FALSE, 
 					DESKTOP_ENUMERATE);
-				if (hwinstaTemp != NULL) {
+				if (hwinstaTemp != NULL) 
+				{
 					// Save the last one
 					hwinstaOld = GetProcessWindowStation();
 					SetProcessWindowStation(hwinstaTemp);
@@ -238,7 +241,6 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 			fReturn = TRUE;
 			break;
 		}
-
 	} 
 	else 
 	{ 
@@ -247,8 +249,7 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 		BOOL fTrans;
 		// Get the actual numbers
 		ULONG lPid = GetDlgItemInt(hwnd, IDE_PID, &fTrans, FALSE);
-		HANDLE hHandle = (HANDLE) GetDlgItemInt(hwnd, IDE_HANDLE, &fTrans, 
-			FALSE);
+		HANDLE hHandle = (HANDLE) GetDlgItemInt(hwnd, IDE_HANDLE, &fTrans, FALSE);
 		HANDLE hObj = NULL;
 
 		switch (pInfo->m_pEntry->m_nSpecificType) 
@@ -269,13 +270,18 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 		default: // The rest work with duplicate handle
 			{
 				HANDLE hProcess = OpenProcess(PROCESS_DUP_HANDLE, FALSE, lPid);
-				if (hProcess != NULL) {
+				if (hProcess != NULL) 
+				{
 					// Get as much access as possible
 					if (!DuplicateHandle(hProcess, hHandle, GetCurrentProcess(),
 						&hObj, MAXIMUM_ALLOWED, FALSE, 0))
+					{
 						ReportError(TEXT("DuplicateHandle"), GetLastError());
-				} else
+					}
+				} 
+				else {
 					ReportError(TEXT("OpenProcess"), GetLastError());
+				}
 			}
 			break;
 		}
@@ -292,12 +298,17 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 		ULONG lErr;
 		PSECURITY_DESCRIPTOR pSD = NULL;
 		if (pInfo->m_szName[0] != 0) // Is it named
+		{
 			lErr = GetNamedSecurityInfo(pInfo->m_szName, 
-			pInfo->m_pEntry->m_objType, DACL_SECURITY_INFORMATION, 
-			NULL, NULL, NULL, NULL, &pSD);
-		else // Is it a handle case
+				pInfo->m_pEntry->m_objType, DACL_SECURITY_INFORMATION, 
+				NULL, NULL, NULL, NULL, &pSD);
+		}
+		else 
+		{
+			// Is it a handle case
 			lErr = GetSecurityInfo(pInfo->m_hHandle, pInfo->m_pEntry->m_objType,
-			DACL_SECURITY_INFORMATION, NULL, NULL, NULL, NULL, &pSD);
+				DACL_SECURITY_INFORMATION, NULL, NULL, NULL, NULL, &pSD);
+		}
 
 		if ((lErr != ERROR_ACCESS_DENIED) && (lErr != ERROR_SUCCESS)){
 			ReportError(TEXT("Get[Named]SecurityInfo"), lErr);
