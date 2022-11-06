@@ -296,16 +296,27 @@ void test_itc_bitfields()
 */
 }
 
+#define BIT5AND6 (32+64)
+
 void Test_bad_masks()
 {
 	const Bitfield2Val_st arBf2V[] =
 	{
+		ITC_NAMEPAIR(BIT5AND6),
+
 		{_T("bit0"), 1},
 		{_T("bit1"), 2},
 		{_T("bit1and2"), 6}, 
 	};
 
 	CInterpretConst itc_bitfields(arBf2V, ARRAYSIZE(arBf2V));
+	TCHAR buf[80] = {};
+	int arVals[] = {0,1,2,3,4,5,6,7,8,9, 16,17, 32,64,96};
+	for(int i=0; i<ARRAYSIZE(arVals); i++)
+	{
+		itc_bitfields.Interpret(arVals[i], buf, ARRAYSIZE(buf));
+		_tprintf(_T("%3d : %s\n"), arVals[i], buf);
+	}
 }
 
 void test_itc()

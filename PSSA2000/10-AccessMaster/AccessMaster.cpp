@@ -18,7 +18,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "..\ClassLib\PrintBuf.h"
 
 #include "AccessData.h"
-
+#include "..\vaDbg.h"
+#include "..\InterpretConst.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -530,6 +531,33 @@ HRESULT CSecurityInformation::GetInheritTypes(PSI_INHERIT_TYPE* ppInheritTypes,
 HRESULT CSecurityInformation::PropertySheetPageCallback(HWND hwnd, UINT uMsg, 
 	SI_PAGE_TYPE uPage) 
 {
+	static const Enum2Val_st e2vMsg[] =
+	{
+		ITC_NAMEPAIR(PSPCB_CREATE),
+		ITC_NAMEPAIR(PSPCB_RELEASE),
+		ITC_NAMEPAIR(PSPCB_SI_INITDIALOG),
+	};
+	static CInterpretConst s_itcMsg(e2vMsg, ARRAYSIZE(e2vMsg));
+
+	static const Enum2Val_st e2vPgt[] =
+	{
+		ITC_NAMEPAIR(SI_PAGE_PERM),
+		ITC_NAMEPAIR(SI_PAGE_ADVPERM),
+		ITC_NAMEPAIR(SI_PAGE_AUDIT),
+		ITC_NAMEPAIR(SI_PAGE_OWNER),
+		ITC_NAMEPAIR(SI_PAGE_EFFECTIVE),
+		ITC_NAMEPAIR(SI_PAGE_TAKEOWNERSHIP),
+	};
+	static CInterpretConst s_itcPgt(e2vPgt, ARRAYSIZE(e2vPgt));
+
+	TCHAR szPspMsg[100]={}, szPgtype[100]={};
+
+	vaDbg(_T("PSPcallback: hwnd=0x%08X , MSG=%s , Pagetype=%s"), 
+		hwnd,
+		s_itcMsg.Interpret(uMsg, szPspMsg, 100), 
+		s_itcPgt.Interpret(uPage, szPgtype, 100)
+		);
+
 	return(S_OK);
 }
 

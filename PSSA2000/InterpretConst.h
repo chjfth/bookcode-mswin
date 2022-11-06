@@ -60,5 +60,6 @@ private:
 	void *ptr_unused1, *ptr_unused2, *ptr_unused3, *ptr_unused4;
 };
 
+#define ITC_NAMEPAIR(macroname) { _T( #macroname ) , macroname }
 
 #endif
