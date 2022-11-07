@@ -30,6 +30,59 @@ struct ConstSection_st
 	int nConst2Val; // element of arConst2Val[]
 };
 
+class CItcString
+{
+public:
+	CItcString(int need_chars)
+	{
+#ifdef ITC_DEBUG_PRINT
+		_tprintf(_T("[%p]CItcString() ctor: %d\n"), this, need_chars);
+#endif // ITC_DEBUG_PRINT
+		
+		m_chars = need_chars;
+		m_str = new TCHAR[m_chars];
+	}
+
+	CItcString(const CItcString &itc)
+	{
+#ifdef ITC_DEBUG_PRINT
+		_tprintf(_T("[%p]CItcString() ctor= %s\n"), this, itc.m_str);
+#endif // ITC_DEBUG_PRINT
+	
+		m_chars = itc.m_chars;
+		m_str = new TCHAR[m_chars];
+		_sntprintf_s(m_str, m_chars, _TRUNCATE, _T("%s"), itc.m_str);
+	}
+
+	~CItcString()
+	{
+#ifdef ITC_DEBUG_PRINT
+		_tprintf(_T("[%p]CItcString() dtor: %s\n"), this, m_str);
+#endif // ITC_DEBUG_PRINT
+		delete m_str;
+		m_str = 0;
+		m_chars = 0;
+	}
+
+	TCHAR *get(){ return m_str; }
+
+	void put(const TCHAR *pstr)
+	{
+		if(m_str)
+		{
+			_sntprintf_s(m_str, m_chars, _TRUNCATE, _T("%s"), pstr);
+		}
+	}
+
+	int bufsize(){ return m_chars; }
+
+	operator TCHAR *(){ return m_str; }
+
+private:
+	TCHAR *m_str;
+	int m_chars;
+};
+
 
 class CInterpretConst
 {
@@ -42,6 +95,8 @@ public:
 	CInterpretConst(const ConstSection_st *arSections, int nSections);
 
 	const TCHAR *Interpret(CONSTVAL_t val, TCHAR *buf, int bufsize);
+
+	CItcString Interpret(CONSTVAL_t val);
 
 private:
 	void _reset();
@@ -60,6 +115,10 @@ private:
 	void *ptr_unused1, *ptr_unused2, *ptr_unused3, *ptr_unused4;
 };
 
+
 #define ITC_NAMEPAIR(macroname) { _T( #macroname ) , macroname }
+
+#define ITCS(val, itcobj) itcobj.Interpret(val).get()
+// -- the "return" of ITCS() macro can be passed as snprintf's variadic params
 
 #endif

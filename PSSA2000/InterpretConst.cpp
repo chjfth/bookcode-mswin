@@ -168,6 +168,16 @@ const TCHAR *CInterpretConst::Interpret(CONSTVAL_t input_val, TCHAR *buf, int bu
 	return buf;
 }
 
+CItcString CInterpretConst::Interpret(CONSTVAL_t input_val)
+{
+	CItcString itcs(200);
+	Interpret(input_val, itcs.get(), itcs.bufsize());
+	return itcs;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
 const Const2Val_st Demo1Sec1[] =
 {
 	{ _T("SEC1_VAL0"), 0 },
@@ -197,13 +207,11 @@ CInterpretConst g_itc1(ar_Demo1CS, ARRAYSIZE(ar_Demo1CS));
 
 void test_itc1()
 {
-	TCHAR buf[80] = {};
 	int arVals[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 0xff};
 	int i;
 	for(i=0; i<ARRAYSIZE(arVals); i++)
 	{
-		_tprintf(_T("%3d : %s\n"), arVals[i],
-			g_itc1.Interpret(arVals[i], buf, ARRAYSIZE(buf)));
+		_tprintf(_T("%3d : %s\n"), arVals[i], ITCS(arVals[i], g_itc1));
 	}
 /*
   0 : SEC1_VAL0|SEC2_VAL0
@@ -330,5 +338,7 @@ void test_itc()
 	printf("==== Bitfields\n");
 	test_itc_bitfields();
 
+#ifdef WANT_ASSERT_FALSE
 	printf("==== Test_bad_masks\n"); Test_bad_masks(); // This will assert()
+#endif
 }

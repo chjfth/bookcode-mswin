@@ -20,4 +20,11 @@ TCHAR *parse_cmdparam_TCHARs(
 	TCHAR outbuf[], int outbuflen, int *p_retlen,
 	TCHAR out_szliteral[], int out_szliteral_buflen);
 
+//////////////////////////////////////////////////////////////////////////
+
+#include "InterpretConst.h"
+
+extern CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uMsg;
+extern CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uPage;
+
 #endif

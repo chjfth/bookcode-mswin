@@ -1,11 +1,16 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <shellapi.h>
+
+#include <AclUI.h>
+#include <PrSht.h>
+
 #include <tchar.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 
+#include "InterpretConst.h"
 #include "vaDbg.h"
 
 void vaDbg(const TCHAR *fmt, ...)
@@ -229,4 +234,33 @@ TCHAR *parse_cmdparam_TCHARs(
 	LocalFree(argv);
 	return outbuf;
 }
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+
+static const Enum2Val_st e2v_CSecurityInformation_PropertySheetPageCallback_uMsg[] =
+{
+	ITC_NAMEPAIR(PSPCB_CREATE),
+	ITC_NAMEPAIR(PSPCB_RELEASE),
+	ITC_NAMEPAIR(PSPCB_SI_INITDIALOG),
+};
+CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uMsg(
+	e2v_CSecurityInformation_PropertySheetPageCallback_uMsg, 
+	ARRAYSIZE(e2v_CSecurityInformation_PropertySheetPageCallback_uMsg));
+
+static const Enum2Val_st e2v_CSecurityInformation_PropertySheetPageCallback_uPage[] =
+{
+	ITC_NAMEPAIR(SI_PAGE_PERM),
+	ITC_NAMEPAIR(SI_PAGE_ADVPERM),
+	ITC_NAMEPAIR(SI_PAGE_AUDIT),
+	ITC_NAMEPAIR(SI_PAGE_OWNER),
+	ITC_NAMEPAIR(SI_PAGE_EFFECTIVE),
+	ITC_NAMEPAIR(SI_PAGE_TAKEOWNERSHIP),
+};
+CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uPage(
+	e2v_CSecurityInformation_PropertySheetPageCallback_uPage, 
+	ARRAYSIZE(e2v_CSecurityInformation_PropertySheetPageCallback_uPage));
 
