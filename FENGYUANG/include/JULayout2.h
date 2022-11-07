@@ -5,7 +5,7 @@ Purpose: This class manages child window positioning and sizing when a parent
          window is resized.
          See Appendix B.
 
-[2017-06-18] Updated by Chj, renamed to JULayout.
+[2012-11-07] Updated by Chj, renamed to JULayout2.h .
 
 Chj Note: To use this lib, pick one and only one of your xxx.cpp, write at its start:
 	
@@ -46,10 +46,32 @@ public:
 
 public:
 	static bool PropSheetProc(HWND hwndPrsht, UINT uMsg, LPARAM lParam);
-	// -- In order to make PropertySheet() dialog resizable, user should call
-	// JULayout::PropSheetProc() once in PropertySheet()'s vanilla PropSheetProc callback, 
-	// relay the three params from Windows, and this function prepares everything 
-	// to make it work. Just that simple.
+	// -- In order to make PropertySheet() dialog resizable, user should hook into
+	// JULayout::PropSheetProc() in PropertySheet()'s PFNPROPSHEETCALLBACK, like this:
+	//
+	// 	static int CALLBACK PrshtProc(HWND hwndPrsht, UINT uMsg, LPARAM lParam)
+	// 	{
+	// 		bool succ = JULayout::PropSheetProc(hwndPrsht, uMsg, lParam);
+	//		if(!succ) ... do some logging ...;
+	// 		return 0;
+	// 	}
+	// 
+	// 	INT_PTR MyPreparePropertysheet(...)
+	// 	{
+	// 		PROPSHEETHEADER psh = {sizeof(PROPSHEETHEADER)};
+	// 
+	// 		psh.dwFlags     = ... | PSH_USECALLBACK;
+	// 		psh.hInstance   = ...;
+	// 		psh.hwndParent  = hWnd;
+	// 	...
+	// 		psh.pfnCallback = PrshtProc;
+	// 
+	// 		return PropertySheet(&psh);
+	// 	}
+	// 
+	// Yes, you relay the three params from Windows to JULayout::PropSheetProc(), 
+	// and this PropSheetProc() prepares everything to make it work. Just that simple.
+	//
 	// Return false on fail, probably due to system running out of resource.
 
 private: // was public, now they are private

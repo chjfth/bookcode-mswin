@@ -15,7 +15,7 @@
 
 #include <commctrl.h>
 
-#include "JULayout.h"
+#include "JULayout2.h"
 
 #include "dialog.h"
 
@@ -48,13 +48,11 @@ class KPropertySheet
 {
 public:
     
-    int propertySheet(HINSTANCE hInst, HWND hWnd, int id_Icon, int nPages, HPROPSHEETPAGE * hPages, const TCHAR *sCaption)
+    int propertySheet(HINSTANCE hInst, HWND hWnd, int id_Icon, int nPages, 
+		HPROPSHEETPAGE * hPages, const TCHAR *sCaption)
     {
-        PROPSHEETHEADER psh;
-
-        memset(& psh, 0, sizeof(PROPSHEETHEADER) );
+		PROPSHEETHEADER psh = {sizeof(PROPSHEETHEADER)};
         
-        psh.dwSize      = sizeof(PROPSHEETHEADER);
         psh.dwFlags     = PSH_USEICONID | PSH_NOAPPLYNOW 
 			| PSH_USECALLBACK
 			;

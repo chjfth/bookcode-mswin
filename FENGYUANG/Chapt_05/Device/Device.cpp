@@ -22,7 +22,7 @@
 #include "resource.h"
 
 #define JULAYOUT_IMPL
-#include "..\..\include\JULayout.h"
+#include "..\..\include\JULayout2.h"
 
 #include "..\..\include\property.h"
 #include "DevPage.h"
