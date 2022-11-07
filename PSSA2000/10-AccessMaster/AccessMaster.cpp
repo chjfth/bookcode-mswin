@@ -21,6 +21,11 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "..\vaDbg.h"
 #include "..\InterpretConst.h"
 
+#define  JULAYOUT_IMPL
+#include "..\JULayout2.h"
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -557,6 +562,16 @@ HRESULT CSecurityInformation::PropertySheetPageCallback(HWND hwnd, UINT uMsg,
 		s_itcMsg.Interpret(uMsg, szPspMsg, 100), 
 		s_itcPgt.Interpret(uPage, szPgtype, 100)
 		);
+
+	if(uMsg==PSPCB_SI_INITDIALOG)
+	{
+		assert(hwnd);
+		HWND hwndPrsht = GetParent(hwnd); // Yes, we should operate on its parent-window
+		
+		bool succ = JULayout::PropSheetProc(hwndPrsht, PSCB_INITIALIZED_1, 0);
+		
+		vaDbg(L"JULayout::PropSheetProc()=%d", succ);
+	}
 
 	return(S_OK);
 }
