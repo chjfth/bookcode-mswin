@@ -162,8 +162,8 @@ const TCHAR *CInterpretConst::Interpret(CONSTVAL_t input_val, TCHAR *buf, int bu
 		buf[--slen] = '\0';
 
 	// If output string empty, fill a '0'.
-	if(buf[0]=='\0')
-		buf[0] = '0';
+	if(buf[0]=='\0' && bufsize>=2)
+		buf[0] = '0', buf[1] = 0;
 
 	return buf;
 }

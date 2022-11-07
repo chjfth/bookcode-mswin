@@ -118,7 +118,8 @@ private:
 
 #define ITC_NAMEPAIR(macroname) { _T( #macroname ) , macroname }
 
-#define ITCS(val, itcobj) itcobj.Interpret(val).get()
+#define ITCS(val, itcobj) itcobj.Interpret((CONSTVAL_t)val).get()
 // -- the "return" of ITCS() macro can be passed as snprintf's variadic params
+// Note: ITCS() cannot be used in __try{} block, otherwise we'll get Compiler Error C2712.
 
 #endif

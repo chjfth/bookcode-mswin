@@ -424,12 +424,22 @@ HRESULT CSecurityInformation::GetSecurity(
 	ULONG lErr;
 	if (m_pInfo->m_szName[0] != 0) // Is it named
 	{
+		vaDbg(_T("CSecurityInformation::GetSecurity(%s) on \"%s\" (%s)"), 
+			ITCS(RequestedInformation, itc_SECURITY_INFORMATION),
+			m_pInfo->m_szName,
+			ITCS(m_pInfo->m_pEntry->m_objType, itc_SE_OBJECT_TYPE)
+			);
 		lErr = GetNamedSecurityInfo(m_pInfo->m_szName, 
 			m_pInfo->m_pEntry->m_objType, RequestedInformation, NULL, NULL, 
 			NULL, NULL, &pSD);
 	}
 	else // Is it a handle case
 	{
+		vaDbg(_T("CSecurityInformation::GetSecurity(%s) on handle=0x%p (%s)"), 
+			ITCS(RequestedInformation, itc_SECURITY_INFORMATION),
+			m_pInfo->m_hHandle,
+			ITCS(m_pInfo->m_pEntry->m_objType, itc_SE_OBJECT_TYPE)
+			);
 		lErr = GetSecurityInfo(m_pInfo->m_hHandle, m_pInfo->m_pEntry->m_objType,
 			RequestedInformation, NULL, NULL, NULL, NULL, &pSD);
 	}
@@ -448,9 +458,19 @@ HRESULT CSecurityInformation::GetSecurity(
 			TEXT("AccessMaster Notice"), 
 			MB_OK);
 	}
-	else {
+	else 
+	{
 		hr = S_OK;
 		*ppSecurityDescriptor = pSD;
+
+		// Debug info below
+		BOOL isDaclPresent = 0, isDaclDefaulted;
+		PACL pAcl = nullptr;
+		BOOL succ = GetSecurityDescriptorDacl(pSD, &isDaclPresent, &pAcl, &isDaclDefaulted);
+		assert(succ);
+		vaDbg(_T("Got DACL. isDaclPresent=%d, pAcl=0x%p, isDaclDefaulted=%d"),
+			isDaclPresent, pAcl, isDaclDefaulted);
+		CH10_DumpACL(pAcl);
 	}
 
 	return(hr);
@@ -549,7 +569,7 @@ HRESULT CSecurityInformation::PropertySheetPageCallback(HWND hwnd, UINT uMsg,
 		
 		bool succ = JULayout::PropSheetProc(hwndPrsht, PSCB_INITIALIZED_1, 0);
 		
-//		vaDbg(L"JULayout::PropSheetProc()=%d", succ);
+		vaDbg(L"JULayout::PropSheetProc()=%s", succ?L"success":L"fail");
 	}
 
 	return(S_OK);

@@ -20,11 +20,21 @@ TCHAR *parse_cmdparam_TCHARs(
 	TCHAR outbuf[], int outbuflen, int *p_retlen,
 	TCHAR out_szliteral[], int out_szliteral_buflen);
 
+//// PSSA2000 specific:
+
+#define PSIDFromPACE(pACE) ((PSID)(&((pACE)->SidStart))) // CH10.2
+
+void CH10_DumpACL( PACL pACL );
+
 //////////////////////////////////////////////////////////////////////////
 
 #include "InterpretConst.h"
 
 extern CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uMsg;
 extern CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uPage;
+extern CInterpretConst itc_SECURITY_INFORMATION;
+extern CInterpretConst itc_SE_OBJECT_TYPE;
+extern CInterpretConst itc_ACE_TYPE;
+extern CInterpretConst itc_ACE_FLAGS;
 
 #endif

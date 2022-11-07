@@ -4,6 +4,7 @@
 
 #include <AclUI.h>
 #include <PrSht.h>
+#include <sddl.h>
 
 #include <tchar.h>
 #include <stdio.h>
@@ -235,6 +236,62 @@ TCHAR *parse_cmdparam_TCHARs(
 	return outbuf;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+#undef _tprintf
+#define _tprintf xxx
+
+void CH10_DumpACL( PACL pACL )
+{
+	// Due to using ITCS(), we cannot use __try{} here.
+
+	if (pACL == NULL){
+		vaDbg(TEXT("NULL DACL"));
+		return;
+	}
+
+	ACL_SIZE_INFORMATION aclSize = {0};
+	if (!GetAclInformation(pACL, &aclSize, sizeof(aclSize), AclSizeInformation))
+		return;
+
+	vaDbg(TEXT("ACL ACE count: %d"), aclSize.AceCount);
+
+	for (ULONG lIndex = 0;lIndex < aclSize.AceCount;lIndex++)
+	{
+		ACCESS_ALLOWED_ACE* pACE;
+		if (!GetAce(pACL, lIndex, (PVOID*)&pACE))
+			return;
+
+		vaDbg(TEXT("ACE #%d/%d"), lIndex+1, aclSize.AceCount);
+		vaDbg(TEXT("  ACE Type = %s"), ITCS(pACE->Header.AceType, itc_ACE_TYPE));
+		vaDbg(TEXT("  ACE Flags = %s"), ITCS(pACE->Header.AceFlags, itc_ACE_FLAGS));
+
+		TCHAR bitbufs[40] = {};
+		ULONG lIndex2 = (ULONG)1<<31;
+		for(int i=0; i<32; i++){
+			bitbufs[i] = ((pACE->Mask & lIndex2) != 0)?TEXT('1'):TEXT('0');
+			lIndex2>>=1;
+		}
+		vaDbg(TEXT("  ACE Mask (32->0) = %s"), bitbufs);
+
+		TCHAR szName[1024];
+		TCHAR szDom[1024];
+		PSID pSID = PSIDFromPACE(pACE);
+		SID_NAME_USE sidUse = SidTypeUnknown;  
+		ULONG lLen1 = 1024, lLen2 = 1024;
+			
+		if (!LookupAccountSid(NULL, pSID, szName, &lLen1, szDom, &lLen2, &sidUse))
+			lstrcpy(szName, TEXT("Unknown"));
+			
+		PTSTR pszSID = nullptr;
+		if (!ConvertSidToStringSid(pSID, &pszSID))
+			return;
+			
+		vaDbg(TEXT("  ACE SID = %s ( %s )"), pszSID, szName);
+		LocalFree(pszSID);
+	}
+}
+
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -250,7 +307,7 @@ static const Enum2Val_st e2v_CSecurityInformation_PropertySheetPageCallback_uMsg
 CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uMsg(
 	e2v_CSecurityInformation_PropertySheetPageCallback_uMsg, 
 	ARRAYSIZE(e2v_CSecurityInformation_PropertySheetPageCallback_uMsg));
-
+//
 static const Enum2Val_st e2v_CSecurityInformation_PropertySheetPageCallback_uPage[] =
 {
 	ITC_NAMEPAIR(SI_PAGE_PERM),
@@ -263,4 +320,75 @@ static const Enum2Val_st e2v_CSecurityInformation_PropertySheetPageCallback_uPag
 CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uPage(
 	e2v_CSecurityInformation_PropertySheetPageCallback_uPage, 
 	ARRAYSIZE(e2v_CSecurityInformation_PropertySheetPageCallback_uPage));
+//
+static const Bitfield2Val_st b2v_SECURITY_INFORMATION[] =
+{
+	ITC_NAMEPAIR(OWNER_SECURITY_INFORMATION           ),
+	ITC_NAMEPAIR(GROUP_SECURITY_INFORMATION           ),
+	ITC_NAMEPAIR(DACL_SECURITY_INFORMATION            ),
+	ITC_NAMEPAIR(SACL_SECURITY_INFORMATION            ),
+	ITC_NAMEPAIR(LABEL_SECURITY_INFORMATION           ),
+	ITC_NAMEPAIR(PROTECTED_DACL_SECURITY_INFORMATION  ),
+	ITC_NAMEPAIR(PROTECTED_SACL_SECURITY_INFORMATION  ),
+	ITC_NAMEPAIR(UNPROTECTED_DACL_SECURITY_INFORMATION),
+	ITC_NAMEPAIR(UNPROTECTED_SACL_SECURITY_INFORMATION),
+};
+CInterpretConst itc_SECURITY_INFORMATION(
+	b2v_SECURITY_INFORMATION, ARRAYSIZE(b2v_SECURITY_INFORMATION)
+	);
+//
+static const Enum2Val_st e2v_SE_OBJECT_TYPE[] =
+{
+	ITC_NAMEPAIR(SE_UNKNOWN_OBJECT_TYPE),
+	ITC_NAMEPAIR(SE_FILE_OBJECT),
+	ITC_NAMEPAIR(SE_SERVICE),
+	ITC_NAMEPAIR(SE_PRINTER),
+	ITC_NAMEPAIR(SE_REGISTRY_KEY),
+	ITC_NAMEPAIR(SE_LMSHARE),
+	ITC_NAMEPAIR(SE_KERNEL_OBJECT),
+	ITC_NAMEPAIR(SE_WINDOW_OBJECT),
+	ITC_NAMEPAIR(SE_DS_OBJECT),
+	ITC_NAMEPAIR(SE_DS_OBJECT_ALL),
+	ITC_NAMEPAIR(SE_PROVIDER_DEFINED_OBJECT),
+	ITC_NAMEPAIR(SE_WMIGUID_OBJECT),
+	ITC_NAMEPAIR(SE_REGISTRY_WOW64_32KEY),
+};
+CInterpretConst itc_SE_OBJECT_TYPE(
+	e2v_SE_OBJECT_TYPE, ARRAYSIZE(e2v_SE_OBJECT_TYPE)
+	);
+//
+static const Enum2Val_st e2v_ACE_TYPE[] =
+{
+	ITC_NAMEPAIR(ACCESS_ALLOWED_ACE_TYPE                 ),
+	ITC_NAMEPAIR(ACCESS_DENIED_ACE_TYPE                  ),
+	ITC_NAMEPAIR(SYSTEM_AUDIT_ACE_TYPE                   ),
+	ITC_NAMEPAIR(SYSTEM_ALARM_ACE_TYPE                   ),
+	ITC_NAMEPAIR(ACCESS_ALLOWED_COMPOUND_ACE_TYPE        ),
+	ITC_NAMEPAIR(ACCESS_ALLOWED_OBJECT_ACE_TYPE          ),
+	ITC_NAMEPAIR(ACCESS_DENIED_OBJECT_ACE_TYPE           ),
+	ITC_NAMEPAIR(SYSTEM_AUDIT_OBJECT_ACE_TYPE            ),
+	ITC_NAMEPAIR(SYSTEM_ALARM_OBJECT_ACE_TYPE            ),
+	ITC_NAMEPAIR(ACCESS_ALLOWED_CALLBACK_ACE_TYPE        ),
+	ITC_NAMEPAIR(ACCESS_DENIED_CALLBACK_ACE_TYPE         ),
+	ITC_NAMEPAIR(ACCESS_ALLOWED_CALLBACK_OBJECT_ACE_TYPE ),
+	ITC_NAMEPAIR(ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE  ),
+	ITC_NAMEPAIR(SYSTEM_AUDIT_CALLBACK_ACE_TYPE          ),
+	ITC_NAMEPAIR(SYSTEM_ALARM_CALLBACK_ACE_TYPE          ),
+	ITC_NAMEPAIR(SYSTEM_AUDIT_CALLBACK_OBJECT_ACE_TYPE   ),
+	ITC_NAMEPAIR(SYSTEM_ALARM_CALLBACK_OBJECT_ACE_TYPE   ),
+	ITC_NAMEPAIR(SYSTEM_MANDATORY_LABEL_ACE_TYPE         ),
+};
+CInterpretConst itc_ACE_TYPE(e2v_ACE_TYPE, ARRAYSIZE(e2v_ACE_TYPE));
+//
+static const Bitfield2Val_st b2v_ACE_FLAGS[] =
+{
+	ITC_NAMEPAIR(OBJECT_INHERIT_ACE         ),
+	ITC_NAMEPAIR(CONTAINER_INHERIT_ACE      ),
+	ITC_NAMEPAIR(NO_PROPAGATE_INHERIT_ACE   ),
+	ITC_NAMEPAIR(INHERIT_ONLY_ACE           ),
+	ITC_NAMEPAIR(INHERITED_ACE              ),
+	ITC_NAMEPAIR(SUCCESSFUL_ACCESS_ACE_FLAG ),
+	ITC_NAMEPAIR(FAILED_ACCESS_ACE_FLAG     ),
+};
+CInterpretConst itc_ACE_FLAGS(b2v_ACE_FLAGS, ARRAYSIZE(b2v_ACE_FLAGS));
 
