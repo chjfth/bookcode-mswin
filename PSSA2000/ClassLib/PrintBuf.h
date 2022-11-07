@@ -87,56 +87,58 @@ void CPrintBuf::Clear() {
 
 LONG CPrintBuf::Filter(EXCEPTION_POINTERS* pep) {
 
-   LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
-   EXCEPTION_RECORD* per = pep->ExceptionRecord;
-   __try {
-      // Is exception is an access violation in the data buffer's region?
-      if (per->ExceptionCode != EXCEPTION_ACCESS_VIOLATION) 
-         __leave;
+	LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
+	EXCEPTION_RECORD* per = pep->ExceptionRecord;
+	__try {
+		// Is exception is an access violation in the data buffer's region?
+		if (per->ExceptionCode != EXCEPTION_ACCESS_VIOLATION) 
+			__leave;
 
-      if (!chINRANGE(m_pszBuffer, (PVOID) per->ExceptionInformation[1], 
-         ((PBYTE) m_pszBuffer) + m_nMaxSizeInBytes - 1)) {
-         __leave;
-      }
+		if (!chINRANGE(m_pszBuffer, (PVOID) per->ExceptionInformation[1], 
+			((PBYTE) m_pszBuffer) + m_nMaxSizeInBytes - 1)) {
+				__leave;
+		}
 
-      // Attempt to commit storage to the region
-      if (VirtualAlloc((PVOID) pep->ExceptionRecord->ExceptionInformation[1], 
-         1, MEM_COMMIT, PAGE_READWRITE) == NULL) {
-         __leave;
-      }
+		// Attempt to commit storage to the region
+		void *pMem = VirtualAlloc(
+			(PVOID) pep->ExceptionRecord->ExceptionInformation[1], 
+			1, MEM_COMMIT, PAGE_READWRITE);
+		if(pMem == NULL) {
+			__leave;
+		}
 
-      lDisposition = EXCEPTION_CONTINUE_EXECUTION;
-   }
-   __finally {
-   }
-   return(lDisposition);
+		lDisposition = EXCEPTION_CONTINUE_EXECUTION;
+	}
+	__finally {
+	}
+	return(lDisposition);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-int CPrintBuf::Print(PCTSTR pszFmt , ...) {
-
-   // This function appends text to the formatted print buffer.
-   int nLength = -1; // Assume failure
-   va_list arglist;
-   va_start(arglist, pszFmt);   
-   __try {
-      // Append string to end of buffer
-      nLength = _vsntprintf_s(m_pszBuffer+m_nCurSize, 
-		  m_nMaxSizeInBytes/sizeof(TCHAR)-m_nCurSize,
-		  _TRUNCATE, // VC2010
-		  pszFmt, arglist);
-      if (nLength > 0) 
-         m_nCurSize += nLength;
-   }
-   __except (Filter(GetExceptionInformation())) {
-      chMB("CPrintBuf attempted to go over the maximum size.");
-      DebugBreak();
-   }
-   va_end(arglist);
-   return(nLength);
+int CPrintBuf::Print(PCTSTR pszFmt , ...) 
+{
+	// This function appends text to the formatted print buffer.
+	int nLength = -1; // Assume failure
+	va_list arglist;
+	va_start(arglist, pszFmt);   
+	__try {
+		// Append string to end of buffer
+		nLength = _vsntprintf_s(m_pszBuffer+m_nCurSize, 
+			m_nMaxSizeInBytes/sizeof(TCHAR)-m_nCurSize,
+			_TRUNCATE, // VC2010
+			pszFmt, arglist);
+		if (nLength > 0) 
+			m_nCurSize += nLength;
+	}
+	__except (Filter(GetExceptionInformation())) {
+		chMB("CPrintBuf attempted to go over the maximum size.");
+		DebugBreak();
+	}
+	va_end(arglist);
+	return(nLength);
 }
 
 
