@@ -287,7 +287,7 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 				{
 					// Get as much access as possible
 					if (!DuplicateHandle(hProcess, hHandle, GetCurrentProcess(),
-						&hObj, MAXIMUM_ALLOWED, FALSE, 0))
+						&hObj, READ_CONTROL, FALSE, 0)) // was MAXIMUM_ALLOWED, would get no right
 					{
 						ReportError(TEXT("DuplicateHandle"), GetLastError());
 					}
