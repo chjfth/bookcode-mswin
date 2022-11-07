@@ -21,7 +21,7 @@
 #include "..\..\include\win.h"
 #include "..\..\include\listview.h"
 #include "..\..\include\property.h"
-#include "..\..\include\JULayout.h"
+#include "..\..\include\JULayout2.h"
 
 #include "..\Diver\Diver.h"
 #include "..\Diver\Report.h"

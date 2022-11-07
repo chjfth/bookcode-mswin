@@ -5,7 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pogy", "Pogy\Pogy.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Diver", "Diver\Diver.vcxproj", "{DAE6A5D3-7D33-2436-CBFA-22ECF16B278D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wingraph", "..\include\wingraph\wingraph.vcxproj", "{227E3A6E-D602-241F-9C67-C45C9E248700}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wingraph", "..\include\wingraph\wingraph.vcxproj", "{20220324-0000-0000-0000-10334500AA00}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Patcher", "Patcher\Patcher.vcxproj", "{541C6321-E2F5-C88A-E78C-6C149922B2E7}"
 EndProject
@@ -37,14 +37,14 @@ Global
 		{DAE6A5D3-7D33-2436-CBFA-22ECF16B278D}.Unicode Debug|Win32.Build.0 = Debug|Win32
 		{DAE6A5D3-7D33-2436-CBFA-22ECF16B278D}.Unicode Release|Win32.ActiveCfg = Release|Win32
 		{DAE6A5D3-7D33-2436-CBFA-22ECF16B278D}.Unicode Release|Win32.Build.0 = Release|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Debug|Win32.ActiveCfg = Debug|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Debug|Win32.Build.0 = Debug|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Release|Win32.ActiveCfg = Release|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Release|Win32.Build.0 = Release|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
-		{227E3A6E-D602-241F-9C67-C45C9E248700}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+		{20220324-0000-0000-0000-10334500AA00}.Debug|Win32.ActiveCfg = Debug|Win32
+		{20220324-0000-0000-0000-10334500AA00}.Debug|Win32.Build.0 = Debug|Win32
+		{20220324-0000-0000-0000-10334500AA00}.Release|Win32.ActiveCfg = Release|Win32
+		{20220324-0000-0000-0000-10334500AA00}.Release|Win32.Build.0 = Release|Win32
+		{20220324-0000-0000-0000-10334500AA00}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{20220324-0000-0000-0000-10334500AA00}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
+		{20220324-0000-0000-0000-10334500AA00}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{20220324-0000-0000-0000-10334500AA00}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
 		{541C6321-E2F5-C88A-E78C-6C149922B2E7}.Debug|Win32.ActiveCfg = Debug|Win32
 		{541C6321-E2F5-C88A-E78C-6C149922B2E7}.Debug|Win32.Build.0 = Debug|Win32
 		{541C6321-E2F5-C88A-E78C-6C149922B2E7}.Release|Win32.ActiveCfg = Release|Win32

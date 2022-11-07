@@ -49,7 +49,7 @@ void GetProcessName(DWORD processID, TCHAR szProcessName[], int bufchars)
 #include "..\..\include\GDITable.h"
 
 #define JULAYOUT_IMPL
-#include "..\..\include\JULayout.h"
+#include "..\..\include\JULayout2.h"
 
 #include "resource.h"
 
@@ -172,7 +172,7 @@ void KGDIObjectTable::UpdateTable(void)
 {
 	int i=0;
 	// clear nNew array for an updating
-	for (i=0; i<m_info.size(); i++)
+	for (i=0; i<(int)m_info.size(); i++)
 		memset(m_info[i].nNew, 0, sizeof(m_info[i].nNew));
 
 	for (i=0; i<MAXGDIHANDLE; i++) // all GDI handles
@@ -188,7 +188,7 @@ void KGDIObjectTable::UpdateTable(void)
 		// search for the processid in m_info table
 		int k = -1;
 		
-		for (int j=0; j<m_info.size(); j++)
+		for (int j=0; j<(int)m_info.size(); j++)
 		{
 			if ( m_info[j].processid == cell._nProcess )
 			{
@@ -226,7 +226,7 @@ void KGDIObjectTable::UpdateTable(void)
 	}
 
 	// update any changed process
-	for (i=0; i<m_info.size(); i++)
+	for (i=0; i<(int)m_info.size(); i++)
 	{
 		// if changed
 		if ( memcmp(m_info[i].nObject, m_info[i].nNew, sizeof(m_info[i].nNew)) )
