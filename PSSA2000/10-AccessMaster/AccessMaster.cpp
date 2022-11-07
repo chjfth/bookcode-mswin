@@ -635,7 +635,7 @@ HRESULT CSecurityInformation::SetSecurity(
 
 	// Report error
 	if (lErr != ERROR_SUCCESS)
-		ReportError(TEXT("GetNamedSecurityInfo"), lErr);
+		ReportError(TEXT("SetNamedSecurityInfo or SetSecurityInfo"), lErr);
 	else
 		hr = S_OK;
 
