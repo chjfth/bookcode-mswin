@@ -9,6 +9,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include <WindowsX.h>
 #include <ACLAPI.h>
 #include <ACLUI.h>
+#include <sddl.h>
 #include "Resource.h"
 
 // Force linking against the ACLUI library
@@ -424,7 +425,7 @@ HRESULT CSecurityInformation::GetSecurity(
 	ULONG lErr;
 	if (m_pInfo->m_szName[0] != 0) // Is it named
 	{
-		vaDbg(_T("CSecurityInformation::GetSecurity(%s) on \"%s\" (%s)"), 
+		vaDbg(_T("System calls our CSecurityInformation::GetSecurity(%s) on \"%s\" (%s)"), 
 			ITCS(RequestedInformation, itc_SECURITY_INFORMATION),
 			m_pInfo->m_szName,
 			ITCS(m_pInfo->m_pEntry->m_objType, itc_SE_OBJECT_TYPE)
@@ -435,7 +436,7 @@ HRESULT CSecurityInformation::GetSecurity(
 	}
 	else // Is it a handle case
 	{
-		vaDbg(_T("CSecurityInformation::GetSecurity(%s) on handle=0x%p (%s)"), 
+		vaDbg(_T("System calls our CSecurityInformation::GetSecurity(%s) on handle=0x%p (%s)"), 
 			ITCS(RequestedInformation, itc_SECURITY_INFORMATION),
 			m_pInfo->m_hHandle,
 			ITCS(m_pInfo->m_pEntry->m_objType, itc_SE_OBJECT_TYPE)
@@ -584,28 +585,61 @@ HRESULT CSecurityInformation::SetSecurity(
 	PSECURITY_DESCRIPTOR pSecurityDescriptor) 
 {
 	HRESULT hr = 1;
+	BOOL succ = 0;
 
 	// Get the Dacl
 	PACL pDACL = NULL;
-	BOOL fPresent=0, fDefaulted=0;
-	GetSecurityDescriptorDacl(pSecurityDescriptor, &fPresent, &pDACL, &fDefaulted);
+	BOOL fPresentDacl=0, fPresentSacl=0;
+	BOOL fDefaultedDacl=0, fDefaultedSacl, fDefaultedOwner=0, fDefaultedGroup;
+	GetSecurityDescriptorDacl(pSecurityDescriptor, &fPresentDacl, &pDACL, &fDefaultedDacl);
 
 	// Get the SACL
 	PACL pSACL = NULL;
-	GetSecurityDescriptorSacl(pSecurityDescriptor, &fPresent, &pSACL, &fDefaulted);
+	GetSecurityDescriptorSacl(pSecurityDescriptor, &fPresentSacl, &pSACL, &fDefaultedSacl);
 
 	// Get the owner
 	PSID psidOwner = NULL;
-	GetSecurityDescriptorOwner(pSecurityDescriptor, &psidOwner, &fDefaulted);
+	GetSecurityDescriptorOwner(pSecurityDescriptor, &psidOwner, &fDefaultedOwner);
 
 	// Get the group
 	PSID psidGroup = NULL;
-	GetSecurityDescriptorGroup(pSecurityDescriptor, &psidGroup, &fDefaulted);
+	GetSecurityDescriptorGroup(pSecurityDescriptor, &psidGroup, &fDefaultedGroup);
 
 	// Find out if DACL and SACL inherit from parent objects
 	SECURITY_DESCRIPTOR_CONTROL sdCtrl = NULL;
 	ULONG ulRevision;
 	GetSecurityDescriptorControl(pSecurityDescriptor, &sdCtrl, &ulRevision);
+
+	// Dump debug:
+	TCHAR *strOwner = nullptr, *strGroup = nullptr;
+	succ = ConvertSidToStringSid(psidOwner, &strOwner); 
+	// -- will be nullptr if dlgbox user does not set a new owner
+	succ = ConvertSidToStringSid(psidGroup, &strGroup);
+	vaDbg(
+		_T("System calls our CSecurityInformation::SetSecurity(), passing in:\n")
+		_T("  SecurityInformation=%s\n")
+		_T("  fPresentDacl=%d , fDefaultedDacl=%d\n")
+		_T("  fPresentSacl=%d , fDefaultedSacl=%d\n")
+		_T("  SD.Owner-SID = %s (defaulted=%d)\n")
+		_T("  SD.Group-SID = %s (defaulted=%d)\n")
+		_T("  SD.Control(flags) = %s")
+		, 
+		ITCS(SecurityInformation, itc_SECURITY_INFORMATION),
+		fPresentDacl, fDefaultedDacl,
+		fPresentSacl, fDefaultedSacl,
+		strOwner ? strOwner : _T("(no update)"), fDefaultedOwner,
+		strGroup ? strGroup : _T("(no update)"), fDefaultedGroup,
+		ITCS1(sdCtrl, itc_SECURITY_DESCRIPTOR_CONTROL)
+		);
+	if(pDACL) {
+		vaDbg(_T("Dump pass-in DACL:"));
+		CH10_DumpACL(pDACL);
+	}
+	if(pSACL) {
+		vaDbg(_T("Dump pass-in SACL:"));
+		CH10_DumpACL(pSACL);
+	}
+
 	if ((sdCtrl & SE_DACL_PROTECTED) != SE_DACL_PROTECTED)
 		SecurityInformation  |= UNPROTECTED_DACL_SECURITY_INFORMATION;
 	else
@@ -617,7 +651,7 @@ HRESULT CSecurityInformation::SetSecurity(
 		SecurityInformation  |= PROTECTED_SACL_SECURITY_INFORMATION;
 
 	// Set the security
-	ULONG lErr;
+	ULONG lErr = 0;
 	if (m_pInfo->m_szName[0] != 0) // Is it named
 	{
 		lErr = SetNamedSecurityInfo(m_pInfo->m_szName, 
