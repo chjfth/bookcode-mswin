@@ -600,7 +600,7 @@ HRESULT CSecurityInformation::SetSecurity(
 
 	// Get the group
 	PSID psidGroup = NULL;
-	GetSecurityDescriptorOwner(pSecurityDescriptor, &psidGroup, &fDefaulted);
+	GetSecurityDescriptorGroup(pSecurityDescriptor, &psidGroup, &fDefaulted);
 
 	// Find out if DACL and SACL inherit from parent objects
 	SECURITY_DESCRIPTOR_CONTROL sdCtrl = NULL;
