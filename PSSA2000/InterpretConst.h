@@ -30,6 +30,12 @@ struct ConstSection_st
 	int nConst2Val; // element of arConst2Val[]
 };
 
+enum ITC_DisplayFormat_et
+{
+	ITC_DF_NameOnly = 0,
+	ITC_DF_NameAndValue = 1,
+};
+
 class CItcString
 {
 public:
@@ -89,24 +95,44 @@ class CInterpretConst
 public:
 	virtual ~CInterpretConst();
 
-	CInterpretConst(const Enum2Val_st *arEnum2Val, int nEnum2Val);
-	CInterpretConst(const Bitfield2Val_st *arBitfield2Val, int nBitfield2Val);
+	CInterpretConst(const Enum2Val_st *arEnum2Val, int nEnum2Val, 
+		const TCHAR *valfmt=nullptr);
+	
+	CInterpretConst(const Bitfield2Val_st *arBitfield2Val, int nBitfield2Val, 
+		const TCHAR *valfmt=nullptr);
 
-	CInterpretConst(const ConstSection_st *arSections, int nSections);
+	CInterpretConst(const ConstSection_st *arSections, int nSections, 
+		const TCHAR *valfmt=nullptr);
 
-	const TCHAR *Interpret(CONSTVAL_t val, TCHAR *buf, int bufsize);
+	const TCHAR *Interpret(CONSTVAL_t val, ITC_DisplayFormat_et dispfmt,
+		TCHAR *buf, int bufsize);
 
-	CItcString Interpret(CONSTVAL_t val);
+	CItcString Interpret(CONSTVAL_t val, ITC_DisplayFormat_et dispfmt);
+
+	bool SetValFmt(const TCHAR *fmt);
 
 private:
-	void _reset();
+	enum { 
+		WholeDisplayMaxChars = 400,
+		OneDisplayMaxChars = 100,
+		FmtSpecMaxChars = 10,
+	};
+
+private:
+	void _reset(const TCHAR *valfmt);
 	bool is_enum_ctor(){ return m_arSections==&m_EnumC2V; };
 	static bool is_unique_mask(CONSTVAL_t oldmasks, CONSTVAL_t newmask);
 	bool ensure_unique_masks();
 
+	TCHAR *FormatOneDisplay(const TCHAR *szVal, CONSTVAL_t val, ITC_DisplayFormat_et dispfmt,
+		TCHAR obuf[], int obufsize);
+
 private:
 	ConstSection_st m_EnumC2V;
 	bool m_using_Bitfield_ctor;
+
+	const TCHAR *m_valfmt; 
+	// -- format string when showing value, "%d", "%X", "0x%04X" etc
 
 private:
 	ConstSection_st *m_arSections;
@@ -118,8 +144,10 @@ private:
 
 #define ITC_NAMEPAIR(macroname) { _T( #macroname ) , macroname }
 
-#define ITCS(val, itcobj) itcobj.Interpret((CONSTVAL_t)val).get()
+#define ITCS(val, itcobj) itcobj.Interpret((CONSTVAL_t)val, ITC_DF_NameOnly).get()
 // -- the "return" of ITCS() macro can be passed as snprintf's variadic params
 // Note: ITCS() cannot be used in __try{} block, otherwise we'll get Compiler Error C2712.
+
+#define ITCS1(val, itcobj) itcobj.Interpret((CONSTVAL_t)val, ITC_DF_NameAndValue).get()
 
 #endif

@@ -415,7 +415,7 @@ HRESULT CSecurityInformation::GetSecurity(
 	SECURITY_INFORMATION RequestedInformation, 
 	PSECURITY_DESCRIPTOR* ppSecurityDescriptor, BOOL fDefault) 
 {
-	assert(!fDefault); // chj: todo: dump RequestedInformation
+	assert(!fDefault);
 
 	HRESULT hr = 1;
 	PSECURITY_DESCRIPTOR pSD = NULL;
@@ -444,7 +444,7 @@ HRESULT CSecurityInformation::GetSecurity(
 			RequestedInformation, NULL, NULL, NULL, NULL, &pSD);
 	}
 
-	// No matter what we still display security information
+	// No matter what, we still display security information
 	if (lErr != ERROR_SUCCESS)
 	{ 
 		// Failure produces an empty SD
@@ -587,14 +587,12 @@ HRESULT CSecurityInformation::SetSecurity(
 
 	// Get the Dacl
 	PACL pDACL = NULL;
-	BOOL fPresent, fDefaulted;
-	GetSecurityDescriptorDacl(pSecurityDescriptor, &fPresent, &pDACL, 
-		&fDefaulted);
+	BOOL fPresent=0, fDefaulted=0;
+	GetSecurityDescriptorDacl(pSecurityDescriptor, &fPresent, &pDACL, &fDefaulted);
 
 	// Get the SACL
 	PACL pSACL = NULL;
-	GetSecurityDescriptorSacl(pSecurityDescriptor, &fPresent, &pSACL, 
-		&fDefaulted);
+	GetSecurityDescriptorSacl(pSecurityDescriptor, &fPresent, &pSACL, &fDefaulted);
 
 	// Get the owner
 	PSID psidOwner = NULL;

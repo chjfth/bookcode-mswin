@@ -36,5 +36,6 @@ extern CInterpretConst itc_SECURITY_INFORMATION;
 extern CInterpretConst itc_SE_OBJECT_TYPE;
 extern CInterpretConst itc_ACE_TYPE;
 extern CInterpretConst itc_ACE_FLAGS;
+extern CInterpretConst itc_SECURITY_DESCRIPTOR_CONTROL;
 
 #endif

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "InterpretConst.h"
 
-void CInterpretConst::_reset()
+void CInterpretConst::_reset(const TCHAR *valfmt)
 {
 	m_EnumC2V.SectionMask=0; 
 	m_EnumC2V.arConst2Val=nullptr; 
@@ -12,8 +12,38 @@ void CInterpretConst::_reset()
 
 	m_using_Bitfield_ctor = false;
 
+	SetValFmt( valfmt );
+
 	m_arSections = nullptr;
 	m_nSections = 0;
+}
+
+bool CInterpretConst::SetValFmt(const TCHAR *fmt)
+{
+	// fmt example: "%d", "%X", "0x%04X"
+
+	bool is_correct_valfmt = true;
+
+	// simple fmt format checking:
+	// try to format a value 0x3F, check whether we get "3F", "3f" or "63" in output string. 
+
+	if(fmt)
+	{
+		TCHAR tbuf[OneDisplayMaxChars] = {};
+		_sntprintf_s(tbuf, _TRUNCATE, fmt, 0x3F);
+
+		if(_tcsstr(tbuf, _T("3F"))==nullptr 
+			&& _tcsstr(tbuf, _T("3f"))==nullptr
+			&& _tcsstr(tbuf, _T("63"))==nullptr
+			)
+			is_correct_valfmt = false;
+
+		assert(is_correct_valfmt==true);
+	}
+
+	m_valfmt = is_correct_valfmt ? fmt : nullptr; // can be nullptr, means default
+
+	return is_correct_valfmt;
 }
 
 CInterpretConst::~CInterpretConst()
@@ -22,9 +52,10 @@ CInterpretConst::~CInterpretConst()
 		delete []m_arSections;
 }
 
-CInterpretConst::CInterpretConst(const ConstSection_st *arSections, int nSections)
+CInterpretConst::CInterpretConst(const ConstSection_st *arSections, int nSections,
+	const TCHAR *valfmt)
 {
-	_reset();
+	_reset(valfmt);
 
 	m_arSections = const_cast<ConstSection_st*>(arSections);
 	m_nSections = nSections;
@@ -32,9 +63,10 @@ CInterpretConst::CInterpretConst(const ConstSection_st *arSections, int nSection
 	ensure_unique_masks();
 }
 
-CInterpretConst::CInterpretConst(const Enum2Val_st *arEnum2Val, int nEnum2Val)
+CInterpretConst::CInterpretConst(const Enum2Val_st *arEnum2Val, int nEnum2Val,
+	const TCHAR *valfmt)
 {
-	_reset();
+	_reset(valfmt);
 
 	m_EnumC2V.SectionMask = 0xFFFFffff;
 	m_EnumC2V.arConst2Val = reinterpret_cast<const Const2Val_st*>(arEnum2Val);
@@ -46,9 +78,10 @@ CInterpretConst::CInterpretConst(const Enum2Val_st *arEnum2Val, int nEnum2Val)
 	ensure_unique_masks();
 }
 
-CInterpretConst::CInterpretConst(const Bitfield2Val_st *arBitfield2Val, int nBitfield2Val)
+CInterpretConst::CInterpretConst(const Bitfield2Val_st *arBitfield2Val, int nBitfield2Val,
+	const TCHAR *valfmt)
 {
-	_reset();
+	_reset(valfmt);
 
 	m_arSections = new ConstSection_st[nBitfield2Val];
 	if(!m_arSections)
@@ -99,7 +132,34 @@ bool CInterpretConst::ensure_unique_masks()
 	return true;
 }
 
-const TCHAR *CInterpretConst::Interpret(CONSTVAL_t input_val, TCHAR *buf, int bufsize)
+TCHAR* CInterpretConst::FormatOneDisplay(
+	const TCHAR *szVal, CONSTVAL_t val, ITC_DisplayFormat_et dispfmt, 
+	TCHAR obuf[], int obufsize)
+{
+	_sntprintf_s(obuf, obufsize, _TRUNCATE, _T("%s"), szVal);
+	int len1 = (int)_tcslen(obuf);
+	
+	assert(len1<obufsize);
+	
+	if(dispfmt==ITC_DF_NameAndValue)
+	{
+		const TCHAR *valfmt = m_valfmt;
+		if(valfmt==nullptr)
+			valfmt = is_enum_ctor() ? _T("%d") : _T("0x%X");
+
+		// Add brackets to value, let "0x3F" shown as "(0x3F)"
+		TCHAR _valfmt_[FmtSpecMaxChars+2] = {};
+		_sntprintf_s(_valfmt_, _TRUNCATE, _T("(%s)"), valfmt);
+
+		_sntprintf_s(obuf+len1, obufsize-len1, _TRUNCATE, _valfmt_, val);
+	}
+
+	return obuf;
+}
+
+const TCHAR *CInterpretConst::Interpret(
+	CONSTVAL_t input_val, ITC_DisplayFormat_et dispfmt,
+	TCHAR *buf, int bufsize)
 {
 	if(bufsize<=0)
 		return NULL;
@@ -121,7 +181,12 @@ const TCHAR *CInterpretConst::Interpret(CONSTVAL_t input_val, TCHAR *buf, int bu
 			{
 				if(c2v[i].ConstName)
 				{
-					_sntprintf_s(buf, bufsize, _TRUNCATE, _T("%s%s|"), buf, c2v[i].ConstName);
+					TCHAR szbuf[OneDisplayMaxChars] = {};
+					_sntprintf_s(buf, bufsize, _TRUNCATE, _T("%s%s|"), 
+						buf, 
+						FormatOneDisplay(c2v[i].ConstName, c2v[i].ConstVal, 
+							dispfmt, szbuf, ARRAYSIZE(szbuf))
+						);
 				}
 
 				break;
@@ -168,10 +233,11 @@ const TCHAR *CInterpretConst::Interpret(CONSTVAL_t input_val, TCHAR *buf, int bu
 	return buf;
 }
 
-CItcString CInterpretConst::Interpret(CONSTVAL_t input_val)
+CItcString CInterpretConst::Interpret(
+	CONSTVAL_t input_val, ITC_DisplayFormat_et dispfmt)
 {
-	CItcString itcs(200);
-	Interpret(input_val, itcs.get(), itcs.bufsize());
+	CItcString itcs(WholeDisplayMaxChars);
+	Interpret(input_val, dispfmt, itcs.get(), itcs.bufsize());
 	return itcs;
 }
 
@@ -233,26 +299,26 @@ void test_itc1()
 */
 }
 
+const Enum2Val_st e2v_weekday[] =
+{
+	{_T("Sunday"), 0},
+	{_T("Monday"), 1},
+	{_T("Tuesday"), 2},
+	{_T("Wednesday"), 3},
+	{_T("Thursday"), 4},
+	{_T("Friday"), 5},
+	{_T("Saturday"), 6},
+};
+CInterpretConst itc_weekday(e2v_weekday, ARRAYSIZE(e2v_weekday));
+
+
 void test_itc_enum()
 {
-	const Enum2Val_st arE2V[] =
-	{
-		{_T("Sunday"), 0},
-		{_T("Monday"), 1},
-		{_T("Tuesday"), 2},
-		{_T("Wednesday"), 3},
-		{_T("Thursday"), 4},
-		{_T("Friday"), 5},
-		{_T("Saturday"), 6},
-	};
-
-	CInterpretConst itc_weekday(arE2V, ARRAYSIZE(arE2V));
-
 	TCHAR buf[80] = {};
 	int arVals[] = {0,1,2, 5,6,7};
 	for(int i=0; i<ARRAYSIZE(arVals); i++)
 	{
-		itc_weekday.Interpret(arVals[i], buf, ARRAYSIZE(buf));
+		itc_weekday.Interpret(arVals[i], ITC_DF_NameOnly, buf, ARRAYSIZE(buf));
 		_tprintf(_T("%3d : %s\n"), arVals[i], buf);
 	}
 /*
@@ -265,24 +331,24 @@ void test_itc_enum()
 */
 }
 
+const Bitfield2Val_st b2v_sample1[] =
+{
+	{_T("bit0"), 1<<0},
+	{_T("bit1"), 1<<1},
+	{_T("bit2"), 1<<2},
+	{_T("bit4"), 1<<4},
+	{_T("bit5and6"), 32+64}, // bit 5&6 must both be set to signify this name
+};
+CInterpretConst itc_bitfields(b2v_sample1, ARRAYSIZE(b2v_sample1));
+
+
 void test_itc_bitfields()
 {
-	const Bitfield2Val_st arBf2V[] =
-	{
-		{_T("bit0"), 1<<0},
-		{_T("bit1"), 1<<1},
-		{_T("bit2"), 1<<2},
-		{_T("bit4"), 1<<4},
-		{_T("bit5and6"), 32+64}, // bit 5&6 must both be set to signify this name
-	};
-
-	CInterpretConst itc_bitfields(arBf2V, ARRAYSIZE(arBf2V));
-
 	TCHAR buf[80] = {};
 	int arVals[] = {0,1,2,3,4,5,6,7,8,9, 16,17, 32,64,96};
 	for(int i=0; i<ARRAYSIZE(arVals); i++)
 	{
-		itc_bitfields.Interpret(arVals[i], buf, ARRAYSIZE(buf));
+		itc_bitfields.Interpret(arVals[i], ITC_DF_NameOnly, buf, ARRAYSIZE(buf));
 		_tprintf(_T("%3d : %s\n"), arVals[i], buf);
 	}
 /*
@@ -304,6 +370,60 @@ void test_itc_bitfields()
 */
 }
 
+void test_itc_enum_showval_defaultfmt()
+{
+	int arVals[] = {0,1,2, 5,6,7};
+	for(int i=0; i<ARRAYSIZE(arVals); i++)
+	{
+		_tprintf(_T("%3d : %s\n"), arVals[i], ITCS1(arVals[i], itc_weekday));
+	}
+/*
+  0 : Sunday(0)
+  1 : Monday(1)
+  2 : Tuesday(2)
+  5 : Friday(5)
+  6 : Saturday(6)
+  7 : 7
+*/
+}
+
+void test_itc_bitfields_defaultfmt()
+{
+	int arVals[] = {0,1,2,3,4,5,6,7,8,9, 16,17, 32,64,96};
+	for(int i=0; i<ARRAYSIZE(arVals); i++)
+	{
+		_tprintf(_T("%3d : %s\n"), arVals[i], ITCS1(arVals[i], itc_bitfields));
+	}
+/*
+  0 : 0
+  1 : bit0(0x1)
+  2 : bit1(0x2)
+  3 : bit0(0x1)|bit1(0x2)
+  4 : bit2(0x4)
+  5 : bit0(0x1)|bit2(0x4)
+  6 : bit1(0x2)|bit2(0x4)
+  7 : bit0(0x1)|bit1(0x2)|bit2(0x4)
+  8 : 0x8
+  9 : bit0(0x1)|0x8
+ 16 : bit4(0x10)
+ 17 : bit0(0x1)|bit4(0x10)
+ 32 : 0x20
+ 64 : 0x40
+ 96 : bit5and6(0x60)
+*/
+}
+
+void test_itc_bitfields_customfmt()
+{
+	CInterpretConst itc_bitfields_customfmt(b2v_sample1, ARRAYSIZE(b2v_sample1), _T("0x%04x"));
+
+	int arVals[] = {0,1,2,3,4,5,6,7,8,9, 16,17, 32,64,96};
+	for(int i=0; i<ARRAYSIZE(arVals); i++)
+	{
+		_tprintf(_T("%3d : %s\n"), arVals[i], ITCS1(arVals[i], itc_bitfields_customfmt));
+	}
+}
+
 #define BIT5AND6 (32+64)
 
 void Test_bad_masks()
@@ -322,7 +442,7 @@ void Test_bad_masks()
 	int arVals[] = {0,1,2,3,4,5,6,7,8,9, 16,17, 32,64,96};
 	for(int i=0; i<ARRAYSIZE(arVals); i++)
 	{
-		itc_bitfields.Interpret(arVals[i], buf, ARRAYSIZE(buf));
+		itc_bitfields.Interpret(arVals[i], ITC_DF_NameOnly, buf, ARRAYSIZE(buf));
 		_tprintf(_T("%3d : %s\n"), arVals[i], buf);
 	}
 }
@@ -337,6 +457,15 @@ void test_itc()
 
 	printf("==== Bitfields\n");
 	test_itc_bitfields();
+
+	printf("==== test_itc_enum_showval_defaultfmt()\n");
+	test_itc_enum_showval_defaultfmt();
+
+	printf("==== test_itc_bitfields_defaultfmt()\n");
+	test_itc_bitfields_defaultfmt();
+
+	printf("==== test_itc_bitfields_customfmt()\n");
+	test_itc_bitfields_customfmt();
 
 #ifdef WANT_ASSERT_FALSE
 	printf("==== Test_bad_masks\n"); Test_bad_masks(); // This will assert()
