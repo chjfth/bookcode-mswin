@@ -342,8 +342,8 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 
 SI_INHERIT_TYPE CSecurityInformation::m_siInheritType[] = {
    {&m_guidNULL, CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE | INHERIT_ONLY_ACE,
-            TEXT("Child")},
-   {&m_guidNULL, OBJECT_INHERIT_ACE | INHERIT_ONLY_ACE, TEXT("Child")}
+            TEXT("~Child")},
+   {&m_guidNULL, OBJECT_INHERIT_ACE | INHERIT_ONLY_ACE, TEXT("~child")}
 };
 
 
@@ -562,6 +562,21 @@ HRESULT CSecurityInformation::GetInheritTypes(PSI_INHERIT_TYPE* ppInheritTypes,
 			*pcInheritTypes = 0;
 		}
 	}
+
+	vaDbg(_T("System calls our CSecurityInformation::GetInheritTypes(). We return %d inherit-types."),
+		*pcInheritTypes);
+
+	if(*pcInheritTypes==1)
+	{
+		vaDbg(
+			_T("  SI_INHERIT_TYPE.pszName=%s\n")
+			_T("  SI_INHERIT_TYPE.dwFlags=%s")
+			, 
+			(*ppInheritTypes)->pszName,
+			ITCS((*ppInheritTypes)->dwFlags, itc_SI_INHERIT_TYPE_flags)
+			);
+	}
+
 	return(S_OK);
 }
 

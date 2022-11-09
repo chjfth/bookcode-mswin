@@ -630,5 +630,15 @@ static const Bitfield2Val_st b2v_SI_OBJECT_INFO_flags[] =
 CInterpretConst itc_SI_OBJECT_INFO_flags(
 	b2v_SI_OBJECT_INFO_flags, ARRAYSIZE(b2v_SI_OBJECT_INFO_flags),
 	_T("0x%08X"));
+//
+static const Bitfield2Val_st b2v_SI_INHERIT_TYPE_flags[] =
+{
+	ITC_NAMEPAIR(CONTAINER_INHERIT_ACE),
+	ITC_NAMEPAIR(INHERIT_ONLY_ACE),
+	ITC_NAMEPAIR(OBJECT_INHERIT_ACE),
+};
+CInterpretConst itc_SI_INHERIT_TYPE_flags(
+	b2v_SI_INHERIT_TYPE_flags, ARRAYSIZE(b2v_SI_INHERIT_TYPE_flags),
+	_T("0x%02X"));
 
 
