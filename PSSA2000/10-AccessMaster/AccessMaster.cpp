@@ -434,7 +434,7 @@ HRESULT CSecurityInformation::GetSecurity(
 			m_pInfo->m_pEntry->m_objType, RequestedInformation, NULL, NULL, 
 			NULL, NULL, &pSD);
 	}
-	else // Is it a handle case
+	else // Is it a hHandle case
 	{
 		vaDbg(_T("System calls our CSecurityInformation::GetSecurity(%s) on handle=0x%p (%s)"), 
 			ITCS(RequestedInformation, itc_SECURITY_INFORMATION),
@@ -465,13 +465,8 @@ HRESULT CSecurityInformation::GetSecurity(
 		*ppSecurityDescriptor = pSD;
 
 		// Debug info below
-		BOOL isDaclPresent = 0, isDaclDefaulted;
-		PACL pAcl = nullptr;
-		BOOL succ = GetSecurityDescriptorDacl(pSD, &isDaclPresent, &pAcl, &isDaclDefaulted);
-		assert(succ);
-		vaDbg(_T("Got DACL. isDaclPresent=%d, pAcl=0x%p, isDaclDefaulted=%d"),
-			isDaclPresent, pAcl, isDaclDefaulted);
-		CH10_DumpACL(pAcl);
+		vaDbg(_T("We return the following SD:"));
+		CH10_DumpSD(pSD);
 	}
 
 	return(hr);
@@ -585,7 +580,6 @@ HRESULT CSecurityInformation::SetSecurity(
 	PSECURITY_DESCRIPTOR pSecurityDescriptor) 
 {
 	HRESULT hr = 1;
-	BOOL succ = 0;
 
 	// Get the Dacl
 	PACL pDACL = NULL;
@@ -611,34 +605,14 @@ HRESULT CSecurityInformation::SetSecurity(
 	GetSecurityDescriptorControl(pSecurityDescriptor, &sdCtrl, &ulRevision);
 
 	// Dump debug:
-	TCHAR *strOwner = nullptr, *strGroup = nullptr;
-	succ = ConvertSidToStringSid(psidOwner, &strOwner); 
-	// -- will be nullptr if dlgbox user does not set a new owner
-	succ = ConvertSidToStringSid(psidGroup, &strGroup);
 	vaDbg(
 		_T("System calls our CSecurityInformation::SetSecurity(), passing in:\n")
 		_T("  SecurityInformation=%s\n")
-		_T("  fPresentDacl=%d , fDefaultedDacl=%d\n")
-		_T("  fPresentSacl=%d , fDefaultedSacl=%d\n")
-		_T("  SD.Owner-SID = %s (defaulted=%d)\n")
-		_T("  SD.Group-SID = %s (defaulted=%d)\n")
-		_T("  SD.Control(flags) = %s")
+		_T("  SD Dump below:")
 		, 
-		ITCS(SecurityInformation, itc_SECURITY_INFORMATION),
-		fPresentDacl, fDefaultedDacl,
-		fPresentSacl, fDefaultedSacl,
-		strOwner ? strOwner : _T("(no update)"), fDefaultedOwner,
-		strGroup ? strGroup : _T("(no update)"), fDefaultedGroup,
-		ITCS1(sdCtrl, itc_SECURITY_DESCRIPTOR_CONTROL)
+		ITCS(SecurityInformation, itc_SECURITY_INFORMATION)
 		);
-	if(pDACL) {
-		vaDbg(_T("Dump pass-in DACL:"));
-		CH10_DumpACL(pDACL);
-	}
-	if(pSACL) {
-		vaDbg(_T("Dump pass-in SACL:"));
-		CH10_DumpACL(pSACL);
-	}
+	CH10_DumpSD(pSecurityDescriptor);
 
 	if ((sdCtrl & SE_DACL_PROTECTED) != SE_DACL_PROTECTED)
 		SecurityInformation  |= UNPROTECTED_DACL_SECURITY_INFORMATION;
@@ -658,7 +632,7 @@ HRESULT CSecurityInformation::SetSecurity(
 			m_pInfo->m_pEntry->m_objType, SecurityInformation, psidOwner, 
 			psidGroup, pDACL, pSACL);
 	}
-	else // Is it a handle case
+	else // Is it a hHandle case
 	{
 		lErr = SetSecurityInfo(m_pInfo->m_hHandle, m_pInfo->m_pEntry->m_objType,
 			SecurityInformation, psidOwner, psidGroup, pDACL, pSACL);

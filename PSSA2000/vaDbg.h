@@ -25,6 +25,7 @@ TCHAR *parse_cmdparam_TCHARs(
 #define PSIDFromPACE(pACE) ((PSID)(&((pACE)->SidStart))) // CH10.2
 
 void CH10_DumpACL( PACL pACL );
+void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd );
 
 //////////////////////////////////////////////////////////////////////////
 
