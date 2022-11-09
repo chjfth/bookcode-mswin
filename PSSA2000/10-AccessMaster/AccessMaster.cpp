@@ -406,6 +406,18 @@ HRESULT CSecurityInformation::GetObjectInformation(
 	pObjectInfo->hInstance = GetModuleHandle(NULL);
 	pObjectInfo->pszServerName = NULL;
 	pObjectInfo->pszObjectName = m_pInfo->m_szObjectName;
+
+	vaDbg(
+		_T("System calls our CSecurityInformation::GetObjectInformation(), we returns SI_OBJECT_INFO:\n")
+		_T("  .pszObjectName=\"%s\"\n")
+		_T("  .hInstance=0x%p\n")
+		_T("  .dwFlags=%s")
+		, 
+		pObjectInfo->pszObjectName,
+		pObjectInfo->hInstance,
+		ITCS(pObjectInfo->dwFlags, itc_SI_OBJECT_INFO_flags)
+		);
+
 	return(S_OK);
 }
 
@@ -482,8 +494,16 @@ HRESULT CSecurityInformation::GetAccessRights(const GUID* pguidObjectType,
 {
 	// chj: 
 	// pguidObjectType is m_guidNULL.
+	//
+	// dwFlags==0, when the "starting" ALCUI is displayed.
 	// dwFlags==SI_ADVANCED, when user clicks [Advanced] button.
 
+	vaDbg(
+		_T("System calls our CSecurityInformation::GetAccessRights(), passing in:\n")
+		_T("  dwFlags=%s")
+		, 
+		ITCS(dwFlags, itc_SI_OBJECT_INFO_flags)
+		);
 
 	// If the binary check box was set, we show only raw binary ACE information
 	if (m_fBinary) {
