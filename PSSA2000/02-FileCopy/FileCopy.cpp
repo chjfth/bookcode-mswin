@@ -10,6 +10,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "..\CmnHdr.h"                    // See Appendix A.
 #include <WindowsX.h>
+#include <assert.h>
 
 #include "..\vaDbg.h"
 
@@ -76,8 +77,19 @@ private:
 #define CK_READ  1
 #define CK_WRITE 2
 
+//#define DEBUG_ALL
 
 ///////////////////////////////////////////////////////////////////////////////
+
+static void vaDbgReadWriteResult(BOOL succ, const TCHAR *opstr)
+{
+#ifdef DEBUG_ALL
+	if(succ)
+		vaDbg(_T("%s success."), opstr);
+	else 
+		vaDbg(_T("%s error, winerr=%d."), opstr, GetLastError());
+#endif 
+}
 
 BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst, 
 	LARGE_INTEGER &liFileSizeSrc, DWORD *pWinErr) 
@@ -145,7 +157,6 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 		BOOL succ = iocp.GetStatus(&CompKey, &dwNumBytes, (OVERLAPPED**) &pior, INFINITE);
 		
 		TCHAR timebuf[40];
-// #define DEBUG_ALL
 #ifdef DEBUG_ALL
 		vaDbg(_T("%s iocp.GetStatus(%s)=%s"), 
 			now_timestr(timebuf, ARRAYSIZE(timebuf)), 
@@ -172,8 +183,10 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 
 			if(!*pWinErr)
 			{
-				pior->Write(hfileDst);  // Write to same offset read from source
+				succ = pior->Write(hfileDst);  // Write to same offset read from source
 				nWritesInProgress++;
+
+				vaDbgReadWriteResult(succ, _T("WriteFile"));
 			}
 			
 			break;
@@ -186,13 +199,19 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 			
 			if (liNextReadOffset.QuadPart < liFileSizeDst.QuadPart) {
 				// Not EOF, read the next block of data from the source file.
-				pior->Read(hfileSrc, &liNextReadOffset);
+				succ = pior->Read(hfileSrc, &liNextReadOffset);
 				nReadsInProgress++;
 				liNextReadOffset.QuadPart += BUFFSIZE; // Advance source offset
+
+				vaDbgReadWriteResult(succ, _T("ReadFile"));
 			}
 			break;
+		
+		default:
+			assert(("Wrong CompKey value!", 0));
 		}
-	}
+
+	} // while
 
 	return *pWinErr ? FALSE : TRUE;
 }

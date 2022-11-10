@@ -156,6 +156,7 @@
  
   <ItemGroup>
     <ClCompile Include="FileCopy.cpp" />
+    <ClCompile Include="..\InterpretConst.cpp" />
     <ClCompile Include="..\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>

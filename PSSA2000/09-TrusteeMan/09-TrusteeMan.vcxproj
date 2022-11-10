@@ -156,6 +156,7 @@
  
   <ItemGroup>
     <ClCompile Include="TrusteeMan.cpp" />
+    <ClCompile Include="..\InterpretConst.cpp" />
     <ClCompile Include="..\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
