@@ -4,6 +4,8 @@
 
 enum ROBOMSG_et
 {
+	ROMOMSG_None = 0,
+
 	ROBOMSG_STOPSERVICE      = 1,
 	ROBOMSG_REMOVESERVICE    = 2,
 	ROBOMSG_ERR              = 3,
@@ -63,7 +65,7 @@ enum ROBOMSG_et
 
 // The base message
 typedef struct _MessageBase {
-	ULONG m_lMsgType;
+	ROBOMSG_et m_lMsgType;
 	ULONG m_lInfo;
 	ULONG m_lExtraDataSize;
 } MessageBase;

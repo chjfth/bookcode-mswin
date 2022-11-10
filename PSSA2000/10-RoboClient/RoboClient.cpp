@@ -240,11 +240,11 @@ void SendWriteMessage(HANDLE hPipe, Message* pMsgNew)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void SendSimpleMessage(HWND hwnd, ULONG lMsg) 
+void SendSimpleMessage(HWND hwnd, ROBOMSG_et lMsg) 
 {
 	RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, DWLP_USER);
 
-	Message msg = {0};
+	Message msg = {};
 	msg.m_baseMsg.m_lMsgType = lMsg;
 	SendWriteMessage(prcState->m_hPipe, &msg);
 }
@@ -253,7 +253,7 @@ void SendSimpleMessage(HWND hwnd, ULONG lMsg)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void SendRobotMessage(HWND hwnd, ULONG lMsg, ULONG lInfo) {
+void SendRobotMessage(HWND hwnd, ROBOMSG_et lMsg, ULONG lInfo) {
 
    RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, 
          DWLP_USER);
@@ -264,7 +264,7 @@ void SendRobotMessage(HWND hwnd, ULONG lMsg, ULONG lInfo) {
       ListView_GetItemText(prcState->m_hwndList, nCur, 0, szName, 
             chDIMOF(szName));
 
-      Message msg = {0};
+      Message msg = {};
       msg.m_baseMsg.m_lMsgType = lMsg;
       msg.m_baseMsg.m_lInfo = lInfo;
       msg.m_pvData = szName;
@@ -477,7 +477,7 @@ HRESULT CSecurityInformation::SetSecurity(
       CopyMemory(&pSD->m_sdSecurity, pSecurityDescriptor, lLength);
    }
 
-   Message msg = {0};
+   Message msg = {};
    msg.m_baseMsg.m_lMsgType = ROBOMSG_SETSECURITY;
    msg.m_pvData = pbData;
    msg.m_baseMsg.m_lExtraDataSize = sizeof(MsgDataName)
@@ -606,7 +606,7 @@ void HandleTakeOwnership(HWND hwnd) {
          CopyMemory(&pSD->m_sdSecurity, &sd, lLength);
       }
 
-      Message msg = {0};
+      Message msg = {};
       msg.m_baseMsg.m_lMsgType = ROBOMSG_SETSECURITY;
       msg.m_pvData = pbData;
       msg.m_baseMsg.m_lExtraDataSize = sizeof(MsgDataName) 
@@ -796,16 +796,15 @@ void CleanupReadThread(RoboClientState* prcState) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void HandleRename(HWND hwnd) {
-   
-   RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, 
-         DWLP_USER);
+void HandleRename(HWND hwnd) 
+{   
+	RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, DWLP_USER);
 
-   int nCur = ListView_GetNextItem(prcState->m_hwndList, -1, LVNI_SELECTED);
-   if (nCur >= 0) {
-      SetFocus(prcState->m_hwndList);
-      ListView_EditLabel(prcState->m_hwndList, nCur);
-   }
+	int nCur = ListView_GetNextItem(prcState->m_hwndList, -1, LVNI_SELECTED);
+	if (nCur >= 0) {
+		SetFocus(prcState->m_hwndList);
+		ListView_EditLabel(prcState->m_hwndList, nCur);
+	}
 }
 
 

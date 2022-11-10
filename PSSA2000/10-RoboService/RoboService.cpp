@@ -416,7 +416,7 @@ void FreeMessageRcv(MessageReceiver* pmsg) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-MessageSender* AllocateMessageSnd(ULONG lType, PVOID pvData, int nDataSize) {
+MessageSender* AllocateMessageSnd(ROBOMSG_et lType, PVOID pvData, int nDataSize) {
    
    MessageSender* pMsg = (MessageSender*) HeapAlloc(GetProcessHeap(), 
          HEAP_ZERO_MEMORY, sizeof(MessageBase) + nDataSize);
@@ -539,74 +539,73 @@ void CleanupConnection(ConnectionInfo* pinfo) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void UpdatePendingConnections(ServerInfo* pinfo) {
+void UpdatePendingConnections(ServerInfo* pinfo) 
+{
+	// It is possible for us to end up with more then 10
+	// Pending connections since we don't serialize here
+	while ((pinfo->m_lPendingConnections < PENDINGCONNECTIONS)
+		&& (pinfo->m_lPendingConnections + pinfo->m_lActiveConnections) < MAXCONNECTIONS) 
+	{
+		// Find a free connection struct
+		int nIndex;
+		nIndex = MAXCONNECTIONS;
+		while (nIndex-- != 0) {
 
-   // It is possible for us to end up with more then 10
-   // Pending connections since we don't serialize here
-   while ((pinfo->m_lPendingConnections < PENDINGCONNECTIONS)
-         && (pinfo->m_lPendingConnections + pinfo->m_lActiveConnections) 
-         < MAXCONNECTIONS) {
+			if (pinfo->m_infoConnections[nIndex].m_lInUse == 0) {
 
-      // Find a free connection struct
-      int nIndex;
-      nIndex = MAXCONNECTIONS;
-      while (nIndex-- != 0) {
-         
-         if (pinfo->m_infoConnections[nIndex].m_lInUse == 0) {
-            
-            LONG lResult = InterlockedIncrement(
-                  &(pinfo->m_infoConnections[nIndex].m_lInUse));
-            
-            // if greater than one, then contention here, and I lost
-            if (lResult > 1) {
-               
-               // So decrement and move on
-               InterlockedDecrement(
-                     &(pinfo->m_infoConnections[nIndex].m_lInUse));
-            } else
-               break; // Found one, and own it
-         }
-      }
+				LONG lResult = InterlockedIncrement(
+					&(pinfo->m_infoConnections[nIndex].m_lInUse));
 
-      if (nIndex!= -1) { // Did we find a free connection struct?
-         
-         // Lets get a pipe and add it to the port
-         pinfo->m_infoConnections[nIndex].m_hPipe = CreateNamedPipe(PIPENAME_LOCALFULL,
-               PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE 
-               | PIPE_READMODE_BYTE | PIPE_WAIT, MAXCONNECTIONS, 0, 0, 1000, 
-               &pinfo->m_saPipeSecurity);
-         
-         if (pinfo->m_infoConnections[nIndex].m_hPipe 
-               != INVALID_HANDLE_VALUE) {
-            
-            if (CreateIoCompletionPort(
-                  pinfo->m_infoConnections[nIndex].m_hPipe,
-                  pinfo->m_hIOCP, CONTEXT_IO, 0) != NULL) {
-               
-               InterlockedIncrement(&(pinfo->m_lPendingConnections));
-               LPOVERLAPPED pOvl = AllocateIOStruct(IOS_CONNECT, 
-                     &pinfo->m_infoConnections[nIndex]);
-               
-               if (pOvl!= NULL) { // Lets get it listening
-                  ConnectNamedPipe(pinfo->m_infoConnections[nIndex].m_hPipe, 
-                        pOvl);
-               }
-               else { // Ooops cleanup then
-                  CleanupConnection(&pinfo->m_infoConnections[nIndex]);
-                  InterlockedDecrement(&(pinfo->m_lPendingConnections));
-               }
+				// if greater than one, then contention here, and I lost
+				if (lResult > 1) {
 
-            } else { // Oops cleanup then
-               CleanupConnection(&pinfo->m_infoConnections[nIndex]);
-               InterlockedDecrement(&(pinfo->m_lPendingConnections));
-            }
+					// So decrement and move on
+					InterlockedDecrement(
+						&(pinfo->m_infoConnections[nIndex].m_lInUse));
+				} else
+					break; // Found one, and own it
+			}
+		}
 
-         }
+		if (nIndex!= -1) { // Did we find a free connection struct?
 
-      } else { // If not, lets sleep and try again, we will soon
-         Sleep(1000);
-      }
-   }
+			// Lets get a pipe and add it to the port
+			pinfo->m_infoConnections[nIndex].m_hPipe = CreateNamedPipe(PIPENAME_LOCALFULL,
+				PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE 
+				| PIPE_READMODE_BYTE | PIPE_WAIT, MAXCONNECTIONS, 0, 0, 1000, 
+				&pinfo->m_saPipeSecurity);
+
+			if (pinfo->m_infoConnections[nIndex].m_hPipe 
+				!= INVALID_HANDLE_VALUE) {
+
+					if (CreateIoCompletionPort(
+						pinfo->m_infoConnections[nIndex].m_hPipe,
+						pinfo->m_hIOCP, CONTEXT_IO, 0) != NULL) {
+
+							InterlockedIncrement(&(pinfo->m_lPendingConnections));
+							LPOVERLAPPED pOvl = AllocateIOStruct(IOS_CONNECT, 
+								&pinfo->m_infoConnections[nIndex]);
+
+							if (pOvl!= NULL) { // Lets get it listening
+								ConnectNamedPipe(pinfo->m_infoConnections[nIndex].m_hPipe, 
+									pOvl);
+							}
+							else { // Ooops cleanup then
+								CleanupConnection(&pinfo->m_infoConnections[nIndex]);
+								InterlockedDecrement(&(pinfo->m_lPendingConnections));
+							}
+
+					} else { // Oops cleanup then
+						CleanupConnection(&pinfo->m_infoConnections[nIndex]);
+						InterlockedDecrement(&(pinfo->m_lPendingConnections));
+					}
+
+			}
+
+		} else { // If not, lets sleep and try again, we will soon
+			Sleep(1000);
+		}
+	}
 }
 
 
