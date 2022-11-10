@@ -259,66 +259,66 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void SendWriteMessage(HANDLE hPipe, Message* pMsgNew) {
+void SendWriteMessage(HANDLE hPipe, Message* pMsgNew) 
+{
+	BOOL fSuccess = FALSE;
+	HANDLE hEvent = NULL;
 
-   BOOL fSuccess = FALSE;
-   HANDLE hEvent = NULL;
+	try 
+	{ {
+		hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		if(!hEvent)
+			goto leave;
 
-   try { {
-      hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-      if(!hEvent)
-         goto leave;
+		OVERLAPPED ovl = {0};
+		ovl.hEvent = hEvent;
+		ULONG lWritten = 0;
+		fSuccess = WriteFile(hPipe, pMsgNew, MSGSIZE, &lWritten, &ovl);
+		if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
+			ULONG lWrote;
+			fSuccess = GetOverlappedResult(hPipe, &ovl, &lWrote, TRUE);
+		}      
 
-      OVERLAPPED ovl = {0};
-      ovl.hEvent = hEvent;
-      ULONG lWritten = 0;
-      fSuccess = WriteFile(hPipe, pMsgNew, MSGSIZE, &lWritten, &ovl);
-      if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
-         ULONG lWrote;
-         fSuccess = GetOverlappedResult(hPipe, &ovl, &lWrote, TRUE);
-      }      
+		if (!fSuccess)
+			goto leave;
 
-      if (!fSuccess)
-         goto leave;
-      
-      if (pMsgNew->m_baseMsg.m_lExtraDataSize > 0) {
-         ZeroMemory(&ovl, sizeof(ovl));
-         ResetEvent(hEvent);
-         ovl.hEvent = hEvent;
-         fSuccess = WriteFile(hPipe, pMsgNew->m_pvData, 
-            pMsgNew->m_baseMsg.m_lExtraDataSize, &lWritten, &ovl);
-         if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
-            ULONG lWrote;
-            fSuccess = GetOverlappedResult(hPipe, &ovl, &lWrote, TRUE);
-         }     
-         if (!fSuccess)
-            goto leave;
-      }
+		if (pMsgNew->m_baseMsg.m_lExtraDataSize > 0) {
+			ZeroMemory(&ovl, sizeof(ovl));
+			ResetEvent(hEvent);
+			ovl.hEvent = hEvent;
+			fSuccess = WriteFile(hPipe, pMsgNew->m_pvData, 
+				pMsgNew->m_baseMsg.m_lExtraDataSize, &lWritten, &ovl);
+			if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
+				ULONG lWrote;
+				fSuccess = GetOverlappedResult(hPipe, &ovl, &lWrote, TRUE);
+			}     
+			if (!fSuccess)
+				goto leave;
+		}
 
-   } leave:;
-   }
-   catch (...) {
-   }
-   if(hEvent != NULL)
-      CloseHandle(hEvent);
+	} leave:; }
+	catch (...) {
+	}
 
-   if (!fSuccess) {
-      // Perhaps clear the connection no matter what
-   }
+	if(hEvent != NULL)
+		CloseHandle(hEvent);
+
+	if (!fSuccess) {
+		// Perhaps clear the connection no matter what
+	}
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void SendSimpleMessage(HWND hwnd, ULONG lMsg) {
+void SendSimpleMessage(HWND hwnd, ULONG lMsg) 
+{
+	RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, DWLP_USER);
 
-   RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, 
-         DWLP_USER);
-
-   Message msg = {0};
-   msg.m_baseMsg.m_lMsgType = lMsg;
-   SendWriteMessage(prcState->m_hPipe, &msg);
+	Message msg = {0};
+	msg.m_baseMsg.m_lMsgType = lMsg;
+	SendWriteMessage(prcState->m_hPipe, &msg);
 }
 
 
@@ -828,12 +828,16 @@ ULONG WINAPI ReadThread(RoboClientState* prcState) {
                   PostMessage);
          break;
       
-      } else { // otherwise handle the message
+      } 
+	  else { // otherwise handle the message
          
          msg.m_pvData = pbData;
       
-         try { HandleReadMessage(prcState, &msg); }
-         catch (...) { }
+         try { 
+			 HandleReadMessage(prcState, &msg); 
+		 }
+         catch (...) {
+		 }
       }
 
       // Cleanup
@@ -880,58 +884,65 @@ void HandleRename(HWND hwnd) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void HandleConnect(HWND hwnd) {
-   
-   // Get state info
-   RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, 
-         DWLP_USER);
+void HandleConnect(HWND hwnd) 
+{
+	// Get state info
+	RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, DWLP_USER);
 
-   if (prcState->m_hPipe == NULL) { // connect 
+	if (prcState->m_hPipe == NULL) 
+	{ 
+		// connect 
 
-      TCHAR szServer[1024];
+		TCHAR szServer[1024];
 
-      lstrcpy(szServer, TEXT("\\\\"));
-      GetDlgItemText(hwnd, IDE_SERVER, &szServer[2], chDIMOF(szServer));
-      if (szServer[2] == 0)
-         lstrcat(szServer, TEXT("."));
+		lstrcpy(szServer, TEXT("\\\\"));
+		GetDlgItemText(hwnd, IDE_SERVER, &szServer[2], chDIMOF(szServer));
+		if (szServer[2] == 0)
+			lstrcat(szServer, TEXT("."));
 
-      lstrcat(szServer, PIPENAME);
+		lstrcat(szServer, PIPENAME);
 
-      prcState->m_hPipe = CreateFile(szServer, FILE_GENERIC_READ
-            | FILE_GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, 
-            OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-      if (prcState->m_hPipe != INVALID_HANDLE_VALUE) {
-      
-         prcState->m_hThread = chBEGINTHREADEX(NULL, 0, ReadThread, prcState,
-               0, NULL);
-         if (prcState->m_hThread == NULL) {
-            CloseHandle(prcState->m_hPipe);
-            prcState->m_hPipe = NULL;
-         }
+		prcState->m_hPipe = CreateFile(szServer, 
+			FILE_GENERIC_READ | FILE_GENERIC_WRITE, 
+			FILE_SHARE_READ|FILE_SHARE_WRITE, 
+			NULL, 
+			OPEN_EXISTING, 
+			FILE_FLAG_OVERLAPPED, NULL);
+		if (prcState->m_hPipe != INVALID_HANDLE_VALUE) {
 
-      } else {
-         
-         MessageBox(hwnd, TEXT("Unable to connect to the RoberService sample ")
-               TEXT("service.  \nCheck to see if the service is installed ")
-               TEXT("and running."), TEXT("RoboClient Error"), MB_OK);
-      }
+			prcState->m_hThread = chBEGINTHREADEX(NULL, 0, ReadThread, prcState,
+				0, NULL);
+			if (prcState->m_hThread == NULL) {
+				CloseHandle(prcState->m_hPipe);
+				prcState->m_hPipe = NULL;
+			}
 
-      if (prcState->m_hThread!= NULL) {
-         SendSimpleMessage(hwnd, ROBOMSG_QUERYROBOTNAMES);
-         EnableControls(hwnd, TRUE);
-         SetDlgItemText(hwnd, IDB_CONNECT, TEXT("Disconnect"));
-      }
+		} else {
 
-   } else { // disconnect
+			MessageBox(hwnd, TEXT("Unable to connect to the RoberService sample ")
+				TEXT("service.  \nCheck to see if the service is installed ")
+				TEXT("and running."), TEXT("RoboClient Error"), MB_OK);
+		}
 
-      HANDLE hPipeTemp = prcState->m_hPipe;
-      prcState->m_hPipe = NULL;
-      CancelIo(hPipeTemp);
-      CloseHandle(hPipeTemp);
-      CleanupReadThread(prcState);
-      EnableControls(hwnd, FALSE);
-      SetDlgItemText(hwnd, IDB_CONNECT, TEXT("Connect"));
-   }
+		if (prcState->m_hThread!= NULL) {
+			SendSimpleMessage(hwnd, ROBOMSG_QUERYROBOTNAMES);
+			EnableControls(hwnd, TRUE);
+			SetDlgItemText(hwnd, IDB_CONNECT, TEXT("Disconnect"));
+		}
+
+	} 
+	else 
+	{ 
+		// disconnect
+
+		HANDLE hPipeTemp = prcState->m_hPipe;
+		prcState->m_hPipe = NULL;
+		CancelIo(hPipeTemp);
+		CloseHandle(hPipeTemp);
+		CleanupReadThread(prcState);
+		EnableControls(hwnd, FALSE);
+		SetDlgItemText(hwnd, IDB_CONNECT, TEXT("Connect"));
+	}
 
 }
 
