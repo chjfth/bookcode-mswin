@@ -465,7 +465,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
    },
 
    {  // #6 AM_PROCESS, Process (74)
-      {&m_guidNULL, PROCESS_ALL_ACCESS, L"PROCESS_TERMINATE", 
+      {&m_guidNULL, PROCESS_ALL_ACCESS, L"PROCESS_ALL_ACCESS", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, PROCESS_TERMINATE, L"PROCESS_TERMINATE", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
