@@ -70,7 +70,6 @@ typedef struct _MessageBase {
 	ULONG m_lExtraDataSize;
 } MessageBase;
 //
-#define MSGSIZE sizeof(MessageBase)
 
 // A data structure for a message with a robot name in the data
 typedef struct _MsgDataName {

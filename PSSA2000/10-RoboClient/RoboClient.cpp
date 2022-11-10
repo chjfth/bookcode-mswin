@@ -43,7 +43,7 @@ typedef struct _Message {
    MessageBase m_baseMsg;
    PVOID  m_pvData; // Points to data
 } Message;
-#define MSGSIZE sizeof(MessageBase)
+#define MSGSIZE sizeof(MessageBase)+111
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -647,8 +647,7 @@ void HandleReadMessage(RoboClientState* prcState, Message* pMsg) {
       case ROBOMSG_ROBOTMSG: {
 
             PTSTR pszMsg = (PTSTR) pMsg->m_pvData;
-            MessageBox(prcState->m_hwndDlg, pszMsg, TEXT("RoboMessage"), 
-                  MB_OK);
+            MessageBox(prcState->m_hwndDlg, pszMsg, TEXT("RoboMessage"), MB_OK);
          }
          break;
       
@@ -669,8 +668,7 @@ void HandleReadMessage(RoboClientState* prcState, Message* pMsg) {
                   pszText = TEXT("Access denied!");
                   break;
             }
-            MessageBox(prcState->m_hwndDlg, pszText, TEXT("Robo-Error"), 
-                  MB_OK);
+            MessageBox(prcState->m_hwndDlg, pszText, TEXT("Robo-Error"), MB_OK);
          }
          break;
 
@@ -739,8 +737,7 @@ ULONG WINAPI ReadThread(RoboClientState* prcState)
 			fSuccess = ReadFile(prcState->m_hPipe, pbData, 
 				msg.m_baseMsg.m_lExtraDataSize, NULL, &ovl);
 			if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
-				fSuccess = GetOverlappedResult(prcState->m_hPipe, &ovl, &lRead, 
-					TRUE);
+				fSuccess = GetOverlappedResult(prcState->m_hPipe, &ovl, &lRead, TRUE);
 			}
 		}
 
@@ -751,9 +748,14 @@ ULONG WINAPI ReadThread(RoboClientState* prcState)
 				delete[] pbData;
 
 			if (prcState->m_hPipe) // If the pipe still needs killing
-				FORWARD_WM_COMMAND(prcState->m_hwndDlg, IDB_CONNECT, 
-				GetDlgItem(prcState->m_hwndDlg, IDB_CONNECT), BN_CLICKED, 
-				PostMessage);
+			{
+				FORWARD_WM_COMMAND(
+					prcState->m_hwndDlg, 
+					IDB_CONNECT, 
+					GetDlgItem(prcState->m_hwndDlg, IDB_CONNECT), 
+					BN_CLICKED, 
+					PostMessage);
+			}
 			break;
 
 		} 
