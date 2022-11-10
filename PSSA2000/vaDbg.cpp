@@ -265,13 +265,13 @@ TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen)
 
 	if(!pvSid)
 	{
-		_sntprintf_s(buf, buflen, _TRUNCATE, _T("(none)"));
+		_sntprintf_s(buf, buflen, _TRUNCATE, _T("( none )"));
 		return buf;
 	}
 
 	if(!IsValidSid(pvSid))
 	{
-		_sntprintf_s(buf, buflen, _TRUNCATE, _T("(invalid!)"));
+		_sntprintf_s(buf, buflen, _TRUNCATE, _T("( invalid! )"));
 		return buf;
 	}
 
@@ -295,7 +295,7 @@ TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen)
 		assert(succ);
 
 		_sntprintf_s(buf, buflen, _TRUNCATE,
-			_T("%s (%s\\%s)")
+			_T("%s ( %s\\%s )")
 			,
 			pszSid, 
 			szTrusteeDom[0] ? szTrusteeDom : _T("."), 
@@ -306,7 +306,7 @@ TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen)
 	{
 		DWORD winerr = GetLastError();
 		assert(!succ && winerr==ERROR_NONE_MAPPED);
-		_sntprintf_s(buf, buflen, _TRUNCATE, _T("(no mapped name)"));
+		_sntprintf_s(buf, buflen, _TRUNCATE, _T("( no mapped name )"));
 	}
 
 	LocalFree(pszSid);
@@ -374,21 +374,11 @@ void CH10_DumpACL( PACL pACL )
 		}
 		vaDbg(TEXT("  ACE Mask (31->0) = %s"), bitbufs);
 
-		TCHAR szName[1024];
-		TCHAR szDom[1024];
 		PSID pSID = PSIDFromPACE(pACE);
-		SID_NAME_USE sidUse = SidTypeUnknown;  
-		ULONG lLen1 = 1024, lLen2 = 1024;
-			
-		if (!LookupAccountSid(NULL, pSID, szName, &lLen1, szDom, &lLen2, &sidUse))
-			lstrcpy(szName, TEXT("Unknown"));
-			
-		PTSTR pszSID = nullptr;
-		if (!ConvertSidToStringSid(pSID, &pszSID))
-			return;
-			
-		vaDbg(TEXT("  ACE SID = %s ( %s )"), pszSID, szName);
-		LocalFree(pszSID);
+		TCHAR szSidRepr[100] = {};
+		SID2Repr(pSID, szSidRepr, ARRAYSIZE(szSidRepr));
+		
+		vaDbg(TEXT("  ACE SID = %s"), szSidRepr);
 	}
 }
 
@@ -418,9 +408,9 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd
 	PACL pDACL = nullptr, pSACL = nullptr;
 	BOOL fPresentDacl=0, fPresentSacl=0;
 	BOOL fDefaultedDacl=0, fDefaultedSacl;
-	GetSecurityDescriptorDacl(pvsd, &fPresentDacl, &pDACL, &fDefaultedDacl);
+	succ = GetSecurityDescriptorDacl(pvsd, &fPresentDacl, &pDACL, &fDefaultedDacl);
 	assert( IsSameBool(fPresentDacl, (psd->Control&SE_DACL_PRESENT)?TRUE:FALSE) );
-	GetSecurityDescriptorSacl(pvsd, &fPresentSacl, &pSACL, &fDefaultedSacl);
+	succ = GetSecurityDescriptorSacl(pvsd, &fPresentSacl, &pSACL, &fDefaultedSacl);
 	assert( IsSameBool(fPresentSacl, (psd->Control&SE_SACL_PRESENT)?TRUE:FALSE) );
 	//
 	PSID psidOwner = nullptr, psidGroup = nullptr;
