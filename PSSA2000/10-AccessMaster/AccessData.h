@@ -26,8 +26,8 @@ typedef enum AM_SECURETYPE{
    AM_PROCESS, AM_THREAD, AM_JOB,     
    AM_SEMAPHORE, AM_EVENT, AM_MUTEX,    
    AM_MAPPING, AM_TIMER, AM_TOKEN,    
-   AM_NAMEDPIPE, AM_ANONPIPE, 
-   AM_WINDOWSTATION, AM_DESKTOP       
+   AM_NAMEDPIPE, AM_ANONPIPE, AM_WINDOWSTATION, 
+   AM_DESKTOP       
 };
 
 
@@ -279,7 +279,7 @@ SI_ACCESS CSecurityInformation::m_siAccessBinaryRights[] = {
 #define ACCESS_NULL_ENTRY NULL, 0, NULL, 0
 SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = { 
    
-   {  // File (0)
+   {  // #0 AM_FILE, (0) 
       {&m_guidNULL, FILE_ALL_ACCESS, L"FILE_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, FILE_READ_DATA, L"FILE_READ_DATA", 
@@ -313,7 +313,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Dir (14)
+   {  // #1 AM_DIR, (14)
       {&m_guidNULL, FILE_ALL_ACCESS, L"FILE_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, FILE_LIST_DIRECTORY, L"FILE_LIST_DIRECTORY", 
@@ -349,7 +349,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Service (29)
+   {  // #2 AM_SERVICE, Service (29)
       {&m_guidNULL, SERVICE_ALL_ACCESS, L"SERVICE_ALL_ACCESS", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, SERVICE_CHANGE_CONFIG, L"SERVICE_CHANGE_CONFIG", 
@@ -387,7 +387,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Printer (44)
+   {  // #3 AM_PRINTER, Printer (44)
       {&m_guidNULL, SERVER_ACCESS_ADMINISTER, L"SERVER_ACCESS_ADMINISTER", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, SERVER_ACCESS_ENUMERATE, L"SERVER_ACCESS_ENUMERATE", 
@@ -413,7 +413,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Registry (55)
+   {  // #4 AM_REGISTRY, Registry (55)
       {&m_guidNULL, KEY_ALL_ACCESS, L"KEY_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, KEY_QUERY_VALUE, L"KEY_QUERY_VALUE", 
@@ -443,7 +443,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Share (68)
+   {  // #5 AM_SHARE, Share (68)
       {&m_guidNULL, PERM_FILE_READ, L"PERM_FILE_READ", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, PERM_FILE_WRITE, L"PERM_FILE_WRITE", 
@@ -464,7 +464,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Process (74)
+   {  // #6 AM_PROCESS, Process (74)
       {&m_guidNULL, PROCESS_ALL_ACCESS, L"PROCESS_TERMINATE", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, PROCESS_TERMINATE, L"PROCESS_TERMINATE", 
@@ -503,7 +503,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Thread (91)
+   {  // #7 AM_THREAD, Thread (91)
       {&m_guidNULL, THREAD_ALL_ACCESS, L"THREAD_ALL_ACCESS", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, THREAD_TERMINATE, L"THREAD_TERMINATE", 
@@ -540,7 +540,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Job (107)
+   {  // #8 AM_JOB, Job (107)
       {&m_guidNULL, JOB_OBJECT_ALL_ACCESS, L"JOB_OBJECT_ALL_ACCESS", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, JOB_OBJECT_ASSIGN_PROCESS, L"JOB_OBJECT_ASSIGN_PROCESS", 
@@ -568,7 +568,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Semaphore
+   {  // #9 AM_SEMAPHORE, Semaphore
       {&m_guidNULL, SEMAPHORE_ALL_ACCESS, L"SEMAPHORE_ALL_ACCESS", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, SEMAPHORE_MODIFY_STATE, L"SEMAPHORE_MODIFY_STATE", 
@@ -588,7 +588,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Event
+   {  // #10 AM_EVENT , Event
       {&m_guidNULL, EVENT_ALL_ACCESS, L"EVENT_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, EVENT_MODIFY_STATE, L"EVENT_MODIFY_STATE", 
@@ -608,7 +608,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Mutex
+   {  // #11 AM_MUTEX, Mutex
       {&m_guidNULL, MUTEX_ALL_ACCESS, L"MUTEX_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, MUTEX_MODIFY_STATE, L"MUTEX_MODIFY_STATE", 
@@ -628,7 +628,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Mapping
+   {  // #12 AM_MAPPING , Mapping
       {&m_guidNULL, FILE_MAP_COPY, L"FILE_MAP_COPY", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, FILE_MAP_WRITE, L"FILE_MAP_WRITE", 
@@ -654,7 +654,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Timer
+   {  // #13 AM_TIMER , Timer
       {&m_guidNULL, TIMER_ALL_ACCESS, L"TIMER_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, TIMER_QUERY_STATE, L"TIMER_QUERY_STATE", 
@@ -676,7 +676,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Token
+   {  // #14 AM_TOKEN , Token
       {&m_guidNULL, TOKEN_ALL_ACCESS, L"TOKEN_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, TOKEN_ASSIGN_PRIMARY, L"TOKEN_ASSIGN_PRIMARY", 
@@ -712,7 +712,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Namedpipe
+   {  // # 15 NAMEDPIPE , Namedpipe
       {&m_guidNULL, FILE_ALL_ACCESS, L"FILE_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, FILE_READ_DATA, L"FILE_READ_DATA", 
@@ -740,7 +740,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Anonpipe
+   {  // # 16 AM_ANONPIPE , Anonymous pipe
       {&m_guidNULL, FILE_ALL_ACCESS, L"FILE_ALL_ACCESS", 
          SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, FILE_READ_DATA, L"FILE_READ_DATA", 
@@ -768,7 +768,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Windowstation
+   {  // #17 WINDOWSTATION , Windowstation
       {&m_guidNULL, WINSTA_ACCESSCLIPBOARD, L"WINSTA_ACCESSCLIPBOARD", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, WINSTA_ACCESSGLOBALATOMS, L"WINSTA_ACCESSGLOBALATOMS", 
@@ -802,7 +802,7 @@ SI_ACCESS CSecurityInformation::m_siAccessAllRights[][19] = {
       {ACCESS_NULL_ENTRY}
    },
 
-   {  // Desktop
+   {  // #18 AM_WINDOWSTATION , Desktop
       {&m_guidNULL, DESKTOP_CREATEMENU, L"DESKTOP_CREATEMENU", 
             SI_ACCESS_GENERAL|SI_ACCESS_SPECIFIC},
       {&m_guidNULL, DESKTOP_CREATEWINDOW, L"DESKTOP_CREATEWINDOW", 
