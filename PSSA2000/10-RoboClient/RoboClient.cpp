@@ -23,13 +23,13 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "Resource.h"
 
+#include "..\10-RoboService\RoboShare.h"
+
 
 #define UILAYOUT_IMPL
 #include "..\ClassLib\UILayout.h"
 
 HINSTANCE g_hInst;
-
-#define PIPENAME TEXT("\\Pipe\\RoboService")
 
 typedef struct _RoboClientState {
    HANDLE            m_hPipe;
@@ -39,83 +39,11 @@ typedef struct _RoboClientState {
    CUILayout*        m_pResizer;
 } RoboClientState;
 
-#define ROBOMSG_STOPSERVICE      1
-#define ROBOMSG_REMOVESERVICE    2
-#define ROBOMSG_ERR              3
-
-#define ROBOMSG_QUERYROBOTNAMES  10
-#define ROBOMSG_ROBOTNAME        11 // Requires MsgDataName extra data
-
-#define ROBOMSG_CREATEROBOT      12 // Requires MsgDataName extra data
-#define ROBOMSG_DELETEROBOT      13 // Requires MsgDataName extra data
-#define ROBOMSG_ROBOTREMOVED     14 // Requires MsgDataName extra data
-
-#define ROBOMSG_CHANGENAME       15 // Requires an array of two MsgDataName
-
-#define ROBOMSG_LOCK             16 // Requires MsgDataName extra data
-
-#define ROBOMSG_QUERY            17 // Requires MsgDataName extra data
-#define ROBOMSG_ROBOTMSG         18 // Requires a following string
-
-#define ROBOMSG_ACTION           19 // Requires MsgDataName extra data
-
-#define ROBOMSG_QUERYSECURITY    20 // Requires MsgDataName extra data
-#define ROBOMSG_RETURNSECURITY   21 // Requires MsgDataSD extra data
-
-#define ROBOMSG_SETSECURITY      22 // Requires MsgDataName and 
-                                    // MsgDataSD extra data
-
-#define ROBOERROR_NAMEEXISTS     1
-#define ROBOERROR_ROBOTNOTFOUND  2
-#define ROBOERROR_ACCESSDENIED   3
-
-#define ROBOACTION_GATHER        1
-#define ROBOACTION_ASSEMBLE      2
-
-// What we can do to a robot
-// Change its name
-#define ROBOT_SETNAME      (0x0001)
-// Lock it
-#define ROBOT_LOCK         (0x0002)
-// Gather material
-#define ROBOT_GATHER       (0x0004)
-// Assemble material
-#define ROBOT_ASSEMBLE     (0x0008)
-// Query status
-#define ROBOT_QUERY        (0x0010)
-// Unlock it (even if you aren't the "locker")
-#define ROBOT_OVERRIDELOCK (0x0020)
-// Delete it
-// Set security
-// Get security
-// Set owner
-#define ROBOT_ALL_ACCESS   (STANDARD_RIGHTS_REQUIRED |\
-                           ROBOT_SETNAME |\
-                           ROBOT_LOCK |\
-                           ROBOT_GATHER |\
-                           ROBOT_ASSEMBLE |\
-                           ROBOT_QUERY|\
-                           ROBOT_OVERRIDELOCK)
-
-typedef struct _MessageBase {
-   ULONG m_lMsgType;
-   ULONG m_lInfo;
-   ULONG m_lExtraDataSize;
-} MessageBase;
-
 typedef struct _Message {
    MessageBase m_baseMsg;
    PVOID  m_pvData; // Points to data
 } Message;
 #define MSGSIZE sizeof(MessageBase)
-
-typedef struct _MsgDataName {
-   TCHAR m_szName[256];
-} MsgDataName;
-
-typedef struct _MsgDataSD {
-   SECURITY_DESCRIPTOR m_sdSecurity;
-} MsgDataSD;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -782,75 +710,75 @@ void HandleReadMessage(RoboClientState* prcState, Message* pMsg) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-ULONG WINAPI ReadThread(RoboClientState* prcState) {
+ULONG WINAPI ReadThread(RoboClientState* prcState) 
+{
+	// All reading done here
+	HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-   // All reading done here
-   HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-   
-   do {
+	do 
+	{
+		ULONG lRead = 0;
+		Message msg = {};
+		PBYTE pbData = NULL;
+		OVERLAPPED ovl = {0};
 
-      ULONG lRead;
-      Message msg;
-      PBYTE pbData = NULL;
-      OVERLAPPED ovl = {0};
+		// Read message base
+		ZeroMemory(&ovl, sizeof(ovl));
+		ovl.hEvent = hEvent;
+		BOOL fSuccess = ReadFile(prcState->m_hPipe, &msg, MSGSIZE, &lRead, &ovl);
+		if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
+			fSuccess = GetOverlappedResult(prcState->m_hPipe, &ovl, &lRead, TRUE);
+		}
 
-      // Read message base
-      ZeroMemory(&ovl, sizeof(ovl));
-      ovl.hEvent = hEvent;
-      BOOL fSuccess = ReadFile(prcState->m_hPipe, &msg, MSGSIZE, &lRead, &ovl);
-      if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
-         fSuccess = GetOverlappedResult(prcState->m_hPipe, &ovl, &lRead, TRUE);
-      }
-      
-      // Maybe read message data
-      if (fSuccess && msg.m_baseMsg.m_lExtraDataSize > 0) {
+		// Maybe read message data
+		if (fSuccess && msg.m_baseMsg.m_lExtraDataSize > 0) {
 
-         pbData = new BYTE[msg.m_baseMsg.m_lExtraDataSize];
-         ZeroMemory(&ovl, sizeof(ovl));
-         ovl.hEvent = hEvent;
-         fSuccess = ReadFile(prcState->m_hPipe, pbData, 
-               msg.m_baseMsg.m_lExtraDataSize, NULL, &ovl);
-         if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
-            fSuccess = GetOverlappedResult(prcState->m_hPipe, &ovl, &lRead, 
-                  TRUE);
-         }
-      }
-      
-      // If it was an overall failure we outta here
-      if (!fSuccess) {
-         
-         if (pbData!= NULL)
-            delete[] pbData;
-         
-         if (prcState->m_hPipe) // If the pipe still needs killing
-            FORWARD_WM_COMMAND(prcState->m_hwndDlg, IDB_CONNECT, 
-                  GetDlgItem(prcState->m_hwndDlg, IDB_CONNECT), BN_CLICKED, 
-                  PostMessage);
-         break;
-      
-      } 
-	  else { // otherwise handle the message
-         
-         msg.m_pvData = pbData;
-      
-         try { 
-			 HandleReadMessage(prcState, &msg); 
-		 }
-         catch (...) {
-		 }
-      }
+			pbData = new BYTE[msg.m_baseMsg.m_lExtraDataSize];
+			ZeroMemory(&ovl, sizeof(ovl));
+			ovl.hEvent = hEvent;
+			fSuccess = ReadFile(prcState->m_hPipe, pbData, 
+				msg.m_baseMsg.m_lExtraDataSize, NULL, &ovl);
+			if (!fSuccess && GetLastError() == ERROR_IO_PENDING) {
+				fSuccess = GetOverlappedResult(prcState->m_hPipe, &ovl, &lRead, 
+					TRUE);
+			}
+		}
 
-      // Cleanup
-      if (pbData!= NULL)
-         delete[] pbData;
+		// If it was an overall failure we outta here
+		if (!fSuccess) {
 
-   // And do it again
-   } while (prcState->m_hPipe!= NULL);
-   
-   if (hEvent != NULL)
-      CloseHandle(hEvent);
+			if (pbData!= NULL)
+				delete[] pbData;
 
-   return (0);
+			if (prcState->m_hPipe) // If the pipe still needs killing
+				FORWARD_WM_COMMAND(prcState->m_hwndDlg, IDB_CONNECT, 
+				GetDlgItem(prcState->m_hwndDlg, IDB_CONNECT), BN_CLICKED, 
+				PostMessage);
+			break;
+
+		} 
+		else { // otherwise handle the message
+
+			msg.m_pvData = pbData;
+
+			try { 
+				HandleReadMessage(prcState, &msg); 
+			}
+			catch (...) {
+			}
+		}
+
+		// Cleanup
+		if (pbData!= NULL)
+			delete[] pbData;
+
+		// And do it again
+	} while (prcState->m_hPipe!= NULL);
+
+	if (hEvent != NULL)
+		CloseHandle(hEvent);
+
+	return (0);
 }
 
 
@@ -900,7 +828,7 @@ void HandleConnect(HWND hwnd)
 		if (szServer[2] == 0)
 			lstrcat(szServer, TEXT("."));
 
-		lstrcat(szServer, PIPENAME);
+		lstrcat(szServer, PIPENAME_LOCALPART);
 
 		prcState->m_hPipe = CreateFile(szServer, 
 			FILE_GENERIC_READ | FILE_GENERIC_WRITE, 

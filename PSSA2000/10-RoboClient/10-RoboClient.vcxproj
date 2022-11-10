@@ -167,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\10-RoboService\RoboShare.h" />
     <ClInclude Include="..\vaDbg.h" />
     <ClInclude Include="..\InterpretConst.h" />
   </ItemGroup>

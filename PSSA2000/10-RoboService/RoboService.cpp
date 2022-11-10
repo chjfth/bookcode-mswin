@@ -9,6 +9,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include <Process.h>
 #include <LMAccess.h>
 
+#include "RoboShare.h"
+
 #define SERVICESTATUS_IMPL
 #include "..\03-TimeService\ServiceStatus.h"
 
@@ -17,42 +19,6 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 // Control the services behavior
 #define THREADPOOL         10
-#define MAXCONNECTIONS     100
-#define PENDINGCONNECTIONS 10
-
-// Server messages
-#define ROBOMSG_ERR             3
-
-#define ROBOMSG_QUERYROBOTNAMES 10
-#define ROBOMSG_ROBOTNAME       11  // Requires MsgDataName extra data
-
-#define ROBOMSG_CREATEROBOT     12  // Requires MsgDataName extra data
-#define ROBOMSG_DELETEROBOT     13  // Requires MsgDataName extra data
-#define ROBOMSG_ROBOTREMOVED    14  // Requires MsgDataName extra data
-
-#define ROBOMSG_CHANGENAME      15  // Requires an array of two MsgDataName
-
-#define ROBOMSG_LOCK            16  // Requires MsgDataName extra data
-
-#define ROBOMSG_QUERY           17  // Requires MsgDataName extra data
-#define ROBOMSG_ROBOTMSG        18  // Requires a following string
-
-#define ROBOMSG_ACTION          19  // Requires MsgDataName extra data
-
-#define ROBOMSG_QUERYSECURITY   20  // Requires MsgDataName extra data
-#define ROBOMSG_RETURNSECURITY  21  // Requires MsgDataSD extra data
-
-#define ROBOMSG_SETSECURITY     22  // Requires MsgDataName and MsgDataSD
-                                    // extra data
-
-// Error defines
-#define ROBOERROR_NAMEEXISTS    1
-#define ROBOERROR_ROBOTNOTFOUND 2
-#define ROBOERROR_ACCESSDENIED  3
-
-// Action defines
-#define ROBOACTION_GATHER       1
-#define ROBOACTION_ASSEMBLE     2
 
 // IO purposes
 #define IOS_CONNECT  1
@@ -67,8 +33,6 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #define SERVICE_CONTROL    1
 #define SERVICE_EXITTHREAD 2
 
-#define PIPENAME TEXT("\\\\.\\Pipe\\RoboService")
-
 // Service name
 TCHAR g_szServiceName[] = 
    TEXT("Programming Server-Side Applications RoboService");
@@ -76,20 +40,6 @@ TCHAR g_szServiceName[] =
 // Service status global class instance
 CServiceStatus g_ssRobo;
 
-// What we can do to a robot
-#define ROBOT_SETNAME      (0x0001)    // Change its name 
-#define ROBOT_LOCK         (0x0002)    // Lock it 
-#define ROBOT_GATHER       (0x0004)    // Gather Material 
-#define ROBOT_ASSEMBLE     (0x0008)    // Assemble Material 
-#define ROBOT_QUERY        (0x0010)    // Query Status 
-#define ROBOT_OVERRIDELOCK (0x0020)    // Unlock it (even if not the "locker")
-#define ROBOT_ALL_ACCESS   (STANDARD_RIGHTS_REQUIRED \
-                           | ROBOT_SETNAME \
-                           | ROBOT_LOCK \
-                           | ROBOT_GATHER \
-                           | ROBOT_ASSEMBLE \
-                           | ROBOT_QUERY \
-                           | ROBOT_OVERRIDELOCK)
 
 // Generic mappings for robots
 GENERIC_MAPPING g_gmRobots = { ROBOT_QUERY, ROBOT_SETNAME, ROBOT_LOCK 
@@ -124,13 +74,6 @@ typedef struct _ServerInfo {
 
 } ServerInfo;
 
-// The base message
-typedef struct _MessageBase {
-   ULONG m_lMsgType;
-   ULONG m_lInfo;
-   ULONG m_lExtraDataSize;
-} MessageBase;
-#define MSGSIZE sizeof(MessageBase)
 
 // Structure used to receive messages
 typedef struct _MessageReceiver {
@@ -145,16 +88,6 @@ typedef struct _MessageSender {
    MessageBase m_baseMsg;
    BYTE        m_bData[1]; // Place holder for the "data block"
 } MessageSender;
-
-// A data structure for a message with a robot name in the data
-typedef struct _MsgDataName {
-   TCHAR m_szName[256];
-} MsgDataName;
-
-// A data structure for a message with a security descriptor
-typedef struct _MsgDataSD {
-   SECURITY_DESCRIPTOR m_sdSecurity;
-} MsgDataSD;
 
 // This structure wraps OVERLAPPED and a message buffer
 typedef struct _IOStruct:OVERLAPPED {
@@ -638,7 +571,7 @@ void UpdatePendingConnections(ServerInfo* pinfo) {
       if (nIndex!= -1) { // Did we find a free connection struct?
          
          // Lets get a pipe and add it to the port
-         pinfo->m_infoConnections[nIndex].m_hPipe = CreateNamedPipe(PIPENAME,
+         pinfo->m_infoConnections[nIndex].m_hPipe = CreateNamedPipe(PIPENAME_LOCALFULL,
                PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE 
                | PIPE_READMODE_BYTE | PIPE_WAIT, MAXCONNECTIONS, 0, 0, 1000, 
                &pinfo->m_saPipeSecurity);
