@@ -640,7 +640,7 @@ void PostReadMessageData(ServerInfo* pInfo, IOStruct* pIOS) {
 void PostReadMessage(ServerInfo* pInfo, IOStruct* pIOS, 
       ConnectionInfo* pinfoConnection) {
 
-   // Allocate IO struct and recieve message buffer
+   // Allocate IO struct and receive message buffer
    if (pIOS == NULL) {
       MessageReceiver* pmsg = AllocateMessageRcv();
       pIOS = (IOStruct*) AllocateIOStruct(IOS_READ, pinfoConnection, pmsg);

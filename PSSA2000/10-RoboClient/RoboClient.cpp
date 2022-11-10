@@ -43,7 +43,6 @@ typedef struct _Message {
    MessageBase m_baseMsg;
    PVOID  m_pvData; // Points to data
 } Message;
-#define MSGSIZE sizeof(MessageBase)+111
 
 
 ///////////////////////////////////////////////////////////////////////////////
