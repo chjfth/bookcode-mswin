@@ -363,8 +363,8 @@ void CH10_DumpACL( PACL pACL )
 			return;
 
 		vaDbg(TEXT("ACE #%d/%d"), lIndex+1, aclSize.AceCount);
-		vaDbg(TEXT("  ACE Type = %s"), ITCS(pACE->Header.AceType, itc_ACE_TYPE));
-		vaDbg(TEXT("  ACE Flags = %s"), ITCS(pACE->Header.AceFlags, itc_ACE_FLAGS));
+		vaDbg(TEXT("  ACE Type = %s"), ITCS1(pACE->Header.AceType, itc_ACE_TYPE));
+		vaDbg(TEXT("  ACE Flags = %s"), ITCS1(pACE->Header.AceFlags, itc_ACE_FLAGS));
 
 		TCHAR bitbufs[40] = {};
 		ULONG lIndex2 = (ULONG)1<<31;
@@ -382,20 +382,12 @@ void CH10_DumpACL( PACL pACL )
 	}
 }
 
-enum DumpSD_get_or_set {
-	// Different value results in sligtly different dump-output
-	DumpSD_get = 0,
-	DumpSD_set = 1,
-};
-
 static bool IsSameBool(BOOL a, BOOL b)
 {
 	return (a ^ b)==0;
 }
 
-void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd 
-//	, DumpSD_get_or_set gors 
-	)
+void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd )
 {
 	BOOL succ = 0;
 	SECURITY_DESCRIPTOR *psd = (SECURITY_DESCRIPTOR*)pvsd;

@@ -409,9 +409,9 @@ HRESULT CSecurityInformation::GetObjectInformation(
 
 	vaDbg(
 		_T("System calls our CSecurityInformation::GetObjectInformation(), we returns SI_OBJECT_INFO:\n")
-		_T("  .pszObjectName=\"%s\"\n")
-		_T("  .hInstance=0x%p\n")
-		_T("  .dwFlags=%s")
+		_T("  .pszObjectName = \"%s\"\n")
+		_T("  .hInstance = 0x%p\n")
+		_T("  .dwFlags = %s")
 		, 
 		pObjectInfo->pszObjectName,
 		pObjectInfo->hInstance,
@@ -433,26 +433,23 @@ HRESULT CSecurityInformation::GetSecurity(
 	HRESULT hr = 1;
 	PSECURITY_DESCRIPTOR pSD = NULL;
 
+	vaDbg(
+		_T("System calls our CSecurityInformation::GetSecurity(), requesting:\n")
+		_T("  RequestedInformation = %s")
+		, 
+		ITCS1(RequestedInformation, itc_SECURITY_INFORMATION)
+		);
+
 	// Get security information
 	ULONG lErr;
 	if (m_pInfo->m_szName[0] != 0) // Is it named
 	{
-		vaDbg(_T("System calls our CSecurityInformation::GetSecurity(%s) on \"%s\" (%s)"), 
-			ITCS(RequestedInformation, itc_SECURITY_INFORMATION),
-			m_pInfo->m_szName,
-			ITCS(m_pInfo->m_pEntry->m_objType, itc_SE_OBJECT_TYPE)
-			);
 		lErr = GetNamedSecurityInfo(m_pInfo->m_szName, 
 			m_pInfo->m_pEntry->m_objType, RequestedInformation, NULL, NULL, 
 			NULL, NULL, &pSD);
 	}
 	else // Is it a hHandle case
 	{
-		vaDbg(_T("System calls our CSecurityInformation::GetSecurity(%s) on handle=0x%p (%s)"), 
-			ITCS(RequestedInformation, itc_SECURITY_INFORMATION),
-			m_pInfo->m_hHandle,
-			ITCS(m_pInfo->m_pEntry->m_objType, itc_SE_OBJECT_TYPE)
-			);
 		lErr = GetSecurityInfo(m_pInfo->m_hHandle, m_pInfo->m_pEntry->m_objType,
 			RequestedInformation, NULL, NULL, NULL, NULL, &pSD);
 	}
@@ -477,7 +474,20 @@ HRESULT CSecurityInformation::GetSecurity(
 		*ppSecurityDescriptor = pSD;
 
 		// Debug info below
-		vaDbg(_T("We return the following SD:"));
+		TCHAR sz_which_object[MAX_PATH+20] = {};
+		if(m_pInfo->m_szName[0] != 0)
+			_sntprintf_s(sz_which_object, _TRUNCATE, _T("object-name: \"%s\""), m_pInfo->m_szName);
+		else
+			_sntprintf_s(sz_which_object, _TRUNCATE, _T("object-handle: 0x%p (as in our process)"), m_pInfo->m_hHandle);
+		vaDbg(
+			_T("We return security info about :\n")
+			_T("  %s\n")
+			_T("  object-type: %s\n")
+			_T("Dump SD below:")
+			,
+			sz_which_object,
+			ITCS(m_pInfo->m_pEntry->m_objType, itc_SE_OBJECT_TYPE)
+			);
 		CH10_DumpSD(pSD);
 	}
 
@@ -500,7 +510,7 @@ HRESULT CSecurityInformation::GetAccessRights(const GUID* pguidObjectType,
 
 	vaDbg(
 		_T("System calls our CSecurityInformation::GetAccessRights(), passing in:\n")
-		_T("  dwFlags=%s")
+		_T("  dwFlags = %s")
 		, 
 		ITCS(dwFlags, itc_SI_OBJECT_INFO_flags)
 		);
@@ -569,8 +579,8 @@ HRESULT CSecurityInformation::GetInheritTypes(PSI_INHERIT_TYPE* ppInheritTypes,
 	if(*pcInheritTypes==1)
 	{
 		vaDbg(
-			_T("  SI_INHERIT_TYPE.pszName=%s\n")
-			_T("  SI_INHERIT_TYPE.dwFlags=%s")
+			_T("  SI_INHERIT_TYPE.pszName = %s\n")
+			_T("  SI_INHERIT_TYPE.dwFlags = %s")
 			, 
 			(*ppInheritTypes)->pszName,
 			ITCS((*ppInheritTypes)->dwFlags, itc_SI_INHERIT_TYPE_flags)
@@ -642,7 +652,7 @@ HRESULT CSecurityInformation::SetSecurity(
 	// Dump debug:
 	vaDbg(
 		_T("System calls our CSecurityInformation::SetSecurity(), passing in:\n")
-		_T("  SecurityInformation=%s\n")
+		_T("  SecurityInformation = %s\n")
 		_T("  SD Dump below:")
 		, 
 		ITCS(SecurityInformation, itc_SECURITY_INFORMATION)
