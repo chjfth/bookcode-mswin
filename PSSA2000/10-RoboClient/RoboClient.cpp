@@ -628,79 +628,84 @@ void HandleTakeOwnership(HWND hwnd) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void HandleReadMessage(RoboClientState* prcState, Message* pMsg) {
-   
-   switch (pMsg->m_baseMsg.m_lMsgType) {
+void HandleReadMessage(RoboClientState* prcState, Message* pMsg) 
+{
+	switch (pMsg->m_baseMsg.m_lMsgType) 
+	{
+	case ROBOMSG_ROBOTNAME: 
+		{
 
-      case ROBOMSG_ROBOTNAME: {
+			MsgDataName* pName = (MsgDataName*) pMsg->m_pvData;
 
-            MsgDataName* pName = (MsgDataName*) pMsg->m_pvData;
+			LVITEM lvItem = {0};
+			lvItem.mask = LVIF_TEXT;
+			lvItem.pszText = pName->m_szName;
+			ListView_InsertItem(prcState->m_hwndList, &lvItem);
+		}
+		break;
 
-            LVITEM lvItem = {0};
-            lvItem.mask = LVIF_TEXT;
-            lvItem.pszText = pName->m_szName;
-            ListView_InsertItem(prcState->m_hwndList, &lvItem);
-         }
-         break;
-      
-      case ROBOMSG_ROBOTMSG: {
+	case ROBOMSG_ROBOTMSG: 
+		{
 
-            PTSTR pszMsg = (PTSTR) pMsg->m_pvData;
-            MessageBox(prcState->m_hwndDlg, pszMsg, TEXT("RoboMessage"), MB_OK);
-         }
-         break;
-      
-      case ROBOMSG_ERR: {
+			PTSTR pszMsg = (PTSTR) pMsg->m_pvData;
+			MessageBox(prcState->m_hwndDlg, pszMsg, TEXT("RoboMessage"), MB_OK);
+		}
+		break;
 
-            PTSTR pszText = NULL;
-            switch (pMsg->m_baseMsg.m_lInfo) {
+	case ROBOMSG_ERR: 
+		{
 
-               case ROBOERROR_NAMEEXISTS:
-                  pszText = TEXT("Name exists!");
-                  break;
-               
-               case ROBOERROR_ROBOTNOTFOUND:
-                  pszText = TEXT("Robot not found!");
-                  break;
-               
-               case ROBOERROR_ACCESSDENIED:
-                  pszText = TEXT("Access denied!");
-                  break;
-            }
-            MessageBox(prcState->m_hwndDlg, pszText, TEXT("Robo-Error"), MB_OK);
-         }
-         break;
+			PTSTR pszText = NULL;
+			switch (pMsg->m_baseMsg.m_lInfo) {
 
-      case ROBOMSG_ROBOTREMOVED: {
+			case ROBOERROR_NAMEEXISTS:
+				pszText = TEXT("Name exists!");
+				break;
 
-            MsgDataName* pName = (MsgDataName*) pMsg->m_pvData;
+			case ROBOERROR_ROBOTNOTFOUND:
+				pszText = TEXT("Robot not found!");
+				break;
 
-            LVFINDINFO lvFindInfo = {0};
-            lvFindInfo.flags = LVFI_STRING;
-            lvFindInfo.psz = pName->m_szName;
+			case ROBOERROR_ACCESSDENIED:
+				pszText = TEXT("Access denied!");
+				break;
+			}
+			MessageBox(prcState->m_hwndDlg, pszText, TEXT("Robo-Error"), MB_OK);
+		}
+		break;
 
-            int nItem = ListView_FindItem(prcState->m_hwndList, -1, &lvFindInfo);
-            if (nItem >= 0)
-               ListView_DeleteItem(prcState->m_hwndList, nItem);
+	case ROBOMSG_ROBOTREMOVED: 
+		{
 
-         }
-         break;
+			MsgDataName* pName = (MsgDataName*) pMsg->m_pvData;
 
-      case ROBOMSG_RETURNSECURITY: {
+			LVFINDINFO lvFindInfo = {0};
+			lvFindInfo.flags = LVFI_STRING;
+			lvFindInfo.psz = pName->m_szName;
 
-            MsgDataName* pName = (MsgDataName*) pMsg->m_pvData;
-            MsgDataSD* pSD = (MsgDataSD*) (pName + 1);
+			int nItem = ListView_FindItem(prcState->m_hwndList, -1, &lvFindInfo);
+			if (nItem >= 0)
+				ListView_DeleteItem(prcState->m_hwndList, nItem);
 
-            CSecurityInformation* pSec = new CSecurityInformation(prcState, 
-                  pName->m_szName, &pSD->m_sdSecurity);
-            
-            // Common dialog box for ACL editing
-            EditSecurity(prcState->m_hwndDlg, pSec);
-            if (pSec != NULL)
-                  pSec->Release();
-         }
-         break;
-   }
+		}
+		break;
+
+	case ROBOMSG_RETURNSECURITY: 
+		{
+
+			MsgDataName* pName = (MsgDataName*) pMsg->m_pvData;
+			MsgDataSD* pSD = (MsgDataSD*) (pName + 1);
+
+			CSecurityInformation* pSec = new CSecurityInformation(prcState, 
+				pName->m_szName, &pSD->m_sdSecurity);
+
+			// Common dialog box for ACL editing
+			EditSecurity(prcState->m_hwndDlg, pSec);
+			if (pSec != NULL)
+				pSec->Release();
+		}
+		break;
+	}
 }
 
 
@@ -1013,68 +1018,72 @@ void Dlg_OnGetMinMaxInfo(HWND hwnd, LPMINMAXINFO lpMinMaxInfo) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL Dlg_OnNotify(HWND hwnd, int idCtrl, LPNMHDR pnmhdr) {
+BOOL Dlg_OnNotify(HWND hwnd, int idCtrl, LPNMHDR pnmhdr) 
+{
+	// Get state info
+	RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, 
+		DWLP_USER);
 
-   // Get state info
-   RoboClientState* prcState = (RoboClientState*) GetWindowLongPtr(hwnd, 
-         DWLP_USER);
+	switch (pnmhdr->code) 
+	{
+	case LVN_ENDLABELEDIT: 
+		{
 
-   switch (pnmhdr->code) {
+			LPNMLVDISPINFOW pnmlvDispInfo = (LPNMLVDISPINFOW) pnmhdr;
 
-      case LVN_ENDLABELEDIT: {
+			TCHAR szOldName[256] = {0};
+			ListView_GetItemText(pnmlvDispInfo->hdr.hwndFrom, 
+				pnmlvDispInfo->item.iItem, 0, szOldName, chDIMOF(szOldName));
 
-            LPNMLVDISPINFOW pnmlvDispInfo = (LPNMLVDISPINFOW) pnmhdr;
+			BOOL fNew = (szOldName[0] == 0);
+			BOOL fEdited = (pnmlvDispInfo->item.pszText != NULL) 
+				&& (pnmlvDispInfo->item.pszText[0] != 0);
 
-            TCHAR szOldName[256] = {0};
-            ListView_GetItemText(pnmlvDispInfo->hdr.hwndFrom, 
-                  pnmlvDispInfo->item.iItem, 0, szOldName, chDIMOF(szOldName));
+			if (fNew) 
+			{
 
-            BOOL fNew = (szOldName[0] == 0);
-            BOOL fEdited = (pnmlvDispInfo->item.pszText != NULL) 
-                  && (pnmlvDispInfo->item.pszText[0] != 0);
-            if (fNew) {
+				if (fEdited) {
+					LVITEM lvItem = {0};
+					if (lstrlen(pnmlvDispInfo->item.pszText) > 255)
+						pnmlvDispInfo->item.pszText[255] = 0;
+					lvItem.mask = LVIF_TEXT;
+					lvItem.iItem = pnmlvDispInfo->item.iItem;
+					lvItem.iSubItem = 0;
+					lvItem.pszText = pnmlvDispInfo->item.pszText;
+					ListView_SetItem(pnmlvDispInfo->hdr.hwndFrom, &lvItem);
+					SendRobotMessage(hwnd, ROBOMSG_CREATEROBOT, 0);
+				}
+				ListView_DeleteItem(pnmlvDispInfo->hdr.hwndFrom, 
+					pnmlvDispInfo->item.iItem);
 
-               if (fEdited) {
-                  LVITEM lvItem = {0};
-                  if (lstrlen(pnmlvDispInfo->item.pszText) > 255)
-                     pnmlvDispInfo->item.pszText[255] = 0;
-                  lvItem.mask = LVIF_TEXT;
-                  lvItem.iItem = pnmlvDispInfo->item.iItem;
-                  lvItem.iSubItem = 0;
-                  lvItem.pszText = pnmlvDispInfo->item.pszText;
-                  ListView_SetItem(pnmlvDispInfo->hdr.hwndFrom, &lvItem);
-                  SendRobotMessage(hwnd, ROBOMSG_CREATEROBOT, 0);
-               }
-               ListView_DeleteItem(pnmlvDispInfo->hdr.hwndFrom, 
-                     pnmlvDispInfo->item.iItem);
+			} 
+			else 
+			{
+				if (fEdited) {
+					Message msg;
+					MsgDataName MsgDataNames[2];
 
-            } else {
+					lstrcpy(MsgDataNames[0].m_szName, szOldName);
+					lstrcpy(MsgDataNames[1].m_szName, 
+						pnmlvDispInfo->item.pszText);
 
-               if (fEdited) {
-                  Message msg;
-                  MsgDataName MsgDataNames[2];
+					msg.m_baseMsg.m_lMsgType = ROBOMSG_CHANGENAME;
+					msg.m_pvData = MsgDataNames;
+					msg.m_baseMsg.m_lExtraDataSize = sizeof(MsgDataNames);
+					// Rename
+					SendWriteMessage(prcState->m_hPipe, &msg);
+				}
 
-                  lstrcpy(MsgDataNames[0].m_szName, szOldName);
-                  lstrcpy(MsgDataNames[1].m_szName, 
-                        pnmlvDispInfo->item.pszText);
+			}
+		}
+		break;
 
-                  msg.m_baseMsg.m_lMsgType = ROBOMSG_CHANGENAME;
-                  msg.m_pvData = MsgDataNames;
-                  msg.m_baseMsg.m_lExtraDataSize = sizeof(MsgDataNames);
-                  // Rename
-                  SendWriteMessage(prcState->m_hPipe, &msg);
-               }
+	case LVN_ITEMCHANGED:
+		EnableControls(hwnd, TRUE);
+		break;
+	}
 
-            }
-         }
-         break;
-
-      case LVN_ITEMCHANGED:
-         EnableControls(hwnd, TRUE);
-         break;
-   }
-
-   return (FALSE);
+	return (FALSE);
 }
 
 

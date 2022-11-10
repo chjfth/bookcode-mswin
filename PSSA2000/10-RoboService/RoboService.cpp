@@ -295,47 +295,50 @@ void InitRobots(ServerInfo* pInfo) {
 
 
 DWORD WINAPI RoboHandlerEx(DWORD dwControl, DWORD dwEventType,
-      PVOID pvEventData, PVOID pvContext) {
+	PVOID pvEventData, PVOID pvContext) 
+{
 
-   DWORD dwReturn = ERROR_CALL_NOT_IMPLEMENTED;
-   BOOL fPostControlToServiceThread = FALSE;
+	DWORD dwReturn = ERROR_CALL_NOT_IMPLEMENTED;
+	BOOL fPostControlToServiceThread = FALSE;
 
-   // Handle service control notifications
-   switch (dwControl) {
-      
-      case SERVICE_CONTROL_STOP:
-      case SERVICE_CONTROL_SHUTDOWN:
-         g_ssRobo.SetUltimateState(SERVICE_STOPPED, 2000);
-         fPostControlToServiceThread = TRUE;
-         break;
+	// Handle service control notifications
+	switch (dwControl) 
+	{
 
-      case SERVICE_CONTROL_PAUSE:
-      case SERVICE_CONTROL_CONTINUE:
-         break;
+	case SERVICE_CONTROL_STOP:
+	case SERVICE_CONTROL_SHUTDOWN:
+		g_ssRobo.SetUltimateState(SERVICE_STOPPED, 2000);
+		fPostControlToServiceThread = TRUE;
+		break;
 
-      case SERVICE_CONTROL_INTERROGATE:
-         g_ssRobo.ReportStatus();
-         break;
+	case SERVICE_CONTROL_PAUSE:
+	case SERVICE_CONTROL_CONTINUE:
+		break;
 
-      case SERVICE_CONTROL_PARAMCHANGE:
-         break;
+	case SERVICE_CONTROL_INTERROGATE:
+		g_ssRobo.ReportStatus();
+		break;
 
-      case SERVICE_CONTROL_DEVICEEVENT:
-      case SERVICE_CONTROL_HARDWAREPROFILECHANGE:
-      case SERVICE_CONTROL_POWEREVENT:
-         break;
-   }
+	case SERVICE_CONTROL_PARAMCHANGE:
+		break;
 
-   HANDLE hIOCP = (HANDLE) pvContext;
-   if (fPostControlToServiceThread) {
-      // The Handler thread is very simple and executes very quickly because
-      // it just passes the control code off to the servicemain thread.
-      PostQueuedCompletionStatus(hIOCP, SERVICE_CONTROL, CONTEXT_SERVICE, 
-            NULL);
-      dwReturn = NO_ERROR;
-   }
+	case SERVICE_CONTROL_DEVICEEVENT:
+	case SERVICE_CONTROL_HARDWAREPROFILECHANGE:
+	case SERVICE_CONTROL_POWEREVENT:
+		break;
+	}
 
-   return(dwReturn);
+	HANDLE hIOCP = (HANDLE) pvContext;
+	if (fPostControlToServiceThread) 
+	{
+		// The Handler thread is very simple and executes very quickly because
+		// it just passes the control code off to the servicemain thread.
+		PostQueuedCompletionStatus(hIOCP, SERVICE_CONTROL, CONTEXT_SERVICE, 
+			NULL);
+		dwReturn = NO_ERROR;
+	}
+
+	return(dwReturn);
 }
 
 
@@ -1075,30 +1078,31 @@ void RoboAction(ServerInfo* pInfo, ConnectionInfo* pinfoConnection,
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL TokenHasTakeOwnership() {
-   
-   BOOL fHas = FALSE;
-   
-   // Get current token
-   HANDLE hToken = OpenCurrentToken(TOKEN_ALL_ACCESS, TRUE);
-   if (hToken != NULL) {
-   
-      PRIVILEGE_SET psPriv = {0};
-      psPriv.Control = 0;
-      psPriv.PrivilegeCount = 1;
-      psPriv.Privilege[0].Attributes = 0;
-      LookupPrivilegeValue(NULL, SE_TAKE_OWNERSHIP_NAME, 
-            &psPriv.Privilege[0].Luid);
+BOOL TokenHasTakeOwnership() 
+{   
+	BOOL fHas = FALSE;
 
-      // Check for the SE_TAKE_OWNERSHIP_NAME privilege
-      if (!PrivilegeCheck(hToken, &psPriv, &fHas)) {
-         fHas = FALSE;
-      }
-   
-      CloseHandle(hToken);
-   }
-   
-   return (fHas);
+	// Get current token
+	HANDLE hToken = OpenCurrentToken(TOKEN_ALL_ACCESS, TRUE);
+	if (hToken != NULL) 
+	{
+
+		PRIVILEGE_SET psPriv = {0};
+		psPriv.Control = 0;
+		psPriv.PrivilegeCount = 1;
+		psPriv.Privilege[0].Attributes = 0;
+		LookupPrivilegeValue(NULL, SE_TAKE_OWNERSHIP_NAME, 
+			&psPriv.Privilege[0].Luid);
+
+		// Check for the SE_TAKE_OWNERSHIP_NAME privilege
+		if (!PrivilegeCheck(hToken, &psPriv, &fHas)) {
+			fHas = FALSE;
+		}
+
+		CloseHandle(hToken);
+	}
+
+	return (fHas);
 }
 
 
@@ -1106,65 +1110,64 @@ BOOL TokenHasTakeOwnership() {
 
 
 void SetRobotSecurity(ServerInfo* pInfo, ConnectionInfo* pinfoConnection, 
-      MessageReceiver* pMsg) {
-   
-   MsgDataName* pName = (MsgDataName*) pMsg->m_pbData;
-   MsgDataSD* pSecurity = (MsgDataSD*) (pName + 1);
+	MessageReceiver* pMsg) 
+{
+	MsgDataName* pName = (MsgDataName*) pMsg->m_pbData;
+	MsgDataSD* pSecurity = (MsgDataSD*) (pName + 1);
 
-   try { {
-   
-      // Serialize and find robot
-      EnterCriticalSection(&pInfo->m_csSerialize);
-      Robot* pRobot = FindRobot(pInfo, pName[0].m_szName);
-      if (pRobot == NULL) {
-         PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ROBOTNOTFOUND);
-         goto leave;
-      }
+	try 
+	{ {
+		// Serialize and find robot
+		EnterCriticalSection(&pInfo->m_csSerialize);
+		Robot* pRobot = FindRobot(pInfo, pName[0].m_szName);
+		if (pRobot == NULL) {
+			PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ROBOTNOTFOUND);
+			goto leave;
+		}
 
-      // What access are they asking for?
-      ULONG lAccess = 0;
-      if (pMsg->m_baseMsg.m_lInfo & DACL_SECURITY_INFORMATION)
-         lAccess |= WRITE_DAC;
-      
-      // Override lack of WRITE_OWNER access if they have take ownership priv
-      if ((pMsg->m_baseMsg.m_lInfo & OWNER_SECURITY_INFORMATION) 
-            && !TokenHasTakeOwnership())
-         lAccess |= WRITE_OWNER;
-      
-      if (pMsg->m_baseMsg.m_lInfo & SACL_SECURITY_INFORMATION)
-         lAccess |= ACCESS_SYSTEM_SECURITY;
+		// What access are they asking for?
+		ULONG lAccess = 0;
+		if (pMsg->m_baseMsg.m_lInfo & DACL_SECURITY_INFORMATION)
+			lAccess |= WRITE_DAC;
 
-      // Check the access
-      if (!CheckRobotSecurity(pRobot, lAccess)) {
-         PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ACCESSDENIED);
-         goto leave;
-      }
+		// Override lack of WRITE_OWNER access if they have take ownership priv
+		if ((pMsg->m_baseMsg.m_lInfo & OWNER_SECURITY_INFORMATION) 
+			&& !TokenHasTakeOwnership())
+			lAccess |= WRITE_OWNER;
 
-      // Rever to service context before seting new security
-      RevertToSelf();
-      BOOL fSuccess = SetPrivateObjectSecurity(pMsg->m_baseMsg.m_lInfo, 
-            &(pSecurity->m_sdSecurity), &(pRobot->m_pSD), &g_gmRobots, 
-            pinfoConnection->m_hToken);
+		if (pMsg->m_baseMsg.m_lInfo & SACL_SECURITY_INFORMATION)
+			lAccess |= ACCESS_SYSTEM_SECURITY;
 
-      // Reimpersonate
-      ImpersonateLoggedOnUser(pinfoConnection->m_hToken);
-      if (!fSuccess) {
-         PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ACCESSDENIED);
-         goto leave;
-      } else {
-         PTSTR pszText = TEXT("Robot security successfully set");
-         MessageSender* pMsgNew = AllocateMessageSnd(ROBOMSG_ROBOTMSG, 
-               pszText, (lstrlen(pszText) + 1) * sizeof(TCHAR));
-         PostWriteMessage(pInfo, pinfoConnection, pMsgNew);
-      }
+		// Check the access
+		if (!CheckRobotSecurity(pRobot, lAccess)) {
+			PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ACCESSDENIED);
+			goto leave;
+		}
 
-   } leave:;
-   }
-   catch (...) {
-   }
+		// Revert to service context before setting new security
+		RevertToSelf();
+		BOOL fSuccess = SetPrivateObjectSecurity(pMsg->m_baseMsg.m_lInfo, 
+			&(pSecurity->m_sdSecurity), &(pRobot->m_pSD), &g_gmRobots, 
+			pinfoConnection->m_hToken);
 
-   // Cleanup and always exit critical section
-   LeaveCriticalSection(&pInfo->m_csSerialize);
+		// Re-impersonate
+		ImpersonateLoggedOnUser(pinfoConnection->m_hToken);
+		if (!fSuccess) {
+			PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ACCESSDENIED);
+			goto leave;
+		} else {
+			PTSTR pszText = TEXT("Robot security successfully set");
+			MessageSender* pMsgNew = AllocateMessageSnd(ROBOMSG_ROBOTMSG, 
+				pszText, (lstrlen(pszText) + 1) * sizeof(TCHAR));
+			PostWriteMessage(pInfo, pinfoConnection, pMsgNew);
+		}
+
+	} leave:; }
+	catch (...) {
+	}
+
+	// Cleanup and always exit critical section
+	LeaveCriticalSection(&pInfo->m_csSerialize);
 }
 
 
@@ -1172,65 +1175,64 @@ void SetRobotSecurity(ServerInfo* pInfo, ConnectionInfo* pinfoConnection,
 
 
 void QueryRobotSecurity(ServerInfo* pInfo, ConnectionInfo* pinfoConnection, 
-      MessageReceiver* pMsg) {
- 
-   MsgDataName* pName = (MsgDataName*) pMsg->m_pbData;
-   PBYTE pbData = NULL;
+	MessageReceiver* pMsg) 
+{ 
+	MsgDataName* pName = (MsgDataName*) pMsg->m_pbData;
+	PBYTE pbData = NULL;
 
-   try { {
-   
-      // Serialize
-      EnterCriticalSection(&pInfo->m_csSerialize);
-      Robot* pRobot = FindRobot(pInfo, pName[0].m_szName);
-      if (pRobot == NULL) {
-         PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ROBOTNOTFOUND);
-         goto leave;
-      }
+	try 
+	{ {
+		// Serialize
+		EnterCriticalSection(&pInfo->m_csSerialize);
+		Robot* pRobot = FindRobot(pInfo, pName[0].m_szName);
+		if (pRobot == NULL) {
+			PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ROBOTNOTFOUND);
+			goto leave;
+		}
 
-      // Do we have rights?
-      if (!CheckRobotSecurity(pRobot, READ_CONTROL)) {
-         PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ACCESSDENIED);
-         goto leave;
-      }
+		// Do we have rights?
+		if (!CheckRobotSecurity(pRobot, READ_CONTROL)) {
+			PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ACCESSDENIED);
+			goto leave;
+		}
 
-      // Get the SD
-      CAutoBuf < SECURITY_DESCRIPTOR > pSD;
-      BOOL fSuccess;
-      
-      do {
-         fSuccess = GetPrivateObjectSecurity(pRobot->m_pSD, 
-               pMsg->m_baseMsg.m_lInfo, pSD, pSD, pSD);
-      } while (!fSuccess && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
-      
-      if (!fSuccess) {
-         PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ROBOTNOTFOUND);
-         goto leave;
-      }
+		// Get the SD
+		CAutoBuf < SECURITY_DESCRIPTOR > pSD;
+		BOOL fSuccess;
 
-      // Copy it into data to be sent in a message
-      ULONG lLength = GetSecurityDescriptorLength(pSD);
-      pbData = (PBYTE) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 
-            lLength + sizeof(MsgDataName));
-      if (pbData == NULL)
-         goto leave;
-      CopyMemory(pbData, pName, sizeof(MsgDataName));
-      CopyMemory(pbData + sizeof(MsgDataName), pSD, lLength);
+		do {
+			fSuccess = GetPrivateObjectSecurity(pRobot->m_pSD, 
+				pMsg->m_baseMsg.m_lInfo, pSD, pSD, pSD);
+		} while (!fSuccess && GetLastError() == ERROR_INSUFFICIENT_BUFFER);
 
-      // Send the SD
-      MessageSender* pMsgNew = AllocateMessageSnd(ROBOMSG_RETURNSECURITY, 
-            pbData, lLength + sizeof(MsgDataName));
-      pMsgNew->m_baseMsg.m_lInfo = pMsg->m_baseMsg.m_lInfo;
-      PostWriteMessage(pInfo, pinfoConnection, pMsgNew);
+		if (!fSuccess) {
+			PostErrorMessage(pInfo, pinfoConnection, ROBOERROR_ROBOTNOTFOUND);
+			goto leave;
+		}
 
-   } leave:;
-   }
-   catch (...) {
-   }
-   
-   // Cleanup and always exit critical section
-   LeaveCriticalSection(&pInfo->m_csSerialize);
-   if (pbData != NULL)
-      HeapFree(GetProcessHeap(), 0, pbData);
+		// Copy it into data to be sent in a message
+		ULONG lLength = GetSecurityDescriptorLength(pSD);
+		pbData = (PBYTE) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 
+			lLength + sizeof(MsgDataName));
+		if (pbData == NULL)
+			goto leave;
+		CopyMemory(pbData, pName, sizeof(MsgDataName));
+		CopyMemory(pbData + sizeof(MsgDataName), pSD, lLength);
+
+		// Send the SD
+		MessageSender* pMsgNew = AllocateMessageSnd(ROBOMSG_RETURNSECURITY, 
+			pbData, lLength + sizeof(MsgDataName));
+		pMsgNew->m_baseMsg.m_lInfo = pMsg->m_baseMsg.m_lInfo;
+		PostWriteMessage(pInfo, pinfoConnection, pMsgNew);
+
+	} leave:; }
+	catch (...) {
+	}
+
+	// Cleanup and always exit critical section
+	LeaveCriticalSection(&pInfo->m_csSerialize);
+	if (pbData != NULL)
+		HeapFree(GetProcessHeap(), 0, pbData);
 }
 
 
@@ -1307,156 +1309,161 @@ void LockRobot(ServerInfo* pInfo, ConnectionInfo* pinfoConnection,
 
 
 void HandleMsg(ServerInfo* pInfo, MessageReceiver* pMsg, 
-      ConnectionInfo* pinfoConnection) {
+	ConnectionInfo* pinfoConnection) 
+{
+	// We impersonate the stored token before handling any messages...
+	// This is not strictly necessary but demonstrates a server technique
+	ImpersonateLoggedOnUser(pinfoConnection->m_hToken);
+	switch (pMsg->m_baseMsg.m_lMsgType) 
+	{
 
-   // We impersonate the stored token before handling any messages...
-   // This is not strictly necessary but demonstrates a server technique
-   ImpersonateLoggedOnUser(pinfoConnection->m_hToken);
-   switch (pMsg->m_baseMsg.m_lMsgType) {
+	case ROBOMSG_QUERYROBOTNAMES:
+		QueryRobotNames(pInfo, pinfoConnection);
+		break;
 
-      case ROBOMSG_QUERYROBOTNAMES:
-         QueryRobotNames(pInfo, pinfoConnection);
-         break;
+	case ROBOMSG_CREATEROBOT:
+		CreateRobot(pInfo, pinfoConnection, pMsg);
+		break;
 
-      case ROBOMSG_CREATEROBOT:
-         CreateRobot(pInfo, pinfoConnection, pMsg);
-         break;
-      
-      case ROBOMSG_DELETEROBOT:
-         DeleteRobot(pInfo, pinfoConnection, pMsg);
-         break;
-      
-      case ROBOMSG_CHANGENAME:
-         ChangeRobotName(pInfo, pinfoConnection, pMsg);
-         break;
-      
-      case ROBOMSG_LOCK:
-         LockRobot(pInfo, pinfoConnection, pMsg, pMsg->m_baseMsg.m_lInfo);
-         break;
-      
-      case ROBOMSG_QUERY:
-         RoboQuery(pInfo, pinfoConnection, pMsg);
-         break;
-      
-      case ROBOMSG_ACTION:
-         RoboAction(pInfo, pinfoConnection, pMsg);
-         break;
-      
-      case ROBOMSG_QUERYSECURITY:
-         QueryRobotSecurity(pInfo, pinfoConnection, pMsg);
-         break;
-      
-      case ROBOMSG_SETSECURITY:
-         SetRobotSecurity(pInfo, pinfoConnection, pMsg);
-         break;
-   }
-   
-   // Back to the service's security context
-   RevertToSelf();
+	case ROBOMSG_DELETEROBOT:
+		DeleteRobot(pInfo, pinfoConnection, pMsg);
+		break;
+
+	case ROBOMSG_CHANGENAME:
+		ChangeRobotName(pInfo, pinfoConnection, pMsg);
+		break;
+
+	case ROBOMSG_LOCK:
+		LockRobot(pInfo, pinfoConnection, pMsg, pMsg->m_baseMsg.m_lInfo);
+		break;
+
+	case ROBOMSG_QUERY:
+		RoboQuery(pInfo, pinfoConnection, pMsg);
+		break;
+
+	case ROBOMSG_ACTION:
+		RoboAction(pInfo, pinfoConnection, pMsg);
+		break;
+
+	case ROBOMSG_QUERYSECURITY:
+		QueryRobotSecurity(pInfo, pinfoConnection, pMsg);
+		break;
+
+	case ROBOMSG_SETSECURITY:
+		SetRobotSecurity(pInfo, pinfoConnection, pMsg);
+		break;
+	}
+
+	// Back to the service's security context
+	RevertToSelf();
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void HandleIO(ServerInfo* pInfo, IOStruct* pIOS, ULONG lBytes) {
+void HandleIO(ServerInfo* pInfo, IOStruct* pIOS, ULONG lBytes) 
+{
+	switch (pIOS->m_nPurpose) 
+	{
+	case IOS_CONNECT:
 
-   switch (pIOS->m_nPurpose) {
-   
-      case IOS_CONNECT:
+		// Update active and downgrade pending
+		InterlockedIncrement(&pInfo->m_lActiveConnections);
+		InterlockedDecrement(&pInfo->m_lPendingConnections);
 
-         // Update active and downgrade pending
-         InterlockedIncrement(&pInfo->m_lActiveConnections);
-         InterlockedDecrement(&pInfo->m_lPendingConnections);
-         
-         // Bring pending connections up to count
-         UpdatePendingConnections(pInfo);
+		// Bring pending connections up to count
+		UpdatePendingConnections(pInfo);
 
-         // Get the connection info structure, and then free IO structure
-         ConnectionInfo* pinfoConnection;
-         pinfoConnection = pIOS->m_pinfoConnection;
-         FreeIOStruct(pIOS);
+		// Get the connection info structure, and then free IO structure
+		ConnectionInfo* pinfoConnection;
+		pinfoConnection = pIOS->m_pinfoConnection;
+		FreeIOStruct(pIOS);
 
-         // Post our first read for reading a message
-         PostReadMessage(pInfo, NULL, pinfoConnection);
-         break;
+		// Post our first read for reading a message
+		PostReadMessage(pInfo, NULL, pinfoConnection);
+		break;
 
-      case IOS_WRITE: // When writes complete we just free the IO struct
-         FreeIOStruct(pIOS);
-         break;
-      
-      case IOS_READ:
-         
-         // Store token with connection info if this is our first read.
-         if (pIOS->m_pinfoConnection->m_hToken == NULL) {
+	case IOS_WRITE: // When writes complete we just free the IO struct
+		FreeIOStruct(pIOS);
+		break;
 
-            BOOL fSuccess = FALSE;
-            if (ImpersonateNamedPipeClient(pIOS->m_pinfoConnection->m_hPipe)) {
-               HANDLE hToken;
-               if (OpenThreadToken(GetCurrentThread(),TOKEN_QUERY 
-                     | TOKEN_ADJUST_DEFAULT | TOKEN_ADJUST_PRIVILEGES 
-                     | TOKEN_IMPERSONATE | TOKEN_DUPLICATE 
-                     | TOKEN_ADJUST_GROUPS, TRUE, &hToken)) {
-                  fSuccess = TRUE;
-                  pIOS->m_pinfoConnection->m_hToken = hToken;
-               }
-               RevertToSelf();
-            }
-         
-            // Can fail and close connection
-            if (!fSuccess) {
-               CleanupConnection(pIOS->m_pinfoConnection);
-               FreeIOStruct(pIOS);
-               InterlockedDecrement(&pInfo->m_lActiveConnections);
-            }
-         }
+	case IOS_READ:
 
-         // If MSGSIZE has already been read, then we must be reading datablock
-         if (pIOS->m_pMessageRcv->m_lMsgBytesRead == MSGSIZE) {
-            
-            pIOS->m_pMessageRcv->m_lDataBytesRead += lBytes;
+		// Store token with connection info if this is our first read.
+		if (pIOS->m_pinfoConnection->m_hToken == NULL) 
+		{
 
-            // If we finished data read, then handle the msg and post new read
-            if (pIOS->m_pMessageRcv->m_lDataBytesRead 
-                  == pIOS->m_pMessageRcv->m_baseMsg.m_lExtraDataSize) {
-               
-               HandleMsg(pInfo, pIOS->m_pMessageRcv, pIOS->m_pinfoConnection);
-               ConnectionInfo* pinfoConnection;
-               pinfoConnection = pIOS->m_pinfoConnection;
-               FreeIOStruct(pIOS);
-            
-               // Read next message
-               PostReadMessage(pInfo, NULL, pinfoConnection);
-            }
-         
-         } else { // We haven't yet read the main message part
-            
-            pIOS->m_pMessageRcv->m_lMsgBytesRead += lBytes;
+			BOOL fSuccess = FALSE;
+			if (ImpersonateNamedPipeClient(pIOS->m_pinfoConnection->m_hPipe)) {
+				HANDLE hToken;
+				if (OpenThreadToken(GetCurrentThread(),TOKEN_QUERY 
+					| TOKEN_ADJUST_DEFAULT | TOKEN_ADJUST_PRIVILEGES 
+					| TOKEN_IMPERSONATE | TOKEN_DUPLICATE 
+					| TOKEN_ADJUST_GROUPS, TRUE, &hToken)) {
+						fSuccess = TRUE;
+						pIOS->m_pinfoConnection->m_hToken = hToken;
+				}
+				RevertToSelf();
+			}
 
-            // If it is completely read then we handle or read for data
-            if (pIOS->m_pMessageRcv->m_lMsgBytesRead == MSGSIZE) { 
-            
-               // finished read
-               if (pIOS->m_pMessageRcv->m_baseMsg.m_lExtraDataSize > 0) { 
-               
-                  // If there is MSG data
-                  PostReadMessageData(pInfo, pIOS);
-               
-               } else { // if there is not MSG data
-                  
-                  HandleMsg(pInfo, pIOS->m_pMessageRcv,
-                        pIOS->m_pinfoConnection);
-                  ConnectionInfo* pinfoConnection;
-                  pinfoConnection = pIOS->m_pinfoConnection;
-                  FreeIOStruct(pIOS);
-               
-                  // Read next message
-                  PostReadMessage(pInfo, NULL, pinfoConnection);
-               }
-            }
-         }
-         break;
-   }
+			// Can fail and close connection
+			if (!fSuccess) {
+				CleanupConnection(pIOS->m_pinfoConnection);
+				FreeIOStruct(pIOS);
+				InterlockedDecrement(&pInfo->m_lActiveConnections);
+			}
+		}
+
+		// If MSGSIZE has already been read, then we must be reading datablock
+		if (pIOS->m_pMessageRcv->m_lMsgBytesRead == MSGSIZE) {
+
+			pIOS->m_pMessageRcv->m_lDataBytesRead += lBytes;
+
+			// If we finished data read, then handle the msg and post new read
+			if (pIOS->m_pMessageRcv->m_lDataBytesRead 
+				== pIOS->m_pMessageRcv->m_baseMsg.m_lExtraDataSize) {
+
+					HandleMsg(pInfo, pIOS->m_pMessageRcv, pIOS->m_pinfoConnection);
+					ConnectionInfo* pinfoConnection;
+					pinfoConnection = pIOS->m_pinfoConnection;
+					FreeIOStruct(pIOS);
+
+					// Read next message
+					PostReadMessage(pInfo, NULL, pinfoConnection);
+			}
+
+		} 
+		else 
+		{ 
+			// We haven't yet read the main message part
+
+			pIOS->m_pMessageRcv->m_lMsgBytesRead += lBytes;
+
+			// If it is completely read then we handle or read for data
+			if (pIOS->m_pMessageRcv->m_lMsgBytesRead == MSGSIZE) { 
+
+				// finished read
+				if (pIOS->m_pMessageRcv->m_baseMsg.m_lExtraDataSize > 0) { 
+
+					// If there is MSG data
+					PostReadMessageData(pInfo, pIOS);
+
+				} else { // if there is not MSG data
+
+					HandleMsg(pInfo, pIOS->m_pMessageRcv,
+						pIOS->m_pinfoConnection);
+					ConnectionInfo* pinfoConnection;
+					pinfoConnection = pIOS->m_pinfoConnection;
+					FreeIOStruct(pIOS);
+
+					// Read next message
+					PostReadMessage(pInfo, NULL, pinfoConnection);
+				}
+			}
+		}
+		break;
+	}
 }
 
 
