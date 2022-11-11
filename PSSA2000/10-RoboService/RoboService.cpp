@@ -11,6 +11,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "RoboShare.h"
 
+#include "..\vaDbg.h"
+
 #define SERVICESTATUS_IMPL
 #include "..\03-TimeService\ServiceStatus.h"
 
@@ -169,6 +171,13 @@ PSID GetCurrentSID()
 
 	} leave:; }
 	catch (...) {
+	}
+
+	if(psid)
+	{
+		// debug info:
+		TCHAR szSid[100];
+		vaDbg(_T("GetCurrentSID() returns SID: %s"), SID2Repr(psid, szSid, ARRAYSIZE(szSid)));
 	}
 
 	if (pUser != NULL)
@@ -518,9 +527,9 @@ void FreeIOStruct(IOStruct* pIO) {
       }
    }
 
-   #ifdef _DEBUG
+#ifdef _DEBUG
    InterlockedDecrement(&g_nIOStruct);
-   #endif
+#endif
 
    HeapFree(GetProcessHeap(), 0, pIO);
 }
@@ -561,8 +570,8 @@ void UpdatePendingConnections(ServerInfo* pinfo)
 		// Find a free connection struct
 		int nIndex;
 		nIndex = MAXCONNECTIONS;
-		while (nIndex-- != 0) {
-
+		while (nIndex-- != 0) 
+		{
 			if (pinfo->m_infoConnections[nIndex].m_lInUse == 0) {
 
 				LONG lResult = InterlockedIncrement(
@@ -570,7 +579,6 @@ void UpdatePendingConnections(ServerInfo* pinfo)
 
 				// if greater than one, then contention here, and I lost
 				if (lResult > 1) {
-
 					// So decrement and move on
 					InterlockedDecrement(
 						&(pinfo->m_infoConnections[nIndex].m_lInUse));
@@ -579,39 +587,39 @@ void UpdatePendingConnections(ServerInfo* pinfo)
 			}
 		}
 
-		if (nIndex!= -1) { // Did we find a free connection struct?
-
+		if (nIndex!= -1)  // Did we find a free connection struct?
+		{
 			// Lets get a pipe and add it to the port
 			pinfo->m_infoConnections[nIndex].m_hPipe = CreateNamedPipe(PIPENAME_LOCALFULL,
-				PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE 
-				| PIPE_READMODE_BYTE | PIPE_WAIT, MAXCONNECTIONS, 0, 0, 1000, 
+				PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, 
+				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT, 
+				MAXCONNECTIONS, 0, 0, 1000, 
 				&pinfo->m_saPipeSecurity);
 
 			if (pinfo->m_infoConnections[nIndex].m_hPipe 
-				!= INVALID_HANDLE_VALUE) {
+				!= INVALID_HANDLE_VALUE) 
+			{
+				if (CreateIoCompletionPort(
+					pinfo->m_infoConnections[nIndex].m_hPipe,
+					pinfo->m_hIOCP, CONTEXT_IO, 0) != NULL) 
+				{
+					InterlockedIncrement(&(pinfo->m_lPendingConnections));
+					LPOVERLAPPED pOvl = AllocateIOStruct(IOS_CONNECT, 
+						&pinfo->m_infoConnections[nIndex]);
 
-					if (CreateIoCompletionPort(
-						pinfo->m_infoConnections[nIndex].m_hPipe,
-						pinfo->m_hIOCP, CONTEXT_IO, 0) != NULL) {
-
-							InterlockedIncrement(&(pinfo->m_lPendingConnections));
-							LPOVERLAPPED pOvl = AllocateIOStruct(IOS_CONNECT, 
-								&pinfo->m_infoConnections[nIndex]);
-
-							if (pOvl!= NULL) { // Lets get it listening
-								ConnectNamedPipe(pinfo->m_infoConnections[nIndex].m_hPipe, 
-									pOvl);
-							}
-							else { // Ooops cleanup then
-								CleanupConnection(&pinfo->m_infoConnections[nIndex]);
-								InterlockedDecrement(&(pinfo->m_lPendingConnections));
-							}
-
-					} else { // Oops cleanup then
+					if (pOvl!= NULL) { // Lets get it listening
+						ConnectNamedPipe(pinfo->m_infoConnections[nIndex].m_hPipe, 
+							pOvl);
+					}
+					else { // Ooops cleanup then
 						CleanupConnection(&pinfo->m_infoConnections[nIndex]);
 						InterlockedDecrement(&(pinfo->m_lPendingConnections));
 					}
 
+				} else { // Oops cleanup then
+					CleanupConnection(&pinfo->m_infoConnections[nIndex]);
+					InterlockedDecrement(&(pinfo->m_lPendingConnections));
+				}
 			}
 
 		} else { // If not, lets sleep and try again, we will soon
@@ -831,9 +839,17 @@ BOOL CheckRobotSecurity(Robot* pRobot, ULONG lAccess)
 		BOOL fAllowed;
 
 		// Run an access check on the requested access
-		if (AccessCheck(pRobot->m_pSD, hToken, lAccess, &g_gmRobots, &psPriv, 
-			&lPrivs, &lGranted, &fAllowed))
+		if (AccessCheck(pRobot->m_pSD, 
+			hToken,  // hClientToken
+			lAccess, // dwDesiredAccess (from client)
+			&g_gmRobots, // generic-rights mapping
+			&psPriv, &lPrivs, // [out] Privilege set 
+			&lGranted, // [out] the granted access-mask
+			&fAllowed  // [out] the check result, TRUE=allowed/FALSE=not-allowed.
+			))
+		{
 			fAllow = fAllowed;
+		}
 		CloseHandle(hToken);
 	}
 
@@ -1404,12 +1420,14 @@ void HandleIO(ServerInfo* pInfo, IOStruct* pIOS, ULONG lBytes)
 		{
 
 			BOOL fSuccess = FALSE;
-			if (ImpersonateNamedPipeClient(pIOS->m_pinfoConnection->m_hPipe)) {
+			if (ImpersonateNamedPipeClient(pIOS->m_pinfoConnection->m_hPipe)) 
+			{
 				HANDLE hToken;
 				if (OpenThreadToken(GetCurrentThread(),TOKEN_QUERY 
 					| TOKEN_ADJUST_DEFAULT | TOKEN_ADJUST_PRIVILEGES 
 					| TOKEN_IMPERSONATE | TOKEN_DUPLICATE 
-					| TOKEN_ADJUST_GROUPS, TRUE, &hToken)) {
+					| TOKEN_ADJUST_GROUPS, TRUE, &hToken)) 
+				{
 						fSuccess = TRUE;
 						pIOS->m_pinfoConnection->m_hToken = hToken;
 				}
@@ -1479,28 +1497,28 @@ void HandleIO(ServerInfo* pInfo, IOStruct* pIOS, ULONG lBytes)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL HandleService(ServerInfo* pInfo, ULONG lCmd) {
-   
-   BOOL fContinue = TRUE;
-   switch (lCmd) {
+BOOL HandleService(ServerInfo* pInfo, ULONG lCmd) 
+{   
+	BOOL fContinue = TRUE;
+	switch (lCmd) {
 
-      case SERVICE_CONTROL: // User elected to stop the service
-         if (g_ssRobo == SERVICE_STOP_PENDING) {
-            g_ssRobo.AdvanceState(20000, 0);
+	case SERVICE_CONTROL: // User elected to stop the service
+		if (g_ssRobo == SERVICE_STOP_PENDING) {
+			g_ssRobo.AdvanceState(20000, 0);
 
-            PostExitMsgs(pInfo);
+			PostExitMsgs(pInfo);
 
-            fContinue = FALSE;
-         }
-         break;
-      
-      // Notification to tell threads to exit for shutdown
-      case SERVICE_EXITTHREAD:
-         fContinue = FALSE;
-         break;
-   }
+			fContinue = FALSE;
+		}
+		break;
 
-   return (fContinue);
+		// Notification to tell threads to exit for shutdown
+	case SERVICE_EXITTHREAD:
+		fContinue = FALSE;
+		break;
+	}
+
+	return (fContinue);
 }
 
 
@@ -1582,7 +1600,7 @@ BOOL InitializePipeSecurity(SECURITY_ATTRIBUTES* pSA)
 		pSA->bInheritHandle = FALSE;
 		pSA->lpSecurityDescriptor = NULL;
 
-		// Create a SID for the "Everyone" well-known group
+		// Create a SID for the "Everyone"(S-1-1-0) well-known group
 		SID_IDENTIFIER_AUTHORITY sidAuth = SECURITY_WORLD_SID_AUTHORITY;
 		if (!AllocateAndInitializeSid(&sidAuth, 1, SECURITY_WORLD_RID, 0, 0, 0, 
 			0, 0, 0, 0, &psidEveryone))
@@ -1613,9 +1631,9 @@ BOOL InitializePipeSecurity(SECURITY_ATTRIBUTES* pSA)
 		succ = InitializeAcl(pacl, lACLSize, ACL_REVISION);
 		succ = SetSecurityDescriptorDacl(pSD, TRUE, pacl, FALSE);
 
-		// Add aces to the DACL
-		if (!AddAccessAllowedAce(pacl, ACL_REVISION, FILE_GENERIC_READ 
-			| FILE_GENERIC_WRITE, psidEveryone))
+		// Add ACEs to the DACL
+		if (!AddAccessAllowedAce(pacl, ACL_REVISION,  
+			FILE_GENERIC_READ|FILE_GENERIC_WRITE, psidEveryone))
 			goto leave;
 
 		if (!AddAccessAllowedAce(pacl, ACL_REVISION, FILE_ALL_ACCESS, psidOwner))
@@ -1725,8 +1743,10 @@ void WINAPI RoboServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 	DeleteCriticalSection(&info.m_csSerialize);
 
 	if (info.m_saPipeSecurity.lpSecurityDescriptor != NULL)
-		HeapFree(GetProcessHeap(), 0, 
-		info.m_saPipeSecurity.lpSecurityDescriptor);
+	{
+		HeapFree(GetProcessHeap(), 0, info.m_saPipeSecurity.lpSecurityDescriptor);
+		// -- was HeapAlloc-ed in InitializePipeSecurity()
+	}
 
 	// Cleanup connections
 	for (nIndex = 0;nIndex < MAXCONNECTIONS;nIndex++) {

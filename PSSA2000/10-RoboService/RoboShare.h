@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sddl.h>
+
 // Message id between server and client:
 
 enum ROBOMSG_et
