@@ -249,6 +249,9 @@ HANDLE GetLSAToken()
 			goto leave;
 		}
 
+		CloseHandle(hToken); // Chj: I think we should close the old token handle.
+		hToken = nullptr;
+
 		// Reopen the process token now that we have added the rights to
 		// query the token, duplicate it, and assign it.
 		fResult = OpenProcessToken(hProc, 
