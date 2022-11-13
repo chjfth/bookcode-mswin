@@ -675,7 +675,7 @@ void PopulateProcessCombo()
 {
 	// Get the ID of our last selection so that the selection will "stick"
 	LRESULT lItem = SendMessage(g_hwndProcessCombo, CB_GETCURSEL, 0, 0);
-	DWORD dwLastID = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA, lItem, 0);
+	DWORD dwLastUsedPID = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA, lItem, 0);
 
 	// Clear the combo box
 	SendMessage(g_hwndProcessCombo, CB_RESETCONTENT, 0, 0);
@@ -684,16 +684,19 @@ void PopulateProcessCombo()
 	if (g_hSnapShot != NULL) 
 	{
 		// Iterate through the process list adding them to the combo
-		PROCESSENTRY32 pentry;
-		pentry.dwSize = sizeof(pentry);
+		PROCESSENTRY32 pentry = { sizeof(pentry) };
 		BOOL fIsProcess = Process32First(g_hSnapShot, &pentry);
-		while (fIsProcess) {
-
+		while (fIsProcess) 
+		{
 			if (pentry.th32ProcessID != 0)
-				lItem = SendMessage(g_hwndProcessCombo, CB_ADDSTRING, 0,
-				(LPARAM) pentry.szExeFile);
-			else {
-
+			{
+				TCHAR szitem[200] = {};
+				_sntprintf_s(szitem, _TRUNCATE, _T("%s (%d)"), 
+					pentry.szExeFile, pentry.th32ProcessID);
+				lItem = ComboBox_AddString(g_hwndProcessCombo, szitem);
+			}
+			else 
+			{
 				// Special Case... The Idle Process has a zero ID
 				lItem = SendMessage(g_hwndProcessCombo, CB_ADDSTRING, 0,
 					(LPARAM) TEXT("[System Idle Process]"));
@@ -705,7 +708,7 @@ void PopulateProcessCombo()
 				pentry.th32ProcessID);
 
 			// If the process ID matches the last one, we found it
-			if (pentry.th32ProcessID == dwLastID)
+			if (pentry.th32ProcessID == dwLastUsedPID)
 				SendMessage(g_hwndProcessCombo, CB_SETCURSEL, lItem, 0);
 
 			fIsProcess = Process32Next(g_hSnapShot, &pentry);
