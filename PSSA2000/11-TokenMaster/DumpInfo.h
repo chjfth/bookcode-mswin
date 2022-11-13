@@ -1,27 +1,5 @@
 #pragma once
 
-#define DIVIDERL  TEXT("****************************************") \
-	TEXT("****************************************\r\n")
-
-#define DIVIDERS  TEXT("----------------------------------------") \
-	TEXT("----------------------------------------\r\n")
-
-
-extern HANDLE g_hSnapShot;
-extern HANDLE g_hToken;
-extern HWND g_hwndToken;
-
-extern HWND g_hwndRestrictedSids;
-
-
-void UpdatePrivileges();
-void UpdateGroups();
-
-
-
-PVOID AllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass);
-
-BOOL GetTextualSid(PSID pSid, PTSTR TextualSid, PDWORD pdwBufferLen);
 
 void DumpSID(PSID psid, CPrintBuf* pbufToken);
 

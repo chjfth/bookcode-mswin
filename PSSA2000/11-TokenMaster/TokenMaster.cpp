@@ -3,15 +3,11 @@ Module:  TokenMaster.cpp
 Notices: Copyright (c) 2000 Jeffrey Richter
 ******************************************************************************/
 
+#define PRINTBUF_IMPL
 
-#include "..\CmnHdr.h"           /* See Appendix A. */
+#include "shareinc.h"
 
-#include <WindowsX.h>
-#include <AclAPI.h>
-#include <AclUI.h>
-#include <ObjBase.h>
-#include <ObjSel.h>
-#include <TlHelp32.h>
+#include "DaclPage.h"
 
 #include "Resource.h"
 
@@ -20,14 +16,6 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #define AUTOBUF_IMPL
 #include "..\ClassLib\AutoBuf.h"       // See Appendix B.
-
-#define PRINTBUF_IMPL
-#include "..\ClassLib\PrintBuf.h"      // See Appendix B.
-
-#define SECINFO_IMPL
-#include "..\ClassLib\SecInfo.h"      // See Appendix B.
-
-#include "DumpInfo.h"
 
 
 HANDLE g_hSnapShot = NULL;
@@ -50,34 +38,6 @@ HWND g_hwndTokenTypes;
 HINSTANCE g_hInst;
 
 CUILayout g_pResizer;
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-class CSecurityPage: public CSecInfo {
-public:
-   CSecurityPage(PSECURITY_DESCRIPTOR pSD);
-   ~CSecurityPage();
-
-private:   
-   PSECURITY_DESCRIPTOR m_pSD; 
-   static SI_ACCESS m_siAccessAllRights[];
-
-private:
-   HRESULT WINAPI GetObjectInformation(PSI_OBJECT_INFO pObjectInfo);
-   HRESULT WINAPI GetSecurity(SECURITY_INFORMATION RequestedInformation,
-      PSECURITY_DESCRIPTOR* ppSecurityDescriptor, BOOL fDefault);
-   STDMETHOD(SetSecurity) (SECURITY_INFORMATION SecurityInformation,
-         PSECURITY_DESCRIPTOR pSecurityDescriptor);
-   STDMETHOD(GetAccessRights) (const GUID* pguidObjectType, DWORD dwFlags,
-         PSI_ACCESS* ppAccess, PULONG pcAccesses, PULONG piDefaultAccess);
-   STDMETHOD(MapGeneric) (const GUID* pguidObjectType, PUCHAR pAceFlags,
-         PACCESS_MASK pMask);
-   HRESULT WINAPI GetInheritTypes(PSI_INHERIT_TYPE* ppInheritTypes, ULONG *pcInheritTypes);
-
-   BOOL UseSDCopy(PSECURITY_DESCRIPTOR psd);
-};
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,8 +92,8 @@ BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-HANDLE OpenSystemProcess() {
-
+HANDLE OpenSystemProcess() 
+{
    HANDLE hSnapshot = NULL;
    HANDLE hProc     = NULL;
 
@@ -149,14 +109,15 @@ HANDLE OpenSystemProcess() {
 
       // Find the "System" process
       BOOL fProcess = Process32First(hSnapshot, &pe32);
-      while (fProcess && (lstrcmpi(pe32.szExeFile, TEXT("SYSTEM")) != 0))
+ 
+	  while (fProcess && (lstrcmpi(pe32.szExeFile, TEXT("SYSTEM")) != 0))
          fProcess = Process32Next(hSnapshot, &pe32);
-      if (!fProcess)
+      
+	  if (!fProcess)
          goto leave;    // Didn't find "System" process
 
       // Open the process with PROCESS_QUERY_INFORMATION access
-      hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE,
-            pe32.th32ProcessID);
+      hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
       if (hProc == NULL)
          goto leave;
 
@@ -174,8 +135,8 @@ HANDLE OpenSystemProcess() {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess) {
-
+BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess) 
+{
    PACL pAcl        = NULL;
    PACL pNewAcl     = NULL;
    PACL pSacl       = NULL;
@@ -297,8 +258,8 @@ BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-HANDLE GetLSAToken() {
-
+HANDLE GetLSAToken() 
+{
    HANDLE hProc  = NULL;
    HANDLE hToken = NULL;
 
@@ -325,8 +286,8 @@ HANDLE GetLSAToken() {
 
       // Add an ace for the current user for the token.  This ace will add
       // TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY rights.
-      if (!ModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY
-            | TOKEN_QUERY)) {
+      if (!ModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY)) 
+	  {
          CloseHandle(hToken);
          hToken = NULL;
          goto leave;
@@ -334,8 +295,9 @@ HANDLE GetLSAToken() {
 
       // Reopen the process token now that we have added the rights to
       // query the token, duplicate it, and assign it.
-      fResult = OpenProcessToken(hProc, TOKEN_QUERY | TOKEN_DUPLICATE
-            | TOKEN_ASSIGN_PRIMARY, &hToken);
+      fResult = OpenProcessToken(hProc, 
+		  TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY, 
+		  &hToken);
       if (FALSE == fResult)  {
          hToken = NULL;
          goto leave;
@@ -355,9 +317,8 @@ HANDLE GetLSAToken() {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL RunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword,
-      PTSTR pszDesktop) {
-
+BOOL RunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword, PTSTR pszDesktop) 
+{
    HANDLE hToken   = NULL;
    BOOL   fProcess = FALSE;
    BOOL   fSuccess = FALSE;
@@ -413,8 +374,8 @@ BOOL RunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword,
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL TryRelaunch() {
-
+BOOL TryRelaunch() 
+{
    BOOL fSuccess = FALSE;
 
    try {{
@@ -435,8 +396,8 @@ BOOL TryRelaunch() {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL GetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize) {
-
+BOOL GetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize) 
+{
    BOOL   fSuccess = FALSE;
    HANDLE hToken   = NULL;
 
@@ -660,7 +621,7 @@ void UpdatePrivileges()
                &(ptpPrivileges->Privileges[dwIndex].Luid), pszName, &dwSize))
             goto leave;
 
-         // Get the diaplay name size
+         // Get the display name size
          DWORD dwDispSize = 0;
          DWORD dwLangID;
          LookupPrivilegeDisplayName(NULL, pszName, NULL, &dwDispSize,
@@ -805,22 +766,21 @@ void UpdateGroups()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void RefreshSnapShot() {
-
+void RefreshSnapShot() 
+{
    // If we already have one, close it
    if (g_hSnapShot != NULL)
       CloseHandle(g_hSnapShot);
 
-   g_hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS
-         | TH32CS_SNAPTHREAD, 0);
+   g_hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS | TH32CS_SNAPTHREAD, 0);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void PopulateProcessCombo() {
-
+void PopulateProcessCombo() 
+{
    // Get the ID of our last selection so that the selection will "stick"
    LRESULT lItem = SendMessage(g_hwndProcessCombo, CB_GETCURSEL, 0, 0);
    DWORD dwLastID = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA, lItem, 0);
@@ -829,8 +789,8 @@ void PopulateProcessCombo() {
    SendMessage(g_hwndProcessCombo, CB_RESETCONTENT, 0, 0);
 
    // No snapshot means we empty the combo
-   if (g_hSnapShot != NULL) {
-
+   if (g_hSnapShot != NULL) 
+   {
       // Iterate through the process list adding them to the combo
       PROCESSENTRY32 pentry;
       pentry.dwSize = sizeof(pentry);
@@ -915,8 +875,8 @@ void PopulateThreadCombo() {
 
 
 
-void PopulateStaticCombos() {
-
+void PopulateStaticCombos() 
+{
    int nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
          (LPARAM) L"Batch");
    SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
@@ -1011,8 +971,8 @@ void PopulateStaticCombos() {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void GetToken(HWND hwnd) {
-
+void GetToken(HWND hwnd) 
+{
    DWORD  dwStatus;
    HANDLE hThread    = NULL;
    HANDLE hProcess   = NULL;
@@ -1157,8 +1117,8 @@ void GetToken(HWND hwnd) {
 
 
 BOOL GetAccountName(HWND hwnd, PTSTR szBuf, DWORD dwSize, BOOL fAllowGroups,
-      BOOL fAllowUsers) {
-
+      BOOL fAllowUsers) 
+{
    BOOL fSuccess      = FALSE;
    BOOL fGotStgMedium = FALSE;
 
@@ -1550,8 +1510,8 @@ void Cmd_AdjustTokenPrivileges() {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void Cmd_SetDACL(HWND hwnd) {
-
+void Cmd_SetDACL(HWND hwnd) 
+{
    PSECURITY_DESCRIPTOR pSD  = NULL;
    CSecurityPage*       pSec = NULL;
 
@@ -2188,168 +2148,6 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) {
 void Dlg_OnClose(HWND hwnd) {
 
    EndDialog(hwnd, 0);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-HRESULT CSecurityPage::GetObjectInformation(PSI_OBJECT_INFO pObjectInfo) {
-   
-   pObjectInfo->dwFlags = SI_EDIT_PERMS;
-   pObjectInfo->hInstance = GetModuleHandle(NULL);
-   pObjectInfo->pszServerName = NULL; 
-   pObjectInfo->pszObjectName = L"Default DACL";
-
-   return(S_OK);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-HRESULT CSecurityPage::SetSecurity(SECURITY_INFORMATION SecurityInformation,
-      PSECURITY_DESCRIPTOR pSecurityDescriptor) {
-
-   HRESULT hResult = 1;
-
-   try {{
-
-      if (g_hToken == NULL)
-         goto leave;
-
-      BOOL fBool;
-      TOKEN_DEFAULT_DACL tokenDacl;
-      if (!GetSecurityDescriptorDacl(pSecurityDescriptor, &fBool,
-            &(tokenDacl.DefaultDacl), &fBool))
-         goto leave;
-
-      if (!SetTokenInformation(g_hToken, TokenDefaultDacl, &tokenDacl,
-            sizeof(tokenDacl)))
-         goto leave;
-
-      Modified();
-      hResult = S_OK;
-
-   } leave:;
-   } catch(...) {}
-
-   return(hResult);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-SI_ACCESS CSecurityPage::m_siAccessAllRights[] = { //"winnt.h"
-    {&m_guidNULL, GENERIC_ALL,     L"GENERIC_ALL",     SI_ACCESS_GENERAL },
-    {&m_guidNULL, GENERIC_READ,    L"GENERIC_READ",    SI_ACCESS_GENERAL },
-    {&m_guidNULL, GENERIC_WRITE,   L"GENERIC_WRITE",   SI_ACCESS_GENERAL },
-    {&m_guidNULL, GENERIC_EXECUTE, L"GENERIC_EXECUTE", SI_ACCESS_GENERAL },
-    
-    {&m_guidNULL, DELETE,       L"DELETE",       SI_ACCESS_GENERAL },
-    {&m_guidNULL, READ_CONTROL, L"READ_CONTROL", SI_ACCESS_GENERAL },
-    {&m_guidNULL, WRITE_DAC,    L"WRITE_DAC",    SI_ACCESS_GENERAL },
-    {&m_guidNULL, WRITE_OWNER,  L"WRITE_OWNER",  SI_ACCESS_GENERAL },
-    {&m_guidNULL, SYNCHRONIZE,  L"SYNCHRONIZE",  SI_ACCESS_GENERAL },
-
-    {&m_guidNULL, STANDARD_RIGHTS_REQUIRED, L"STANDARD_RIGHTS_REQUIRED", SI_ACCESS_GENERAL }, 
-    {&m_guidNULL, STANDARD_RIGHTS_READ,     L"STANDARD_RIGHTS_READ",     SI_ACCESS_GENERAL },
-    {&m_guidNULL, STANDARD_RIGHTS_WRITE,    L"STANDARD_RIGHTS_WRITE",    SI_ACCESS_GENERAL },
-    {&m_guidNULL, STANDARD_RIGHTS_EXECUTE,  L"STANDARD_RIGHTS_EXECUTE",  SI_ACCESS_GENERAL }, 
-    {&m_guidNULL, STANDARD_RIGHTS_ALL,      L"STANDARD_RIGHTS_ALL",      SI_ACCESS_GENERAL }, 
-    {&m_guidNULL, SPECIFIC_RIGHTS_ALL,      L"SPECIFIC_RIGHTS_ALL",      SI_ACCESS_GENERAL },
-    
-    {&m_guidNULL, ACCESS_SYSTEM_SECURITY, L"ACCESS_SYSTEM_SECURITY", SI_ACCESS_GENERAL },
-    {&m_guidNULL, MAXIMUM_ALLOWED,        L"MAXIMUM_ALLOWED",        SI_ACCESS_GENERAL }
-};
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-HRESULT CSecurityPage::GetAccessRights(const GUID* pguidObjectType,
-      DWORD dwFlags, PSI_ACCESS* ppAccess, PULONG pcAccesses,
-      PULONG piDefaultAccess) {
-
-   // Skip the Generic Access
-   *ppAccess = m_siAccessAllRights;
-   *pcAccesses = chDIMOF(m_siAccessAllRights);
-   *piDefaultAccess = 0;
-
-   return(S_OK);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-HRESULT CSecurityPage::MapGeneric(const GUID* pguidObjectType,
-      PUCHAR pAceFlags, ACCESS_MASK* pMask) {
-
-   return(S_OK);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-CSecurityPage::CSecurityPage(PSECURITY_DESCRIPTOR pSD) {   
-   m_pSD = NULL;
-   UseSDCopy(pSD);
-}
-
-
-CSecurityPage::~CSecurityPage() {
-   if (m_pSD != NULL) {
-      LocalFree(m_pSD);
-   }
-} 
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-BOOL CSecurityPage::UseSDCopy(PSECURITY_DESCRIPTOR pSD) {
-    
-   __try {
-      if (pSD == NULL) __leave; 
-      if (m_pSD != NULL) {
-         LocalFree(m_pSD);
-         m_pSD = NULL;
-      }
-
-      m_pSD = LocalAllocSDCopy(pSD);
-      
-   }
-   __finally {
-   } 
-   return(m_pSD != NULL);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-HRESULT CSecurityPage::GetSecurity(SECURITY_INFORMATION RequestedInformation, 
-   PSECURITY_DESCRIPTOR* ppSecurityDescriptor, BOOL fDefault) {
-
-   HRESULT hr = 1;
-   *ppSecurityDescriptor = m_pSD;
-   if (m_pSD != NULL)
-      hr = S_OK;
-   m_pSD = NULL;
-   return(hr);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-HRESULT CSecurityPage::GetInheritTypes(PSI_INHERIT_TYPE* ppInheritTypes, ULONG* pcInheritTypes) {
-   *ppInheritTypes = NULL; 
-   *pcInheritTypes = 0;
-   return(S_OK);
 }
 
 

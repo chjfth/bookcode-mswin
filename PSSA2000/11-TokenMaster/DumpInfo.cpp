@@ -1,15 +1,4 @@
-#include "..\CmnHdr.h"           /* See Appendix A. */
-
-#include <WindowsX.h>
-#include <AclAPI.h>
-#include <AclUI.h>
-#include <ObjBase.h>
-#include <ObjSel.h>
-#include <TlHelp32.h>
-
-#include "..\ClassLib\PrintBuf.h"      // See Appendix B.
-
-#include "DumpInfo.h"
+#include "shareinc.h"
 
 BOOL GetTextualSid(PSID pSid, PTSTR TextualSid, PDWORD pdwBufferLen) 
 {
