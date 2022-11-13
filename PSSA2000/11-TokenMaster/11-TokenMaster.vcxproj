@@ -156,6 +156,7 @@
  
   <ItemGroup>
     <ClCompile Include="TokenMaster.cpp" />
+    <ClCompile Include="TokenMaster-helper.cpp" />
     <ClCompile Include="DaclPage.cpp" />
     <ClCompile Include="DumpInfo.cpp" />
     <ClCompile Include="..\InterpretConst.cpp" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TokenMaster-helper.h" />
     <ClInclude Include="shareinc.h" />
     <ClInclude Include="DumpInfo.h" />
     <ClInclude Include="DaclPage.h" />

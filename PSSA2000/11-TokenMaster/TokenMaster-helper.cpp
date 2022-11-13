@@ -1,0 +1,1121 @@
+#include "shareinc.h"
+#include "TokenMaster-helper.h"
+
+
+BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled) 
+{
+	HANDLE hToken   = NULL;
+	BOOL   fSuccess = FALSE;
+
+	try {{
+
+		// First lookup the system unique luid for the privilege
+		LUID luid;
+		if (!LookupPrivilegeValue(NULL, szPriv, &luid)) {
+
+			// If the name is bogus...
+			goto leave;
+		}
+
+		// Then get the processes token
+		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES,
+			&hToken)) {
+				goto leave;
+		}
+
+		// Set up our token privileges "array" (in our case an array of one)
+		TOKEN_PRIVILEGES tp;
+		tp.PrivilegeCount             = 1;
+		tp.Privileges[0].Luid         = luid;
+		tp.Privileges[0].Attributes = fEnabled ? SE_PRIVILEGE_ENABLED : 0;
+
+		// Adjust our token privileges by enabling or disabling this one
+		if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES),
+			NULL, NULL)) {
+				goto leave;
+		}
+
+		fSuccess = TRUE;
+
+	} leave:;
+	} catch(...) {}
+
+	// Cleanup
+	if (hToken != NULL)
+		CloseHandle(hToken);
+
+	return(fSuccess);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+HANDLE OpenSystemProcess() 
+{
+	HANDLE hSnapshot = NULL;
+	HANDLE hProc     = NULL;
+
+	try {{
+
+		// Get a snapshot of the processes in the system
+		hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+		if (hSnapshot == NULL)
+			goto leave;
+
+		PROCESSENTRY32 pe32;
+		pe32.dwSize = sizeof(pe32);
+
+		// Find the "System" process
+		BOOL fProcess = Process32First(hSnapshot, &pe32);
+
+		while (fProcess && (lstrcmpi(pe32.szExeFile, TEXT("SYSTEM")) != 0))
+			fProcess = Process32Next(hSnapshot, &pe32);
+
+		if (!fProcess)
+			goto leave;    // Didn't find "System" process
+
+		// Open the process with PROCESS_QUERY_INFORMATION access
+		hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
+		if (hProc == NULL)
+			goto leave;
+
+	} leave:;
+	} catch(...) {}
+
+	// Cleanup the snapshot
+	if (hSnapshot != NULL)
+		CloseHandle(hSnapshot);
+
+	return(hProc);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess) 
+{
+	PACL pAcl        = NULL;
+	PACL pNewAcl     = NULL;
+	PACL pSacl       = NULL;
+	PSID pSidOwner   = NULL;
+	PSID pSidPrimary = NULL;
+	BOOL fSuccess    = TRUE;
+
+	PSECURITY_DESCRIPTOR pSD = NULL;
+
+	try {{
+
+		// Find the length of the security object for the kernel object
+		DWORD dwSDLength;
+		if (GetKernelObjectSecurity(hProc, DACL_SECURITY_INFORMATION, pSD, 0,
+			&dwSDLength) || (GetLastError() !=
+			ERROR_INSUFFICIENT_BUFFER))
+			goto leave;
+
+		// Allocate a buffer of that length
+		pSD = LocalAlloc(LPTR, dwSDLength);
+		if (pSD == NULL)
+			goto leave;
+
+		// Retrieve the kernel object
+		if (!GetKernelObjectSecurity(hProc, DACL_SECURITY_INFORMATION, pSD,
+			dwSDLength, &dwSDLength))
+			goto leave;
+
+		// Get a pointer to the DACL of the SD
+		BOOL fDaclPresent;
+		BOOL fDaclDefaulted;
+		if (!GetSecurityDescriptorDacl(pSD, &fDaclPresent, &pAcl,
+			&fDaclDefaulted))
+			goto leave;
+
+		// Get the current user's name
+		TCHAR szName[1024];
+		DWORD dwLen = chDIMOF(szName);
+		if (!GetUserName(szName, &dwLen))
+			goto leave;
+
+		// Build an EXPLICIT_ACCESS structure for the ace we wish to add.
+		EXPLICIT_ACCESS ea;
+		BuildExplicitAccessWithName(&ea, szName, dwAccess, GRANT_ACCESS, 0);
+		ea.Trustee.TrusteeType = TRUSTEE_IS_USER;
+
+		// We are allocating a new ACL with a new ace inserted.  The new
+		// ACL must be LocalFree'd
+		if (ERROR_SUCCESS != SetEntriesInAcl(1, &ea, pAcl,
+			&pNewAcl)) {
+				pNewAcl = NULL;
+				goto leave;
+		}
+
+		// Find the buffer sizes we would need to make our SD absolute
+		pAcl               = NULL;
+		dwSDLength         = 0;
+		DWORD dwAclSize    = 0;
+		DWORD dwSaclSize   = 0;
+		DWORD dwSidOwnLen  = 0;
+		DWORD dwSidPrimLen = 0;
+		PSECURITY_DESCRIPTOR pAbsSD = NULL;
+		if (MakeAbsoluteSD(pSD, pAbsSD, &dwSDLength, pAcl, &dwAclSize, pSacl,
+			&dwSaclSize, pSidOwner, &dwSidOwnLen, pSidPrimary, &dwSidPrimLen)
+			|| (GetLastError() != ERROR_INSUFFICIENT_BUFFER))
+			goto leave;
+
+		// Allocate the buffers
+		pAcl = (PACL) LocalAlloc(LPTR, dwAclSize);
+		pSacl = (PACL) LocalAlloc(LPTR, dwSaclSize);
+		pSidOwner = (PSID) LocalAlloc(LPTR, dwSidOwnLen);
+		pSidPrimary = (PSID) LocalAlloc(LPTR, dwSidPrimLen);
+		pAbsSD = (PSECURITY_DESCRIPTOR) LocalAlloc(LPTR, dwSDLength);
+		if (!(pAcl && pSacl && pSidOwner && pSidPrimary && pAbsSD))
+			goto leave;
+
+		// And actually make our SD absolute
+		if (!MakeAbsoluteSD(pSD, pAbsSD, &dwSDLength, pAcl, &dwAclSize, pSacl,
+			&dwSaclSize, pSidOwner, &dwSidOwnLen, pSidPrimary, &dwSidPrimLen))
+			goto leave;
+
+		// Now set the security descriptor DACL
+		if (!SetSecurityDescriptorDacl(pAbsSD, fDaclPresent, pNewAcl,
+			fDaclDefaulted))
+			goto leave;
+
+		// And set the security for the object
+		if (!SetKernelObjectSecurity(hProc, DACL_SECURITY_INFORMATION, pAbsSD))
+			goto leave;
+
+		fSuccess = TRUE;
+
+	} leave:;
+	} catch(...) {}
+
+	// Cleanup
+	if (pNewAcl == NULL)
+		LocalFree(pNewAcl);
+
+	if (pSD == NULL)
+		LocalFree(pSD);
+
+	if (pAcl == NULL)
+		LocalFree(pAcl);
+
+	if (pSacl == NULL)
+		LocalFree(pSacl);
+
+	if (pSidOwner == NULL)
+		LocalFree(pSidOwner);
+
+	if (pSidPrimary == NULL)
+		LocalFree(pSidPrimary);
+
+	return(fSuccess);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+HANDLE GetLSAToken() 
+{
+	HANDLE hProc  = NULL;
+	HANDLE hToken = NULL;
+
+	try {{
+
+		// Enable the SE_DEBUG_NAME privilege in our process token
+		if (!EnablePrivilege(SE_DEBUG_NAME, TRUE))
+			goto leave;
+
+		// Retrieve a handle to the "System" process
+		hProc = OpenSystemProcess();
+		if (hProc == NULL)
+			goto leave;
+
+		// Open the process token with READ_CONTROL and WRITE_DAC access.  We
+		// will use this access to modify the security of the token so that we
+		// retrieve it again with a more complete set of rights.
+		BOOL fResult = OpenProcessToken(hProc, READ_CONTROL | WRITE_DAC,
+			&hToken);
+		if (FALSE == fResult)  {
+			hToken = NULL;
+			goto leave;
+		}
+
+		// Add an ace for the current user for the token.  This ace will add
+		// TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY rights.
+		if (!ModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY)) 
+		{
+			CloseHandle(hToken);
+			hToken = NULL;
+			goto leave;
+		}
+
+		// Reopen the process token now that we have added the rights to
+		// query the token, duplicate it, and assign it.
+		fResult = OpenProcessToken(hProc, 
+			TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY, 
+			&hToken);
+		if (FALSE == fResult)  {
+			hToken = NULL;
+			goto leave;
+		}
+
+	} leave:;
+	} catch(...) {}
+
+	// Close the System process handle
+	if (hProc != NULL)
+		CloseHandle(hProc);
+
+	return(hToken);
+}
+
+
+BOOL RunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword, PTSTR pszDesktop) 
+{
+	HANDLE hToken   = NULL;
+	BOOL   fProcess = FALSE;
+	BOOL   fSuccess = FALSE;
+
+	PROCESS_INFORMATION pi = {NULL, NULL, 0, 0};
+
+	try {{
+
+		if (pszUserName == NULL) {
+
+			hToken = GetLSAToken();
+			if (hToken == NULL)
+				goto leave;
+
+		} else {
+
+			if (!LogonUser(pszUserName, NULL, pszPassword,
+				LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hToken))
+				goto leave;
+		}
+
+		STARTUPINFO si;
+		si.cb          = sizeof(si);
+		si.lpDesktop   = pszDesktop;
+		si.lpTitle     = NULL;
+		si.dwFlags     = 0;
+		si.cbReserved2 = 0;
+		si.lpReserved  = NULL;
+		si.lpReserved2 = NULL;
+
+		fProcess = CreateProcessAsUser(hToken, NULL, pszEXE, NULL, NULL, FALSE,
+			0, NULL, NULL, &si, &pi);
+		if (!fProcess)
+			goto leave;
+
+		fSuccess = TRUE;
+
+	} leave:;
+	} catch(...) {}
+
+	if (hToken != NULL)
+		CloseHandle(hToken);
+
+	if (fProcess) {
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
+
+	return(fSuccess);
+}
+
+BOOL TryRelaunch() 
+{
+	BOOL fSuccess = FALSE;
+
+	try {{
+
+		TCHAR szFilename[MAX_PATH + 50];
+		if (!GetModuleFileName(NULL, szFilename, chDIMOF(szFilename)))
+			goto leave;
+
+		fSuccess = RunAsUser(szFilename, NULL, NULL, TEXT("Winsta0\\Default"));
+
+	} leave:;
+	} catch(...) {}
+
+	return(fSuccess);
+}
+
+
+BOOL GetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize) 
+{
+	BOOL   fSuccess = FALSE;
+	HANDLE hToken   = NULL;
+
+	try {{
+
+		if (fAllowImpersonate)
+			if (!OpenThreadToken(GetCurrentThread(), TOKEN_QUERY, TRUE, &hToken))
+				hToken = NULL;
+
+		if (hToken == NULL)
+			if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+				goto leave;
+
+		DWORD dwSize;
+		if (!GetTokenInformation(hToken, TokenUser, psid, *pdwSize, &dwSize))
+			goto leave;
+
+		fSuccess = TRUE;
+
+	} leave:;
+	} catch(...) {}
+
+	if (hToken != NULL)
+		CloseHandle(hToken);
+
+	return(fSuccess);
+}
+
+
+void Status(PTSTR szStatus, DWORD dwLastError) 
+{
+	CPrintBuf* pbufStatus = NULL;
+
+	try {{
+
+		if (szStatus == NULL)
+			goto leave;
+
+		// Clear the text
+		SetWindowText(g_hwndStatus, TEXT(""));
+
+		// Using the CPrintBuf class to buffer printing to the window
+		pbufStatus = new CPrintBuf;
+		if (pbufStatus == NULL)
+			goto leave;
+
+		pbufStatus->Print(TEXT("Token Master, Status - "));
+		pbufStatus->Print(szStatus);
+
+		if (dwLastError != 0)   {
+			pbufStatus->Print(TEXT(": "));
+			pbufStatus->PrintError(dwLastError);
+		}
+
+	} leave:;
+	} catch(...) {}
+
+	if (pbufStatus != NULL) {
+		SetWindowText(g_hwndStatus, *pbufStatus);
+		delete pbufStatus;
+	}
+}
+
+
+PVOID AllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass) 
+{
+	PVOID pvBuffer  = NULL;
+	PTSTR pszStatus = NULL;
+	DWORD dwStatus;
+
+	try {{
+
+		// Initial buffer size
+		DWORD dwSize   = 0;
+		BOOL  fSuccess = FALSE;
+		do {
+
+			// Do we have a size now?
+			if (dwSize != 0) {
+
+				// If we already have a buffer, free it
+				if (pvBuffer != NULL)
+					LocalFree(pvBuffer);
+
+				// Allocate a new buffer
+				pvBuffer = LocalAlloc(LPTR, dwSize);
+				if (pvBuffer == NULL) {
+					pszStatus = TEXT("LocalAlloc");
+					goto leave;
+				}
+			}
+
+			// Try again
+			fSuccess = GetTokenInformation(hToken, tokenClass, pvBuffer, dwSize,
+				&dwSize);
+			// while it is failing on ERROR_INSUFFICIENT_BUFFER
+		} while (!fSuccess && (GetLastError() == ERROR_INSUFFICIENT_BUFFER));
+
+		// If we failed for some other reason then back out
+		if (!fSuccess) {
+			dwStatus = GetLastError();
+			pszStatus = TEXT("GetTokenInformation");
+			if (pvBuffer != NULL) {
+				LocalFree(pvBuffer);
+				pvBuffer = NULL;
+			}
+			SetLastError(dwStatus);
+			goto leave;
+		}
+
+		SetLastError(0);
+
+	} leave:;
+	} catch(...) {}
+
+	dwStatus = GetLastError();
+	Status(pszStatus, dwStatus);
+	SetLastError(dwStatus);
+
+	// Return locally allocated buffer
+	return(pvBuffer);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+void UpdatePrivileges() 
+{
+	PTOKEN_PRIVILEGES ptpPrivileges = NULL;
+
+	PTSTR pszName     = NULL;
+	PTSTR pszDispName = NULL;
+
+	// Clear out both list boxes
+	SendMessage(g_hwndEnablePrivileges, LB_RESETCONTENT , 0, 0);
+	SendMessage(g_hwndDeletedPrivileges, LB_RESETCONTENT , 0, 0);
+
+	try {{
+
+		// No token?  Then we fly
+		if (g_hToken == NULL)
+			goto leave;
+
+		// Get that token-privilege information
+		ptpPrivileges = (PTOKEN_PRIVILEGES) AllocateTokenInfo(g_hToken,
+			TokenPrivileges);
+		if (ptpPrivileges == NULL)
+			goto leave;
+
+		// Iterate through the privileges
+		DWORD dwIndex;
+		for (dwIndex = 0; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) {
+
+			// Get size of the name
+			DWORD dwSize = 0;
+			LookupPrivilegeName(NULL, &(ptpPrivileges->Privileges[dwIndex].Luid),
+				pszName, &dwSize);
+			pszName = (PTSTR) LocalAlloc(LPTR, dwSize * sizeof(TCHAR));
+			if (pszName == NULL)
+				goto leave;
+
+			// Get the name itself
+			if (!LookupPrivilegeName(NULL,
+				&(ptpPrivileges->Privileges[dwIndex].Luid), pszName, &dwSize))
+				goto leave;
+
+			// Get the display name size
+			DWORD dwDispSize = 0;
+			DWORD dwLangID;
+			LookupPrivilegeDisplayName(NULL, pszName, NULL, &dwDispSize,
+				&dwLangID);
+			pszDispName = (PTSTR) LocalAlloc(LPTR, (dwDispSize + dwSize + 3)
+				* sizeof(TCHAR));
+			if (pszDispName == NULL)
+				goto leave;
+
+			// Create the composite string
+			lstrcpy(pszDispName, pszName);
+			lstrcat(pszDispName, TEXT("--"));
+
+			// Get the display name
+			if (!LookupPrivilegeDisplayName(NULL, pszName, pszDispName
+				+ lstrlen(pszDispName), &dwDispSize, &dwLangID))
+				goto leave;
+
+			// Add the string to the enable/disable privilege list
+			DWORD dwItem = SendMessage(g_hwndEnablePrivileges, LB_ADDSTRING, 0,
+				(LPARAM) pszDispName);
+
+			// Now the item data
+			SendMessage(g_hwndEnablePrivileges, LB_SETITEMDATA, dwItem,
+				(LPARAM) dwIndex);
+
+			// If it is enabled then enable it in the list box
+			if (ptpPrivileges->Privileges[dwIndex].Attributes
+				& SE_PRIVILEGE_ENABLED)
+				SendMessage(g_hwndEnablePrivileges, LB_SETSEL, TRUE, dwItem);
+
+			// Now the deleted privileges
+			dwItem = SendMessage(g_hwndDeletedPrivileges, LB_ADDSTRING, 0,
+				(LPARAM) pszName);
+			SendMessage(g_hwndDeletedPrivileges, LB_SETITEMDATA, dwItem,
+				(LPARAM) dwIndex);
+
+			// Free up our recurring buffers
+			LocalFree(pszName);
+			pszName = NULL;
+
+			LocalFree(pszDispName);
+			pszDispName = NULL;
+		}
+
+	} leave:;
+	} catch(...) {}
+
+	// Cleanup
+	if (ptpPrivileges != NULL)
+		LocalFree(ptpPrivileges);
+
+	if (pszName != NULL)
+		LocalFree(pszName);
+
+	if (pszDispName != NULL)
+		LocalFree(pszDispName);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void UpdateGroups() 
+{
+	PTOKEN_GROUPS ptgGroups = NULL;
+
+	// Clear out both list boxes
+	SendMessage(g_hwndEnableGroups, LB_RESETCONTENT , 0, 0);
+	SendMessage(g_hwndDisabledSids, LB_RESETCONTENT , 0, 0);
+
+	try {{
+
+		if (g_hToken == NULL)
+			goto leave;
+
+		// Get that group information
+		ptgGroups = (PTOKEN_GROUPS) AllocateTokenInfo(g_hToken, TokenGroups);
+		if (ptgGroups == NULL)
+			goto leave;
+
+		// Iterate through them
+		DWORD dwIndex;
+		for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++) {
+
+			DWORD dwSize = 0;
+			TCHAR szDomName[255] = {TEXT("")};
+			DWORD dwSizeDom = chDIMOF(szDomName);
+
+			// Get the text name size
+			SID_NAME_USE sNameUse;
+			LookupAccountSid(NULL, (ptgGroups->Groups[dwIndex].Sid), NULL,
+				&dwSize, szDomName, &dwSizeDom, &sNameUse);
+			PTSTR pszName = (PTSTR) LocalAlloc(LPTR, dwSize * sizeof(TCHAR));
+			if (pszName == NULL)
+				goto leave;
+
+			// Get the name
+			TCHAR szCompositeName[1024];
+			if (LookupAccountSid(NULL, (ptgGroups->Groups[dwIndex].Sid), pszName,
+				&dwSize, szDomName, &dwSizeDom, &sNameUse)) {
+
+					// Make the composite string
+					lstrcpy(szCompositeName, szDomName);
+					lstrcat(szCompositeName, TEXT("\\"));
+					lstrcat(szCompositeName, pszName);
+
+					// If it is neither mandatory nor the logon ID then add it to
+					// the enable/disable list box
+					DWORD dwItem;
+					if (!((ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_MANDATORY)
+						|| (ptgGroups->Groups[dwIndex].Attributes
+						& SE_GROUP_LOGON_ID))) {
+
+							// Add the string to the list box
+							dwItem = SendMessage(g_hwndEnableGroups, LB_ADDSTRING, 0,
+								(LPARAM) szCompositeName);
+							SendMessage(g_hwndEnableGroups, LB_SETITEMDATA, dwItem,
+								(LPARAM) dwIndex);
+							if (ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_ENABLED)
+								SendMessage(g_hwndEnableGroups, LB_SETSEL, TRUE, dwItem);
+					}
+
+					// Add to the CreateRestrictedToken list
+					dwItem = SendMessage(g_hwndDisabledSids, LB_ADDSTRING, 0,
+						(LPARAM) szCompositeName);
+					SendMessage(g_hwndDisabledSids, LB_SETITEMDATA, dwItem,
+						(LPARAM) dwIndex);
+			}
+			LocalFree(pszName);
+		}
+
+	} leave:;
+	} catch(...) {}
+
+	// Cleanup
+	if (ptgGroups != NULL)
+		LocalFree(ptgGroups);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void RefreshSnapShot() 
+{
+	// If we already have one, close it
+	if (g_hSnapShot != NULL)
+		CloseHandle(g_hSnapShot);
+
+	g_hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS | TH32CS_SNAPTHREAD, 0);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void PopulateProcessCombo() 
+{
+	// Get the ID of our last selection so that the selection will "stick"
+	LRESULT lItem = SendMessage(g_hwndProcessCombo, CB_GETCURSEL, 0, 0);
+	DWORD dwLastID = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA, lItem, 0);
+
+	// Clear the combo box
+	SendMessage(g_hwndProcessCombo, CB_RESETCONTENT, 0, 0);
+
+	// No snapshot means we empty the combo
+	if (g_hSnapShot != NULL) 
+	{
+		// Iterate through the process list adding them to the combo
+		PROCESSENTRY32 pentry;
+		pentry.dwSize = sizeof(pentry);
+		BOOL fIsProcess = Process32First(g_hSnapShot, &pentry);
+		while (fIsProcess) {
+
+			if (pentry.th32ProcessID != 0)
+				lItem = SendMessage(g_hwndProcessCombo, CB_ADDSTRING, 0,
+				(LPARAM) pentry.szExeFile);
+			else {
+
+				// Special Case... The Idle Process has a zero ID
+				lItem = SendMessage(g_hwndProcessCombo, CB_ADDSTRING, 0,
+					(LPARAM) TEXT("[System Idle Process]"));
+				SendMessage(g_hwndProcessCombo, CB_SETCURSEL, lItem, 0);
+			}
+
+			// Set the item data to the processes ID
+			SendMessage(g_hwndProcessCombo, CB_SETITEMDATA, lItem,
+				pentry.th32ProcessID);
+
+			// If the process ID matches the last one, we found it
+			if (pentry.th32ProcessID == dwLastID)
+				SendMessage(g_hwndProcessCombo, CB_SETCURSEL, lItem, 0);
+
+			fIsProcess = Process32Next(g_hSnapShot, &pentry);
+		}
+	}
+}
+
+
+void PopulateThreadCombo() 
+{
+	// Get process id
+	LRESULT lIndex = SendMessage(g_hwndProcessCombo, CB_GETCURSEL, 0, 0);
+	DWORD   dwID   = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA, lIndex, 0);
+
+	// We want the selected thread to stick, if possible
+	lIndex = SendMessage(g_hwndThreadCombo, CB_GETCURSEL, 0, 0);
+	DWORD dwLastThreadID = SendMessage(g_hwndThreadCombo, CB_GETITEMDATA,
+		lIndex, 0);
+
+	SendMessage(g_hwndThreadCombo, CB_RESETCONTENT, 0, 0);
+
+	// Add that "No Thread" option
+	lIndex = SendMessage(g_hwndThreadCombo, CB_ADDSTRING, 0,
+		(LPARAM) TEXT("[No Thread]"));
+	SendMessage(g_hwndThreadCombo, CB_SETITEMDATA, lIndex, 0);
+	SendMessage(g_hwndThreadCombo, CB_SETCURSEL, 0, 0);
+
+	if (g_hSnapShot != NULL) {
+
+		// Iterate through the threads adding them
+		TCHAR szBuf[256];
+		THREADENTRY32 entry;
+		entry.dwSize = sizeof(entry);
+		BOOL fIsThread = Thread32First(g_hSnapShot, &entry);
+		while (fIsThread) {
+
+			if (entry.th32OwnerProcessID == dwID) {
+
+				wsprintf(szBuf, TEXT("ID = %d"), entry.th32ThreadID);
+				lIndex = SendMessage(g_hwndThreadCombo, CB_ADDSTRING, 0,
+					(LPARAM) szBuf);
+				SendMessage(g_hwndThreadCombo, CB_SETITEMDATA, lIndex,
+					entry.th32ThreadID);
+
+				// Last thread selected?  If so reselect
+				if (entry.th32ThreadID == dwLastThreadID)
+					SendMessage(g_hwndThreadCombo, CB_SETCURSEL, lIndex, 0);
+			}
+			fIsThread = Thread32Next(g_hSnapShot, &entry);
+		}
+	}
+}
+
+
+void PopulateStaticCombos() 
+{
+	int nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"Batch");
+	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
+		LOGON32_LOGON_BATCH);
+
+	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"Network");
+	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
+		LOGON32_LOGON_NETWORK);
+
+	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"Network Cleartext");
+	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
+		LOGON32_LOGON_NETWORK_CLEARTEXT);
+
+	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"New Credentials");
+	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
+		LOGON32_LOGON_NEW_CREDENTIALS);
+
+	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"Service");
+	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
+		LOGON32_LOGON_SERVICE);
+
+	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"Unlock");
+	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
+		LOGON32_LOGON_UNLOCK);
+
+	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"Interactive");
+	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
+		LOGON32_LOGON_INTERACTIVE);
+	SendMessage(g_hwndLogonTypes, CB_SETCURSEL, nIndex, 0);
+
+
+	nIndex = SendMessage(g_hwndLogonProviders, CB_ADDSTRING, 0,
+		(LPARAM) L"Windows 2000");
+	SendMessage(g_hwndLogonProviders, CB_SETITEMDATA, nIndex,
+		LOGON32_PROVIDER_WINNT50);
+
+	nIndex = SendMessage(g_hwndLogonProviders, CB_ADDSTRING, 0,
+		(LPARAM) L"Windows NT 4.0");
+	SendMessage(g_hwndLogonProviders, CB_SETITEMDATA, nIndex,
+		LOGON32_PROVIDER_WINNT40);
+
+	nIndex = SendMessage(g_hwndLogonProviders, CB_ADDSTRING, 0,
+		(LPARAM) L"Windows NT 3.5");
+	SendMessage(g_hwndLogonProviders, CB_SETITEMDATA, nIndex,
+		LOGON32_PROVIDER_WINNT35);
+
+	nIndex = SendMessage(g_hwndLogonProviders, CB_ADDSTRING, 0,
+		(LPARAM) L"Default");
+	SendMessage(g_hwndLogonProviders, CB_SETITEMDATA, nIndex,
+		LOGON32_PROVIDER_DEFAULT);
+	SendMessage(g_hwndLogonProviders, CB_SETCURSEL, nIndex, 0);
+
+	nIndex = SendMessage(g_hwndImpersonationLevels, CB_ADDSTRING, 0,
+		(LPARAM) L"SecurityAnonymous");
+	SendMessage(g_hwndImpersonationLevels, CB_SETITEMDATA, nIndex,
+		SecurityAnonymous);
+
+	nIndex = SendMessage(g_hwndImpersonationLevels, CB_ADDSTRING, 0,
+		(LPARAM) L"SecurityIdentification");
+	SendMessage(g_hwndImpersonationLevels, CB_SETITEMDATA, nIndex,
+		SecurityIdentification);
+
+	nIndex = SendMessage(g_hwndImpersonationLevels, CB_ADDSTRING, 0,
+		(LPARAM) L"SecurityDelegation");
+	SendMessage(g_hwndImpersonationLevels, CB_SETITEMDATA, nIndex,
+		SecurityDelegation);
+
+	nIndex = SendMessage(g_hwndImpersonationLevels, CB_ADDSTRING, 0,
+		(LPARAM) L"SecurityImpersonation");
+	SendMessage(g_hwndImpersonationLevels, CB_SETITEMDATA, nIndex,
+		SecurityImpersonation);
+	SendMessage(g_hwndImpersonationLevels, CB_SETCURSEL, nIndex, 0);
+
+	nIndex = SendMessage(g_hwndTokenTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"Impersonation");
+	SendMessage(g_hwndTokenTypes, CB_SETITEMDATA, nIndex,
+		TokenImpersonation);
+
+	nIndex = SendMessage(g_hwndTokenTypes, CB_ADDSTRING, 0,
+		(LPARAM) L"Primary");
+	SendMessage(g_hwndTokenTypes, CB_SETITEMDATA, nIndex, TokenPrimary);
+	SendMessage(g_hwndTokenTypes, CB_SETCURSEL, nIndex, 0);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void GetToken(HWND hwnd) 
+{
+	DWORD  dwStatus;
+	HANDLE hThread    = NULL;
+	HANDLE hProcess   = NULL;
+	HANDLE hToken     = NULL;
+	PTSTR  pszStatus  = TEXT("Dumped Process Token");
+
+	PSECURITY_DESCRIPTOR pSD = NULL;
+
+	if (g_hToken != NULL) {
+		CloseHandle(g_hToken);
+		g_hToken = NULL;
+	}
+
+	try {{
+
+		// Find the process ID
+		LRESULT lIndex = SendMessage(g_hwndProcessCombo, CB_GETCURSEL, 0, 0);
+		DWORD dwProcessID = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA,
+			lIndex, 0);
+
+		// Get the thread ID
+		lIndex = SendMessage(g_hwndThreadCombo, CB_GETCURSEL, 0, 0);
+		DWORD dwThreadID = SendMessage(g_hwndThreadCombo, CB_GETITEMDATA,
+			lIndex, 0);
+
+		// Open the thread if we can
+		hThread = OpenThread(THREAD_QUERY_INFORMATION, FALSE, dwThreadID);
+
+		// Thread?
+		if (hThread != NULL) {
+
+			// Get its token
+			if (!OpenThreadToken(hThread, TOKEN_READ | TOKEN_QUERY_SOURCE, TRUE,
+				&hToken)) {
+
+					hToken = NULL;
+					if (GetLastError() == ERROR_NO_TOKEN) {
+
+						// Not a critical error, the thread doesn't have a token
+						pszStatus = TEXT("Thread does not have a token, ")
+							TEXT(" dumping process token");
+						SetLastError(0);
+
+					} else {
+
+						pszStatus = TEXT("OpenThreadToken");
+						goto leave;
+					}
+			}
+		}
+
+		// So we don't have a token yet, lets get it from the process
+		if (hToken == NULL) {
+
+			// Get the handle to the process
+			hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessID);
+			if (hProcess == NULL) {
+				pszStatus = TEXT("OpenProcess");
+				goto leave;
+			}
+
+			// Get the token (All access so we can change and launch things
+			if (!OpenProcessToken(hProcess, TOKEN_ALL_ACCESS, &hToken)) {
+				hToken = NULL;
+				pszStatus = TEXT("OpenProcessToken");
+				goto leave;
+			}
+		}
+
+		// Get memory for an SD
+		pSD = (PSECURITY_DESCRIPTOR) GlobalAlloc(GPTR,
+			SECURITY_DESCRIPTOR_MIN_LENGTH);
+
+		if (pSD == NULL) {
+			pszStatus = TEXT("GlobalAlloc");
+			goto leave;
+		}
+
+		// Initialize it
+		if (!InitializeSecurityDescriptor(pSD, SECURITY_DESCRIPTOR_REVISION)) {
+			pszStatus = TEXT("InitializeSecurityDescriptor");
+			goto leave;
+		}
+
+		// Add a NULL DACL to the security descriptor..
+		if (!SetSecurityDescriptorDacl(pSD, TRUE, (PACL) NULL, FALSE)) {
+			pszStatus = TEXT("SetSecurityDescriptorDacl");
+			goto leave;
+		}
+
+		// We made the security descriptor just in case they want a duplicate.
+		// We make the duplicate have all access to everyone.
+		SECURITY_ATTRIBUTES sa;
+		sa.nLength              = sizeof(sa);
+		sa.lpSecurityDescriptor = pSD;
+		sa.bInheritHandle       = TRUE;
+
+		// If the user chooses not to copy the token, then changes made to it
+		// will effect the owning process
+		if (IDNO == MessageBox(hwnd, TEXT("Would you like to make a copy of ")
+			TEXT("this process token?\n(Selecting \"No\" will cause the ")
+			TEXT("\"AdjustToken\" and \"SetToken\"\nfeatures to affect the ")
+			TEXT("owning process.) "), TEXT("Duplicate Token?"), MB_YESNO)) {
+				g_hToken = hToken;
+
+		}  else {
+
+			// Duplicate the token
+			if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, &sa,
+				SecurityImpersonation, TokenPrimary, &g_hToken)) {
+					g_hToken = NULL;
+					pszStatus = TEXT("DuplicateTokenEx");
+					goto leave;
+			}
+		}
+
+		SetLastError(0);
+
+	} leave:;
+	} catch(...) {}
+
+	// Status and Cleanup
+	dwStatus = GetLastError();
+
+	if (hToken && hToken != g_hToken)
+		CloseHandle(hToken);
+
+	if (hProcess != NULL)
+		CloseHandle(hProcess);
+
+	if (hThread != NULL)
+		CloseHandle(hThread);
+
+	if (pSD != NULL)
+		GlobalFree(pSD);
+
+	Status(pszStatus, dwStatus);
+}
+
+
+BOOL GetAccountName(HWND hwnd, PTSTR szBuf, DWORD dwSize, BOOL fAllowGroups,
+	BOOL fAllowUsers) 
+{
+	BOOL fSuccess      = FALSE;
+	BOOL fGotStgMedium = FALSE;
+
+	STGMEDIUM stgmedium = {TYMED_HGLOBAL, NULL, NULL};
+
+	IDsObjectPicker* pdsObjectPicker = NULL;
+	IDataObject*     pdoNames        = NULL;
+
+	*szBuf = 0;
+
+	try {{
+
+		// Yes we are using COM
+		HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+		if (FAILED(hr))
+			goto leave;
+
+		// Create an instance of the object picker.
+		hr = CoCreateInstance(CLSID_DsObjectPicker, NULL, CLSCTX_INPROC_SERVER,
+			IID_IDsObjectPicker, (void**) &pdsObjectPicker);
+		if (FAILED(hr))
+			goto leave;
+
+		// Initialize the DSOP_SCOPE_INIT_INFO array.
+		DSOP_SCOPE_INIT_INFO dsopScopeInitInfo;
+		ZeroMemory(&dsopScopeInitInfo, sizeof(dsopScopeInitInfo));
+
+		// The scope in our case is the the current system + downlevel domains
+		dsopScopeInitInfo.cbSize = sizeof(DSOP_SCOPE_INIT_INFO);
+		dsopScopeInitInfo.flType = DSOP_SCOPE_TYPE_TARGET_COMPUTER
+			| DSOP_SCOPE_TYPE_DOWNLEVEL_JOINED_DOMAIN
+			| DSOP_SCOPE_TYPE_USER_ENTERED_DOWNLEVEL_SCOPE;
+
+		// What are we selecting?
+		dsopScopeInitInfo.FilterFlags.flDownlevel = 0;
+
+		if (fAllowGroups)
+			dsopScopeInitInfo.FilterFlags.flDownlevel |=
+			DSOP_DOWNLEVEL_FILTER_ALL_WELLKNOWN_SIDS
+			| DSOP_DOWNLEVEL_FILTER_LOCAL_GROUPS
+			| DSOP_DOWNLEVEL_FILTER_GLOBAL_GROUPS;
+
+		if (fAllowUsers)
+			dsopScopeInitInfo.FilterFlags.flDownlevel |=
+			DSOP_DOWNLEVEL_FILTER_USERS;
+
+		// Initialize the DSOP_INIT_INFO structure.
+		DSOP_INIT_INFO dsopInitInfo;
+		ZeroMemory(&dsopInitInfo, sizeof(dsopInitInfo));
+		dsopInitInfo.cbSize            = sizeof(dsopInitInfo);
+		dsopInitInfo.pwzTargetComputer = NULL; // Target is the local computer
+		dsopInitInfo.cDsScopeInfos     = 1;
+		dsopInitInfo.aDsScopeInfos     = &dsopScopeInitInfo;
+		dsopInitInfo.flOptions         = 0;
+
+		// Initialize the object picker instance.
+		hr = pdsObjectPicker->Initialize(&dsopInitInfo);
+		if (FAILED(hr))
+			goto leave;
+
+		// Invoke the modal dialog where the user selects the user or group
+		hr = pdsObjectPicker->InvokeDialog(hwnd, &pdoNames);
+		if (FAILED(hr))
+			goto leave;
+
+		if (hr == S_OK) {
+
+			// Get the global memory block containing the user's selections.
+			FORMATETC formatetc = {(CLIPFORMAT)
+				RegisterClipboardFormat(CFSTR_DSOP_DS_SELECTION_LIST), NULL,
+				DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+			hr = pdoNames->GetData(&formatetc, &stgmedium);
+			if (FAILED(hr))
+				goto leave;
+			fGotStgMedium = TRUE;
+
+			// Retrieve pointer to DS_SELECTION_LIST structure.
+			PDS_SELECTION_LIST pdsSelList = NULL;
+			pdsSelList = (PDS_SELECTION_LIST) GlobalLock(stgmedium.hGlobal);
+			if (pdsSelList == NULL)
+				goto leave;
+
+			// We only allowed the selection of one, so our list is 1 or 0
+			if (pdsSelList->cItems == 1) {
+
+				// Copy the account name to the buffer passed in
+				lstrcpynW(szBuf, pdsSelList->aDsSelection->pwzName, dwSize);
+				fSuccess = TRUE;
+			}
+
+		}
+
+	} leave:;
+	} catch(...) {}
+
+	if (fGotStgMedium)   {
+
+		// Unlock that buffer
+		GlobalUnlock(stgmedium.hGlobal);
+
+		// Release the data
+		ReleaseStgMedium(&stgmedium);
+	}
+
+	// Release the picker
+	if (pdsObjectPicker != NULL)
+		pdsObjectPicker->Release();
+
+	// Release the data
+	if (pdoNames != NULL)
+		pdoNames->Release();
+
+	// Done with COM for the moment
+	CoUninitialize();
+
+	return(fSuccess);
+}
+
