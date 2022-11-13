@@ -18,9 +18,9 @@ BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled)
 		}
 
 		// Then get the processes token
-		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES,
-			&hToken)) {
-				goto leave;
+		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)) 
+		{
+			goto leave;
 		}
 
 		// Set up our token privileges "array" (in our case an array of one)
@@ -30,9 +30,9 @@ BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled)
 		tp.Privileges[0].Attributes = fEnabled ? SE_PRIVILEGE_ENABLED : 0;
 
 		// Adjust our token privileges by enabling or disabling this one
-		if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES),
-			NULL, NULL)) {
-				goto leave;
+		if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) 
+		{
+			goto leave;
 		}
 
 		fSuccess = TRUE;
@@ -94,7 +94,7 @@ HANDLE OpenSystemProcess()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess) 
+BOOL ModifySecurity(HANDLE hKobj, DWORD dwAccess) 
 {
 	PACL pAcl        = NULL;
 	PACL pNewAcl     = NULL;
@@ -109,9 +109,8 @@ BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess)
 
 		// Find the length of the security object for the kernel object
 		DWORD dwSDLength;
-		if (GetKernelObjectSecurity(hProc, DACL_SECURITY_INFORMATION, pSD, 0,
-			&dwSDLength) || (GetLastError() !=
-			ERROR_INSUFFICIENT_BUFFER))
+		if (GetKernelObjectSecurity(hKobj, DACL_SECURITY_INFORMATION, pSD, 0, &dwSDLength) 
+			|| (GetLastError()!=ERROR_INSUFFICIENT_BUFFER))
 			goto leave;
 
 		// Allocate a buffer of that length
@@ -120,8 +119,7 @@ BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess)
 			goto leave;
 
 		// Retrieve the kernel object
-		if (!GetKernelObjectSecurity(hProc, DACL_SECURITY_INFORMATION, pSD,
-			dwSDLength, &dwSDLength))
+		if (!GetKernelObjectSecurity(hKobj, DACL_SECURITY_INFORMATION, pSD, dwSDLength, &dwSDLength))
 			goto leave;
 
 		// Get a pointer to the DACL of the SD
@@ -144,10 +142,10 @@ BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess)
 
 		// We are allocating a new ACL with a new ace inserted.  The new
 		// ACL must be LocalFree'd
-		if (ERROR_SUCCESS != SetEntriesInAcl(1, &ea, pAcl,
-			&pNewAcl)) {
-				pNewAcl = NULL;
-				goto leave;
+		if (ERROR_SUCCESS != SetEntriesInAcl(1, &ea, pAcl, &pNewAcl)) 
+		{
+			pNewAcl = NULL;
+			goto leave;
 		}
 
 		// Find the buffer sizes we would need to make our SD absolute
@@ -183,7 +181,7 @@ BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess)
 			goto leave;
 
 		// And set the security for the object
-		if (!SetKernelObjectSecurity(hProc, DACL_SECURITY_INFORMATION, pAbsSD))
+		if (!SetKernelObjectSecurity(hKobj, DACL_SECURITY_INFORMATION, pAbsSD))
 			goto leave;
 
 		fSuccess = TRUE;
@@ -236,14 +234,13 @@ HANDLE GetLSAToken()
 		// Open the process token with READ_CONTROL and WRITE_DAC access.  We
 		// will use this access to modify the security of the token so that we
 		// retrieve it again with a more complete set of rights.
-		BOOL fResult = OpenProcessToken(hProc, READ_CONTROL | WRITE_DAC,
-			&hToken);
+		BOOL fResult = OpenProcessToken(hProc, READ_CONTROL | WRITE_DAC, &hToken);
 		if (FALSE == fResult)  {
 			hToken = NULL;
 			goto leave;
 		}
 
-		// Add an ace for the current user for the token.  This ace will add
+		// Add an ACE for the current user for the token.  This ACE will add
 		// TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY rights.
 		if (!ModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY)) 
 		{

@@ -79,43 +79,42 @@ void DumpSID(PSID psid, CPrintBuf* pbufToken)
 		DWORD dwDomSize      = chDIMOF(szDomName);
 
 		// What is the SID type
-		if (LookupAccountSid(NULL, psid, szName, &dwSize, szDomName, &dwDomSize,
-			&snuUse)) {
+		if (LookupAccountSid(NULL, psid, szName, &dwSize, szDomName, &dwDomSize, &snuUse)) 
+		{
+			switch (snuUse) {
 
-				switch (snuUse) {
+			case SidTypeUser:
+				pszUse = TEXT("User SID");
+				break;
 
-				case SidTypeUser:
-					pszUse = TEXT("User SID");
-					break;
+			case SidTypeGroup:
+				pszUse = TEXT("Group SID");
+				break;
 
-				case SidTypeGroup:
-					pszUse = TEXT("Group SID");
-					break;
+			case SidTypeDomain:
+				pszUse = TEXT("Domain SID");
+				break;
 
-				case SidTypeDomain:
-					pszUse = TEXT("Domain SID");
-					break;
+			case SidTypeAlias:
+				pszUse = TEXT("Alias SID");
+				break;
 
-				case SidTypeAlias:
-					pszUse = TEXT("Alias SID");
-					break;
+			case SidTypeWellKnownGroup:
+				pszUse = TEXT("Well-Known Group SID");
+				break;
 
-				case SidTypeWellKnownGroup:
-					pszUse = TEXT("Well-Known Group SID");
-					break;
+			case SidTypeDeletedAccount:
+				pszUse = TEXT("Deleted Account");
+				break;
 
-				case SidTypeDeletedAccount:
-					pszUse = TEXT("Deleted Account");
-					break;
+			case SidTypeInvalid:
+				pszUse = TEXT("Invalid SID");
+				break;
 
-				case SidTypeInvalid:
-					pszUse = TEXT("Invalid SID");
-					break;
-
-				default:
-					pszUse = TEXT("Unknown SID");
-					break;
-				}
+			default:
+				pszUse = TEXT("Unknown SID");
+				break;
+			}
 
 		} else {
 
@@ -200,7 +199,8 @@ BOOL DumpTokenGroups(HANDLE hToken, CPrintBuf* pbufToken)
 
 		// Dump the SID and Attributes for each group
 		DWORD dwIndex = ptgGroups->GroupCount;
-		for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++) {
+		for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++) 
+		{
 			pbufToken->Print(TEXT("Sid #%d\r\n"), dwIndex);
 			DumpSID(ptgGroups->Groups[dwIndex].Sid, pbufToken);
 			DumpSIDAttributes(ptgGroups->Groups[dwIndex].Attributes, pbufToken);
@@ -234,29 +234,29 @@ void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken)
 		pbufToken->Print(DIVIDERL);
 
 		DWORD dwIndex;
-		for (dwIndex = 0; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) {
-
+		for (dwIndex = 0; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) 
+		{
 			// Get the privilege name and print it with attribute information
 			TCHAR szName[255];
 			DWORD dwSize = chDIMOF(szName);
 			if (LookupPrivilegeName(NULL,
-				&(ptpPrivileges->Privileges[dwIndex].Luid), szName, &dwSize)) {
+				&(ptpPrivileges->Privileges[dwIndex].Luid), szName, &dwSize)) 
+			{
+				pbufToken->Print(szName);
+				if (ptpPrivileges->Privileges[dwIndex].Attributes
+					& SE_PRIVILEGE_ENABLED_BY_DEFAULT)
+					pbufToken->Print(TEXT("\r\n\t")
+					TEXT("SE_PRIVILEGE_ENABLED_BY_DEFAULT"));
 
-					pbufToken->Print(szName);
-					if (ptpPrivileges->Privileges[dwIndex].Attributes
-						& SE_PRIVILEGE_ENABLED_BY_DEFAULT)
-						pbufToken->Print(TEXT("\r\n\t")
-						TEXT("SE_PRIVILEGE_ENABLED_BY_DEFAULT"));
+				if (ptpPrivileges->Privileges[dwIndex].Attributes
+					& SE_PRIVILEGE_ENABLED)
+					pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_ENABLED"));
 
-					if (ptpPrivileges->Privileges[dwIndex].Attributes
-						& SE_PRIVILEGE_ENABLED)
-						pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_ENABLED"));
+				if (ptpPrivileges->Privileges[dwIndex].Attributes
+					& SE_PRIVILEGE_USED_FOR_ACCESS)
+					pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_USED_FOR_ACCESS"));
 
-					if (ptpPrivileges->Privileges[dwIndex].Attributes
-						& SE_PRIVILEGE_USED_FOR_ACCESS)
-						pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_USED_FOR_ACCESS"));
-
-					pbufToken->Print(TEXT("\r\n"));
+				pbufToken->Print(TEXT("\r\n"));
 			}
 		}
 
@@ -346,12 +346,12 @@ void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken)
 		// Iterate through the aces
 		DWORD dwCount = sizeInfo.AceCount;
 		DWORD dwIndex;
-		for (dwIndex = 0; dwIndex < dwCount; dwIndex++) {
-
+		for (dwIndex = 0; dwIndex < dwCount; dwIndex++) 
+		{
 			// Get the ACE by index
 			PACCESS_ALLOWED_ACE paceAllowed;
-			if (GetAce(ptdDacl->DefaultDacl, dwIndex, (PVOID*) &paceAllowed)) {
-
+			if (GetAce(ptdDacl->DefaultDacl, dwIndex, (PVOID*) &paceAllowed)) 
+			{
 				// Output what type of ACE it is
 				switch (paceAllowed->Header.AceFlags) {
 
@@ -395,6 +395,7 @@ void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken)
 				pbufToken->Print(TEXT("\r\nACCESS_MASK:  "));
 				DWORD dwMask = paceAllowed->Mask;
 				DWORD dwIndex2;
+			
 				for (dwIndex2 = 0; dwIndex2 < 32; dwIndex2++) {
 					if (dwMask&(1 << 31))
 						pbufToken->Print(TEXT("1"));

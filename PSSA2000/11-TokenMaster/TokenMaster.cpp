@@ -1050,8 +1050,10 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 
       if ((lstrcmpi(szUserName, TEXT("System")) != 0)
             && (lstrcmpi(pszCmdLine, TEXT("NoRelaunch")) != 0))
-         if (TryRelaunch())
-            goto leave;
+	  {
+		  if (TryRelaunch())
+			  goto leave;
+	  }
 
       g_hInst = hinstExe;
       DialogBox(hinstExe, MAKEINTRESOURCE(IDD_DUMPTOKEN), NULL, Dlg_Proc);
