@@ -674,11 +674,11 @@ void RefreshSnapShot()
 void PopulateProcessCombo() 
 {
 	// Get the ID of our last selection so that the selection will "stick"
-	LRESULT lItem = SendMessage(g_hwndProcessCombo, CB_GETCURSEL, 0, 0);
-	DWORD dwLastUsedPID = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA, lItem, 0);
+	LRESULT idxItem = ComboBox_GetCurSel(g_hwndProcessCombo);
+	DWORD dwLastUsedPID = ComboBox_GetItemData(g_hwndProcessCombo, idxItem);
 
 	// Clear the combo box
-	SendMessage(g_hwndProcessCombo, CB_RESETCONTENT, 0, 0);
+	ComboBox_ResetContent(g_hwndProcessCombo);
 
 	// No snapshot means we empty the combo
 	if (g_hSnapShot != NULL) 
@@ -693,23 +693,21 @@ void PopulateProcessCombo()
 				TCHAR szitem[200] = {};
 				_sntprintf_s(szitem, _TRUNCATE, _T("%s (%d)"), 
 					pentry.szExeFile, pentry.th32ProcessID);
-				lItem = ComboBox_AddString(g_hwndProcessCombo, szitem);
+				idxItem = ComboBox_AddString(g_hwndProcessCombo, szitem);
 			}
 			else 
 			{
 				// Special Case... The Idle Process has a zero ID
-				lItem = SendMessage(g_hwndProcessCombo, CB_ADDSTRING, 0,
-					(LPARAM) TEXT("[System Idle Process]"));
-				SendMessage(g_hwndProcessCombo, CB_SETCURSEL, lItem, 0);
+				idxItem = ComboBox_AddString(g_hwndProcessCombo, _T("[System Idle Process]"));
+				ComboBox_SetCurSel(g_hwndProcessCombo, idxItem);
 			}
 
 			// Set the item data to the processes ID
-			SendMessage(g_hwndProcessCombo, CB_SETITEMDATA, lItem,
-				pentry.th32ProcessID);
+			ComboBox_SetItemData(g_hwndProcessCombo, idxItem, pentry.th32ProcessID);
 
 			// If the process ID matches the last one, we found it
 			if (pentry.th32ProcessID == dwLastUsedPID)
-				SendMessage(g_hwndProcessCombo, CB_SETCURSEL, lItem, 0);
+				ComboBox_SetCurSel(g_hwndProcessCombo, idxItem);
 
 			fIsProcess = Process32Next(g_hSnapShot, &pentry);
 		}
@@ -720,42 +718,38 @@ void PopulateProcessCombo()
 void PopulateThreadCombo() 
 {
 	// Get process id
-	LRESULT lIndex = SendMessage(g_hwndProcessCombo, CB_GETCURSEL, 0, 0);
-	DWORD   dwID   = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA, lIndex, 0);
+	LRESULT idxIndex = ComboBox_GetCurSel(g_hwndProcessCombo);
+	DWORD   dwID   = ComboBox_GetItemData(g_hwndProcessCombo, idxIndex);
 
 	// We want the selected thread to stick, if possible
-	lIndex = SendMessage(g_hwndThreadCombo, CB_GETCURSEL, 0, 0);
-	DWORD dwLastThreadID = SendMessage(g_hwndThreadCombo, CB_GETITEMDATA,
-		lIndex, 0);
+	idxIndex = ComboBox_GetCurSel(g_hwndThreadCombo);
+	DWORD dwLastUsedThreadID = ComboBox_GetItemData(g_hwndThreadCombo, idxIndex);
 
-	SendMessage(g_hwndThreadCombo, CB_RESETCONTENT, 0, 0);
+	ComboBox_ResetContent(g_hwndThreadCombo);
 
 	// Add that "No Thread" option
-	lIndex = SendMessage(g_hwndThreadCombo, CB_ADDSTRING, 0,
-		(LPARAM) TEXT("[No Thread]"));
-	SendMessage(g_hwndThreadCombo, CB_SETITEMDATA, lIndex, 0);
-	SendMessage(g_hwndThreadCombo, CB_SETCURSEL, 0, 0);
+	idxIndex = ComboBox_AddString(g_hwndThreadCombo, TEXT("[No Thread]"));
+	ComboBox_SetItemData(g_hwndThreadCombo, idxIndex, 0);
+	ComboBox_SetCurSel(g_hwndThreadCombo, 0);
 
-	if (g_hSnapShot != NULL) {
-
+	if (g_hSnapShot != NULL) 
+	{
 		// Iterate through the threads adding them
 		TCHAR szBuf[256];
-		THREADENTRY32 entry;
-		entry.dwSize = sizeof(entry);
+		THREADENTRY32 entry = {sizeof(entry)};
 		BOOL fIsThread = Thread32First(g_hSnapShot, &entry);
-		while (fIsThread) {
 
-			if (entry.th32OwnerProcessID == dwID) {
+		while (fIsThread) 
+		{
+			if (entry.th32OwnerProcessID == dwID) 
+			{
+				_sntprintf_s(szBuf, _TRUNCATE, TEXT("ID = %d"), entry.th32ThreadID);
+				idxIndex = ComboBox_AddString(g_hwndThreadCombo, szBuf);
+				ComboBox_SetItemData(g_hwndThreadCombo, idxIndex, entry.th32ThreadID);
 
-				wsprintf(szBuf, TEXT("ID = %d"), entry.th32ThreadID);
-				lIndex = SendMessage(g_hwndThreadCombo, CB_ADDSTRING, 0,
-					(LPARAM) szBuf);
-				SendMessage(g_hwndThreadCombo, CB_SETITEMDATA, lIndex,
-					entry.th32ThreadID);
-
-				// Last thread selected?  If so reselect
-				if (entry.th32ThreadID == dwLastThreadID)
-					SendMessage(g_hwndThreadCombo, CB_SETCURSEL, lIndex, 0);
+				// Last thread selected?  If so, reselect
+				if (entry.th32ThreadID == dwLastUsedThreadID)
+					ComboBox_SetCurSel(g_hwndThreadCombo, idxIndex);
 			}
 			fIsThread = Thread32Next(g_hSnapShot, &entry);
 		}
@@ -874,47 +868,43 @@ void GetToken(HWND hwnd)
 		g_hToken = NULL;
 	}
 
-	try {{
-
+	try 
+	{{
 		// Find the process ID
-		LRESULT lIndex = SendMessage(g_hwndProcessCombo, CB_GETCURSEL, 0, 0);
-		DWORD dwProcessID = SendMessage(g_hwndProcessCombo, CB_GETITEMDATA,
-			lIndex, 0);
+		LRESULT idxIndex = ComboBox_GetCurSel(g_hwndProcessCombo);
+		DWORD dwProcessID = ComboBox_GetItemData(g_hwndProcessCombo, idxIndex);
 
 		// Get the thread ID
-		lIndex = SendMessage(g_hwndThreadCombo, CB_GETCURSEL, 0, 0);
-		DWORD dwThreadID = SendMessage(g_hwndThreadCombo, CB_GETITEMDATA,
-			lIndex, 0);
+		idxIndex = ComboBox_GetCurSel(g_hwndThreadCombo);
+		DWORD dwThreadID = ComboBox_GetItemData(g_hwndThreadCombo, idxIndex);
 
 		// Open the thread if we can
 		hThread = OpenThread(THREAD_QUERY_INFORMATION, FALSE, dwThreadID);
 
 		// Thread?
-		if (hThread != NULL) {
-
+		if (hThread != NULL) 
+		{
 			// Get its token
-			if (!OpenThreadToken(hThread, TOKEN_READ | TOKEN_QUERY_SOURCE, TRUE,
-				&hToken)) {
+			if (!OpenThreadToken(hThread, TOKEN_READ|TOKEN_QUERY_SOURCE, TRUE, &hToken)) 
+			{
+				hToken = NULL;
+				if (GetLastError() == ERROR_NO_TOKEN) {
 
-					hToken = NULL;
-					if (GetLastError() == ERROR_NO_TOKEN) {
+					// Not a critical error, the thread doesn't have a token
+					pszStatus = TEXT("Thread does not have a token, dumping process token");
+					SetLastError(0);
 
-						// Not a critical error, the thread doesn't have a token
-						pszStatus = TEXT("Thread does not have a token, ")
-							TEXT(" dumping process token");
-						SetLastError(0);
+				} else {
 
-					} else {
-
-						pszStatus = TEXT("OpenThreadToken");
-						goto leave;
-					}
+					pszStatus = TEXT("OpenThreadToken");
+					goto leave;
+				}
 			}
 		}
 
 		// So we don't have a token yet, lets get it from the process
-		if (hToken == NULL) {
-
+		if (hToken == NULL) 
+		{
 			// Get the handle to the process
 			hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessID);
 			if (hProcess == NULL) {
@@ -931,8 +921,7 @@ void GetToken(HWND hwnd)
 		}
 
 		// Get memory for an SD
-		pSD = (PSECURITY_DESCRIPTOR) GlobalAlloc(GPTR,
-			SECURITY_DESCRIPTOR_MIN_LENGTH);
+		pSD = (PSECURITY_DESCRIPTOR) GlobalAlloc(GPTR, SECURITY_DESCRIPTOR_MIN_LENGTH);
 
 		if (pSD == NULL) {
 			pszStatus = TEXT("GlobalAlloc");
@@ -946,7 +935,7 @@ void GetToken(HWND hwnd)
 		}
 
 		// Add a NULL DACL to the security descriptor..
-		if (!SetSecurityDescriptorDacl(pSD, TRUE, (PACL) NULL, FALSE)) {
+		if (!SetSecurityDescriptorDacl(pSD, TRUE, (PACL)NULL, FALSE)) {
 			pszStatus = TEXT("SetSecurityDescriptorDacl");
 			goto leave;
 		}
@@ -970,10 +959,11 @@ void GetToken(HWND hwnd)
 
 			// Duplicate the token
 			if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, &sa,
-				SecurityImpersonation, TokenPrimary, &g_hToken)) {
-					g_hToken = NULL;
-					pszStatus = TEXT("DuplicateTokenEx");
-					goto leave;
+				SecurityImpersonation, TokenPrimary, &g_hToken)) 
+			{
+				g_hToken = NULL;
+				pszStatus = TEXT("DuplicateTokenEx");
+				goto leave;
 			}
 		}
 
