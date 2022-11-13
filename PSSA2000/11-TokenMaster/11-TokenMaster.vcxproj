@@ -156,6 +156,7 @@
  
   <ItemGroup>
     <ClCompile Include="TokenMaster.cpp" />
+    <ClCompile Include="DumpInfo.cpp" />
     <ClCompile Include="..\InterpretConst.cpp" />
     <ClCompile Include="..\vaDbg.cpp" />
   </ItemGroup>
@@ -167,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="DumpInfo.h" />
     <ClInclude Include="..\vaDbg.h" />
   </ItemGroup>
  
