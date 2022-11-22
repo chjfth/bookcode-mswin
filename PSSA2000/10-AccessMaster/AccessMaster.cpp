@@ -340,10 +340,18 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-SI_INHERIT_TYPE CSecurityInformation::m_siInheritType[] = {
-   {&m_guidNULL, CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE | INHERIT_ONLY_ACE,
-            TEXT("~Child")},
-   {&m_guidNULL, OBJECT_INHERIT_ACE | INHERIT_ONLY_ACE, TEXT("~child")}
+SI_INHERIT_TYPE CSecurityInformation::m_sPropagateType[] = // was named: m_siInheritType[]
+{	// Chj modified, more rational
+	{
+		&m_guidNULL, 
+		CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE,
+		TEXT("Apply to me, and to my children")
+	},
+	{
+		&m_guidNULL, 
+		CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE | INHERIT_ONLY_ACE, 
+		TEXT("Apply to my children, but not me")
+	},
 };
 
 
@@ -549,41 +557,37 @@ HRESULT CSecurityInformation::MapGeneric(const GUID* pguidObjectType,
 ///////////////////////////////////////////////////////////////////////////////
 
 
-HRESULT CSecurityInformation::GetInheritTypes(PSI_INHERIT_TYPE* ppInheritTypes,
-	ULONG* pcInheritTypes) 
+HRESULT CSecurityInformation::GetInheritTypes(PSI_INHERIT_TYPE* ppPropagTypes,
+	ULONG* pcPropagTypes) 
 {
-	*pcInheritTypes = 1;
-	// If it is a container pass static inherit information for containers
-	if (m_pInfo->m_pEntry->m_fIsContainer) {
+	if (m_pInfo->m_pEntry->m_fIsContainer) 
+	{
+		// If it is a container (e.g. a NTFS directory)...
 
-		*ppInheritTypes = &(m_siInheritType[0]);
+		*pcPropagTypes = ARRAYSIZE(m_sPropagateType);
 
+		*ppPropagTypes = m_sPropagateType;
 	} 
-	else { // If it is a child pass static inherit information for containers
-
-		if (m_pInfo->m_pEntry->m_fIsChild) {
-
-			*ppInheritTypes = &(m_siInheritType[1]);
-
-		} 
-		else { // If neither, no inheritance
-
-			*ppInheritTypes = NULL;
-			*pcInheritTypes = 0;
-		}
+	else 
+	{ 
+		// If it is not container (e.g. a NTFS file), propagation is meaningless
+		*ppPropagTypes = NULL;
+		*pcPropagTypes = 0;
 	}
 
-	vaDbg(_T("System calls our CSecurityInformation::GetInheritTypes(). We return %d inherit-types."),
-		*pcInheritTypes);
+	vaDbg(_T("System calls our CSecurityInformation::GetInheritTypes(). We return %d propagation-types."),
+		*pcPropagTypes);
 
-	if(*pcInheritTypes==1)
+	for(int i=0; i<(int)*pcPropagTypes; i++)
 	{
 		vaDbg(
-			_T("  SI_INHERIT_TYPE.pszName = %s\n")
-			_T("  SI_INHERIT_TYPE.dwFlags = %s")
+			_T("  Propagation-type #%d:\n")
+			_T("    SI_INHERIT_TYPE.pszName = %s\n")
+			_T("    SI_INHERIT_TYPE.dwFlags = %s")
 			, 
-			(*ppInheritTypes)->pszName,
-			ITCS((*ppInheritTypes)->dwFlags, itc_SI_INHERIT_TYPE_flags)
+			i+1,
+			(*ppPropagTypes)[i].pszName,
+			ITCS((*ppPropagTypes)[i].dwFlags, itc_SI_INHERIT_TYPE_flags)
 			);
 	}
 

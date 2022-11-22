@@ -174,7 +174,7 @@ private:
    static const int MyMaxAccessRightEntries = 21;
    static SI_ACCESS m_siAccessAllRights[][MyMaxAccessRightEntries];
    static SI_ACCESS m_siAccessBinaryRights[32];
-   static SI_INHERIT_TYPE m_siInheritType[];
+   static SI_INHERIT_TYPE m_sPropagateType[];
 
    ULONG    m_nRef;
    ObjInf*  m_pInfo;
