@@ -362,7 +362,13 @@ void CH10_DumpACL( PACL pACL )
 		if (!GetAce(pACL, lIndex, (PVOID*)&pACE))
 			return;
 
-		vaDbg(TEXT("ACE #%d/%d"), lIndex+1, aclSize.AceCount);
+		vaDbg(TEXT("ACE #%d/%d :"), lIndex+1, aclSize.AceCount);
+
+		PSID pSID = PSIDFromPACE(pACE);
+		TCHAR szSidRepr[100] = {};
+		SID2Repr(pSID, szSidRepr, ARRAYSIZE(szSidRepr));
+		vaDbg(TEXT("  ACE SID = %s"), szSidRepr);
+
 		vaDbg(TEXT("  ACE Type = %s"), ITCS1(pACE->Header.AceType, itc_ACE_TYPE));
 		vaDbg(TEXT("  ACE Flags = %s"), ITCS1(pACE->Header.AceFlags, itc_ACE_FLAGS));
 
@@ -373,12 +379,6 @@ void CH10_DumpACL( PACL pACL )
 			lIndex2>>=1;
 		}
 		vaDbg(TEXT("  ACE Mask (31->0) = %s"), bitbufs);
-
-		PSID pSID = PSIDFromPACE(pACE);
-		TCHAR szSidRepr[100] = {};
-		SID2Repr(pSID, szSidRepr, ARRAYSIZE(szSidRepr));
-		
-		vaDbg(TEXT("  ACE SID = %s"), szSidRepr);
 	}
 }
 
