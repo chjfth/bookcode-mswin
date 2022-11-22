@@ -663,15 +663,15 @@ HRESULT CSecurityInformation::SetSecurity(
 		);
 	CH10_DumpSD(pSecurityDescriptor);
 
-	if ((sdCtrl & SE_DACL_PROTECTED) != SE_DACL_PROTECTED)
-		SecurityInformation  |= UNPROTECTED_DACL_SECURITY_INFORMATION;
+	if (sdCtrl & SE_DACL_PROTECTED)
+		SecurityInformation |= PROTECTED_DACL_SECURITY_INFORMATION;
 	else
-		SecurityInformation  |= PROTECTED_DACL_SECURITY_INFORMATION;
+		SecurityInformation |= UNPROTECTED_DACL_SECURITY_INFORMATION;
 
-	if ((sdCtrl & SE_SACL_PROTECTED) != SE_SACL_PROTECTED)
-		SecurityInformation  |= UNPROTECTED_SACL_SECURITY_INFORMATION;
+	if (sdCtrl & SE_SACL_PROTECTED)
+		SecurityInformation |= PROTECTED_SACL_SECURITY_INFORMATION;
 	else
-		SecurityInformation  |= PROTECTED_SACL_SECURITY_INFORMATION;
+		SecurityInformation |= UNPROTECTED_SACL_SECURITY_INFORMATION;
 
 	// Set the security
 	ULONG lErr = 0;
