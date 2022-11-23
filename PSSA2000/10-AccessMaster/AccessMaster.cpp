@@ -764,9 +764,11 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
 	switch (id) {
 
+#if 0
 	case IDCANCEL:
 		EndDialog(hwnd, 0);
 		break;
+#endif
 
 	case IDC_TYPE:
 		HandleType(hwnd, codeNotify, hwndCtl);
@@ -787,16 +789,24 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 	}
 }
 
+void Dlg_OnSysCommand(HWND hwnd, UINT cmd, int x, int y) 
+{
+	if(cmd==SC_CLOSE)
+	{
+		EndDialog(hwnd, 0);
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
 
-INT_PTR WINAPI Dlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
-	switch (uMsg) {
-
+INT_PTR WINAPI Dlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
+{
+	switch (uMsg) 
+	{
 		chHANDLE_DLGMSG(hwnd, WM_INITDIALOG, Dlg_OnInitDialog);
 		chHANDLE_DLGMSG(hwnd, WM_COMMAND, Dlg_OnCommand);
+		chHANDLE_DLGMSG(hwnd, WM_SYSCOMMAND, Dlg_OnSysCommand);
 	}
 	return(FALSE);
 }
