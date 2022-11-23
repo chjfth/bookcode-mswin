@@ -448,14 +448,26 @@ INT_PTR CALLBACK DlgProc_ChangeSampleText(HWND hdlg, UINT message, WPARAM wParam
 
 			EndDialog(hdlg, RELOAD_SAMPLE_TEXT);
 		}
-		
-		if(id==IDCANCEL)
-		{
-			EndDialog(hdlg, 3);
-		}
+
+ 		if(id==ID_MYCANCEL)
+ 		{
+			// I do NOT check id==IDCANCEL, bcz I do NOT want ESC to close the dialog-box.
+ 			EndDialog(hdlg, 3);
+ 		}
 
 		return TRUE;
+
 	} // WM_COMMAND
+		
+	case WM_SYSCOMMAND:
+	{
+		if(wParam==SC_CLOSE)
+		{
+			// So user can use Alt+F4 or window-title Close button to close it.
+			EndDialog(hdlg, 3);
+		}
+	}
+
 	}}
 
 	return FALSE;

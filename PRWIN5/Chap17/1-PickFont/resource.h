@@ -78,6 +78,7 @@
 #define IDC_EDIT_LITERAL                1069
 #define IDC_RADIO_USE_LITERAL           1070
 #define IDC_RADIO_USE_HEXFORM           1071
+#define ID_MYCANCEL                     1072
 #define IDM_DEVICE_SCREEN               40001
 #define IDM_DEVICE_PRINTER              40002
 
@@ -87,7 +88,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
 #define _APS_NEXT_COMMAND_VALUE         40003
-#define _APS_NEXT_CONTROL_VALUE         1071
+#define _APS_NEXT_CONTROL_VALUE         1073
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
