@@ -804,9 +804,14 @@ INT_PTR WINAPI Dlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) 
 	{
-		chHANDLE_DLGMSG(hwnd, WM_INITDIALOG, Dlg_OnInitDialog);
-		chHANDLE_DLGMSG(hwnd, WM_COMMAND, Dlg_OnCommand);
-		chHANDLE_DLGMSG(hwnd, WM_SYSCOMMAND, Dlg_OnSysCommand);
+		HANDLE_MSG(hwnd, WM_INITDIALOG, Dlg_OnInitDialog);
+		HANDLE_MSG(hwnd, WM_COMMAND, Dlg_OnCommand);
+		
+		// [2022-11-23] Jeffrey's chHANDLE_DLGMSG() returns TRUE to Windows 
+		// dialog-box manager, which caused a weird problem:
+		// We would not be able to move the dialog-box with mouse.
+		// Using HANDLE_MSG() is good, who returns 0 to dialog-box manager.
+		HANDLE_MSG(hwnd, WM_SYSCOMMAND, Dlg_OnSysCommand); 
 	}
 	return(FALSE);
 }
