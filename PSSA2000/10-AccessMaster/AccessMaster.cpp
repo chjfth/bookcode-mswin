@@ -416,7 +416,7 @@ HRESULT CSecurityInformation::GetObjectInformation(
 	pObjectInfo->pszObjectName = m_pInfo->m_szObjectName;
 
 	vaDbg(
-		_T("System calls our CSecurityInformation::GetObjectInformation(), we returns SI_OBJECT_INFO:\n")
+		_T("System calls our CSecurityInformation::GetObjectInformation(), we return (to ACLUI) SI_OBJECT_INFO:\n")
 		_T("  .pszObjectName = \"%s\"\n")
 		_T("  .hInstance = 0x%p\n")
 		_T("  .dwFlags = %s")
@@ -488,7 +488,7 @@ HRESULT CSecurityInformation::GetSecurity(
 		else
 			_sntprintf_s(sz_which_object, _TRUNCATE, _T("object-handle: 0x%p (as in our process)"), m_pInfo->m_hHandle);
 		vaDbg(
-			_T("We return security info about :\n")
+			_T("We return (to ACLUI) security info about :\n")
 			_T("  %s\n")
 			_T("  object-type: %s\n")
 			_T("Dump SD below:")
@@ -528,6 +528,8 @@ HRESULT CSecurityInformation::GetAccessRights(const GUID* pguidObjectType,
 
 		*pcAccesses = 32;
 		*ppAccess = m_siAccessBinaryRights;
+
+		*piDefaultAccess = 0; // chj: better set a value
 
 	} else { // Otherwise locate the appropriate block of specific rights
 
