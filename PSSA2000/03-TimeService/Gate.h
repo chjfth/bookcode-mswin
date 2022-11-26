@@ -18,24 +18,31 @@ Purpose: This class creates a normally open gate that only one thread can
 ///////////////////////////////////////////////////////////////////////////////
 
 
-class CGate {
+class CGate 
+{
 public:
-   CGate(BOOL fInitiallyUp = TRUE, PCTSTR pszName = NULL) { 
-      m_hevt = ::CreateEvent(NULL, FALSE, fInitiallyUp, pszName); 
-   }
+	CGate(BOOL fInitiallyUp = TRUE, PCTSTR pszName = NULL) 
+	{ 
+		m_hevt = ::CreateEvent(NULL, FALSE, fInitiallyUp, pszName); 
+	}
 
-   ~CGate() { 
-      ::CloseHandle(m_hevt); 
-   }
+	~CGate() 
+	{ 
+		::CloseHandle(m_hevt); 
+	}
 
-   DWORD WaitToEnterGate(DWORD dwTimeout = INFINITE, BOOL fAlertable = FALSE) {
-      return(::WaitForSingleObjectEx(m_hevt, dwTimeout, fAlertable)); 
-   }
-   
-   VOID LiftGate() { ::SetEvent(m_hevt); }
+	DWORD WaitToEnterGate(DWORD dwTimeout = INFINITE, BOOL fAlertable = FALSE) 
+	{
+		return(::WaitForSingleObjectEx(m_hevt, dwTimeout, fAlertable)); 
+	}
+
+	VOID LiftGate() 
+	{ 
+		::SetEvent(m_hevt); 
+	}
 
 private:
-    HANDLE m_hevt;
+	HANDLE m_hevt;
 };
 
 

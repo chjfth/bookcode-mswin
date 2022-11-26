@@ -33,130 +33,139 @@ enum COMPKEY {
 //////////////////////////////////////////////////////////////////////////////
 
 
-DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, 
-   PVOID pvEventData, PVOID pvContext) {
+DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, PVOID pvEventData, PVOID pvContext) 
+{
 
-   DWORD dwReturn = ERROR_CALL_NOT_IMPLEMENTED;
-   BOOL fPostControlToServiceThread = FALSE;
+	DWORD dwReturn = ERROR_CALL_NOT_IMPLEMENTED;
+	BOOL fPostControlToServiceThread = FALSE;
 
-   switch (dwControl) {
-   case SERVICE_CONTROL_STOP:
-   case SERVICE_CONTROL_SHUTDOWN:
-      g_ssTime.SetUltimateState(SERVICE_STOPPED, 2000);
-      fPostControlToServiceThread = TRUE;
-      break;
+	switch (dwControl) 
+	{
+	case SERVICE_CONTROL_STOP:
+	case SERVICE_CONTROL_SHUTDOWN:
+		g_ssTime.SetUltimateState(SERVICE_STOPPED, 2000);
+		fPostControlToServiceThread = TRUE;
+		break;
 
-   case SERVICE_CONTROL_PAUSE:
-      g_ssTime.SetUltimateState(SERVICE_PAUSED, 2000);
-      fPostControlToServiceThread = TRUE;
-      break;
+	case SERVICE_CONTROL_PAUSE:
+		g_ssTime.SetUltimateState(SERVICE_PAUSED, 2000);
+		fPostControlToServiceThread = TRUE;
+		break;
 
-   case SERVICE_CONTROL_CONTINUE:
-      g_ssTime.SetUltimateState(SERVICE_RUNNING, 2000);
-      fPostControlToServiceThread = TRUE;
-      break;
+	case SERVICE_CONTROL_CONTINUE:
+		g_ssTime.SetUltimateState(SERVICE_RUNNING, 2000);
+		fPostControlToServiceThread = TRUE;
+		break;
 
-   case SERVICE_CONTROL_INTERROGATE:
-      g_ssTime.ReportStatus();
-      break;
+	case SERVICE_CONTROL_INTERROGATE:
+		g_ssTime.ReportStatus();
+		break;
 
-   case SERVICE_CONTROL_PARAMCHANGE:
-      break;
+	case SERVICE_CONTROL_PARAMCHANGE:
+		break;
 
-   case SERVICE_CONTROL_DEVICEEVENT:
-   case SERVICE_CONTROL_HARDWAREPROFILECHANGE:
-   case SERVICE_CONTROL_POWEREVENT:
-      break;
+	case SERVICE_CONTROL_DEVICEEVENT:
+	case SERVICE_CONTROL_HARDWAREPROFILECHANGE:
+	case SERVICE_CONTROL_POWEREVENT:
+		break;
 
-   case 128:   // A user-define code just for testing
-      // NOTE: Normally, a service shouldn't display UI
-      MessageBox(NULL, TEXT("In HandlerEx processing user-defined code."),
-         g_szServiceName, MB_OK | MB_SERVICE_NOTIFICATION);
-      break;
-   }
-   if (fPostControlToServiceThread) {
-      // The Handler thread is very simple and executes very quickly because
-      // it just passes the control code off to the ServiceMain thread.
-      CIOCP* piocp = (CIOCP*) pvContext;
-      piocp->PostStatus(CK_SERVICECONTROL, dwControl);
-      dwReturn = NO_ERROR;
-   }
+	case 128:   // A user-define code just for testing
+		// NOTE: Normally, a service shouldn't display UI
+		MessageBox(NULL, TEXT("In HandlerEx processing user-defined code."),
+			g_szServiceName, MB_OK | MB_SERVICE_NOTIFICATION);
+		break;
+	}
 
-   return(dwReturn);
+	if (fPostControlToServiceThread) 
+	{
+		// The Handler thread is very simple and executes very quickly because
+		// it just passes the control code off to the ServiceMain thread.
+		CIOCP* piocp = (CIOCP*) pvContext;
+		piocp->PostStatus(CK_SERVICECONTROL, dwControl);
+		dwReturn = NO_ERROR;
+	}
+
+	return(dwReturn);
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 
+void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv) 
+{
+	ULONG_PTR CompKey = CK_SERVICECONTROL;
+	DWORD dwControl = SERVICE_CONTROL_CONTINUE;
+	CEnsureCloseFile hpipe;
+	OVERLAPPED o = {}, *po = nullptr;
+	SYSTEMTIME st = {};
+	DWORD dwNumBytes = 0;
 
-void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv) {
+	// Create the completion port and save its handle in a global
+	// variable so that the Handler function can access it.
+	CIOCP iocp(0);
 
-   ULONG_PTR CompKey = CK_SERVICECONTROL;
-   DWORD dwControl = SERVICE_CONTROL_CONTINUE;
-   CEnsureCloseFile hpipe;
-   OVERLAPPED o, *po;
-   SYSTEMTIME st;
-   DWORD dwNumBytes;
+	g_ssTime.Initialize(g_szServiceName, TimeHandlerEx, (PVOID) &iocp, TRUE);
 
-   // Create the completion port and save its handle in a global
-   // variable so that the Handler function can access it.
-   CIOCP iocp(0);
+	g_ssTime.AcceptControls(
+		SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PAUSE_CONTINUE);
 
-   g_ssTime.Initialize(g_szServiceName, TimeHandlerEx, (PVOID) &iocp, TRUE);
-   g_ssTime.AcceptControls(
-      SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PAUSE_CONTINUE);
-   
-   do {
-      switch (CompKey) {
-      case CK_SERVICECONTROL:
-         // We got a new control code
-         switch (dwControl) {
-         case SERVICE_CONTROL_CONTINUE:
-            // While running, create a pipe that clients can connect to.
-            hpipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\TimeService"), 
-               PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-               PIPE_TYPE_BYTE, 1, sizeof(st), sizeof(st), 1000, NULL);
+	do 
+	{
+		switch (CompKey) 
+		{
+		case CK_SERVICECONTROL:
+			// We got a new control code
+			switch (dwControl) 
+			{
+			case SERVICE_CONTROL_CONTINUE:
+				// While running, create a pipe that clients can connect to.
+				hpipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\TimeService"), 
+					PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+					PIPE_TYPE_BYTE, 1, sizeof(st), sizeof(st), 1000, NULL);
 
-            // Associate the pipe with the completion port
-            iocp.AssociateDevice(hpipe, CK_PIPE);
+				// Associate the pipe with the completion port
+				iocp.AssociateDevice(hpipe, CK_PIPE);
 
-            // Pend an asynchronous connect against the pipe
-            ZeroMemory(&o, sizeof(o));
-            ConnectNamedPipe(hpipe, &o);
-            g_ssTime.ReportUltimateState();
-            break;
+				// Pend an asynchronous connect against the pipe
+				ZeroMemory(&o, sizeof(o));
+				ConnectNamedPipe(hpipe, &o);
+				g_ssTime.ReportUltimateState();
+				break;
 
-         case SERVICE_CONTROL_PAUSE:
-         case SERVICE_CONTROL_STOP:
-            // When not running, close the pipe so clients can't connect
-            hpipe.Cleanup();
-            g_ssTime.ReportUltimateState();
-            break;
-         }
-         break;
+			case SERVICE_CONTROL_PAUSE:
+			case SERVICE_CONTROL_STOP:
+				// When not running, close the pipe so clients can't connect
+				hpipe.Cleanup();
+				g_ssTime.ReportUltimateState();
+				break;
+			}
+			break;
 
-      case CK_PIPE:
-         if (hpipe.IsValid()) {
-            // We got a client request: Send our current time to the client
-            GetSystemTime(&st);
-            WriteFile(hpipe, &st, sizeof(st), &dwNumBytes, NULL);
-            FlushFileBuffers(hpipe);
-            DisconnectNamedPipe(hpipe);
+		case CK_PIPE:
+			if (hpipe.IsValid()) 
+			{
+				// We got a client request: Send our current time to the client
+				GetSystemTime(&st);
+				WriteFile(hpipe, &st, sizeof(st), &dwNumBytes, NULL);
+				FlushFileBuffers(hpipe);
+				DisconnectNamedPipe(hpipe);
 
-            // Allow another client to connect 
-            ZeroMemory(&o, sizeof(o));
-            ConnectNamedPipe(hpipe, &o);
-         } else {
-            // We get here when the pipe is closed
-         }
-      }
+				// Allow another client to connect 
+				ZeroMemory(&o, sizeof(o));
+				ConnectNamedPipe(hpipe, &o);
+			} 
+			else 
+			{
+				// We get here when the pipe is closed
+			}
+		}
 
-      if (g_ssTime != SERVICE_STOPPED) {
-         // Sleep until a control code comes in or a client connects
-         iocp.GetStatus(&CompKey, &dwNumBytes, &po);
-         dwControl = dwNumBytes;
-      }
-   } while (g_ssTime != SERVICE_STOPPED);
+		if (g_ssTime != SERVICE_STOPPED) 
+		{
+			// Sleep until a control code comes in or a client connects
+			iocp.GetStatus(&CompKey, &dwNumBytes, &po);
+			dwControl = dwNumBytes;
+		}
+	} while (g_ssTime != SERVICE_STOPPED);
 }
 
 
@@ -212,61 +221,67 @@ void RemoveService() {
 //////////////////////////////////////////////////////////////////////////////
 
 
-int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int) {
-
-   int nArgc = __argc;
+int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int) 
+{
+	int nArgc = __argc;
 #ifdef UNICODE
-   PCTSTR *ppArgv = (PCTSTR*) CommandLineToArgvW(GetCommandLine(), &nArgc);
+	PCTSTR *ppArgv = (PCTSTR*) CommandLineToArgvW(GetCommandLine(), &nArgc);
 #else
-   PCTSTR *ppArgv = (PCTSTR*) __argv;
+	PCTSTR *ppArgv = (PCTSTR*) __argv;
 #endif
 
-   if (nArgc < 2) {
-      MessageBox(NULL, 
-         TEXT("Programming Server-Side Applications for Microsoft Windows: ")
-         TEXT("Time Service Sample\n\n")
-         TEXT("Usage: TimeService.exe [/install] [/remove] [/debug] ")
-         TEXT("[/service]\n")
-         TEXT("   /install\t\tInstalls the service in the SCM's database.\n")
-         TEXT("   /remove\t\tRemoves the service from the SCM's database.\n")
-         TEXT("   /debug\t\tRuns the service as a normal process for ")
-         TEXT("debugging.\n")
-         TEXT("   /service\t\tRuns the process as a service ")
-         TEXT("(should only be set in the SCM's database)."),
-         g_szServiceName, MB_OK);
-   } else {
-      for (int i = 1; i < nArgc; i++) {
-         if ((ppArgv[i][0] == TEXT('-')) || (ppArgv[i][0] == TEXT('/'))) {
-            // Command line switch
-            if (lstrcmpi(&ppArgv[i][1], TEXT("install")) == 0) 
-               InstallService();
+	if (nArgc < 2) 
+	{
+		MessageBox(NULL, 
+			TEXT("Programming Server-Side Applications for Microsoft Windows: ")
+			TEXT("Time Service Sample\n\n")
+			TEXT("Usage: TimeService.exe [/install] [/remove] [/debug] [/service]")
+			TEXT("\n")
+			TEXT("   /install\t\tInstalls the service in the SCM's database.\n")
+			TEXT("   /remove\t\tRemoves the service from the SCM's database.\n")
+			TEXT("   /debug\t\tRuns as a normal process for debugging.")
+			TEXT("   /service\t\tRun as a service (should only be set in the SCM's database)")
+			,
+			g_szServiceName, MB_OK);
+	} 
+	else 
+	{
+		for (int i = 1; i < nArgc; i++) 
+		{
+			if ((ppArgv[i][0] == TEXT('-')) || (ppArgv[i][0] == TEXT('/'))) 
+			{
+				// Command line switch
+				if (lstrcmpi(&ppArgv[i][1], TEXT("install")) == 0) 
+					InstallService();
 
-            if (lstrcmpi(&ppArgv[i][1], TEXT("remove"))  == 0)
-               RemoveService();
+				if (lstrcmpi(&ppArgv[i][1], TEXT("remove"))  == 0)
+					RemoveService();
 
-            if (lstrcmpi(&ppArgv[i][1], TEXT("debug"))   == 0) {
-               g_ssTime.SetDebugMode();
+				if (lstrcmpi(&ppArgv[i][1], TEXT("debug"))   == 0) 
+				{
+					g_ssTime.SetDebugMode();
 
-               // Execute the service code
-               TimeServiceMain(0, NULL);
-            }
+					// Execute the service code
+					TimeServiceMain(0, NULL);
+				}
 
-            if (lstrcmpi(&ppArgv[i][1], TEXT("service")) == 0) {
-               // Connect to the service control dispatcher
-               SERVICE_TABLE_ENTRY ServiceTable[] = {
-                  { g_szServiceName, TimeServiceMain },
-                  { NULL,            NULL }   // End of list
-               };
-               chVERIFY(StartServiceCtrlDispatcher(ServiceTable));
-            }
-         }
-      }
-   }
+				if (lstrcmpi(&ppArgv[i][1], TEXT("service")) == 0) 
+				{
+					// Connect to the service control dispatcher
+					SERVICE_TABLE_ENTRY ServiceTable[] = {
+						{ g_szServiceName, TimeServiceMain },
+						{ NULL,            NULL }   // End of list
+					};
+					chVERIFY(StartServiceCtrlDispatcher(ServiceTable));
+				}
+			}
+		}
+	}
 
 #ifdef UNICODE
-   HeapFree(GetProcessHeap(), 0, (PVOID) ppArgv);
+	HeapFree(GetProcessHeap(), 0, (PVOID) ppArgv);
 #endif
-   return(0);
+	return(0);
 }
 
 
