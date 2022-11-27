@@ -47,6 +47,7 @@ Purpose: Common header file containing handy macros and definitions
 #pragma warning(push, 4)
 #include <Windows.h>
 #include <TChar.h>
+#include <stdio.h>
 
 
 ///////////// Verify that the proper header files are being used //////////////
@@ -206,10 +207,15 @@ inline void chMBANDDEBUG(PSTR szMsg) {
 
 
 // Put up an assertion failure message box.
-inline void chASSERTFAIL(LPCSTR file, int line, PCSTR expr) {
-   char sz[256];
-   wsprintfA(sz, "File %s, line %d : %s", file, line, expr);
-   chMBANDDEBUG(sz);
+inline void chASSERTFAIL(LPCSTR file, int line, PCSTR expr) 
+{
+	char sz[1000] = "";
+	_snprintf_s(sz, _TRUNCATE, 
+		"Assertion Fail ! \r\n\r\n"
+		"File %s, line %d : %s"
+		, 
+		file, line, expr);
+	chMBANDDEBUG(sz);
 }
 
 

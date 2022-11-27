@@ -98,6 +98,8 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 	OVERLAPPED o = {}, *po = nullptr;
 	SYSTEMTIME st = {};
 	DWORD dwNumBytes = 0;
+	BOOL succ = 0;
+	int MaxPipeInstances = 1; // var to debug on the fly
 
 	// Create the completion port and save its handle in a global
 	// variable so that the Handler function can access it.
@@ -120,14 +122,14 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 				// While running, create a pipe that clients can connect to.
 				hpipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\TimeService"), 
 					PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-					PIPE_TYPE_BYTE, 1, sizeof(st), sizeof(st), 1000, NULL);
+					PIPE_TYPE_BYTE, MaxPipeInstances, sizeof(st), sizeof(st), 1000, NULL);
 
 				// Associate the pipe with the completion port
 				iocp.AssociateDevice(hpipe, CK_PIPE);
 
 				// Pend an asynchronous connect against the pipe
 				ZeroMemory(&o, sizeof(o));
-				ConnectNamedPipe(hpipe, &o);
+				succ = ConnectNamedPipe(hpipe, &o);
 				g_ssTime.ReportUltimateState();
 				break;
 
@@ -145,13 +147,14 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 			{
 				// We got a client request: Send our current time to the client
 				GetSystemTime(&st);
-				WriteFile(hpipe, &st, sizeof(st), &dwNumBytes, NULL);
-				FlushFileBuffers(hpipe);
-				DisconnectNamedPipe(hpipe);
+				succ = WriteFile(hpipe, &st, sizeof(st), &dwNumBytes, NULL);
+				
+				succ = FlushFileBuffers(hpipe);
+				succ = DisconnectNamedPipe(hpipe);
 
 				// Allow another client to connect 
 				ZeroMemory(&o, sizeof(o));
-				ConnectNamedPipe(hpipe, &o);
+				succ = ConnectNamedPipe(hpipe, &o);
 			} 
 			else 
 			{
