@@ -159,48 +159,49 @@ typedef struct _ObjInf {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-class CSecurityInformation: public ISecurityInformation {
-
+class CSecurityInformation: public ISecurityInformation 
+{
 public:
-   CSecurityInformation(ObjInf* pInfo, BOOL fBinary) { 
-      m_pInfo = pInfo; 
-      m_nRef = 1; 
-      m_fBinary = fBinary; 
-   }
+	CSecurityInformation(ObjInf* pInfo, BOOL fBinary) 
+	{ 
+		m_pInfo = pInfo; 
+		m_nRef = 1; 
+		m_fBinary = fBinary; 
+	}
 
 private:
-   static GUID m_guidNULL;
+	static GUID m_guidNULL;
 
-   static const int MyMaxAccessRightEntries = 21;
-   static SI_ACCESS m_siAccessAllRights[][MyMaxAccessRightEntries];
-   static SI_ACCESS m_siAccessBinaryRights[32];
-   static SI_INHERIT_TYPE m_sPropagateType[];
+	static const int MyMaxAccessRightEntries = 21;
+	static SI_ACCESS m_siAccessAllRights[][MyMaxAccessRightEntries];
+	static SI_ACCESS m_siAccessBinaryRights[32];
+	static SI_INHERIT_TYPE m_sPropagateType[];
 
-   ULONG    m_nRef;
-   ObjInf*  m_pInfo;
+	ULONG    m_nRef;
+	ObjInf*  m_pInfo;
 
-   BOOL     m_fBinary;
+	BOOL     m_fBinary;
 
 public:
-   HRESULT WINAPI QueryInterface(REFIID riid, PVOID* ppvObj);
-   ULONG WINAPI AddRef();
-   ULONG WINAPI Release();
+	HRESULT WINAPI QueryInterface(REFIID riid, PVOID* ppvObj);
+	ULONG WINAPI AddRef();
+	ULONG WINAPI Release();
 
 private:
-   HRESULT WINAPI GetObjectInformation(PSI_OBJECT_INFO pObjectInfo);
-   HRESULT WINAPI GetSecurity(SECURITY_INFORMATION RequestedInformation,
-      PSECURITY_DESCRIPTOR* ppSecurityDescriptor, BOOL fDefault);
-   HRESULT WINAPI SetSecurity(SECURITY_INFORMATION SecurityInformation,
-      PSECURITY_DESCRIPTOR pSecurityDescriptor);
-   HRESULT WINAPI GetAccessRights(const GUID* pguidObjectType,
-      DWORD dwFlags, // si_edit_audits, si_edit_properties
-      PSI_ACCESS* ppAccess, ULONG* pcAccesses, ULONG* piDefaultAccess);
-   HRESULT WINAPI MapGeneric(const GUID* pguidObjectType,
-      UCHAR* pAceFlags, ACCESS_MASK* pMask);
-   HRESULT WINAPI GetInheritTypes(PSI_INHERIT_TYPE* ppInheritTypes, 
-         ULONG* pcInheritTypes);
-   HRESULT WINAPI PropertySheetPageCallback(HWND hwnd, UINT uMsg, 
-         SI_PAGE_TYPE uPage);
+	HRESULT WINAPI GetObjectInformation(PSI_OBJECT_INFO pObjectInfo);
+	HRESULT WINAPI GetSecurity(SECURITY_INFORMATION RequestedInformation,
+		PSECURITY_DESCRIPTOR* ppSecurityDescriptor, BOOL fDefault);
+	HRESULT WINAPI SetSecurity(SECURITY_INFORMATION SecurityInformation,
+		PSECURITY_DESCRIPTOR pSecurityDescriptor);
+	HRESULT WINAPI GetAccessRights(const GUID* pguidObjectType,
+		DWORD dwFlags, // si_edit_audits, si_edit_properties
+		PSI_ACCESS* ppAccess, ULONG* pcAccesses, ULONG* piDefaultAccess);
+	HRESULT WINAPI MapGeneric(const GUID* pguidObjectType,
+		UCHAR* pAceFlags, ACCESS_MASK* pMask);
+	HRESULT WINAPI GetInheritTypes(PSI_INHERIT_TYPE* ppInheritTypes, 
+		ULONG* pcInheritTypes);
+	HRESULT WINAPI PropertySheetPageCallback(HWND hwnd, UINT uMsg, 
+		SI_PAGE_TYPE uPage);
 };
 
 GUID CSecurityInformation::m_guidNULL = GUID_NULL;

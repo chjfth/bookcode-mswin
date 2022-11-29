@@ -722,40 +722,41 @@ void HandleEdit(HWND hwnd)
 		EditSecurity(hwnd, pSec);
 		if (pSec != NULL)
 			pSec->Release();
+	}
 
-		// Cleanup if we had opened a handle before
-		if (info.m_szName[0] == 0) 
+	// Cleanup if we had opened a handle before.
+	// Chj fixed: Even if FillInfo() failed, we need to clean-up.
+	if (info.m_szName[0] == 0) 
+	{
+		switch (info.m_pEntry->m_nSpecificType) 
 		{
-			switch (info.m_pEntry->m_nSpecificType) 
-			{
 
-			case AM_FILE:
-			case AM_PROCESS:
-			case AM_THREAD:
-			case AM_JOB:
-			case AM_SEMAPHORE:
-			case AM_EVENT:
-			case AM_MUTEX:
-			case AM_MAPPING:
-			case AM_TIMER:
-			case AM_TOKEN:
-			case AM_NAMEDPIPE:
-			case AM_ANONPIPE:
-				CloseHandle(info.m_hHandle);
-				break;
+		case AM_FILE:
+		case AM_PROCESS:
+		case AM_THREAD:
+		case AM_JOB:
+		case AM_SEMAPHORE:
+		case AM_EVENT:
+		case AM_MUTEX:
+		case AM_MAPPING:
+		case AM_TIMER:
+		case AM_TOKEN:
+		case AM_NAMEDPIPE:
+		case AM_ANONPIPE:
+			CloseHandle(info.m_hHandle);
+			break;
 
-			case AM_REGISTRY:
-				RegCloseKey((HKEY) info.m_hHandle);
-				break;
+		case AM_REGISTRY:
+			RegCloseKey((HKEY) info.m_hHandle);
+			break;
 
-			case AM_WINDOWSTATION:
-				CloseWindowStation((HWINSTA) info.m_hHandle);
-				break;
+		case AM_WINDOWSTATION:
+			CloseWindowStation((HWINSTA) info.m_hHandle);
+			break;
 
-			case AM_DESKTOP:
-				CloseDesktop((HDESK) info.m_hHandle);
-				break;
-			}
+		case AM_DESKTOP:
+			CloseDesktop((HDESK) info.m_hHandle);
+			break;
 		}
 	}
 }
