@@ -164,7 +164,7 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 
 		case AM_WINDOWSTATION:
 			{ 
-				// If windowstation, we must translate the name to a handle
+				// If window-station, we must translate the name to a handle
 				HWINSTA hwinsta = NULL;
 				GetDlgItemText(hwnd, IDE_NAME, pInfo->m_szName, 
 					chDIMOF(pInfo->m_szName));
@@ -288,7 +288,11 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 				{
 					// Get as much access as possible
 					if (!DuplicateHandle(hProcess, hHandle, GetCurrentProcess(),
-						&hObj, READ_CONTROL, FALSE, 0)) // was MAXIMUM_ALLOWED, would get no right
+						&hObj, 
+						0, // dwDesiredAccess, was MAXIMUM_ALLOWED, would get no right on Win7
+						FALSE, 
+						DUPLICATE_SAME_ACCESS // Chj fixed, was 0.
+						)) 
 					{
 						ReportError(TEXT("DuplicateHandle"), GetLastError());
 					}
