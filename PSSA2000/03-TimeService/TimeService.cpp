@@ -24,7 +24,7 @@ CServiceStatus g_ssTime;
 
 
 // The completion port wakes for 1 of 2 reasons:
-enum COMPKEY { 
+enum COMPKEY_et { 
    CK_SERVICECONTROL,   // A service control code
    CK_PIPE              // A client connects to our pipe
 };
@@ -92,7 +92,7 @@ DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, PVOID pvEventData
 
 void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv) 
 {
-	ULONG_PTR CompKey = CK_SERVICECONTROL;
+	COMPKEY_et CompKey = CK_SERVICECONTROL;
 	DWORD dwControl = SERVICE_CONTROL_CONTINUE;
 	CEnsureCloseFile hpipe;
 	OVERLAPPED o = {}, *po = nullptr;
@@ -119,10 +119,14 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 			switch (dwControl) 
 			{
 			case SERVICE_CONTROL_CONTINUE:
+				
 				// While running, create a pipe that clients can connect to.
 				hpipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\TimeService"), 
 					PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
-					PIPE_TYPE_BYTE, MaxPipeInstances, sizeof(st), sizeof(st), 1000, NULL);
+					PIPE_TYPE_BYTE, 
+					MaxPipeInstances, 
+					sizeof(st), sizeof(st), 
+					1000, NULL);
 
 				// Associate the pipe with the completion port
 				iocp.AssociateDevice(hpipe, CK_PIPE);
@@ -165,7 +169,12 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 		if (g_ssTime != SERVICE_STOPPED) 
 		{
 			// Sleep until a control code comes in or a client connects
-			iocp.GetStatus(&CompKey, &dwNumBytes, &po);
+
+			ULONG_PTR ulptr = 0;
+			iocp.GetStatus(&ulptr, &dwNumBytes, &po);
+			
+			CompKey = (COMPKEY_et)ulptr;
+			
 			dwControl = dwNumBytes;
 		}
 	} while (g_ssTime != SERVICE_STOPPED);

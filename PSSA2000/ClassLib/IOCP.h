@@ -54,16 +54,15 @@ public:
 		return(AssociateDevice((HANDLE) hSocket, CompKey));
 	}
 
-	BOOL PostStatus(ULONG_PTR CompKey, DWORD dwNumBytes = 0,  OVERLAPPED* po = NULL) 
+	BOOL PostStatus(ULONG_PTR CompKey, DWORD dwNumBytes=0,  OVERLAPPED* po=NULL) 
 	{
-
 		BOOL fOk = PostQueuedCompletionStatus(m_hIOCP, dwNumBytes, CompKey, po);
 		chASSERT(fOk);
 		return(fOk);
 	}
 
 	BOOL GetStatus(ULONG_PTR* pCompKey, PDWORD pdwNumBytes,
-		OVERLAPPED** ppo, DWORD dwMilliseconds = INFINITE) 
+		OVERLAPPED** ppo, DWORD dwMilliseconds=INFINITE) 
 	{
 		return(GetQueuedCompletionStatus(m_hIOCP, pdwNumBytes, 
 			pCompKey, ppo, dwMilliseconds));
