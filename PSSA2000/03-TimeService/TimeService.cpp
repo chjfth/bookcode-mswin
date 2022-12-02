@@ -9,6 +9,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "..\ClassLib\IOCP.h"          /* See Appendix B */
 #include "..\ClassLib\EnsureCleanup.h" /* See Appendix B */
 
+#include "..\vaDbg.h"
+
 #define SERVICESTATUS_IMPL
 #include "ServiceStatus.h"
 
@@ -16,7 +18,9 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 //////////////////////////////////////////////////////////////////////////////
 
 
-TCHAR g_szServiceName[] = TEXT("Programming Server-Side Applications Time");
+TCHAR g_szServiceName[] = TEXT("03-TimeService");
+TCHAR g_szServiceDisplayName[] = TEXT("03-TimeService from book PSSA2000");
+
 CServiceStatus g_ssTime;
 
 
@@ -80,6 +84,7 @@ DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, PVOID pvEventData
 	{
 		// The Handler thread is very simple and executes very quickly because
 		// it just passes the control code off to the ServiceMain thread.
+
 		CIOCP* piocp = (CIOCP*) pvContext;
 		piocp->PostStatus(CK_SERVICECONTROL, dwControl);
 		dwReturn = NO_ERROR;
@@ -99,6 +104,7 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 	SYSTEMTIME st = {};
 	DWORD dwNumBytes = 0;
 	BOOL succ = 0;
+	DWORD winerr = 0;
 	int MaxPipeInstances = 1; // var to debug on the fly
 
 	// Create the completion port and save its handle in a global
@@ -127,7 +133,21 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 					MaxPipeInstances, 
 					sizeof(st), sizeof(st), 
 					1000, NULL);
-
+#if 0
+				// Chj: Check for error. (pipe-namespace creation fail)
+				// May due to another TimeService.exe process has occupied the pipe-namespace.
+				//
+				if(hpipe==INVALID_HANDLE_VALUE)
+				{
+					winerr = GetLastError();
+					if(g_ssTime.IsDebugMode())
+					{
+						vaMsgBox(MB_OK|MB_ICONEXCLAMATION, 
+							_T("CreateNamedPipe() fail, %s"), WinerrStr(winerr));
+					}
+					break; // go to idle
+				}
+#endif
 				// Associate the pipe with the completion port
 				iocp.AssociateDevice(hpipe, CK_PIPE);
 
@@ -144,7 +164,7 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 				g_ssTime.ReportUltimateState();
 				break;
 			}
-			break;
+			break; // break out of `CompKey`, not `for`
 
 		case CK_PIPE:
 			if (hpipe.IsValid()) 
@@ -184,49 +204,47 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 //////////////////////////////////////////////////////////////////////////////
 
 
-void InstallService() {
+void InstallService() 
+{
+	// Open the SCM on this machine.
+	CEnsureCloseServiceHandle hSCM = 
+		OpenSCManager(NULL, NULL, SC_MANAGER_CREATE_SERVICE);
 
-   // Open the SCM on this machine.
-   CEnsureCloseServiceHandle hSCM = 
-      OpenSCManager(NULL, NULL, SC_MANAGER_CREATE_SERVICE);
+	// Get our full pathname
+	TCHAR szModulePathname[_MAX_PATH * 2];
+	GetModuleFileName(NULL, szModulePathname, chDIMOF(szModulePathname));
 
-   // Get our full pathname
-   TCHAR szModulePathname[_MAX_PATH * 2];
-   GetModuleFileName(NULL, szModulePathname, chDIMOF(szModulePathname));
+	// Append the switch that causes the process to run as a service.
+	lstrcat(szModulePathname, TEXT(" /service"));   
 
-   // Append the switch that causes the process to run as a service.
-   lstrcat(szModulePathname, TEXT(" /service"));   
+	// Add this service to the SCM's database.
+	CEnsureCloseServiceHandle hService = 
+		CreateService(hSCM, g_szServiceName, g_szServiceDisplayName,
+		SERVICE_CHANGE_CONFIG, SERVICE_WIN32_OWN_PROCESS, 
+		SERVICE_DEMAND_START, SERVICE_ERROR_IGNORE,
+		szModulePathname, NULL, NULL, NULL, NULL, NULL);
 
-   // Add this service to the SCM's database.
-   CEnsureCloseServiceHandle hService = 
-      CreateService(hSCM, g_szServiceName, g_szServiceName,
-         SERVICE_CHANGE_CONFIG, SERVICE_WIN32_OWN_PROCESS, 
-         SERVICE_DEMAND_START, SERVICE_ERROR_IGNORE,
-         szModulePathname, NULL, NULL, NULL, NULL, NULL);
-
-   SERVICE_DESCRIPTION sd = { 
-      TEXT("Sample Time Service from ")
-      TEXT("Programming Server-Side Applications for Microsoft Windows Book")
-   };
-   ChangeServiceConfig2(hService, SERVICE_CONFIG_DESCRIPTION, &sd);
+	SERVICE_DESCRIPTION sd = 
+	{ 
+		TEXT("Sample Time Service from ")
+		TEXT("Programming Server-Side Applications for Microsoft Windows Book")
+	};
+	ChangeServiceConfig2(hService, SERVICE_CONFIG_DESCRIPTION, &sd);
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+void RemoveService() 
+{
+	// Open the SCM on this machine.
+	CEnsureCloseServiceHandle hSCM = 
+		OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
 
+	// Open this service for DELETE access
+	CEnsureCloseServiceHandle hService = 
+		OpenService(hSCM, g_szServiceName, DELETE);
 
-void RemoveService() {
-
-   // Open the SCM on this machine.
-   CEnsureCloseServiceHandle hSCM = 
-      OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
-
-   // Open this service for DELETE access
-   CEnsureCloseServiceHandle hService = 
-      OpenService(hSCM, g_szServiceName, DELETE);
-
-   // Remove this service from the SCM's database.
-   DeleteService(hService);
+	// Remove this service from the SCM's database.
+	DeleteService(hService);
 }
 
 

@@ -23,6 +23,7 @@ public:
 	CServiceStatus();
 
 	void SetDebugMode() { m_fDebug = TRUE; }
+	bool IsDebugMode() { return m_fDebug ? true : false; }
 
 	BOOL Initialize(PCTSTR szServiceName, LPHANDLER_FUNCTION_EX pfnHandler, 
 		PVOID pvContext, BOOL fOwnProcess, BOOL fInteractWithDesktop = FALSE);
@@ -125,6 +126,9 @@ BOOL CServiceStatus::Initialize(PCTSTR szServiceName,
 
 BOOL CServiceStatus::SetUltimateState(DWORD dwUltimateState, DWORD dwWaitHint) 
 {
+	// Chj memo: Original function naming is wacky!
+	// Set dwUltimateState as the new wish-for service state.
+
 	DWORD dwPendingState = 0;  // An invalid state value
 	switch (dwUltimateState) 
 	{
@@ -196,6 +200,10 @@ BOOL CServiceStatus::AdvanceState(DWORD dwWaitHint, DWORD dwCheckPoint)
    
 BOOL CServiceStatus::ReportUltimateState() 
 {
+	// Chj memo: Original function naming is wacky!
+	// If current service state is xxx_PENDING, land that pending state.
+	// If current service state is not xxx_PENDING, do nothing.
+
 	DWORD dwUltimateState = 0;  // An invalid state value
 	switch (dwCurrentState) 
 	{

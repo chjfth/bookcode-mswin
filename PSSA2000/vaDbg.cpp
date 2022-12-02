@@ -127,36 +127,81 @@ int vaMsgBox(UINT utype, const TCHAR *szfmt, ...)
 	return ret;
 }
 
-const TCHAR *app_WinErrStr(DWORD winerr)
-{
-	static TCHAR s_retbuf[400] = {};
-	TCHAR szWinErr[200] = {};
+//////////////////////////////////////////////////////////////////////////
 
+struct Const2Str_st
+{
+	int Const;
+	const TCHAR *Str;
+};
+
+#define ITEM_Const2Str(macroname) { macroname, _T( #macroname ) }
+
+template<size_t arsize>
+const TCHAR *Const2Str(
+	const Const2Str_st (&armap)[arsize], int Const, bool ret_known=false)
+{
+	for(int i=0; i<arsize; i++)
+	{
+		if(armap[i].Const==Const)
+			return armap[i].Str;
+	}
+
+	return ret_known ? _T("Unknown") : NULL;
+}
+
+////
+
+#include "winerrs.partial.cpp"
+
+const TCHAR * Winerr2Str(DWORD winerr)
+{
+	return Const2Str(gar_Winerr2Str, winerr, true);
+}
+
+const TCHAR *WinerrStr(DWORD winerr)
+{
+	static TCHAR s_retbuf[80] = {};
 	s_retbuf[0] = 0;
 
-	if (winerr == (DWORD)-1)
+	if (winerr==0 || winerr==(DWORD)-1)
 		winerr = GetLastError();
 
-	DWORD retchars = FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, 
-		winerr,
-		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), // LANGID
-		szWinErr, ARRAYSIZE(szWinErr),
-		NULL); 
+	const TCHAR *errstr = Const2Str(gar_Winerr2Str, winerr, false);
 
-	if(retchars>0)
+	if(errstr)
 	{
-		_sntprintf_s(s_retbuf, _TRUNCATE, _T("WinErr=%d, %s"), winerr, szWinErr);
+		_sntprintf_s(s_retbuf, _TRUNCATE, _T("WinErr=%d (%s)"), winerr, errstr);
 	}
 	else
 	{
-		_sntprintf_s(s_retbuf, _TRUNCATE, 
-			_T("WinErr=%d (FormatMessage does not known this error-code)"), 
-			winerr);
+		TCHAR szErrDesc[200] = {};
+		DWORD retchars = FormatMessage(
+			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, 
+			winerr,
+			MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), // LANGID
+			szErrDesc, ARRAYSIZE(szErrDesc)-1,
+			NULL); 
+
+		if(retchars>0)
+		{
+			_sntprintf_s(s_retbuf, _TRUNCATE, _T("WinErr=%d, %s"), winerr, szErrDesc);
+		}
+		else
+		{
+			_sntprintf_s(s_retbuf, _TRUNCATE, 
+				_T("WinErr=%d (FormatMessage does not known this error-code)"), 
+				winerr);
+		}
 	}
 
 	return s_retbuf;
+}
+
+const TCHAR *app_WinErrStr(DWORD winerr)
+{
+	return WinerrStr(winerr);
 }
 
 

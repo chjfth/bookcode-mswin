@@ -13,7 +13,9 @@ void chSETWINDOWICON(HWND hwnd, const TCHAR *icon_resname);
 
 int vaMsgBox(UINT utype, const TCHAR *szfmt, ...);
 
-const TCHAR *app_WinErrStr(DWORD winerr);
+const TCHAR *WinerrStr(DWORD winerr=0);
+const TCHAR *app_WinErrStr(DWORD winerr); // same as above
+
 
 TCHAR *parse_cmdparam_TCHARs(
 	const TCHAR *T_cmdline, bool single_param_as_literal,
