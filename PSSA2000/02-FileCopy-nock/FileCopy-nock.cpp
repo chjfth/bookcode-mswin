@@ -5,6 +5,11 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 * Report file copying speed on success.
 * Report error loudly when error occurs during file-copy. File copying failure
   can be reproduced easily with a file on a network shared folder.
+
+* "nock" means "no completion-key" parameter.
+   We can do this because the big-tail OVERLAPPED struct(CIOReq) can hold 
+   an extra value that represent the "completion-key".
+
 ******************************************************************************/
 
 
@@ -21,6 +26,18 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#define BUFFSIZE              (64 * 1024) // The size of an I/O buffer
+#define MAX_PENDING_IO_REQS   4           // The maximum # of of I/Os
+
+// The signature values indicate the type of completed I/O.
+enum WhichOp_et
+{
+	CK_Unset = 0,
+	CK_READ = 1,
+	CK_WRITE = 2,
+};
+
+#define DEBUG_ALL
 
 // Each I/O Request needs an OVERLAPPED structure and a data buffer
 class CIOReq : public OVERLAPPED {
@@ -31,6 +48,8 @@ public:
 		hEvent = NULL;
 		m_nBuffSize = 0;
 		m_pvData = NULL;
+
+		m_op = CK_Unset;
 	}
 
 	~CIOReq() {
@@ -49,6 +68,7 @@ public:
 			Offset     = pliOffset->LowPart;
 			OffsetHigh = pliOffset->HighPart;
 		}
+		m_op = CK_READ;
 		return(::ReadFile(hDevice, m_pvData, (DWORD)m_nBuffSize, NULL, this));
 	}
 
@@ -57,27 +77,19 @@ public:
 			Offset     = pliOffset->LowPart;
 			OffsetHigh = pliOffset->HighPart;
 		}
+		m_op = CK_WRITE;
 		return(::WriteFile(hDevice, m_pvData, (DWORD)m_nBuffSize, NULL, this));
 	}
 
 private:
 	SIZE_T m_nBuffSize;
 	PVOID  m_pvData;
+
+public:
+	// Chj mod:
+	WhichOp_et m_op;
 };
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-#define BUFFSIZE              (64 * 1024) // The size of an I/O buffer
-#define MAX_PENDING_IO_REQS   4           // The maximum # of of I/Os
-
-
-// The completion key values indicate the type of completed I/O.
-#define CK_READ  1
-#define CK_WRITE 2
-
-//#define DEBUG_ALL
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -127,8 +139,8 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 
 	// Create an I/O completion port and associate the files with it.
 	CIOCP iocp(0);
-	iocp.AssociateDevice(hfileSrc, CK_READ);  // Read from source file
-	iocp.AssociateDevice(hfileDst, CK_WRITE); // Write to destination file
+	iocp.AssociateDevice(hfileSrc, NULL);  // Read from source file
+	iocp.AssociateDevice(hfileDst, NULL); // Write to destination file
 
 	// Initialize record-keeping variables
 	CIOReq ior[MAX_PENDING_IO_REQS];
@@ -144,18 +156,20 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 		// Each I/O request requires a data buffer for transfers
 		chVERIFY(ior[nIOReq].AllocBuffer(BUFFSIZE));
 		nWritesInProgress++;
-		iocp.PostStatus(CK_WRITE, 0, &ior[nIOReq]);
+		ior[nIOReq].m_op = CK_WRITE;
+		iocp.PostStatus(NULL, 0, &ior[nIOReq]);
 	}
 
 	// Loop while outstanding I/O requests still exist
 	while ((nReadsInProgress > 0) || (nWritesInProgress > 0)) 
 	{
 		// Suspend the thread until an I/O completes
-		ULONG_PTR CompKey;
 		DWORD dwNumBytes;
 		CIOReq* pior;
-		BOOL succ = iocp.GetStatus(&CompKey, &dwNumBytes, (OVERLAPPED**) &pior, INFINITE);
-		
+		BOOL succ = iocp.GetStatus(NULL, &dwNumBytes, (OVERLAPPED**) &pior, INFINITE);
+
+		WhichOp_et CompKey = pior->m_op;
+
 		TCHAR timebuf[40];
 #ifdef DEBUG_ALL
 		vaDbg(_T("%s iocp.GetStatus(%s)=%s"), 
@@ -183,7 +197,7 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 
 			if(!*pWinErr)
 			{
-				succ = pior->Write(hfileDst);  // Write to same offset read from source
+				succ = pior->Write(hfileDst);  // Write to same offset as just read
 				nWritesInProgress++;
 
 				vaDbgReadWriteResult(succ, _T("WriteFile"));

@@ -64,8 +64,10 @@ public:
 	BOOL GetStatus(ULONG_PTR* pCompKey, PDWORD pdwNumBytes,
 		OVERLAPPED** ppo, DWORD dwMilliseconds=INFINITE) 
 	{
+		ULONG_PTR compkey = 0;
 		return(GetQueuedCompletionStatus(m_hIOCP, pdwNumBytes, 
-			pCompKey, ppo, dwMilliseconds));
+			pCompKey ? pCompKey : &compkey, 
+			ppo, dwMilliseconds));
 	}
 
 private:
