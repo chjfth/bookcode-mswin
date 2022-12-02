@@ -45,5 +45,7 @@ extern CInterpretConst itc_SECURITY_DESCRIPTOR_CONTROL;
 extern CInterpretConst itc_SI_ACCESS_flags;
 extern CInterpretConst itc_SI_OBJECT_INFO_flags;
 extern CInterpretConst itc_SI_INHERIT_TYPE_flags;
+extern CInterpretConst itc_SERVICE_CONTROL;
+extern CInterpretConst itc_DBT;
 
 #endif

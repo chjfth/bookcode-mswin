@@ -40,6 +40,16 @@ enum COMPKEY_et {
 DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, PVOID pvEventData, PVOID pvContext) 
 {
 
+	vaDbg(
+		_T("[tid=%d]CH03-TimeService: In TimeHandlerEx() callback,\n")
+		_T("  dwControl   = %s\n")
+		_T("  dwEventType = %s")
+		,
+		GetCurrentThreadId(),
+		ITCS(dwControl, itc_SERVICE_CONTROL),
+		ITCS(dwEventType, itc_DBT)
+		);
+
 	DWORD dwReturn = ERROR_CALL_NOT_IMPLEMENTED;
 	BOOL fPostControlToServiceThread = FALSE;
 
@@ -97,6 +107,9 @@ DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, PVOID pvEventData
 
 void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv) 
 {
+	vaDbg(_T("[tid=%d]CH03-TimeService: In TimeServiceMain()."),
+		GetCurrentThreadId());
+
 	COMPKEY_et CompKey = CK_SERVICECONTROL;
 	DWORD dwControl = SERVICE_CONTROL_CONTINUE;
 	CEnsureCloseFile hpipe;
@@ -172,6 +185,9 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 				// We got a client request: Send our current time to the client
 				GetSystemTime(&st);
 				succ = WriteFile(hpipe, &st, sizeof(st), &dwNumBytes, NULL);
+				// -- Chj memo: We're a bit lazy by not using OVLP in this WriteFile.
+				// It's OK bcz we just write a small amount of bytes, and those bytes
+				// will go into sender-buffer, so we're not likely to get blocked in I/O.
 				
 				succ = FlushFileBuffers(hpipe);
 				succ = DisconnectNamedPipe(hpipe);
@@ -191,7 +207,13 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 			// Sleep until a control code comes in or a client connects
 
 			ULONG_PTR ulptr = 0;
-			iocp.GetStatus(&ulptr, &dwNumBytes, &po);
+			succ = iocp.GetStatus(&ulptr, &dwNumBytes, &po);
+			if(!succ)
+			{
+				DWORD bytesdone = 0;
+				succ = GetOverlappedResult(hpipe, po, &bytesdone, TRUE);
+				vaDbg(_T("[WEIRD] CH03 TimeService.cpp: iocp.GetStatus() fail, %s"), WinerrStr());
+			}
 			
 			CompKey = (COMPKEY_et)ulptr;
 			
@@ -259,6 +281,11 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 #else
 	PCTSTR *ppArgv = (PCTSTR*) __argv;
 #endif
+
+	vaDbg(_T("[tid=%d]CH03-TimeService: In _tWinMain().")
+		_T("  pszCmdLine = %s")
+		,
+		GetCurrentThreadId(), pszCmdLine);
 
 	if (nArgc < 2) 
 	{
