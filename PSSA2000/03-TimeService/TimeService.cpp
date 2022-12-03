@@ -247,25 +247,56 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 //////////////////////////////////////////////////////////////////////////////
 
 
-void myInstallService() 
+int myInstallService() 
 {
+	DWORD winerr = 0;
+
 	// Open the SCM on this machine.
 	CEnsureCloseServiceHandle hSCM = 
 		OpenSCManager(NULL, NULL, SC_MANAGER_CREATE_SERVICE);
 
-	// Get our full pathname
-	TCHAR szModulePathname[_MAX_PATH * 2];
-	GetModuleFileName(NULL, szModulePathname, chDIMOF(szModulePathname));
+	if(hSCM.IsInvalid())
+	{
+		vaMsgBox(MB_OK|MB_ICONERROR, _T("OpenSCManager() fail, %s"), WinerrStr());
+		return 4;
+	}
 
-	// Append the switch that causes the process to run as a service.
-	lstrcat(szModulePathname, TEXT(" /service"));   
+	// Get our full pathname
+	TCHAR szModulePath[_MAX_PATH] = {};
+	GetModuleFileName(NULL, szModulePath, chDIMOF(szModulePath)-1);
+
+	TCHAR szCmdLine[_MAX_PATH+20] = {}; // add "/service" param
+	_sntprintf_s(szCmdLine, _TRUNCATE, _T("\"%s\" /service"), szModulePath);
+
+	vaDbg(
+		_T("Will call CreateService() with:\n")
+		_T("  lpServiceName = %s\n")
+		_T("  lpDisplayName = %s\n")
+		_T("  lpBinaryPathName = %s\n")
+		,
+		g_szServiceName,
+		g_szServiceDisplayName,
+		szCmdLine
+		);
 
 	// Add this service to the SCM's database.
 	CEnsureCloseServiceHandle hService = 
 		CreateService(hSCM, g_szServiceName, g_szServiceDisplayName,
 		SERVICE_CHANGE_CONFIG, SERVICE_WIN32_OWN_PROCESS, 
 		SERVICE_DEMAND_START, SERVICE_ERROR_IGNORE,
-		szModulePathname, NULL, NULL, NULL, NULL, NULL);
+		szCmdLine, NULL, NULL, NULL, NULL, NULL);
+
+	if(hService.IsValid())
+	{
+		vaDbg(_T("CreateService() success."));
+	}
+	else
+	{
+		winerr = GetLastError();
+		vaDbg(_T("CreateService() fail, %s"), WinerrStr(winerr));
+		vaMsgBox(MB_OK|MB_ICONERROR, _T("CreateService() fail, %s"), WinerrStr(winerr));
+		return 4;
+	}
 
 	SERVICE_DESCRIPTION sd = 
 	{ 
@@ -273,21 +304,42 @@ void myInstallService()
 		TEXT("TimeService sample program from PSSA2000 book, CH03")
 	};
 	ChangeServiceConfig2(hService, SERVICE_CONFIG_DESCRIPTION, &sd);
+
+	return 0;
 }
 
 
-void myRemoveService() 
+int myRemoveService() 
 {
 	// Open the SCM on this machine.
 	CEnsureCloseServiceHandle hSCM = 
 		OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
 
+	if(hSCM.IsInvalid())
+	{
+		vaMsgBox(MB_OK|MB_ICONERROR, _T("OpenSCManager() fail, %s"), WinerrStr());
+		return 4;
+	}
+
 	// Open this service for DELETE access
 	CEnsureCloseServiceHandle hService = 
 		OpenService(hSCM, g_szServiceName, DELETE);
 
+	if(hService.IsInvalid())
+	{
+		vaMsgBox(MB_OK|MB_ICONERROR, _T("OpenService() fail, %s"), WinerrStr());
+		return 4;
+	}
+
 	// Remove this service from the SCM's database.
-	DeleteService(hService);
+	BOOL succ = DeleteService(hService);
+	if(!succ)
+	{
+		vaMsgBox(MB_OK|MB_ICONERROR, _T("DeleteService() fail, %s"), WinerrStr());
+		return 4;
+	}
+
+	return 0;
 }
 
 
@@ -307,6 +359,8 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 		_T("  pszCmdLine = %s")
 		,
 		GetCurrentThreadId(), pszCmdLine);
+
+	int exitcode = 0;
 
 	if (nArgc < 2) 
 	{
@@ -330,10 +384,10 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 			{
 				// Command line switch
 				if (lstrcmpi(&ppArgv[i][1], TEXT("install")) == 0) 
-					myInstallService();
+					exitcode = myInstallService();
 
 				if (lstrcmpi(&ppArgv[i][1], TEXT("remove"))  == 0)
-					myRemoveService();
+					exitcode = myRemoveService();
 
 				if (lstrcmpi(&ppArgv[i][1], TEXT("debug"))   == 0) 
 				{
@@ -359,7 +413,7 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 #ifdef UNICODE
 	HeapFree(GetProcessHeap(), 0, (PVOID) ppArgv);
 #endif
-	return(0);
+	return exitcode;
 }
 
 
