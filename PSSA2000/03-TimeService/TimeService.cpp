@@ -104,6 +104,13 @@ DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, PVOID pvEventData
 
 //////////////////////////////////////////////////////////////////////////////
 
+inline void reset_ovlp_keep_hEvent(OVERLAPPED &ovlp)
+{
+	HANDLE he = ovlp.hEvent;
+	ZeroMemory(&ovlp, sizeof(ovlp));
+	ovlp.hEvent = he;
+}
+
 void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv) 
 {
 	vaDbg(_T("[tid=%d]CH03-TimeService: In TimeServiceMain()."),
@@ -145,7 +152,7 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 					MaxPipeInstances, 
 					sizeof(st), sizeof(st), 
 					1000, NULL);
-#if 0
+#if 0 // enable later
 				// Chj: Check for error. (pipe-namespace creation fail)
 				// May due to another TimeService.exe process has occupied the pipe-namespace.
 				//
@@ -164,17 +171,19 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 				iocp.AssociateDevice(hpipe, CK_PIPE);
 
 				// Pend an asynchronous connect against the pipe
-				ZeroMemory(&o, sizeof(o));
+				reset_ovlp_keep_hEvent(o);
 				succ = ConnectNamedPipe(hpipe, &o);
 				g_ssTime.ReportUltimateState();
 				break;
 
 			case SERVICE_CONTROL_PAUSE:
 			case SERVICE_CONTROL_STOP:
+
 				// When not running, close the pipe so clients can't connect
 				hpipe.Cleanup();
 				g_ssTime.ReportUltimateState();
 				break;
+
 			}
 			break; // break out of `CompKey`, not `for`
 
@@ -192,7 +201,7 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 				succ = DisconnectNamedPipe(hpipe);
 
 				// Allow another client to connect 
-				ZeroMemory(&o, sizeof(o));
+				reset_ovlp_keep_hEvent(o);
 				succ = ConnectNamedPipe(hpipe, &o);
 			} 
 			else 
@@ -207,6 +216,8 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 
 			ULONG_PTR ulptr = 0;
 			succ = iocp.GetStatus(&ulptr, &dwNumBytes, &po);
+			CompKey = (COMPKEY_et)ulptr;
+
 			if(!succ)
 			{
 				DWORD bytesdone = 0;
@@ -214,11 +225,10 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 				vaDbg(_T("[WEIRD] CH03 TimeService.cpp: iocp.GetStatus() fail, %s"), WinerrStr());
 			}
 			
-			CompKey = (COMPKEY_et)ulptr;
-			
 			dwControl = dwNumBytes;
 		}
 	} while (g_ssTime != SERVICE_STOPPED);
+
 }
 
 
