@@ -743,7 +743,7 @@ void PostExitMsgs(ServerInfo* pInfo) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void RemoveService() {
+void myRemoveService() {
 
    // Open the SCM on this machine.
    SC_HANDLE hSCM =
@@ -1781,7 +1781,7 @@ void WINAPI RoboServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void InstallService() {
+void myInstallService() {
 
    // Open the SCM on this machine.
    SC_HANDLE hSCM =
@@ -1850,10 +1850,10 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, LPTSTR pszCmdLine, int)
          
             // Command line switch
             if (lstrcmpi(&ppArgv[i][1], TEXT("install")) == 0)
-               InstallService();
+               myInstallService();
 
             if (lstrcmpi(&ppArgv[i][1], TEXT("remove"))  == 0)
-               RemoveService();
+               myRemoveService();
 
             if (lstrcmpi(&ppArgv[i][1], TEXT("debug"))   == 0) {
                g_ssRobo.SetDebugMode();

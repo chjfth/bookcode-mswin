@@ -39,7 +39,6 @@ enum COMPKEY_et {
 
 DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, PVOID pvEventData, PVOID pvContext) 
 {
-
 	vaDbg(
 		_T("[tid=%d]CH03-TimeService: In TimeHandlerEx() callback,\n")
 		_T("  dwControl   = %s\n")
@@ -226,7 +225,7 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 //////////////////////////////////////////////////////////////////////////////
 
 
-void InstallService() 
+void myInstallService() 
 {
 	// Open the SCM on this machine.
 	CEnsureCloseServiceHandle hSCM = 
@@ -255,7 +254,7 @@ void InstallService()
 }
 
 
-void RemoveService() 
+void myRemoveService() 
 {
 	// Open the SCM on this machine.
 	CEnsureCloseServiceHandle hSCM = 
@@ -309,10 +308,10 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 			{
 				// Command line switch
 				if (lstrcmpi(&ppArgv[i][1], TEXT("install")) == 0) 
-					InstallService();
+					myInstallService();
 
 				if (lstrcmpi(&ppArgv[i][1], TEXT("remove"))  == 0)
-					RemoveService();
+					myRemoveService();
 
 				if (lstrcmpi(&ppArgv[i][1], TEXT("debug"))   == 0) 
 				{
