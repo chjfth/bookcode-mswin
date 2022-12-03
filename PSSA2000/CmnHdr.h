@@ -168,9 +168,9 @@ typedef unsigned (__stdcall *PTHREAD_START) (void *);
 ////////////////// DebugBreak Improvement for x86 platforms ///////////////////
 
 
-#ifdef _X86_
-#define DebugBreak()    _asm { int 3 }
-#endif
+// #ifdef _X86_
+// #define DebugBreak()    _asm { int 3 }
+// #endif
 
 
 /////////////////////////// Software Exception Macro //////////////////////////

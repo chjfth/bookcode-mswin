@@ -125,6 +125,8 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 	BOOL succ = 0;
 	DWORD winerr = 0;
 	int MaxPipeInstances = 1; // var to debug on the fly
+	DWORD pipe_openmode = PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED;
+	pipe_openmode |= FILE_FLAG_FIRST_PIPE_INSTANCE; // since Win2000 SP2
 
 	// Create the completion port and save its handle in a global
 	// variable so that the Handler function can access it.
@@ -147,12 +149,12 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 				
 				// While running, create a pipe that clients can connect to.
 				hpipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\TimeService"), 
-					PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+					pipe_openmode,
 					PIPE_TYPE_BYTE, 
 					MaxPipeInstances, 
 					sizeof(st), sizeof(st), 
 					1000, NULL);
-#if 0 // enable later
+
 				// Chj: Check for error. (pipe-namespace creation fail)
 				// May due to another TimeService.exe process has occupied the pipe-namespace.
 				//
@@ -161,12 +163,17 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 					winerr = GetLastError();
 					if(g_ssTime.IsDebugMode())
 					{
+						// Only show UI when not running as service.
 						vaMsgBox(MB_OK|MB_ICONEXCLAMATION, 
 							_T("CreateNamedPipe() fail, %s"), WinerrStr(winerr));
 					}
-					break; // go to idle
+					else
+					{
+						vaDbg(_T("03-TimeService: CreateNamedPipe() fail, %s"), WinerrStr(winerr));
+					}
+					exit(5);
 				}
-#endif
+
 				// Associate the pipe with the completion port
 				iocp.AssociateDevice(hpipe, CK_PIPE);
 
