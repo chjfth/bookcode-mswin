@@ -247,8 +247,8 @@ void myInstallService()
 
 	SERVICE_DESCRIPTION sd = 
 	{ 
-		TEXT("Sample Time Service from ")
-		TEXT("Programming Server-Side Applications for Microsoft Windows Book")
+		// This is the service "description" text that is shown in services.msc .
+		TEXT("TimeService sample program from PSSA2000 book, CH03")
 	};
 	ChangeServiceConfig2(hService, SERVICE_CONFIG_DESCRIPTION, &sd);
 }
