@@ -221,8 +221,13 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 			if(!succ)
 			{
 				DWORD bytesdone = 0;
+				SetLastError(0); // deliberate, will show that GetOverlappedResult re-assign WinErr. 
 				succ = GetOverlappedResult(hpipe, po, &bytesdone, TRUE);
-				vaDbg(_T("[WEIRD] CH03 TimeService.cpp: iocp.GetStatus() fail, %s"), WinerrStr());
+				vaDbg(
+					_T("[INFO] CH03 TimeService.cpp: iocp.GetStatus() fail, %s")
+					_T("  -- this error can be ignored.")
+					, 
+					WinerrStr());
 			}
 			
 			dwControl = dwNumBytes;
