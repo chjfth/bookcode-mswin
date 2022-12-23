@@ -1,4 +1,4 @@
-/mswin/**/*.user
-/mswin/**/*.sdf
-/mswin/**/*.suo
-/mswin/**/*.tss
+/**/*.user
+/**/*.sdf
+/**/*.suo
+/**/*.tss
