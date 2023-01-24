@@ -1,5 +1,5 @@
 /*------------------------------------------------------------
-   GuiNoRc.cpp -- As template for PRWIN5 bookcode projects.
+   GuiHasRc.cpp -- As template for PRWIN5 bookcode projects.
   ------------------------------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
