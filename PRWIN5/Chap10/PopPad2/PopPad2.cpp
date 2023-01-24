@@ -82,6 +82,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ES_AUTOHSCROLL | ES_AUTOVSCROLL,
 			0, 0, 0, 0, hwnd, (HMENU) ID_EDIT,
 			((LPCREATESTRUCT) lParam)->hInstance, NULL) ;
+
+		SetWindowText(hwndEdit, TEXT("Chj: You can press Ctrl+K to copy selected text."));
+
 		return 0 ;
 
 	case WM_SETFOCUS:
