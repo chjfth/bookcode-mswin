@@ -179,12 +179,23 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Accelerator
+//
+
+PICKFONT ACCELERATORS
+BEGIN
+    VK_F2,          IDC_BTN_CHANGE_SAMPLE_TEXT,   VIRTKEY
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Icon
 //
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "PickFont.ico"
+	
 #endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 

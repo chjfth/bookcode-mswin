@@ -3,18 +3,20 @@ PICKFONT.C -- Create Logical Font
        (c) Charles Petzold, 1998
 
 Enhancements by Jimm Chen.
-[2022-09-04] v2.0, can be compiled with VC2010, not supporting VC6 any more.
+[2022-09-04] v2.0: Can be compiled with VC2010, not supporting VC6 any more.
+[2022-09-16] v2.3: Text to draw can be change inside GUI.
 -----------------------------------------*/
 
 #include <windows.h>
 #include <windowsx.h>
+#include <tchar.h>
 #include <stdio.h>
 #include "..\..\vaDbg.h"
 #include "resource.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#define VERSION "2.3"
+#define VERSION "2.4"
 
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
@@ -168,9 +170,10 @@ void reload_sample_text()
 	}
 }
 
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	PSTR szCmdLine, int iCmdShow)
+int WINAPI _tWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
+	PTSTR szParams, int iCmdShow)
 {
+	(void)szParams;
 	prepare_cmd_params();
 
 	g_hInstanceExe = hInstance;
@@ -206,7 +209,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	TEXT ("PickFont: Create Logical Font");
 
 	TCHAR szTitle[100]={};
-	_sntprintf_s(szTitle, _TRUNCATE, _T("%s - v%s , GetACP=%u"),
+	_sntprintf_s(szTitle, _TRUNCATE, _T("%s - v%s , ACP=%u"),
 		wintitle_prefix, TEXT(VERSION), GetACP()
 		);
 
@@ -222,12 +225,17 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
 
+	HACCEL hAccel = LoadAccelerators(hInstance, szAppName);
+
 	while (GetMessage (&msg, NULL, 0, 0))
 	{
-		if (g_hdlg == 0 || !IsDialogMessage (g_hdlg, &msg))
+		if(!TranslateAccelerator(hwnd, hAccel, &msg))
 		{
-			TranslateMessage (&msg) ;
-			DispatchMessage (&msg) ;
+			if (g_hdlg == 0 || !IsDialogMessage (g_hdlg, &msg))
+			{
+				TranslateMessage (&msg) ;
+				DispatchMessage (&msg) ;
+			}
 		}
 	}
 	return (int)msg.wParam ;
@@ -319,6 +327,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			CheckMenuItem (GetMenu (hwnd), dp.iDevice, MF_CHECKED) ;
 			SendMessage (hwnd, WM_COMMAND, IDOK, 0) ;
 			return 0 ;
+
+		case IDC_BTN_CHANGE_SAMPLE_TEXT:
+			SendMessage(g_hdlg, WM_COMMAND, wParam, lParam);
+			return 0;
 		}
 		break ;
 
@@ -397,7 +409,8 @@ INT_PTR CALLBACK DlgProc_ChangeSampleText(HWND hdlg, UINT message, WPARAM wParam
 {
 	static bool s_usehex = false;
 	static const TCHAR *s_helptext=
-		_T("Hint: You can pass in sample-text from command line.\r\n")
+		_T("Hint: Press F2 to bring up this dialog again.\r\n")
+		_T("You can pass in sample-text from command line.\r\n")
 		_T("If only one parameter is given to the command-line, typically wrapped with a double-quotes, it is considered literal.\r\n")
 		_T("If more than one parameters are given, each one is in hexform represent a TCHAR.")
 		;
@@ -734,6 +747,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect (GetParent (hdlg), NULL, TRUE) ;
 			return TRUE ;
 		} // WM_COMMAND.ID_OK
+
 		case IDC_BTN_CHANGE_SAMPLE_TEXT:
 			{
 				INT_PTR ret = DialogBox(g_hInstanceExe, MAKEINTRESOURCE(IDD_CHANGE_SAMPLE_TEXT), hdlg, 
