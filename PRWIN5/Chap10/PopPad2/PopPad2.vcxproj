@@ -40,9 +40,9 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20230124-0000-0000-0000-112709000001}</ProjectGuid>
-    <ProjectName>GuiHasRc</ProjectName>
-     <TargetName>GuiHasRc</TargetName>
+    <ProjectGuid>{20230124-0000-0000-0000-113253000001}</ProjectGuid>
+    <ProjectName>PopPad2</ProjectName>
+     <TargetName>PopPad2</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
@@ -149,13 +149,13 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="GuiHasRc.cpp" />
+    <ClCompile Include="PopPad2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="GuiHasRc.rc" />
+    <ResourceCompile Include="PopPad2.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GuiHasRc.ico" />
+    <None Include="PopPad2.ico" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->
