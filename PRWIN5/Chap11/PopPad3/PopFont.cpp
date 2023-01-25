@@ -10,7 +10,7 @@ static HFONT   hFont ;
 
 BOOL PopFontChooseFont (HWND hwnd)
 {
-	CHOOSEFONT cf ;
+	CHOOSEFONT cf = {};
 
 	cf.lStructSize    = sizeof (CHOOSEFONT) ;
 	cf.hwndOwner      = hwnd ;
@@ -33,10 +33,11 @@ BOOL PopFontChooseFont (HWND hwnd)
 
 void PopFontInitialize (HWND hwndEdit)
 {
-	GetObject (GetStockObject (SYSTEM_FONT), sizeof (LOGFONT), 
-		(PTSTR) &logfont) ;
+	// Chj: Better use a fixed-width font for the editbox.
+	hFont = CreateFont (0, 0, 0, 0, 0, 0, 0, 0,
+		DEFAULT_CHARSET, 
+		0, 0, 0, FIXED_PITCH, NULL); 
 
-	hFont = CreateFontIndirect (&logfont) ;
 	SendMessage (hwndEdit, WM_SETFONT, (WPARAM) hFont, 0) ;
 }
 
