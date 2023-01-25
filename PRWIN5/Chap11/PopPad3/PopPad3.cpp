@@ -139,7 +139,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static BOOL      bNeedSave = FALSE ;
 	static HINSTANCE hInst ;
 	static HWND      hwndEdit ;
-	static int       iOffset ;
+
+//	static int       iOffset ;
+	// -- [2023-01-25] Chj: iOffset should NOT be static, bcz when FindText or ReplaceText 
+	// modeless dialog is shown, user can still click anywhere into the text document,
+	// with the intention to set a new starting point to do Find/Replace. So, this iOffset
+	// value should be determined each time user issues Find/Replace command.
+
 	static TCHAR     szFileName[MAX_PATH], szTitleName[MAX_PATH] ;
 	static UINT      messageFindReplace ;
 	int              iSelBeg, iSelEnd, iEnable ;
@@ -187,14 +193,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// Enable Undo if edit control can do it
 
 			EnableMenuItem ((HMENU) wParam, IDM_EDIT_UNDO,
-				SendMessage (hwndEdit, EM_CANUNDO, 0, 0L) ?
-MF_ENABLED : MF_GRAYED) ;
+				SendMessage (hwndEdit, EM_CANUNDO, 0, 0L) ? MF_ENABLED : MF_GRAYED) ;
 
 			// Enable Paste if text is in the clipboard
 
 			EnableMenuItem ((HMENU) wParam, IDM_EDIT_PASTE,
-				IsClipboardFormatAvailable (CF_TEXT) ?
-MF_ENABLED : MF_GRAYED) ;
+				IsClipboardFormatAvailable (CF_TEXT) ? MF_ENABLED : MF_GRAYED) ;
 
 			// Enable Cut, Copy, and Del if text is selected
 
@@ -213,8 +217,7 @@ MF_ENABLED : MF_GRAYED) ;
 			// Enable Find, Next, and Replace if modeless
 			//   dialogs are not already active
 
-			iEnable = hDlgModeless == NULL ?
-MF_ENABLED : MF_GRAYED ;
+			iEnable = hDlgModeless == NULL ? MF_ENABLED : MF_GRAYED ;
 
 			EnableMenuItem ((HMENU) wParam, IDM_SEARCH_FIND,    iEnable) ;
 			EnableMenuItem ((HMENU) wParam, IDM_SEARCH_NEXT,    iEnable) ;
@@ -351,22 +354,26 @@ MF_ENABLED : MF_GRAYED ;
 			// Messages from Search menu
 
 		case IDM_SEARCH_FIND:
-			SendMessage (hwndEdit, EM_GETSEL, 0, (LPARAM) &iOffset) ;
+//			SendMessage (hwndEdit, EM_GETSEL, 0, (LPARAM) &iOffset) ; // Charles code
 			hDlgModeless = PopFindFindDlg (hwnd) ;
 			return 0 ;
 
 		case IDM_SEARCH_NEXT:
-			SendMessage (hwndEdit, EM_GETSEL, 0, (LPARAM) &iOffset) ;
+//			SendMessage (hwndEdit, EM_GETSEL, 0, (LPARAM) &iOffset) ; // Charles code
 
 			if (PopFindValidFind ())
+			{
+				int iOffset = 0;
+				SendMessage (hwndEdit, EM_GETSEL, 0, (LPARAM) &iOffset) ;
 				PopFindNextText (hwndEdit, &iOffset) ;
+			}
 			else
 				hDlgModeless = PopFindFindDlg (hwnd) ;
 
 			return 0 ;
 
 		case IDM_SEARCH_REPLACE:
-			SendMessage (hwndEdit, EM_GETSEL, 0, (LPARAM) &iOffset) ;
+//			SendMessage (hwndEdit, EM_GETSEL, 0, (LPARAM) &iOffset) ; // Charles code
 			hDlgModeless = PopFindReplaceDlg (hwnd) ;
 			return 0 ;
 
@@ -412,6 +419,9 @@ MF_ENABLED : MF_GRAYED ;
 
 		if (message == messageFindReplace)
 		{
+			int iOffset = 0;
+			SendMessage (hwndEdit, EM_GETSEL, 0, (LPARAM) &iOffset) ;
+
 			pfr = (LPFINDREPLACE) lParam ;
 
 			if (pfr->Flags & FR_DIALOGTERM)
