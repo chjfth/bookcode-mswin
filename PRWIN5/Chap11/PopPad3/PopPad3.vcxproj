@@ -66,6 +66,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" $(Configuration.Contains('ANSI'))" Label="Configuration">
     <CharacterSet>MultiByte</CharacterSet>
+     <TargetName>$(TargetName)A</TargetName>
   </PropertyGroup>
 
   <!---->

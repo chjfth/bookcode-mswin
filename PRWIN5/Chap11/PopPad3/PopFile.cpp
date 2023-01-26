@@ -61,7 +61,8 @@ BOOL PopFileRead (HWND hwndEdit, PTSTR pstrFileName)
 	DWORD  dwBytesRead ;
 	HANDLE hFile ;
 	int    i, iFileLength, iUniTest ;
-	PBYTE  pBuffer, pText, pConv ;
+	PBYTE  pBuffer, pText;
+	char *pConv = NULL;
 
 	// Open the file.
 
@@ -106,7 +107,7 @@ BOOL PopFileRead (HWND hwndEdit, PTSTR pstrFileName)
 
 		// Allocate memory for possibly converted string
 
-		pConv = (PBYTE)malloc (iFileLength + 2) ;
+		pConv = (char*)malloc (iFileLength + 2) ;
 
 		// If the edit control is not Unicode, convert Unicode text to 
 		// non-Unicode (ie, in general, wide character).
@@ -127,7 +128,7 @@ BOOL PopFileRead (HWND hwndEdit, PTSTR pstrFileName)
 
 		// Allocate memory for possibly converted string.
 
-		pConv = (PBYTE)malloc (2 * iFileLength + 2) ;
+		pConv = (char*)malloc (2 * iFileLength + 2) ;
 
 		// If the edit control is Unicode, convert ASCII text.
 
