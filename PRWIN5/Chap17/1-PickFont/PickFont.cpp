@@ -152,7 +152,7 @@ const TCHAR *mySyslocString()
 {
 	static TCHAR s_sysloc[100] = {};
 
-	TCHAR langtag[40] = {};
+	WCHAR langtag[40] = {}; // GetSystemDefaultLocaleName() no ANSI variant
 	if(dlptr_GetSystemDefaultLocaleName)
 	{
 		dlptr_GetSystemDefaultLocaleName(langtag, ARRAYSIZE(langtag));
@@ -161,9 +161,19 @@ const TCHAR *mySyslocString()
 	LCID lcid = GetSystemDefaultLCID();
 
 	if(langtag[0])
-		_sntprintf_s(s_sysloc, _TRUNCATE, _T("sysloc=%s(0x%04X)"), langtag, lcid);
+	{
+#ifdef UNICODE
+		const WCHAR *T_langtag = langtag;
+#else
+		char T_langtag[40] = {};
+		WideCharToMultiByte(CP_ACP, 0, langtag, -1, T_langtag, ARRAYSIZE(T_langtag), NULL, NULL);
+#endif
+		_sntprintf_s(s_sysloc, _TRUNCATE, _T("sysloc=%s(0x%04X)"), T_langtag, lcid);
+	}
 	else 
+	{
 		_sntprintf_s(s_sysloc, _TRUNCATE, _T("sysloc=0x%04X"), lcid);
+	}
 
 	return s_sysloc;
 }
