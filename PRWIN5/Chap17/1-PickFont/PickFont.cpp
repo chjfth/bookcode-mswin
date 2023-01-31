@@ -12,11 +12,12 @@ Enhancements by Jimm Chen.
 #include <tchar.h>
 #include <stdio.h>
 #include "..\..\vaDbg.h"
+#include "..\..\dlptr_winapi.h"
 #include "resource.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#define VERSION "2.4"
+#define VERSION "2.5"
 
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
@@ -145,6 +146,28 @@ void prepare_cmd_params()
 	}
 }
 
+DEFINE_DLPTR_WINAPI("kernel32.dll", GetSystemDefaultLocaleName) // Vista+
+
+const TCHAR *mySyslocString()
+{
+	static TCHAR s_sysloc[100] = {};
+
+	TCHAR langtag[40] = {};
+	if(dlptr_GetSystemDefaultLocaleName)
+	{
+		dlptr_GetSystemDefaultLocaleName(langtag, ARRAYSIZE(langtag));
+	}
+
+	LCID lcid = GetSystemDefaultLCID();
+
+	if(langtag[0])
+		_sntprintf_s(s_sysloc, _TRUNCATE, _T("sysloc=%s(0x%04X)"), langtag, lcid);
+	else 
+		_sntprintf_s(s_sysloc, _TRUNCATE, _T("sysloc=0x%04X"), lcid);
+
+	return s_sysloc;
+}
+
 void reload_sample_text()
 {
 	// Input: g_dlgsamp
@@ -206,11 +229,11 @@ int WINAPI _tWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #else
 	TEXT ("(ANSI) ") 
 #endif
-	TEXT ("PickFont: Create Logical Font");
+	TEXT ("PickFont");
 
 	TCHAR szTitle[100]={};
-	_sntprintf_s(szTitle, _TRUNCATE, _T("%s - v%s , ACP=%u"),
-		wintitle_prefix, TEXT(VERSION), GetACP()
+	_sntprintf_s(szTitle, _TRUNCATE, _T("%s - v%s , ACP=%u , %s"),
+		wintitle_prefix, TEXT(VERSION), GetACP(), mySyslocString()
 		);
 
 	hwnd = CreateWindow (szAppName, 
@@ -409,6 +432,8 @@ INT_PTR CALLBACK DlgProc_ChangeSampleText(HWND hdlg, UINT message, WPARAM wParam
 {
 	static bool s_usehex = false;
 	static const TCHAR *s_helptext=
+		_T("This program calls WinAPI CreateFont and displays to you font attributes and text-rendering samples.\r\n")
+		_T("\r\n")
 		_T("Hint: Press F2 to bring up this dialog again.\r\n")
 		_T("You can pass in sample-text from command line.\r\n")
 		_T("If only one parameter is given to the command-line, typically wrapped with a double-quotes, it is considered literal.\r\n")

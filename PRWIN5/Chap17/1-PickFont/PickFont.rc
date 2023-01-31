@@ -136,18 +136,18 @@ BEGIN
     PUSHBUTTON      "?",IDC_BTN_CHANGE_SAMPLE_TEXT,329,289,12,11
 END
 
-IDD_CHANGE_SAMPLE_TEXT DIALOGEX 0, 0, 291, 136
+IDD_CHANGE_SAMPLE_TEXT DIALOGEX 0, 0, 291, 158
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Change sample text"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "&1. Use literal",IDC_RADIO_USE_LITERAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,57,56,10
-    EDITTEXT        IDC_EDIT_LITERAL,7,69,277,14,ES_AUTOHSCROLL
-    CONTROL         "&2. Use hex-form",IDC_RADIO_USE_HEXFORM,"Button",BS_AUTORADIOBUTTON,7,86,68,10
-    EDITTEXT        IDC_EDIT_HEXFORM,7,96,277,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,180,115,50,14
-    PUSHBUTTON      "Cancel",ID_MYCANCEL,234,115,50,14
-    EDITTEXT        IDC_HELPTEXT,7,7,277,46,ES_MULTILINE | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    CONTROL         "&1. Use literal",IDC_RADIO_USE_LITERAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,77,56,10
+    EDITTEXT        IDC_EDIT_LITERAL,7,89,277,14,ES_AUTOHSCROLL
+    CONTROL         "&2. Use hex-form",IDC_RADIO_USE_HEXFORM,"Button",BS_AUTORADIOBUTTON,7,106,68,10
+    EDITTEXT        IDC_EDIT_HEXFORM,7,118,277,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,180,137,50,14
+    PUSHBUTTON      "Cancel",ID_MYCANCEL,234,137,50,14
+    EDITTEXT        IDC_HELPTEXT,7,7,277,67,ES_MULTILINE | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
 END
 
 
@@ -171,7 +171,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 284
         TOPMARGIN, 7
-        BOTTOMMARGIN, 129
+        BOTTOMMARGIN, 151
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -184,8 +184,9 @@ END
 
 PICKFONT ACCELERATORS
 BEGIN
-    VK_F2,          IDC_BTN_CHANGE_SAMPLE_TEXT,   VIRTKEY
+    VK_F2,          IDC_BTN_CHANGE_SAMPLE_TEXT, VIRTKEY 
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -195,7 +196,6 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "PickFont.ico"
-	
 #endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
