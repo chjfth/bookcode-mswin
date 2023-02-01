@@ -9,6 +9,7 @@ Enhancements by Jimm Chen.
 
 #include <windows.h>
 #include <windowsx.h>
+#include <assert.h>
 #include <tchar.h>
 #include <stdio.h>
 #include "..\..\vaDbg.h"
@@ -527,6 +528,8 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 	static PRINTDLG    pd = { sizeof (PRINTDLG) } ;
 	HDC                hdcDevice ;
 	HFONT              hFont ;
+	LOGFONT logfont = {}; //test purpose
+	int ret = 0;
 
 	switch (message)
 	{{
@@ -734,6 +737,14 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			hFont = CreateFontIndirect (&pdp->lf) ;
 			SelectObject (hdcDevice, hFont) ;
 
+			ret = GetObject(hFont, sizeof(logfont), &logfont);
+			assert(ret>0);
+			// -- Chj: This is useless as MSDN says. Windows will merely return in logfont 
+			// what we told CreateFontIndirect(), not the actual font parameters. To get
+			// those actual params, we have to detour, i.e. create a DC/IC, select the hFont
+			// into DC/IC, and call GetTextMetrics() to get them. Maybe the actual font
+			// selection inside Windows is delayed until an HFONT is selected into DC/IC.
+
 			// Get the text metrics and face name
 
 			GetTextMetrics (hdcDevice, &pdp->tm) ;
@@ -779,8 +790,10 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			// Update dialog fields and invalidate main window
 
 			SetFieldsFromTextMetric (hdlg, pdp) ;
+
 			InvalidateRect (GetParent (hdlg), NULL, TRUE) ;
 			return TRUE ;
+
 		} // WM_COMMAND.ID_OK
 
 		case IDC_BTN_CHANGE_SAMPLE_TEXT:
