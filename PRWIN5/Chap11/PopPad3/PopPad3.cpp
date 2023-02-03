@@ -41,10 +41,18 @@ void PopFontDeinitialize (void) ;
 
 BOOL PopPrntPrintFile (HINSTANCE, HWND, HWND, PTSTR) ;
 
+#define APPNAME "PopPad"
+
+#ifdef UNICODE
+#define TITLE_PREFIX "(Unicode) "
+#else
+#define TITLE_PREFIX "(ANSI) "
+#endif
+
 // Global variables
 
 static HWND  hDlgModeless ;
-static TCHAR szAppName[] = TEXT ("PopPad") ;
+static TCHAR szAppName[] = TEXT(APPNAME) ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
@@ -75,7 +83,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hwnd = CreateWindow (szAppName, NULL,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		760, 560,
 		NULL, NULL, hInstance, szCmdLine) ;
 
 	ShowWindow (hwnd, iCmdShow) ;
@@ -101,7 +109,8 @@ void DoCaption (HWND hwnd, TCHAR * szTitleName)
 {
 	TCHAR szCaption[64 + MAX_PATH] ;
 
-	wsprintf (szCaption, TEXT ("%s - %s"), szAppName,
+	wsprintf (szCaption, TEXT ("%s - %s"), 
+		TEXT(TITLE_PREFIX) TEXT(APPNAME) TEXT("3"),
 		szTitleName[0] ? szTitleName : UNTITLED) ;
 
 	SetWindowText (hwnd, szCaption) ;
