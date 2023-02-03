@@ -10,7 +10,7 @@ static HFONT   hFont ;
 
 BOOL PopFontChooseFont (HWND hwnd)
 {
-	CHOOSEFONT cf = {};
+	CHOOSEFONT cf = {0};
 
 	cf.lStructSize    = sizeof (CHOOSEFONT) ;
 	cf.hwndOwner      = hwnd ;

@@ -1,6 +1,11 @@
 /*---------------------------------------
    POPPAD.C -- Popup Editor
                (c) Charles Petzold, 1998
+
+[2023.02.23] Chj: Compile it using VC6 command line, so that it can be run on Win98.
+
+rc PopPad3.rc
+cl PopPad3.cpp PopFile.cpp PopFind.cpp PopFont.cpp PopPrnt0.cpp PopPad3.RES /link /out:PopPad3A-vc6.exe user32.lib gdi32.lib comdlg32.lib advapi32.lib
   ---------------------------------------*/
 
 #include <windows.h>

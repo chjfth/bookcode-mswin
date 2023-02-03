@@ -32,7 +32,7 @@ HWND PopFindFindDlg (HWND hwnd)
 
 HWND PopFindReplaceDlg (HWND hwnd)
 {
-	static FINDREPLACE fr = {}; // must be static for modeless dialog!!!
+	static FINDREPLACE fr = {0}; // must be static for modeless dialog!!!
 
 	fr.lStructSize      = sizeof (FINDREPLACE) ;
 	fr.hwndOwner        = hwnd ;
@@ -88,7 +88,7 @@ BOOL PopFindFindText (HWND hwndEdit, int * piSearchOffset, LPFINDREPLACE pfr)
 
 BOOL PopFindNextText (HWND hwndEdit, int * piSearchOffset)
 {
-	FINDREPLACE fr = {};
+	FINDREPLACE fr = {0};
 
 	fr.lpstrFindWhat = szFindText ;
 
