@@ -18,14 +18,13 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <!-- Modify RootNamespace's value in your NEW copy of this vcxproj. 
     RootNamespace' value is referenced later in cpp file list and VSPG. 
     -->
   <PropertyGroup Label="Globals">
     <RootNamespace>SeqDisp</RootNamespace>
+    <ProjectGuid>{C2B14AAB-78BF-01EA-C750-32192BA5E120}</ProjectGuid>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -97,7 +96,7 @@
   </ImportGroup>
   <!-- import VSPG start -->
   <PropertyGroup>
-    <VSPG_BootsDir_NoTBS>..\..\..\_VSPG\boots</VSPG_BootsDir_NoTBS>
+    <VSPG_BootsDir_NoTBS>..\..\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(VSPG_BootsDir_NoTBS)\_VSPG.props" />
