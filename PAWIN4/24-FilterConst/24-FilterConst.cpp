@@ -1,5 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
 #include <tchar.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,9 +72,63 @@ void test_EXCEPTION_EXECUTE_HANDLER()
 	printf("\n");
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+void FuncPheasant() 
+{
+	printf("[FuncPheasant] Starts.\n");
+
+	__try {
+		printf("[FuncPheasant] In __try{...}, triggerring nullptr exception)\n");
+		strcpy(NULL, NULL);
+	}
+	__finally {
+		printf("[FuncPheasant] In __finally{...}, executing 'return'.\n");
+		printf("               This will halt global unwinds.\n");
+		return;
+	}
+}
+
+void FuncFish() 
+{
+	printf("[FuncFish] Starts.\n");
+
+	FuncPheasant();
+
+	printf("[FuncFish] Ends.\n"); // This WILL execute.
+} 
+
+void FuncMonkey() 
+{
+	printf("[FuncMonkey] Starts.\n");
+
+	__try {
+		FuncFish();
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		// This will not execute.
+		MessageBeep(0); 
+	}	
+
+	printf("[FuncMonkey] Ends.\n");
+} 
+
+
+void test_finally_return()
+{
+	printf("==== Halting Global Unwinds ====\n");
+
+	FuncMonkey(); // => FuncFish() => FuncPheasant()
+
+	printf("\n");
+}
+
+
 int main(int argc, char* argv[])
 {
 	test_EXCEPTION_EXECUTE_HANDLER();
+
+	test_finally_return();
 
 	return 0;
 }
