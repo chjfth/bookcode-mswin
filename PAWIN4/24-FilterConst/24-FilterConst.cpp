@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS // disable warning on strcpy
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
@@ -14,7 +14,6 @@ void FuncOStimpy1()
 
 	// 1. Do any processing here.
 	printf("1. [FuncOStimpy1] Starts.\n");
-
 
 	__try {
 		// 2. Call another function.
@@ -87,6 +86,8 @@ void FuncPheasant()
 		printf("               This will halt global unwinds.\n");
 		return;
 	}
+
+	printf("[FuncPheasant] Ends.\n"); // This does not execute.
 }
 
 void FuncFish() 
