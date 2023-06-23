@@ -21,18 +21,69 @@ LONG CoffeeFilter (DWORD dwExceptionCode)
 
 void test_GetExpressionCode(int dividend, int divisor)
 {
-	int result1 = 0;
+	printf("==== test_GetExpressionCode ====\n");
+
+	int result = 0;
 	__try {
-		result1 = dividend / divisor;
+		result = dividend / divisor;
 		
-		((int*)nullptr)[result1] = 0x4444;
+		((int*)nullptr)[result] = 0x4444;
 	}
 	__except (CoffeeFilter(GetExceptionCode())) {
 		// Handle the exception.
-		printf("[Caught1!] exception code = 0x%X\n", g_ExceptionCode);
+		printf("[A][Caught!] exception code = 0x%X\n", g_ExceptionCode);
 	} 
 
-	printf("result1 = %d\n", result1);
+	printf("[A]result = %d\n", result);
+
+	printf("\n");
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+void FuncSkunk(int dividend, int divisor) 
+{
+	// Declare variables that we can use to save [the exception-record 
+	// and the context-record] if an exception should occur.
+	
+	EXCEPTION_RECORD SavedExceptRec;
+	CONTEXT SavedContext;
+
+	int result = 0;
+	__try {
+
+		result = dividend / divisor;
+
+		((int*)nullptr)[result] = 0x4444;
+	}
+	__except (
+		SavedExceptRec = *(GetExceptionInformation())->ExceptionRecord,
+		SavedContext = *(GetExceptionInformation())->ContextRecord,
+		EXCEPTION_EXECUTE_HANDLER
+		) 
+	{
+		printf("[B][Caught!] EXCEPTION_RECORD members:\n");
+		printf("  .ExceptionCode    = 0x%X\n", SavedExceptRec.ExceptionCode);
+		printf("  .ExceptionFlags   = 0x%X\n", SavedExceptRec.ExceptionFlags);
+		printf("  .ExceptionRecord  = @[%p]\n", SavedExceptRec.ExceptionRecord);
+		printf("  .ExceptionAddress = @[%p]\n", SavedExceptRec.ExceptionAddress);
+		printf("  .NumberParameters = %d\n", SavedExceptRec.NumberParameters);
+		for(int i=0; i<(int)SavedExceptRec.NumberParameters; i++)
+		{
+			printf("    [%d] ptr[%p]\n", i, SavedExceptRec.ExceptionInformation[i]);
+		}
+	}
+
+	printf("[B]result = %d\n", result);
+}
+
+void test_GetExceptionInformation(int dividend, int divisor)
+{
+	printf("==== test_GetExceptionInformation ====\n");
+	
+	FuncSkunk(dividend, divisor);
+
+	printf("\n");
 }
 
 int main(int argc, char* argv[])
@@ -43,14 +94,45 @@ int main(int argc, char* argv[])
 
 	// p664j: CoffeeFilter
 	test_GetExpressionCode(3, param);
-	/*
-	> D:\...\24-SehFilterExpression.exe
-	[Caught1!] exception code = 0xC0000094
 
-	> D:\...\24-SehFilterExpression.exe 1
-	[Caught1!] exception code = 0xC0000005
-	*/
+	// p666: FuncSkunk()
+	test_GetExceptionInformation(3, param);
 
 	return 0;
 }
 
+/*
+chj@WIN7EVN-PC [2023/06/23 11:01:15.94] C:\Users\win7evn
+> D:\gitw\bookcode-mswin\PAWIN4\bin-v100\Win32\Debug\24-SehFilterExpression.exe
+==== test_GetExpressionCode ====
+[A][Caught!] exception code = 0xC0000094
+[A]result = 0
+
+==== test_GetExceptionInformation ====
+[B][Caught!] EXCEPTION_RECORD members:
+  .ExceptionCode    = 0xC0000094
+  .ExceptionFlags   = 0x0
+  .ExceptionRecord  = @[00000000]
+  .ExceptionAddress = @[004011A7]
+  .NumberParameters = 0
+[B]result = 0
+
+
+chj@WIN7EVN-PC [2023/06/23 11:01:20.12] C:\Users\win7evn
+> D:\gitw\bookcode-mswin\PAWIN4\bin-v100\Win32\Debug\24-SehFilterExpression.exe 1
+==== test_GetExpressionCode ====
+[A][Caught!] exception code = 0xC0000005
+[A]result = 3
+
+==== test_GetExceptionInformation ====
+[B][Caught!] EXCEPTION_RECORD members:
+  .ExceptionCode    = 0xC0000005
+  .ExceptionFlags   = 0x0
+  .ExceptionRecord  = @[00000000]
+  .ExceptionAddress = @[004011B6]
+  .NumberParameters = 2
+    [0] ptr[00000001]
+    [1] ptr[0000000C]
+[B]result = 3
+
+*/
