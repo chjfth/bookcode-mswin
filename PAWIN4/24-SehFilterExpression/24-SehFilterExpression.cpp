@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 DWORD g_ExceptionCode = 0;
+DWORD g_temp = 0;
 
 LONG CoffeeFilter (DWORD dwExceptionCode) 
 {
@@ -54,6 +55,22 @@ void see_asm_GetExceptionInformation()
 	__except( seh_continue_search(GetExceptionInformation()) ) {
 
 	}
+}
+
+int see_asm_AbnormalTermination(bool is_abnormal)
+{
+	int iret = -1;
+	char array[0x100] = {};
+	__try {
+		if(is_abnormal)
+			*(int*)nullptr = 0x4444;
+	}
+	__finally {
+		iret = AbnormalTermination();
+		g_temp = iret; // so that we can always inspect iret's value
+	}
+
+	return iret;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -110,6 +127,15 @@ int main(int argc, char* argv[])
 		param = atoi(argv[1]);
 
 	see_asm_GetExceptionInformation();
+
+	see_asm_AbnormalTermination(false);
+
+	__try {
+		see_asm_AbnormalTermination(true);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		; 
+	}
 
 	// p664j: CoffeeFilter
 	test_GetExceptionCode(3, param);
