@@ -127,8 +127,10 @@ void test_finally_return()
 
 int main(int argc, char* argv[])
 {
+	// p655j: FuncOStimpy1
 	test_EXCEPTION_EXECUTE_HANDLER();
 
+	// p656j: FuncMonkey
 	test_finally_return();
 
 	return 0;
