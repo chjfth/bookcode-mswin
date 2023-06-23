@@ -40,9 +40,9 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{20230622-0000-0000-0000-065545000001}</ProjectGuid>
-    <ProjectName>24-FilterConst</ProjectName>
-     <TargetName>24-FilterConst</TargetName>
+    <ProjectGuid>{20230623-0000-0000-0000-095537000001}</ProjectGuid>
+    <ProjectName>24-SehFlows</ProjectName>
+     <TargetName>24-SehFlows</TargetName>
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -156,7 +156,7 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="24-FilterConst.cpp" />
+    <ClCompile Include="24-SehFlows.cpp" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->
