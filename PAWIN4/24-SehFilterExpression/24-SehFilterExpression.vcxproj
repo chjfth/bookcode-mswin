@@ -97,6 +97,9 @@
       <!-- This disables _RTC_CheckEsp on function epilog, for easier ASM study. -->
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
 
+      <!-- /JMC- , disable __CheckForDebuggerJustMyCode in function prolog. (VC2019) -->
+      <SupportJustMyCode>false</SupportJustMyCode>
+
       <!-- Note: $(TargetPath) cannot receive a value in <PropertyGroup>, so it has to be in ItemDefinitionGroup. -->
 
       <!-- LIB's .pdb is final-pdb at compile stage, we want to see whole original xxx.lib name in PDB filename. -->
