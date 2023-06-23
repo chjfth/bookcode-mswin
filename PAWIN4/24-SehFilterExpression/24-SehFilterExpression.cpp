@@ -42,21 +42,28 @@ void test_GetExceptionCode(int dividend, int divisor)
 
 //////////////////////////////////////////////////////////////////////////
 
-static int seh_continue_search(void *)
+extern"C" __declspec(noinline)
+int seh_continue_search(void *)
 {
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
-void see_asm_GetExceptionInformation()
+extern"C"
+int see_asm_GetExceptionInformation(bool is_abnormal)
 {
+	int divisor = is_abnormal ? 0 : 1;
+	int iret = -1;
 	__try {
-
+		iret = 3 / divisor;
 	} 
 	__except( seh_continue_search(GetExceptionInformation()) ) {
-
+		printf("In __except body GEI.\n");
 	}
+
+	return iret;
 }
 
+extern"C"
 int see_asm_AbnormalTermination(bool is_abnormal)
 {
 	int iret = -1;
@@ -126,7 +133,14 @@ int main(int argc, char* argv[])
 	if(argc>1)
 		param = atoi(argv[1]);
 
-	see_asm_GetExceptionInformation();
+	see_asm_GetExceptionInformation(false);
+
+	__try {
+		see_asm_GetExceptionInformation(true);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		// just catch it an go on
+	}
 
 	see_asm_AbnormalTermination(false);
 
@@ -134,7 +148,7 @@ int main(int argc, char* argv[])
 		see_asm_AbnormalTermination(true);
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER) {
-		; 
+		// just catch it an go on
 	}
 
 	// p664j: CoffeeFilter
