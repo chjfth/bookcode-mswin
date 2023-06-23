@@ -5,8 +5,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-DWORD g_ExceptionCode = 0;
 DWORD g_temp = 0;
+DWORD g_ExceptionCode = 0;
+
+extern"C" __declspec(noinline)
+int seh_continue_search(void*)
+{
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+extern"C"
+int see_asm_GetExceptionInformation(bool is_abnormal)
+{
+	int divisor = is_abnormal ? 0 : 1;
+	int iret = -1;
+	__try {
+		iret = 3 / divisor;
+	}
+	__except (seh_continue_search(GetExceptionInformation())) {
+		printf("In __except body GEI.\n");
+	}
+
+	return iret;
+}
+
+extern"C"
+int see_asm_AbnormalTermination(bool is_abnormal)
+{
+	int iret = -1;
+	char array[0x100] = {};
+	__try {
+		if (is_abnormal)
+			*(int*)nullptr = 0x4444;
+	}
+	__finally {
+		iret = AbnormalTermination();
+		g_temp = iret; // so that we can always inspect iret's value
+	}
+
+	return iret;
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 LONG CoffeeFilter (DWORD dwExceptionCode) 
 {
@@ -36,48 +76,7 @@ void test_GetExceptionCode(int dividend, int divisor)
 	} 
 
 	printf("[A]result = %d\n", result);
-
 	printf("\n");
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-extern"C" __declspec(noinline)
-int seh_continue_search(void *)
-{
-	return EXCEPTION_CONTINUE_SEARCH;
-}
-
-extern"C"
-int see_asm_GetExceptionInformation(bool is_abnormal)
-{
-	int divisor = is_abnormal ? 0 : 1;
-	int iret = -1;
-	__try {
-		iret = 3 / divisor;
-	} 
-	__except( seh_continue_search(GetExceptionInformation()) ) {
-		printf("In __except body GEI.\n");
-	}
-
-	return iret;
-}
-
-extern"C"
-int see_asm_AbnormalTermination(bool is_abnormal)
-{
-	int iret = -1;
-	char array[0x100] = {};
-	__try {
-		if(is_abnormal)
-			*(int*)nullptr = 0x4444;
-	}
-	__finally {
-		iret = AbnormalTermination();
-		g_temp = iret; // so that we can always inspect iret's value
-	}
-
-	return iret;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -142,6 +141,8 @@ int main(int argc, char* argv[])
 		// just catch it an go on
 	}
 
+	////
+	
 	see_asm_AbnormalTermination(false);
 
 	__try {
@@ -151,6 +152,8 @@ int main(int argc, char* argv[])
 		// just catch it an go on
 	}
 
+	////
+	
 	// p664j: CoffeeFilter
 	test_GetExceptionCode(3, param);
 
