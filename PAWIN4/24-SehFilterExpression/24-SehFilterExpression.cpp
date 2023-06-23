@@ -19,7 +19,7 @@ LONG CoffeeFilter (DWORD dwExceptionCode)
 		: EXCEPTION_CONTINUE_SEARCH;
 }
 
-void test_GetExpressionCode(int dividend, int divisor)
+void test_GetExceptionCode(int dividend, int divisor)
 {
 	printf("==== test_GetExpressionCode ====\n");
 
@@ -37,6 +37,23 @@ void test_GetExpressionCode(int dividend, int divisor)
 	printf("[A]result = %d\n", result);
 
 	printf("\n");
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+static int seh_continue_search(void *)
+{
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+void see_asm_GetExceptionInformation()
+{
+	__try {
+
+	} 
+	__except( seh_continue_search(GetExceptionInformation()) ) {
+
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -70,7 +87,7 @@ void FuncSkunk(int dividend, int divisor)
 		printf("  .NumberParameters = %d\n", SavedExceptRec.NumberParameters);
 		for(int i=0; i<(int)SavedExceptRec.NumberParameters; i++)
 		{
-			printf("    [%d] ptr[%p]\n", i, SavedExceptRec.ExceptionInformation[i]);
+			printf("    [%d] ptr[%p]\n", i, (void*)SavedExceptRec.ExceptionInformation[i]);
 		}
 	}
 
@@ -92,8 +109,10 @@ int main(int argc, char* argv[])
 	if(argc>1)
 		param = atoi(argv[1]);
 
+	see_asm_GetExceptionInformation();
+
 	// p664j: CoffeeFilter
-	test_GetExpressionCode(3, param);
+	test_GetExceptionCode(3, param);
 
 	// p666: FuncSkunk()
 	test_GetExceptionInformation(3, param);
