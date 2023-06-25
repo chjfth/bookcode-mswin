@@ -62,7 +62,7 @@ LONG CoffeeFilter (DWORD dwExceptionCode)
 
 void test_GetExceptionCode(int dividend, int divisor)
 {
-	printf("==== test_GetExpressionCode ====\n");
+	printf("==== test_GetExceptionCode ====\n");
 
 	int result = 0;
 	__try {
@@ -164,9 +164,9 @@ int main(int argc, char* argv[])
 }
 
 /*
-chj@WIN7EVN-PC [2023/06/23 11:01:15.94] C:\Users\win7evn
+chj@WIN7EVN-PC [2023/06/25 21:06:50.04] d:\test
 > D:\gitw\bookcode-mswin\PAWIN4\bin-v100\Win32\Debug\24-SehFilterExpression.exe
-==== test_GetExpressionCode ====
+==== test_GetExceptionCode ====
 [A][Caught!] exception code = 0xC0000094
 [A]result = 0
 
@@ -175,14 +175,14 @@ chj@WIN7EVN-PC [2023/06/23 11:01:15.94] C:\Users\win7evn
   .ExceptionCode    = 0xC0000094
   .ExceptionFlags   = 0x0
   .ExceptionRecord  = @[00000000]
-  .ExceptionAddress = @[004011A7]
+  .ExceptionAddress = @[0040129E]
   .NumberParameters = 0
 [B]result = 0
 
 
-chj@WIN7EVN-PC [2023/06/23 11:01:20.12] C:\Users\win7evn
+chj@WIN7EVN-PC [2023/06/25 21:06:55.15] d:\test
 > D:\gitw\bookcode-mswin\PAWIN4\bin-v100\Win32\Debug\24-SehFilterExpression.exe 1
-==== test_GetExpressionCode ====
+==== test_GetExceptionCode ====
 [A][Caught!] exception code = 0xC0000005
 [A]result = 3
 
@@ -191,7 +191,7 @@ chj@WIN7EVN-PC [2023/06/23 11:01:20.12] C:\Users\win7evn
   .ExceptionCode    = 0xC0000005
   .ExceptionFlags   = 0x0
   .ExceptionRecord  = @[00000000]
-  .ExceptionAddress = @[004011B6]
+  .ExceptionAddress = @[004012AD]
   .NumberParameters = 2
     [0] ptr[00000001]
     [1] ptr[0000000C]
