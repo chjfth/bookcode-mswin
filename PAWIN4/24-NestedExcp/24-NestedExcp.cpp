@@ -117,11 +117,6 @@ int my_inner_work(int divisor)
 	return retval;
 }
 
-ExceptionCode_t my_outer_filter(EXCEPTION_RECORD *erec)
-{
-	return EXCEPTION_EXECUTE_HANDLER;
-}
-
 int my_outer_work(int divisor)
 {
 	printf("my_outer_work() Starts.\n");
