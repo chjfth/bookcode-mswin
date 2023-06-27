@@ -18,7 +18,7 @@ But the result is unlucky, EXCEPTION_RECORD.ExceptionRecord is *always* NULL.
 #include <stdlib.h>
 #include <malloc.h>
 
-typedef int ExceptionCode_t;
+typedef int ExcpFilterDecision_t;
 
 void ind(int indent)
 {
@@ -42,16 +42,16 @@ void dump_erec(const EXCEPTION_RECORD *perec, int indent=0)
 #ifdef _M_IX86
 	void *now_esp = nullptr;
 	__asm { mov now_esp, esp }
-	ind(indent); printf("  ESP = %p\n", now_esp);
+	ind(indent); printf("  ESP = [%p]\n", now_esp);
 #else
 	// Allocate a piece of space on a stack
 	void *stackptr = _alloca(0);
-	ind(indent); printf("  Stack-pointer(rough) = %p \n", stackptr);
+	ind(indent); printf("  Stack-pointer(rough) = [%p] \n", stackptr);
 #endif
 }
 
 
-ExceptionCode_t my_filter_rebomb(EXCEPTION_RECORD *perec, int divisor)
+ExcpFilterDecision_t my_filter_rebomb(EXCEPTION_RECORD *perec, int divisor)
 {
 	static int s_seq = 0;
 	s_seq++;
