@@ -1,6 +1,10 @@
 /*
 This code is from PAWIN4 p699j .
 We use C++ try/catch to catch SEH exception.
+To achieve this goal, we need cl.exe option /EHa or /EHs- .
+If passing /EHsc, try/catch will NOT catch SEH exceptions.
+-- Verified on VC2010 SP1.
+
 Key Windows function: _set_se_translator()
 */
 
