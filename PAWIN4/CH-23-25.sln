@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "24-NestedExcp", "24-NestedE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "24-MyRaiseExcp", "24-MyRaiseExcp\24-MyRaiseExcp.vcxproj", "{20230626-0000-0000-0000-230124000001}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "24-CxxCatchSEh", "24-CxxCatchSEh\24-CxxCatchSEh.vcxproj", "{20230628-0000-0000-0000-174212000001}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -121,6 +123,22 @@ Global
 		{20230626-0000-0000-0000-230124000001}.vs2019 Release|Win32.Build.0 = vs2019 Release|Win32
 		{20230626-0000-0000-0000-230124000001}.vs2019 Release|x64.ActiveCfg = vs2019 Release|x64
 		{20230626-0000-0000-0000-230124000001}.vs2019 Release|x64.Build.0 = vs2019 Release|x64
+		{20230628-0000-0000-0000-174212000001}.Debug|Win32.ActiveCfg = Debug|Win32
+		{20230628-0000-0000-0000-174212000001}.Debug|Win32.Build.0 = Debug|Win32
+		{20230628-0000-0000-0000-174212000001}.Debug|x64.ActiveCfg = Debug|x64
+		{20230628-0000-0000-0000-174212000001}.Debug|x64.Build.0 = Debug|x64
+		{20230628-0000-0000-0000-174212000001}.Release|Win32.ActiveCfg = Release|Win32
+		{20230628-0000-0000-0000-174212000001}.Release|Win32.Build.0 = Release|Win32
+		{20230628-0000-0000-0000-174212000001}.Release|x64.ActiveCfg = Release|x64
+		{20230628-0000-0000-0000-174212000001}.Release|x64.Build.0 = Release|x64
+		{20230628-0000-0000-0000-174212000001}.vs2019 Debug|Win32.ActiveCfg = vs2019 Debug|Win32
+		{20230628-0000-0000-0000-174212000001}.vs2019 Debug|Win32.Build.0 = vs2019 Debug|Win32
+		{20230628-0000-0000-0000-174212000001}.vs2019 Debug|x64.ActiveCfg = vs2019 Debug|x64
+		{20230628-0000-0000-0000-174212000001}.vs2019 Debug|x64.Build.0 = vs2019 Debug|x64
+		{20230628-0000-0000-0000-174212000001}.vs2019 Release|Win32.ActiveCfg = vs2019 Release|Win32
+		{20230628-0000-0000-0000-174212000001}.vs2019 Release|Win32.Build.0 = vs2019 Release|Win32
+		{20230628-0000-0000-0000-174212000001}.vs2019 Release|x64.ActiveCfg = vs2019 Release|x64
+		{20230628-0000-0000-0000-174212000001}.vs2019 Release|x64.Build.0 = vs2019 Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
