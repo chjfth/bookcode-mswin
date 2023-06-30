@@ -94,7 +94,7 @@
       <!-- To have C++ try/catch catch SEH, we need /EHa option. -->
       <ExceptionHandling>Async</ExceptionHandling>
 
-      <!-- CL option /GS- , so that compiler uses __except_handler3 is used instead of newer __except_handler4 -->
+      <!-- CL option /GS- , so that compiler uses __except_handler3 instead of newer __except_handler4 -->
       <BufferSecurityCheck>false</BufferSecurityCheck>
       
       <!-- This disables _RTC_CheckEsp on function epilog, for easier ASM study. -->

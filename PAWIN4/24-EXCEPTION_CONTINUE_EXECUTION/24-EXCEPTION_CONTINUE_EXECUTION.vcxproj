@@ -91,7 +91,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       
-      <!-- CL option /GS- , so that compiler uses __except_handler3 is used instead of newer __except_handler4 -->
+      <!-- CL option /GS- , so that compiler uses __except_handler3 instead of newer __except_handler4 -->
       <BufferSecurityCheck>false</BufferSecurityCheck>
 
       <!-- Note: $(TargetPath) cannot receive a value in <PropertyGroup>, so it has to be in ItemDefinitionGroup. -->
