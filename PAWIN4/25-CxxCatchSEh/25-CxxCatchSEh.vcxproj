@@ -40,9 +40,9 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{20230628-0000-0000-0000-174212000001}</ProjectGuid>
-    <ProjectName>24-CxxCatchSEh</ProjectName>
-     <TargetName>24-CxxCatchSEh</TargetName>
+    <ProjectGuid>{20230630-0000-0000-0000-151226000001}</ProjectGuid>
+    <ProjectName>25-CxxCatchSEh</ProjectName>
+     <TargetName>25-CxxCatchSEh</TargetName>
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -165,7 +165,7 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="24-CxxCatchSEh.cpp" />
+    <ClCompile Include="25-CxxCatchSEh.cpp" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->
