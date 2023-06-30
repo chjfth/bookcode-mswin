@@ -1,6 +1,22 @@
 /******************************************************************************
 Module:  Spreadsheet.cpp
 Notices: Copyright (c) 2000 Jeffrey Richter
+
+[2023-06-30] Chj note: To see effects of this program, you MUST NOT run it
+with VSIDE debugger attached. If there is a debugger attached, the callback
+function assigned by SetUnhandledExceptionFilter() will not be executed
+and the whole purpose of this program is ruined.
+
+Quote from MSDN SetUnhandledExceptionFilter :
+
+	Enables an application to supersede the top-level exception handler 
+	of each thread of a process.
+
+	After calling this function, if an exception occurs in a process 
+	*that is not being debugged*, and the exception makes it to the 
+	unhandled exception filter, that filter will call the exception filter 
+	function specified by the lpTopLevelExceptionFilter parameter.
+
 ******************************************************************************/
 
 #include "..\CmnHdr.h"     /* See Appendix A. */
