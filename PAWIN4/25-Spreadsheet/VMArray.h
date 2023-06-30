@@ -23,7 +23,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 
 template <class TYPE>
-class CVMArray {
+class CVMArray 
+{
 public:
    // Reserves sparse array of elements
    CVMArray(DWORD dwReserveElements);
@@ -76,8 +77,8 @@ PTOP_LEVEL_EXCEPTION_FILTER CVMArray<TYPE>::sm_pfnUnhandledExceptionFilterPrev;
 
 
 template <class TYPE>
-CVMArray<TYPE>::CVMArray(DWORD dwReserveElements) {
-
+CVMArray<TYPE>::CVMArray(DWORD dwReserveElements) 
+{
    if (sm_pHead == NULL) {
       // Install our global unhandled exception filter when
       // creating the first instance of the class.
@@ -103,8 +104,8 @@ CVMArray<TYPE>::CVMArray(DWORD dwReserveElements) {
 
 
 template <class TYPE>
-CVMArray<TYPE>::~CVMArray() {
-
+CVMArray<TYPE>::~CVMArray() 
+{
    // Free the array's region (decommitting all storage within it)
    VirtualFree(m_pArray, 0, MEM_RELEASE);
 
@@ -135,8 +136,8 @@ CVMArray<TYPE>::~CVMArray() {
 // Default handling of access violations attempts to commit storage
 template <class TYPE>
 LONG CVMArray<TYPE>::OnAccessViolation(PVOID pvAddrTouched, 
-   BOOL fAttemptedRead, PEXCEPTION_POINTERS pep, BOOL fRetryUntilSuccessful) {
-
+   BOOL fAttemptedRead, PEXCEPTION_POINTERS pep, BOOL fRetryUntilSuccessful) 
+{
    BOOL fCommittedStorage = FALSE;  // Assume committing storage fails
 
    do {
@@ -192,8 +193,8 @@ void dbgprint_excinfo(EXCEPTION_POINTERS *pep, TCHAR *funcname)
 // The filter associated with a single CVMArray object
 template <class TYPE>
 LONG CVMArray<TYPE>::ExceptionFilter(PEXCEPTION_POINTERS pep, 
-   BOOL fRetryUntilSuccessful) {
-
+   BOOL fRetryUntilSuccessful) 
+{
    // Default to trying another filter (safest thing to do)
    LONG lDisposition = EXCEPTION_CONTINUE_SEARCH;
 
@@ -225,8 +226,8 @@ LONG CVMArray<TYPE>::ExceptionFilter(PEXCEPTION_POINTERS pep,
 
 // The filter associated with all CVMArray objects
 template <class TYPE>
-LONG WINAPI CVMArray<TYPE>::UnhandledExceptionFilter(PEXCEPTION_POINTERS pep) {
-
+LONG WINAPI CVMArray<TYPE>::UnhandledExceptionFilter(PEXCEPTION_POINTERS pep) 
+{
    // Default to trying another filter (safest thing to do)
    LONG lDisposition = EXCEPTION_CONTINUE_SEARCH;
 
