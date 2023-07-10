@@ -1,4 +1,4 @@
-#include "..\CmnHdr.h"     /* See Appendix A. */
+#include <windows.h>
 #include <tchar.h>
 
 // The demo code from p658j with some additional info
