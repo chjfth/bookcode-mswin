@@ -134,7 +134,7 @@ TCHAR * charsets_to_codepages_hint(TCHAR *buf, int buflen)
 		int charset = _ttoi(ar_charset_prefix[i]);
 
 		CHARSETINFO csi = {};
-		BOOL succ = TranslateCharsetInfo((DWORD*)charset, &csi, TCI_SRCCHARSET);
+		BOOL succ = TranslateCharsetInfo((DWORD*)(DWORD_PTR)charset, &csi, TCI_SRCCHARSET);
 		if(succ)
 		{
 			_sntprintf_s(tmp, _TRUNCATE, _T("%-40.40s , ANSI-codepage: %u\n"), ar_charset_prefix[i], csi.ciACP);
