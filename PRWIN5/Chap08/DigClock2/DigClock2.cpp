@@ -66,6 +66,8 @@ int g_seconds_remain = 0;
 
 HWND g_hwndCountdownCfg;
 
+POINT g_ptClickCountDown;
+
 SIZE g_init_winsize = {180, 60};
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
@@ -582,14 +584,28 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if(!s_isScratchingMainWindow)
 		{
-			s_isScratchingMainWindow = true;
-
 			// Establish WM_MOUSELEAVE tracking.
 			TRACKMOUSEEVENT tme = {sizeof(tme), TME_LEAVE, hwnd};
 			TrackMouseEvent(&tme);
 
+			POINT ptnow = {};
+			GetCursorPos(&ptnow);
+
 			if(g_ClockMode==CM_Countdown)
-				ShowWindow(g_hwndCountdownCfg, SW_SHOW);
+			{
+				if(ptnow.x==g_ptClickCountDown.x && ptnow.y==g_ptClickCountDown.y)
+				{
+					// invalidate old value of g_ptClickCountDown
+					g_ptClickCountDown.x = g_ptClickCountDown.y = 0;
+				}
+				else
+				{
+					s_isScratchingMainWindow = true;
+
+					vaDbg(_T("Re-show cfgdlg."));
+					ShowWindow(g_hwndCountdownCfg, SW_SHOW);
+				}
+			}
 
 			hit = true;
 		}
@@ -690,11 +706,16 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if(cmdid==IDM_COUNTDOWN_MODE)
 		{
 			g_ClockMode = ClockMode_et(!g_ClockMode);
+
+			if(g_ClockMode==CM_WallTime)
+				ShowWindow(g_hwndCountdownCfg, SW_HIDE);
+
 			InvalidateRect(hwnd, NULL, TRUE);
 		}
 		else if(cmdid==IDM_ALWAYS_ON_TOP)
 		{
 			s_is_always_on_top = !s_is_always_on_top;
+
 			Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
 		}
 		else if(cmdid==IDM_CLICK_CHANGE_COLOR)
@@ -807,7 +828,10 @@ Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			g_seconds_countdown_cfg = seconds;
 			g_seconds_remain = seconds;
 
-			InvalidateRect(hwndMain, NULL, TRUE);
+			GetCursorPos(&g_ptClickCountDown);
+			ShowWindow(hDlg, SW_HIDE);
+
+			InvalidateRect(hwndMain, NULL, TRUE);			
 		}
 
 		return TRUE;
