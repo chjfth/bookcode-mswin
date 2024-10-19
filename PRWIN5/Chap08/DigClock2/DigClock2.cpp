@@ -1,7 +1,9 @@
 /*-----------------------------------------
 DIGCLOCK.c -- Digital Clock(c) Charles Petzold, 1998
 
-DigClock.cpp -- Updated by Chj, 2022.05.
+DigClock2.cpp -- Updated by Jimm Chen
+
+Since 2022.05:
 * Thin window border.
 * Drag window by clicking anywhere inside the window.
 * Move window by pressing arrow keys, Ctrl to accelerate.
@@ -10,7 +12,9 @@ DigClock.cpp -- Updated by Chj, 2022.05.
 * Scale down "second" value display(75%), so to have it stand out.
 * Toggle showing window title, with EXE file name as title text.
 * Eliminate UI flickering by MemDC-double-buffering.
-  -----------------------------------------*/
+
+Since 2024.10:
+-----------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
 #include <tchar.h>
@@ -41,6 +45,9 @@ void ShowHelp(HWND hwndParent)
 }
 
 #define ID_TIMER    1
+
+BOOL g_f24Hour;
+BOOL g_fSuppressHighDigit;
 
 SIZE g_init_winsize = {160, 60};
 
@@ -206,6 +213,8 @@ void DisplayDigit (HDC hdc, int iNumber, bool is_scale_down=false)
 
 void DisplayTwoDigits (HDC hdc, int iNumber, BOOL fSuppress, bool is_scale_down=false)
 {
+	// fSuppress: suppress high digit. If true, 1 will be displayed as 1, instead of 01.
+
 	if (!fSuppress || (iNumber / 10 != 0))
 		DisplayDigit (hdc, iNumber / 10, is_scale_down) ;
 
@@ -217,8 +226,10 @@ void DisplayTwoDigits (HDC hdc, int iNumber, BOOL fSuppress, bool is_scale_down=
 
 void DisplayColon (HDC hdc)
 {
-	POINT ptColon [2][4] = { 2,  21,  6,  17,  10, 21,  6, 25,
-		2,  51,  6,  47,  10, 51,  6, 55 } ;
+	POINT ptColon [2][4] = { 
+		2,21,  6,17,  10,21,  6,25,
+		2,51,  6,47,  10,51,  6,55 
+	} ;
 
 	Polygon (hdc, ptColon [0], 4) ;
 	Polygon (hdc, ptColon [1], 4) ;
@@ -226,7 +237,7 @@ void DisplayColon (HDC hdc)
 	OffsetWindowOrgEx (hdc, -12, 0, NULL) ;
 }
 
-void DisplayTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
+void DisplayWallTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 {
 	SYSTEMTIME st = {};
 	GetLocalTime (&st) ;
@@ -243,17 +254,15 @@ void DisplayTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 	DisplayTwoDigits (hdc, st.wSecond, FALSE, true) ;
 }
 
-static BOOL   f24Hour, fSuppress ;
-//
 void ReloadSetting(HWND hwnd)
 {
 	TCHAR         szBuffer [2] ;
 
 	GetLocaleInfo (LOCALE_USER_DEFAULT, LOCALE_ITIME, szBuffer, 2) ;
-	f24Hour = (szBuffer[0] == '1') ;
+	g_f24Hour = (szBuffer[0] == '1') ;
 
 	GetLocaleInfo (LOCALE_USER_DEFAULT, LOCALE_ITLZERO, szBuffer, 2) ;
-	fSuppress = (szBuffer[0] == '0') ;
+	g_fSuppressHighDigit = (szBuffer[0] == '0') ;
 
 	InvalidateRect (hwnd, NULL, TRUE) ;
 }
@@ -399,7 +408,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SelectObject (hdc, GetStockObject (NULL_PEN)) ;
 		SelectObject (hdc, hbrush) ;
 
-		DisplayTime (hdc, f24Hour, fSuppress) ;
+		DisplayWallTime (hdc, g_f24Hour, g_fSuppressHighDigit) ;
 
 		EndPaint_NoFlicker(hwnd, &ps) ;
 
