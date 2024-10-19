@@ -14,6 +14,7 @@ Since 2022.05:
 * Eliminate UI flickering by MemDC-double-buffering.
 
 Since 2024.10:
+* Add Countdown mode.
 -----------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
@@ -32,7 +33,8 @@ Since 2024.10:
 void ShowHelp(HWND hwndParent)
 {
 	static TCHAR *s_help =
-		_T("DigClock from Charles Petzold [PRWIN5] Chap08, with improvements from Jimm Chen.\r\n")
+		_T("DigClock2 by Jimm Chen. (version 1.0)\r\n")
+		_T("Clock drawing code by DigClock from Charles Petzold [PRWIN5] Chap08.\r\n")
 		_T("\r\n")
 		_T("To Move the clock window:\r\n")
 		_T("(1) Click and drag with mouse left button.\r\n")
@@ -775,9 +777,6 @@ INT_PTR CALLBACK
 Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HWND hwndMain = GetParent(hDlg);
-	HWND       hwndParent;
-	HWND hCtrl ; // TO-DEL
-	int        iCtrlID, iIndex ;
 
 	switch (message)
 	{{
