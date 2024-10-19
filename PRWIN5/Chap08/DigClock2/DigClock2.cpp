@@ -136,10 +136,14 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
 
+
 	while (GetMessage (&msg, NULL, 0, 0))
 	{
-		TranslateMessage (&msg) ;
-		DispatchMessage (&msg) ;
+		if(!IsDialogMessage(g_hwndCountdownCfg, &msg))
+		{
+			TranslateMessage (&msg) ;
+			DispatchMessage (&msg) ;
+		}
 	}
 	return (int)msg.wParam ;
 }
@@ -784,7 +788,9 @@ Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		const TCHAR *pszCfg = Seconds_to_HMS(g_seconds_countdown_cfg);
 		SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
 
-		return TRUE;
+		// Special focus to the [Start countdown] button, explicitly.
+		SetFocus(GetDlgItem(hDlg, IDOK));
+		return FALSE; // FALSE to disobey dialog manager's suggested focus(would be IDC_EDIT1).
 	}
 	case WM_COMMAND:
 	{
