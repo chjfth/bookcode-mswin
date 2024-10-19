@@ -593,12 +593,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			if(g_ClockMode==CM_Countdown)
 			{
-				if(ptnow.x==g_ptClickCountDown.x && ptnow.y==g_ptClickCountDown.y)
-				{
-					// invalidate old value of g_ptClickCountDown
-					g_ptClickCountDown.x = g_ptClickCountDown.y = 0;
-				}
-				else
+				if(!(ptnow.x==g_ptClickCountDown.x && ptnow.y==g_ptClickCountDown.y))
 				{
 					s_isScratchingMainWindow = true;
 
