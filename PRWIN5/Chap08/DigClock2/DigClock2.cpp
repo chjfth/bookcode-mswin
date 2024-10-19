@@ -18,6 +18,7 @@ Since 2024.10:
 
 #define WIN32_LEAN_AND_MEAN
 #include <tchar.h>
+#include <assert.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
@@ -25,6 +26,8 @@ Since 2024.10:
 
 #include "..\..\vaDbg.h"
 #include "..\..\BeginPaint_NoFlicker.h"
+
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 void ShowHelp(HWND hwndParent)
 {
@@ -44,12 +47,24 @@ void ShowHelp(HWND hwndParent)
 	MessageBox(hwndParent, s_help, _T("Help"), MB_OK);
 }
 
-#define ID_TIMER    1
+#define APPNAME "DigClock2"
+
+#define ID_TIMER_SECONDS_TICK   1
+#define ID_TIMER_HIDE_CFG_PANEL 2
+
+HINSTANCE g_hInstance;
 
 BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
 
-SIZE g_init_winsize = {160, 60};
+enum ClockMode_et { CM_WallTime=0, CM_Countdown=1 } g_ClockMode;
+
+int g_seconds_countdown_cfg = 60;
+int g_seconds_remain = 0;
+
+HWND g_hwndCountdownCfg;
+
+SIZE g_init_winsize = {180, 60};
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -69,13 +84,17 @@ const TCHAR *GetExeFilename()
 	return pfilename;
 }
 
+INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+
+
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
-	static TCHAR szAppName[] = TEXT ("DigClock") ;
+	static TCHAR szAppName[] = TEXT (APPNAME) ;
 	HWND         hwnd ;
 	MSG          msg ;
 	WNDCLASS     wndclass ;
+	g_hInstance = hInstance;
 
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
 	wndclass.lpfnWndProc   = WndProc ;
@@ -108,6 +127,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	SendMessage(hwnd, WM_SETICON, TRUE, (LPARAM)LoadIcon(hInstance, _T("MYPROGRAM")));
 
 	Hwnd_ShowTitle(hwnd, false);
+
+	g_hwndCountdownCfg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwnd, Dlgproc_CountdownCfg);
+	assert(g_hwndCountdownCfg);
 
 	SetWindowText(hwnd, GetExeFilename());
 
@@ -254,6 +276,55 @@ void DisplayWallTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 	DisplayTwoDigits (hdc, st.wSecond, FALSE, true) ;
 }
 
+void DisplayCountDown(HDC hdc)
+{
+	int zSeconds = g_seconds_remain % 60;
+	int tmp = g_seconds_remain / 60;
+	int zMinutes = tmp % 60;
+	int zHours = (tmp / 60) % 100;
+	
+	DisplayTwoDigits(hdc, zHours, FALSE);
+	DisplayColon (hdc) ;
+	DisplayTwoDigits (hdc, zMinutes, FALSE) ;
+	DisplayColon (hdc) ;
+	DisplayTwoDigits (hdc, zSeconds, FALSE, true) ;
+
+	//
+	// Drawing the countdown bar.
+	//
+
+	OffsetWindowOrgEx(hdc, 42+42, -58, NULL);
+
+	const RECT rcBar = {0,0, 42+42-4, 12};
+	//FrameRect(hdc, &rcBar, GetStockBrush(BLACK_BRUSH));
+		
+	HBRUSH hbrushGray = CreateSolidBrush(RGB(220,220,220));
+	HBRUSH hbrushOrig = (HBRUSH) SelectObject(hdc, hbrushGray);
+	
+	// draw background gray bar
+	Rectangle(hdc, rcBar.left, rcBar.top, rcBar.right, rcBar.bottom); 
+
+	if(g_seconds_remain>0)
+	{
+		// draw remain percent using original color(as user picked)
+		SelectObject(hdc, hbrushOrig);
+		double frac = (double)g_seconds_remain/g_seconds_countdown_cfg;
+		int draw_width = (int)((rcBar.right-rcBar.left)*frac) + 1;
+		Rectangle(hdc, rcBar.left, rcBar.top, min(rcBar.left+draw_width, rcBar.right), rcBar.bottom); 
+	}
+}
+
+void RefreshTheClock(HDC hdc)
+{
+//	vaDbg(_T("RefreshTheClock()..."));
+	if(g_ClockMode==CM_WallTime)
+		DisplayWallTime (hdc, g_f24Hour, g_fSuppressHighDigit) ;
+	else if(g_ClockMode==CM_Countdown)
+		DisplayCountDown(hdc);
+	else
+		assert(0);
+}
+
 void ReloadSetting(HWND hwnd)
 {
 	TCHAR         szBuffer [2] ;
@@ -338,6 +409,49 @@ void Hwnd_ShowTitle(HWND hwnd, bool istitle)
 		);
 }
 
+bool Is_MouseInClientRect(HWND hwnd)
+{
+	POINT mpt = {};
+	GetCursorPos(&mpt);
+	ScreenToClient(hwnd, &mpt);
+
+	RECT rccli = {};
+	GetClientRect(hwnd, &rccli);
+	if(PtInRect(&rccli, mpt))
+		return true;
+	else 
+		return false;
+
+}
+
+void DoTimer(HWND hwnd, int idtimer)
+{
+	static int s_prev_remain = 0;
+
+	if(idtimer==ID_TIMER_SECONDS_TICK)
+	{
+		if(g_seconds_remain>0)
+		{
+			// Yes, even if the UI is in walltime mode, we let the countdown go,
+			// so that the use can temporarily switch back to peek the walltime. 
+			g_seconds_remain--;
+		}
+		
+		if(s_prev_remain>0 && g_seconds_remain==0)
+		{
+			MessageBeep(MB_OK); // times up beep
+		}
+
+		s_prev_remain = g_seconds_remain;
+
+		InvalidateRect (hwnd, NULL, TRUE);
+	}
+	else if(idtimer==ID_TIMER_HIDE_CFG_PANEL)
+	{
+		if(!Is_MouseInClientRect(hwnd))
+			ShowWindow(g_hwndCountdownCfg, SW_HIDE);
+	}
+}
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -356,6 +470,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static bool s_is_moved = false;
 	static int s_idxcolor = 0;
 
+	static bool s_isScratchingMainWindow = false;
+
 	bool isCtrl = GetKeyState(VK_CONTROL)<0;
 	bool isShift = GetKeyState(VK_SHIFT)<0;
 
@@ -363,7 +479,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{{
 	case WM_CREATE:
 	{
-		SetTimer (hwnd, ID_TIMER, 1000, NULL) ;
+		SetTimer(hwnd, ID_TIMER_SECONDS_TICK, 1000, NULL) ;
+		SetTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL, 500, NULL);
 
 		if(!s_popmenu)
 		{
@@ -386,8 +503,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_TIMER:
-		InvalidateRect (hwnd, NULL, TRUE) ;
+	{
+		WPARAM idtimer = wParam;
+		DoTimer(hwnd, (int)idtimer);
 		return 0 ;
+	}
 
 	case WM_PAINT:
 	{
@@ -408,7 +528,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SelectObject (hdc, GetStockObject (NULL_PEN)) ;
 		SelectObject (hdc, hbrush) ;
 
-		DisplayWallTime (hdc, g_f24Hour, g_fSuppressHighDigit) ;
+		RefreshTheClock(hdc); 
 
 		EndPaint_NoFlicker(hwnd, &ps) ;
 
@@ -430,22 +550,68 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_MOUSEMOVE:
 	{
-		if(s_is_dragging==false)
-			break;
-		
-		// Set new window pos
+		bool hit = false;
 
-		int offsetx = GET_X_LPARAM(lParam) - s_pos_mousedown.x;
-		int offsety = GET_Y_LPARAM(lParam) - s_pos_mousedown.y;
-		if(offsetx!=0 || offsety!=0)
+		// Handle window dragging
+		//
+
+		if(s_is_dragging==true)
 		{
-			s_is_moved = true;
+			// Set new window pos
+
+			int offsetx = GET_X_LPARAM(lParam) - s_pos_mousedown.x;
+			int offsety = GET_Y_LPARAM(lParam) - s_pos_mousedown.y;
+			if(offsetx!=0 || offsety!=0)
+			{
+				s_is_moved = true;
+			}
+
+			MoveWindow_byOffset(hwnd, offsetx, offsety);
+			hit = true;
 		}
 
-		MoveWindow_byOffset(hwnd, offsetx, offsety);
-		
-		return 0; // this return is a must!
+		//
+		// Handle Countdown-cfg panel show/hide
+		// 
+
+		if(!s_isScratchingMainWindow)
+		{
+			s_isScratchingMainWindow = true;
+
+			// Establish WM_MOUSELEAVE tracking.
+			TRACKMOUSEEVENT tme = {sizeof(tme), TME_LEAVE, hwnd};
+			TrackMouseEvent(&tme);
+
+			if(g_ClockMode==CM_Countdown)
+				ShowWindow(g_hwndCountdownCfg, SW_SHOW);
+
+			hit = true;
+		}
+
+		//
+		if(hit)
+			return 0; // Not calling DefWindowProc()
+		else
+			break;
 	}
+
+	case WM_MOUSELEAVE:
+	{
+		// Here, we check whether mouse pointer is outside the main window.
+		// If outside, we will hide Countdown-cfg panel.
+		// Note: If the mouse is over the cfg panel, WM_MOUSELEAVE *is* generated,
+		// but we should *not* consider it outside(=should not hide the panel).
+
+		s_isScratchingMainWindow = false;
+
+		if(!Is_MouseInClientRect(hwnd)) // mouse outside
+		{
+			ShowWindow(g_hwndCountdownCfg, SW_HIDE);
+		}
+
+		break;
+	}
+
 	case WM_LBUTTONUP:
 	{
 		s_is_dragging = false;
@@ -496,6 +662,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if(hmenuPopup!=s_popmenu)
 			break;
 
+		CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
+			g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
+
 		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
 			s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
 
@@ -512,7 +681,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		int cmdid = GET_WM_COMMAND_ID(wParam, lParam);
 
-		if(cmdid==IDM_ALWAYS_ON_TOP)
+		if(cmdid==IDM_COUNTDOWN_MODE)
+		{
+			g_ClockMode = ClockMode_et(!g_ClockMode);
+			InvalidateRect(hwnd, NULL, TRUE);
+		}
+		else if(cmdid==IDM_ALWAYS_ON_TOP)
 		{
 			s_is_always_on_top = !s_is_always_on_top;
 			Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
@@ -546,10 +720,98 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	case WM_DESTROY:
-		KillTimer (hwnd, ID_TIMER) ;
+		KillTimer(hwnd, ID_TIMER_SECONDS_TICK) ;
+		KillTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL);
 //		DeleteObject (hBrushRed) ;
 		PostQuitMessage (0) ;
 		return 0 ;
 	}}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
+
+const TCHAR* Seconds_to_HMS(int seconds)
+{
+	// Turn 63 seconds into "00:01:03"
+
+	static TCHAR szHMS[40];
+
+	int zSeconds = seconds % 60;
+	int tmp = seconds / 60;
+	int zMinutes = tmp % 60;
+	int zHours = (tmp / 60) % 100;
+
+	_sntprintf_s(szHMS, _TRUNCATE, _T("%02d:%02d:%02d"), zHours, zMinutes, zSeconds);
+	return szHMS;
+}
+
+int HMS_to_Seconds(const TCHAR *szHMS)
+{
+	// Strip leading spaces.
+	const TCHAR *pszHMS = szHMS;
+	while(*pszHMS==' ')
+		pszHMS++;
+
+	// Turn "00:01:03" into 63 seconds.
+	// -1 on error.
+	if(! (pszHMS[2]==':' && pszHMS[5]==':') )
+	{
+		vaMsgBox(NULL, MB_OK|MB_ICONWARNING, _T(APPNAME),
+			_T("Time format error:\r\n\r\n%s"), pszHMS);
+		return -1;
+	}
+
+	int zHours=0, zMinutes=0, zSeconds=0;
+	_stscanf_s(pszHMS, _T("%02d:%02d:%02d"), &zHours, &zMinutes, &zSeconds);
+
+	int seconds = (zHours*60+zMinutes) * 60 + zSeconds;
+	return seconds;
+}
+
+INT_PTR CALLBACK 
+Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	HWND hwndMain = GetParent(hDlg);
+	HWND       hwndParent;
+	HWND hCtrl ; // TO-DEL
+	int        iCtrlID, iIndex ;
+
+	switch (message)
+	{{
+	case WM_INITDIALOG :
+	{
+//		vaDbg(_T("WM_INITDIALOG wParam=%X"), wParam);
+
+		const TCHAR *pszCfg = Seconds_to_HMS(g_seconds_countdown_cfg);
+		SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
+
+		return TRUE;
+	}
+	case WM_COMMAND:
+	{
+		int idcmd = GET_WM_COMMAND_ID(wParam,lParam);
+//		vaDbg(_T("Parent is 0x%X, idcmd=%d"), (UINT)hwndMain, idcmd);
+		
+		if(idcmd==IDOK)
+		{
+			TCHAR szHMS[20] = {};
+			GetDlgItemText(hDlg, IDC_EDIT1, szHMS, ARRAYSIZE(szHMS)-1);
+			int seconds = HMS_to_Seconds(szHMS);
+			if(seconds<0)
+				return TRUE;
+
+			g_seconds_countdown_cfg = seconds;
+			g_seconds_remain = seconds;
+
+			InvalidateRect(hwndMain, NULL, TRUE);
+		}
+
+		return TRUE;
+	}
+	
+	default:
+		break;
+	}}
+	return FALSE ;
+}
+
+// BUG: IDM_RESET_SIZE would shrink the window.  g_init_winsize should be named g_init_clisize.

@@ -1,7 +1,10 @@
-#define IDR_MENU1  101
-#define IDM_ALWAYS_ON_TOP 1000
-#define IDM_RESET_SIZE 1001
-#define IDM_EXIT 4000
-#define IDM_HELP 4001
-#define IDM_CLICK_CHANGE_COLOR 4002
-#define IDM_SHOW_TITLE 4003
+#define IDR_MENU1                       101
+#define IDD_COUNTDOWN_CFG               102
+#define IDM_ALWAYS_ON_TOP               1000
+#define IDM_RESET_SIZE                  1001
+#define IDM_COUNTDOWN_MODE              2000
+#define IDC_EDIT1                       3000
+#define IDM_EXIT                        4000
+#define IDM_HELP                        4001
+#define IDM_CLICK_CHANGE_COLOR          4002
+#define IDM_SHOW_TITLE                  4003
