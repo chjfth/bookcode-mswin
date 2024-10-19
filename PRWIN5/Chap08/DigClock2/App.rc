@@ -1,0 +1,28 @@
+#include "resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+MYPROGRAM                ICON                    "DigClock2.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU
+BEGIN
+    POPUP "MYPOPUP"
+    BEGIN
+        MENUITEM "&Always on Top",          IDM_ALWAYS_ON_TOP
+        MENUITEM "&Click to change color",  IDM_CLICK_CHANGE_COLOR
+        MENUITEM "&Reset size",             IDM_RESET_SIZE
+        MENUITEM "&Show text title",        IDM_SHOW_TITLE
+        MENUITEM "&Help",                   IDM_HELP
+        MENUITEM "&Exit",                   IDM_EXIT
+    END
+END
