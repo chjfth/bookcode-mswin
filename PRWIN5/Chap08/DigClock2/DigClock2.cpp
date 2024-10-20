@@ -33,8 +33,11 @@ Since 2024.10:
 void ShowHelp(HWND hwndParent)
 {
 	static TCHAR *s_help =
-		_T("DigClock2 by Jimm Chen. (version 1.0)\r\n")
+		_T("DigClock2 by Jimm Chen. (version 1.1)\r\n")
+		_T("\r\n")
+		_T("This clock program works in wall-time mode or countdown mode.\r\n")
 		_T("Clock drawing code by DigClock from Charles Petzold [PRWIN5] Chap08.\r\n")
+
 		_T("\r\n")
 		_T("To Move the clock window:\r\n")
 		_T("(1) Click and drag with mouse left button.\r\n")
@@ -54,6 +57,8 @@ void ShowHelp(HWND hwndParent)
 #define ID_TIMER_SECONDS_TICK   1
 #define ID_TIMER_HIDE_CFG_PANEL 2
 
+#define ADD_EXTRA_MILLISEC 16
+
 HINSTANCE g_hInstance;
 
 BOOL g_f24Hour;
@@ -63,6 +68,7 @@ enum ClockMode_et { CM_WallTime=0, CM_Countdown=1 } g_ClockMode;
 
 int g_seconds_countdown_cfg = 60;
 int g_seconds_remain = 0;
+DWORD g_msectick_start = 0; // value from GetTickCount()
 
 HWND g_hwndCountdownCfg;
 
@@ -434,25 +440,32 @@ bool Is_MouseInClientRect(HWND hwnd)
 
 void DoTimer(HWND hwnd, int idtimer)
 {
-	static int s_prev_remain = 0;
-
 	if(idtimer==ID_TIMER_SECONDS_TICK)
 	{
+		int prev_remain = g_seconds_remain;
+
 		if(g_seconds_remain>0)
 		{
 			// Yes, even if the UI is in walltime mode, we let the countdown go,
-			// so that the use can temporarily switch back to peek the walltime. 
+			// so that the user can temporarily switch back to peek the walltime. 
+
+			DWORD now_msectick = GetTickCount();
+			int msec_remain = int(
+				g_msectick_start + g_seconds_countdown_cfg*1000 + ADD_EXTRA_MILLISEC
+				- now_msectick);
+
+			if(msec_remain>0)
+				g_seconds_remain = (msec_remain+999) / 1000;
+			else 
+				g_seconds_remain = 0;
+
 			g_seconds_remain--;
+
+			if(prev_remain>0 && g_seconds_remain==0)
+				MessageBeep(MB_OK); // time-up beep
 		}
 		
-		if(s_prev_remain>0 && g_seconds_remain==0)
-		{
-			MessageBeep(MB_OK); // times up beep
-		}
-
-		s_prev_remain = g_seconds_remain;
-
-		InvalidateRect (hwnd, NULL, TRUE);
+		InvalidateRect (hwnd, NULL, TRUE); // draw UI according to g_seconds_remain
 	}
 	else if(idtimer==ID_TIMER_HIDE_CFG_PANEL)
 	{
@@ -821,7 +834,10 @@ Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				return TRUE;
 
 			g_seconds_countdown_cfg = seconds;
-			g_seconds_remain = seconds;
+			g_msectick_start = GetTickCount();
+
+			g_seconds_remain = 1; // arbitrary >0 value
+			DoTimer(hwndMain, ID_TIMER_SECONDS_TICK);
 
 			GetCursorPos(&g_ptClickCountDown);
 			ShowWindow(hDlg, SW_HIDE);
@@ -839,3 +855,4 @@ Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 // BUG: IDM_RESET_SIZE would shrink the window.  g_init_winsize should be named g_init_clisize.
+// + Menu-item: Minimize, Stop timer .
