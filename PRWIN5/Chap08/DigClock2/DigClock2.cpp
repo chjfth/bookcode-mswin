@@ -71,7 +71,7 @@ HWND g_hdlgCountdownCfg;
 
 POINT g_ptClickCountDown;
 
-SIZE g_init_winsize = {180, 60};
+SIZE g_init_clisize = {180, 60}; // Initial main-window client-area size
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -112,8 +112,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		szAppName, TEXT ("Digital Clock"),
 		WS_POPUPWINDOW, // will set more styles in Hwnd_ShowTitle()
 		mousepos.x, mousepos.y,
-		g_init_winsize.cx, g_init_winsize.cy, // CW_USEDEFAULT, CW_USEDEFAULT, 
+		g_init_clisize.cx, g_init_clisize.cy, // CW_USEDEFAULT, CW_USEDEFAULT, 
 		NULL, NULL, hInstance, NULL) ;
+	Hwnd_ShowTitle(hwnd, false, g_init_clisize.cx, g_init_clisize.cy);
 
 	SendMessage(hwnd, WM_SETICON, TRUE, (LPARAM)LoadIcon(hInstance, _T("MYPROGRAM")));
 
@@ -372,7 +373,6 @@ void DoTimer(HWND hwnd, int idtimer)
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-//	static HBRUSH hBrushRed ;
 	static int    cxClient, cyClient ;
 	HDC           hdc ;
 	PAINTSTRUCT   ps ;
@@ -637,10 +637,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else if(cmdid==IDM_RESET_SIZE)
 		{
-			RECT oldrect = {};
-			GetWindowRect(hwnd, &oldrect);
-			MoveWindow(hwnd, oldrect.left, oldrect.top, 
-				g_init_winsize.cx, g_init_winsize.cy, TRUE);
+			Hwnd_ShowTitle(hwnd, s_is_show_title, g_init_clisize.cx, g_init_clisize.cy);
 		}
 		else if(cmdid==IDM_EXIT)
 		{
@@ -653,7 +650,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		KillTimer(hwnd, ID_TIMER_SECONDS_TICK) ;
 		KillTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL);
-//		DeleteObject (hBrushRed) ;
 		PostQuitMessage (0) ;
 		return 0 ;
 	}}
@@ -712,5 +708,4 @@ Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return FALSE ;
 }
 
-// BUG: IDM_RESET_SIZE would shrink the window.  g_init_winsize should be named g_init_clisize.
 // + Menu-item: Minimize, Stop timer .

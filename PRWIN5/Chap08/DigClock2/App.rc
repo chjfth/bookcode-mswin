@@ -22,7 +22,7 @@ BEGIN
         MENUITEM "Count-&down mode",        IDM_COUNTDOWN_MODE
         MENUITEM "&Always on Top",          IDM_ALWAYS_ON_TOP
         MENUITEM "&Click to change color",  IDM_CLICK_CHANGE_COLOR
-        MENUITEM "&Reset size",             IDM_RESET_SIZE
+        MENUITEM "&Reset window size",      IDM_RESET_SIZE
         MENUITEM "&Show text title",        IDM_SHOW_TITLE
         MENUITEM "&Help",                   IDM_HELP
         MENUITEM "&Exit",                   IDM_EXIT

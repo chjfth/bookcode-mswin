@@ -22,8 +22,11 @@ void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop)
 		);
 }
 
-void Hwnd_ShowTitle(HWND hwnd, bool istitle)
+void Hwnd_ShowTitle(HWND hwnd, bool istitle, int cli_width, int cli_height)
 {
+	// cli_width, cli_height: If >0, This function will adjust window size so that
+	// hwnd's client area has exactly that width & height (pixels)
+
 	struct StyleBits 
 	{ 
 		DWORD bits_on; DWORD bits_on_ex; 
@@ -34,10 +37,18 @@ void Hwnd_ShowTitle(HWND hwnd, bool istitle)
 		{ WS_OVERLAPPEDWINDOW , WS_EX_TOOLWINDOW }, // style bits for has-title window
 	};
 
+	int cliw_inc = 0, clih_inc = 0;
+
 	// Save original client-area absolute position first.
 	//
 	RECT rectAbsCli = {}; // client-area absolute position(screen coordinate)
 	GetClientRect(hwnd, &rectAbsCli); // interim result
+	//
+	if(cli_width>0)
+		cliw_inc = cli_width - rectAbsCli.right;
+	if(cli_height>0)
+		clih_inc = cli_height - rectAbsCli.bottom;
+	//
 	MapWindowPoints(hwnd, HWND_DESKTOP, (POINT*)&rectAbsCli, 2);
 
 	DWORD winstyle = (DWORD)GetWindowLongPtr(hwnd, GWL_STYLE);
@@ -71,8 +82,10 @@ void Hwnd_ShowTitle(HWND hwnd, bool istitle)
 	rectNewFrame.bottom += (rectAbsCli.bottom - rectNewCli.bottom);
 
 	SetWindowPos(hwnd, NULL, 
-		rectNewFrame.left, rectNewFrame.top, 
-		rectNewFrame.right-rectNewFrame.left, rectNewFrame.bottom-rectNewFrame.top,
+		rectNewFrame.left, 
+		rectNewFrame.top, 
+		rectNewFrame.right-rectNewFrame.left + cliw_inc, 
+		rectNewFrame.bottom-rectNewFrame.top + clih_inc,
 		SWP_NOZORDER | SWP_FRAMECHANGED
 		);
 }
