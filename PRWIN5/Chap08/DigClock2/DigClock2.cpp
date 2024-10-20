@@ -591,6 +591,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
 			g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
 
+		EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
+			g_seconds_remain>0 ? MF_ENABLED: MF_DISABLED);
+
 		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
 			s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
 
@@ -616,6 +619,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			InvalidateRect(hwnd, NULL, TRUE);
 		}
+		else if(cmdid==IDM_STOP_COUNTDOWN)
+		{
+			g_seconds_remain = 0;
+			InvalidateRect(hwnd, NULL, TRUE);
+		}
 		else if(cmdid==IDM_ALWAYS_ON_TOP)
 		{
 			s_is_always_on_top = !s_is_always_on_top;
@@ -630,6 +638,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			s_is_show_title = !s_is_show_title;
 			Hwnd_ShowTitle(hwnd, s_is_show_title);
+		}
+		else if(cmdid==IDM_MINIMIZE_WINDOW)
+		{
+			ShowWindow(hwnd, SW_MINIMIZE);
 		}
 		else if(cmdid==IDM_HELP)
 		{
@@ -707,5 +719,3 @@ Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}}
 	return FALSE ;
 }
-
-// + Menu-item: Minimize, Stop timer .

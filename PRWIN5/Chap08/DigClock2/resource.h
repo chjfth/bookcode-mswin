@@ -2,7 +2,9 @@
 #define IDD_COUNTDOWN_CFG               102
 #define IDM_ALWAYS_ON_TOP               1000
 #define IDM_RESET_SIZE                  1001
+#define IDM_MINIMIZE_WINDOW             1002
 #define IDM_COUNTDOWN_MODE              2000
+#define IDM_STOP_COUNTDOWN              2001
 #define IDC_EDIT1                       3000
 #define IDM_EXIT                        4000
 #define IDM_HELP                        4001

@@ -17,16 +17,18 @@ MYPROGRAM                ICON                    "DigClock2.ico"
 
 IDR_MENU1 MENU
 BEGIN
-    POPUP "MYPOPUP"
-    BEGIN
-        MENUITEM "Count-&down mode",        IDM_COUNTDOWN_MODE
-        MENUITEM "&Always on Top",          IDM_ALWAYS_ON_TOP
-        MENUITEM "&Click to change color",  IDM_CLICK_CHANGE_COLOR
-        MENUITEM "&Reset window size",      IDM_RESET_SIZE
-        MENUITEM "&Show text title",        IDM_SHOW_TITLE
-        MENUITEM "&Help",                   IDM_HELP
-        MENUITEM "&Exit",                   IDM_EXIT
-    END
+	POPUP "MYPOPUP"
+	BEGIN
+		MENUITEM "Count-&down mode",        IDM_COUNTDOWN_MODE
+		MENUITEM "Stop countdown",          IDM_STOP_COUNTDOWN
+		MENUITEM "&Always on Top",          IDM_ALWAYS_ON_TOP
+		MENUITEM "&Click to change color",  IDM_CLICK_CHANGE_COLOR
+		MENUITEM "&Show text title",        IDM_SHOW_TITLE
+		MENUITEM "&Reset window size",      IDM_RESET_SIZE
+		MENUITEM "&Minimize window",        IDM_MINIMIZE_WINDOW
+		MENUITEM "&Help",                   IDM_HELP
+		MENUITEM "&Exit",                   IDM_EXIT
+	END
 END
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,6 +40,6 @@ IDD_COUNTDOWN_CFG DIALOGEX 0, 0, 102, 16
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 9, "Tahoma", 400, 0, 0x1
 BEGIN
-    EDITTEXT        IDC_EDIT1,1,1,37,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Start countdown",IDOK,39,1,62,14
+	EDITTEXT        IDC_EDIT1,1,1,37,14,ES_AUTOHSCROLL
+	DEFPUSHBUTTON   "Start countdown",IDOK,39,1,62,14
 END
