@@ -169,6 +169,7 @@
     <ClCompile Include="DigClock2.cpp" />
     <ClCompile Include="..\..\BeginPaint_NoFlicker.cpp" />
     <ClCompile Include="..\..\vaDbg.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc" />
@@ -179,6 +180,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\BeginPaint_NoFlicker.h" />
     <ClInclude Include="..\..\vaDbg.h" />
+    <ClInclude Include="utils.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
 
