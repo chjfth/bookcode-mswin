@@ -25,14 +25,15 @@ Since 2024.10:
 #include <shlwapi.h>
 #include "resource.h"
 
+#include "iversion.h"
 #include "utils.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 void ShowHelp(HWND hwndParent)
 {
-	static TCHAR *s_help =
-		_T("DigClock2 by Jimm Chen. (version 1.1)\r\n")
+	static TCHAR *s_help_fmt =
+		_T("DigClock2 by Jimm Chen. (version %d.%d)\r\n")
 		_T("\r\n")
 		_T("This clock program works in wall-time mode or countdown mode.\r\n")
 		_T("Clock drawing code by DigClock from Charles Petzold [PRWIN5] Chap08.\r\n")
@@ -48,7 +49,8 @@ void ShowHelp(HWND hwndParent)
 		_T("\r\n")
 		_T("Compiled on: ") _T(__DATE__) _T(", ") _T(__TIME__)
 		;
-	MessageBox(hwndParent, s_help, _T("Help"), MB_OK);
+	vaMsgBox(hwndParent, MB_OK,_T("Help"), 
+		s_help_fmt, THISEXE_VMAJOR, THISEXE_VMINOR);
 }
 
 #define ID_TIMER_SECONDS_TICK   1
@@ -506,7 +508,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					s_isScratchingMainWindow = true;
 
-					vaDbg(_T("Re-show cfgdlg."));
+//					vaDbg(_T("Re-show cfgdlg."));
 					ShowWindow(g_hdlgCountdownCfg, SW_SHOW);
 				}
 			}
