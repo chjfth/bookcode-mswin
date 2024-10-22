@@ -306,10 +306,13 @@ void DisplayCountDown(HDC hdc)
 	{
 		// draw remain percent using original color(as user picked)
 		SelectObject(hdc, hbrushOrig);
+
 		double frac = (double)g_seconds_remain/g_seconds_countdown_cfg;
 		int draw_width = (int)((rcBar.right-rcBar.left)*frac) + 1;
 		Rectangle(hdc, rcBar.left, rcBar.top, min(rcBar.left+draw_width, rcBar.right), rcBar.bottom); 
 	}
+
+	DeleteObject(hbrushGray);
 }
 
 void RefreshTheClock(HDC hdc)
