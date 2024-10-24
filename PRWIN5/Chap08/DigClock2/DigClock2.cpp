@@ -687,6 +687,9 @@ Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		const TCHAR *pszCfg = Seconds_to_HMS(g_seconds_countdown_cfg);
 		SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
 
+		HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
+		Editbox_EnableUpDownKeyAdjustNumber(hEdit, 0, 59, true, true);
+			
 		// Special focus to the [Start countdown] button, explicitly.
 		SetFocus(GetDlgItem(hDlg, IDOK));
 		return FALSE; // FALSE to disobey dialog manager's suggested focus(would be IDC_EDIT1).
