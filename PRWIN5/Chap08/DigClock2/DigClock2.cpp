@@ -689,9 +689,13 @@ Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 		HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
 		Editbox_EnableUpDownKeyAdjustNumber(hEdit, 0, 59, true, true);
+
+		// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
+		int textlen = GetWindowTextLength (hEdit);
+		Edit_SetSel(hEdit, textlen, textlen);
 			
-		// Special focus to the [Start countdown] button, explicitly.
-		SetFocus(GetDlgItem(hDlg, IDOK));
+		// Specify focus to the editbox, explicitly.
+		SetFocus(hEdit);
 		return FALSE; // FALSE to disobey dialog manager's suggested focus(would be IDC_EDIT1).
 	}
 	case WM_COMMAND:
