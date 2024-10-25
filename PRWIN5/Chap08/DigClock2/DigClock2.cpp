@@ -77,6 +77,24 @@ SIZE g_init_clisize = {180, 60}; // Initial main-window client-area size
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
+// Global vars for WndProc() >>>
+
+static int    s_cxClient, s_cyClient ;
+static HMENU s_popmenu;
+static bool s_is_always_on_top = true;
+static bool s_is_change_color = false;
+static bool s_is_show_title = false;
+
+static POINT s_pos_mousedown; // client-area position
+static bool s_is_dragging = false;
+static bool s_is_moved = false;
+static int s_idxcolor = 0;
+
+static bool s_isScratchingMainWindow = false;
+
+// Global vars for WndProc <<<
+
+
 INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 
@@ -339,7 +357,6 @@ void ReloadSetting(HWND hwnd)
 	InvalidateRect (hwnd, NULL, TRUE) ;
 }
 
-
 void DoTimer(HWND hwnd, int idtimer)
 {
 	if(idtimer==ID_TIMER_SECONDS_TICK)
@@ -376,358 +393,340 @@ void DoTimer(HWND hwnd, int idtimer)
 	}
 }
 
-LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
-	static int    cxClient, cyClient ;
-	HDC           hdc ;
-	PAINTSTRUCT   ps ;
+	SetTimer(hwnd, ID_TIMER_SECONDS_TICK, 1000, NULL) ;
+	SetTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL, 500, NULL);
 
-	static HMENU s_popmenu;
-	static bool s_is_always_on_top = true;
-	static bool s_is_change_color = false;
-	static bool s_is_show_title = false;
+	if(!s_popmenu)
+	{
+		s_popmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MENU1));
+		s_popmenu = GetSubMenu(s_popmenu, 0) ; 
+	}
 
-	static POINT s_pos_mousedown; // client-area position
-	static bool s_is_dragging = false;
-	static bool s_is_moved = false;
-	static int s_idxcolor = 0;
+	Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
 
-	static bool s_isScratchingMainWindow = false;
+	ReloadSetting(hwnd);
 
+	return TRUE; // create ok
+}
+
+void Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+	s_cxClient = cx;
+	s_cyClient = cy;
+}
+
+void Cls_OnTimer(HWND hwnd, UINT id)
+{
+	DoTimer(hwnd, id);
+}
+
+void Cls_OnPaint(HWND hwnd)
+{
+	PAINTSTRUCT ps = {};
+	HDC hdc = BeginPaint_NoFlicker(hwnd, &ps) ;
+	RECT rccli = {};
+	GetClientRect(hwnd, &rccli);
+	FillRect(hdc, &rccli, GetStockBrush(WHITE_BRUSH));
+
+	HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
+
+	SetMapMode (hdc, MM_ISOTROPIC) ;
+	SetWindowExtEx (hdc, 276, 72, NULL) ;
+	SetViewportExtEx (hdc, s_cxClient, s_cyClient, NULL) ;
+
+	SetWindowOrgEx (hdc, 138, 36, NULL) ;
+	SetViewportOrgEx (hdc, s_cxClient / 2, s_cyClient / 2, NULL) ;
+
+	SelectObject (hdc, GetStockObject (NULL_PEN)) ;
+	SelectObject (hdc, hbrush) ;
+
+	RefreshTheClock(hdc); 
+
+	EndPaint_NoFlicker(hwnd, &ps) ;
+
+	SelectObject(hdc, GetStockBrush(WHITE_BRUSH));
+	DeleteObject(hbrush);
+}
+
+void Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+{
+	s_is_dragging = true;
+	s_is_moved = false;
+	SetCapture(hwnd);
+
+	s_pos_mousedown.x = x;
+	s_pos_mousedown.y = y;
+}
+
+void Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
+{
+	// Handle window dragging
+
+	if(s_is_dragging==true)
+	{
+		// Set new window pos
+
+		int offsetx = x - s_pos_mousedown.x;
+		int offsety = y - s_pos_mousedown.y;
+		if(offsetx!=0 || offsety!=0)
+		{
+			s_is_moved = true;
+		}
+
+//		vaDbg(_T("pos_mousedown: %d,%d => offset %d,%d"), s_pos_mousedown.x, s_pos_mousedown.y, offsetx, offsety);
+
+		MoveWindow_byOffset(hwnd, offsetx, offsety);
+	}
+
+	// Handle Countdown-cfg panel show/hide
+
+	if(!s_isScratchingMainWindow)
+	{
+		// Establish WM_MOUSELEAVE tracking.
+		TRACKMOUSEEVENT tme = {sizeof(tme), TME_LEAVE, hwnd};
+		TrackMouseEvent(&tme);
+
+		POINT ptnow = {};
+		GetCursorPos(&ptnow);
+
+		if(g_ClockMode==CM_Countdown)
+		{
+			if(!(ptnow.x==g_ptClickCountDown.x && ptnow.y==g_ptClickCountDown.y))
+			{
+				s_isScratchingMainWindow = true;
+
+				//					vaDbg(_T("Re-show cfgdlg."));
+				ShowWindow(g_hdlgCountdownCfg, SW_SHOW);
+			}
+		}
+	}
+}
+
+void My_OnMouseLeave(HWND hwnd)
+{
+	// Here, we check whether mouse pointer is outside the main window.
+	// If outside, we will hide the Countdown-cfg panel.
+	// Note: If the mouse is over the cfg panel, WM_MOUSELEAVE *is* generated,
+	// but we should *not* consider it outside(=should not hide the panel).
+
+	s_isScratchingMainWindow = false;
+
+	if(!Is_MouseInClientRect(hwnd)) // mouse outside
+	{
+		ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
+	}
+}
+
+void Cls_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+{
 	bool isCtrl = GetKeyState(VK_CONTROL)<0;
 	bool isShift = GetKeyState(VK_SHIFT)<0;
 
-	switch (message)
-	{{
-	case WM_CREATE:
-	{
-		SetTimer(hwnd, ID_TIMER_SECONDS_TICK, 1000, NULL) ;
-		SetTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL, 500, NULL);
+	s_is_dragging = false;
+	ReleaseCapture();
 
-		if(!s_popmenu)
+	if(s_is_moved==false)
+	{
+		if(s_is_change_color)
 		{
-			s_popmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MENU1));
-			s_popmenu = GetSubMenu(s_popmenu, 0) ; 
+			s_idxcolor = Get_NewColorIdx(s_idxcolor, (isCtrl||isShift) ? -1 : 1);
+			InvalidateRect(hwnd, NULL, TRUE);
 		}
-
-		Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
-
-		ReloadSetting(hwnd);
-		return 0;
 	}
-	case WM_SETTINGCHANGE:
-		ReloadSetting(hwnd);
-		return 0 ;
+}
 
-	case WM_SIZE:
-		cxClient = LOWORD (lParam) ;
-		cyClient = HIWORD (lParam) ;
-		return 0 ;
+void Cls_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT flags)
+{
+	bool isCtrl = GetKeyState(VK_CONTROL)<0;
+	bool isShift = GetKeyState(VK_SHIFT)<0;
 
-	case WM_TIMER:
-	{
-		WPARAM idtimer = wParam;
-		DoTimer(hwnd, (int)idtimer);
-		return 0 ;
-	}
-
-	case WM_PAINT:
-	{
-		hdc = BeginPaint_NoFlicker(hwnd, &ps) ;
-		RECT rccli = {};
-		GetClientRect(hwnd, &rccli);
-		FillRect(hdc, &rccli, GetStockBrush(WHITE_BRUSH));
-
-		HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
-
-		SetMapMode (hdc, MM_ISOTROPIC) ;
-		SetWindowExtEx (hdc, 276, 72, NULL) ;
-		SetViewportExtEx (hdc, cxClient, cyClient, NULL) ;
-
-		SetWindowOrgEx (hdc, 138, 36, NULL) ;
-		SetViewportOrgEx (hdc, cxClient / 2, cyClient / 2, NULL) ;
-
-		SelectObject (hdc, GetStockObject (NULL_PEN)) ;
-		SelectObject (hdc, hbrush) ;
-
-		RefreshTheClock(hdc); 
-
-		EndPaint_NoFlicker(hwnd, &ps) ;
-
-		SelectObject(hdc, GetStockBrush(WHITE_BRUSH));
-		DeleteObject(hbrush);
-
-		return 0 ;
-	}
-
-	case WM_LBUTTONDOWN:
-	{
-		s_is_dragging = true;
-		s_is_moved = false;
-		SetCapture(hwnd);
-
-		s_pos_mousedown.x = GET_X_LPARAM(lParam);
-		s_pos_mousedown.y = GET_Y_LPARAM(lParam);
-		return 0;
-	}
-	case WM_MOUSEMOVE:
-	{
-		bool hit = false;
-
-		// Handle window dragging
-		//
-
-		if(s_is_dragging==true)
-		{
-			// Set new window pos
-
-			int offsetx = GET_X_LPARAM(lParam) - s_pos_mousedown.x;
-			int offsety = GET_Y_LPARAM(lParam) - s_pos_mousedown.y;
-			if(offsetx!=0 || offsety!=0)
-			{
-				s_is_moved = true;
-			}
-
-			MoveWindow_byOffset(hwnd, offsetx, offsety);
-			hit = true;
-		}
-
-		//
-		// Handle Countdown-cfg panel show/hide
-		// 
-
-		if(!s_isScratchingMainWindow)
-		{
-			// Establish WM_MOUSELEAVE tracking.
-			TRACKMOUSEEVENT tme = {sizeof(tme), TME_LEAVE, hwnd};
-			TrackMouseEvent(&tme);
-
-			POINT ptnow = {};
-			GetCursorPos(&ptnow);
-
-			if(g_ClockMode==CM_Countdown)
-			{
-				if(!(ptnow.x==g_ptClickCountDown.x && ptnow.y==g_ptClickCountDown.y))
-				{
-					s_isScratchingMainWindow = true;
-
-//					vaDbg(_T("Re-show cfgdlg."));
-					ShowWindow(g_hdlgCountdownCfg, SW_SHOW);
-				}
-			}
-
-			hit = true;
-		}
-
-		//
-		if(hit)
-			return 0; // Not calling DefWindowProc()
-		else
-			break;
-	}
-
-	case WM_MOUSELEAVE:
-	{
-		// Here, we check whether mouse pointer is outside the main window.
-		// If outside, we will hide Countdown-cfg panel.
-		// Note: If the mouse is over the cfg panel, WM_MOUSELEAVE *is* generated,
-		// but we should *not* consider it outside(=should not hide the panel).
-
-		s_isScratchingMainWindow = false;
-
-		if(!Is_MouseInClientRect(hwnd)) // mouse outside
-		{
-			ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
-		}
-
-		break;
-	}
-
-	case WM_LBUTTONUP:
-	{
-		s_is_dragging = false;
-		ReleaseCapture();
-
-		if(s_is_moved==false)
-		{
-			if(s_is_change_color)
-			{
-				s_idxcolor = Get_NewColorIdx(s_idxcolor, (isCtrl||isShift) ? -1 : 1);
-				InvalidateRect(hwnd, NULL, TRUE);
-			}
-		}
-
-		return 0;
-	}
-
-	case WM_RBUTTONDOWN:
-	{
-		POINT point = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-		ClientToScreen (hwnd, &point) ;
-		TrackPopupMenu(s_popmenu, TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL) ;
-		return 0;
-	}
-
-	case WM_KEYDOWN:
+	if(fDown)
 	{
 		int scale = isCtrl ? 10 : 1;
 
 		int offsetx = 0, offsety = 0;
-		if(wParam==VK_UP)
+		if(vk==VK_UP)
 			offsety = -1 * scale;
-		else if(wParam==VK_DOWN)
+		else if(vk==VK_DOWN)
 			offsety = 1 * scale;
-		else if(wParam==VK_LEFT)
+		else if(vk==VK_LEFT)
 			offsetx = -1 * scale;
-		else if(wParam==VK_RIGHT)
+		else if(vk==VK_RIGHT)
 			offsetx = 1 * scale;
 
 		MoveWindow_byOffset(hwnd, offsetx, offsety);
-
-		return 0;
 	}
+}
 
-	case WM_INITMENUPOPUP:
+void Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+{
+	POINT point = {x, y};
+	ClientToScreen (hwnd, &point) ;
+	TrackPopupMenu(s_popmenu, TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL) ;
+}
+
+void Cls_OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
+{
+	HMENU hmenuPopup = hMenu;
+	if(hmenuPopup!=s_popmenu)
+		return;
+
+	CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
+		g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
+
+	EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
+		g_seconds_remain>0 ? MF_ENABLED: MF_DISABLED);
+
+	CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
+		s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
+
+	CheckMenuItem(hmenuPopup, IDM_CLICK_CHANGE_COLOR, 
+		s_is_change_color ? MF_CHECKED : MF_UNCHECKED);
+
+	CheckMenuItem(hmenuPopup, IDM_SHOW_TITLE, 
+		s_is_show_title ? MF_CHECKED : MF_UNCHECKED);
+}
+
+void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
+{
+	if(cmdid==IDM_COUNTDOWN_MODE)
 	{
-		HMENU hmenuPopup = (HMENU)wParam;
-		if(hmenuPopup!=s_popmenu)
-			break;
+		g_ClockMode = ClockMode_et(!g_ClockMode);
 
-		CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
-			g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
+		if(g_ClockMode==CM_WallTime)
+			ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
 
-		EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
-			g_seconds_remain>0 ? MF_ENABLED: MF_DISABLED);
-
-		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
-			s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, IDM_CLICK_CHANGE_COLOR, 
-			s_is_change_color ? MF_CHECKED : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, IDM_SHOW_TITLE, 
-			s_is_show_title ? MF_CHECKED : MF_UNCHECKED);
-
-		return 0;
+		InvalidateRect(hwnd, NULL, TRUE);
 	}
-
-	case WM_COMMAND:
+	else if(cmdid==IDM_STOP_COUNTDOWN)
 	{
-		int cmdid = GET_WM_COMMAND_ID(wParam, lParam);
-
-		if(cmdid==IDM_COUNTDOWN_MODE)
-		{
-			g_ClockMode = ClockMode_et(!g_ClockMode);
-
-			if(g_ClockMode==CM_WallTime)
-				ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
-
-			InvalidateRect(hwnd, NULL, TRUE);
-		}
-		else if(cmdid==IDM_STOP_COUNTDOWN)
-		{
-			g_seconds_remain = 0;
-			InvalidateRect(hwnd, NULL, TRUE);
-		}
-		else if(cmdid==IDM_ALWAYS_ON_TOP)
-		{
-			s_is_always_on_top = !s_is_always_on_top;
-
-			Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
-		}
-		else if(cmdid==IDM_CLICK_CHANGE_COLOR)
-		{
-			s_is_change_color = !s_is_change_color;
-		}
-		else if(cmdid==IDM_SHOW_TITLE)
-		{
-			s_is_show_title = !s_is_show_title;
-			Hwnd_ShowTitle(hwnd, s_is_show_title);
-		}
-		else if(cmdid==IDM_MINIMIZE_WINDOW)
-		{
-			ShowWindow(hwnd, SW_MINIMIZE);
-		}
-		else if(cmdid==IDM_HELP)
-		{
-			ShowHelp(hwnd);
-		}
-		else if(cmdid==IDM_RESET_SIZE)
-		{
-			Hwnd_ShowTitle(hwnd, s_is_show_title, g_init_clisize.cx, g_init_clisize.cy);
-		}
-		else if(cmdid==IDM_EXIT)
-		{
-			PostMessage(hwnd, WM_CLOSE, 0, 0);
-		}
-
-		return 0;
+		g_seconds_remain = 0;
+		InvalidateRect(hwnd, NULL, TRUE);
 	}
+	else if(cmdid==IDM_ALWAYS_ON_TOP)
+	{
+		s_is_always_on_top = !s_is_always_on_top;
 
-	case WM_DESTROY:
-		KillTimer(hwnd, ID_TIMER_SECONDS_TICK) ;
-		KillTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL);
-		PostQuitMessage (0) ;
-		return 0 ;
-	}}
+		Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
+	}
+	else if(cmdid==IDM_CLICK_CHANGE_COLOR)
+	{
+		s_is_change_color = !s_is_change_color;
+	}
+	else if(cmdid==IDM_SHOW_TITLE)
+	{
+		s_is_show_title = !s_is_show_title;
+		Hwnd_ShowTitle(hwnd, s_is_show_title);
+	}
+	else if(cmdid==IDM_MINIMIZE_WINDOW)
+	{
+		ShowWindow(hwnd, SW_MINIMIZE);
+	}
+	else if(cmdid==IDM_HELP)
+	{
+		ShowHelp(hwnd);
+	}
+	else if(cmdid==IDM_RESET_SIZE)
+	{
+		Hwnd_ShowTitle(hwnd, s_is_show_title, g_init_clisize.cx, g_init_clisize.cy);
+	}
+	else if(cmdid==IDM_EXIT)
+	{
+		PostMessage(hwnd, WM_CLOSE, 0, 0);
+	}
+}
+
+void Cls_OnDestroy(HWND hwnd)
+{
+	KillTimer(hwnd, ID_TIMER_SECONDS_TICK) ;
+	KillTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL);
+	
+	PostQuitMessage (0) ;
+}
+
+LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+		HANDLE_MSG(hwnd, WM_CREATE, Cls_OnCreate);
+		HANDLE_MSG(hwnd, WM_SIZE, Cls_OnSize);
+		HANDLE_MSG(hwnd, WM_TIMER, Cls_OnTimer);
+		HANDLE_MSG(hwnd, WM_PAINT, Cls_OnPaint);
+		
+		HANDLE_MSG(hwnd, WM_LBUTTONDOWN, Cls_OnLButtonDown);
+		HANDLE_MSG(hwnd, WM_MOUSEMOVE, Cls_OnMouseMove);
+		case WM_MOUSELEAVE: 
+			My_OnMouseLeave(hwnd);
+			return 0;
+		HANDLE_MSG(hwnd, WM_LBUTTONUP, Cls_OnLButtonUp);
+		HANDLE_MSG(hwnd, WM_RBUTTONDOWN, Cls_OnRButtonDown);
+
+		HANDLE_MSG(hwnd, WM_KEYDOWN, Cls_OnKey);
+
+		HANDLE_MSG(hwnd, WM_INITMENUPOPUP, Cls_OnInitMenuPopup);
+		HANDLE_MSG(hwnd, WM_COMMAND, Cls_OnCommand);
+		HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);
+
+		case WM_SETTINGCHANGE: // for user-locale(time format) change
+			ReloadSetting(hwnd);
+			return 0 ;
+	}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
-INT_PTR CALLBACK 
-Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+//////////////////////////////////////////////////////////////////////////
+
+BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
+{
+	const TCHAR *pszCfg = Seconds_to_HMS(g_seconds_countdown_cfg);
+	SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
+
+	HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
+	Editbox_EnableUpDownKeyAdjustNumber(hEdit, 0, 59, true, true);
+
+	// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
+	int textlen = GetWindowTextLength (hEdit);
+	Edit_SetSel(hEdit, textlen, textlen);
+
+	// Specify focus to the editbox, explicitly.
+	SetFocus(hEdit);
+	return FALSE; // FALSE to disobey dialog manager's suggested focus(would be IDC_EDIT1).
+}
+
+void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 {
 	HWND hwndMain = GetParent(hDlg);
 
+	if(idcmd==IDOK)
+	{
+		TCHAR szHMS[20] = {};
+		GetDlgItemText(hDlg, IDC_EDIT1, szHMS, ARRAYSIZE(szHMS)-1);
+		int seconds = HMS_to_Seconds(szHMS);
+		if(seconds<0)
+			return;
+
+		g_seconds_countdown_cfg = seconds;
+		g_msectick_start = GetTickCount();
+
+		g_seconds_remain = 1; // arbitrary >0 value
+		DoTimer(hwndMain, ID_TIMER_SECONDS_TICK);
+
+		GetCursorPos(&g_ptClickCountDown);
+		ShowWindow(hDlg, SW_HIDE);
+
+		InvalidateRect(hwndMain, NULL, TRUE);			
+	}
+}
+
+INT_PTR CALLBACK 
+Dlgproc_CountdownCfg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
 	switch (message)
-	{{
-	case WM_INITDIALOG :
 	{
-//		vaDbg(_T("WM_INITDIALOG wParam=%X"), wParam);
-
-		const TCHAR *pszCfg = Seconds_to_HMS(g_seconds_countdown_cfg);
-		SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
-
-		HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
-		Editbox_EnableUpDownKeyAdjustNumber(hEdit, 0, 59, true, true);
-
-		// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
-		int textlen = GetWindowTextLength (hEdit);
-		Edit_SetSel(hEdit, textlen, textlen);
-			
-		// Specify focus to the editbox, explicitly.
-		SetFocus(hEdit);
-		return FALSE; // FALSE to disobey dialog manager's suggested focus(would be IDC_EDIT1).
+		HANDLE_dlgMSG(hwnd, WM_INITDIALOG, CountdownCfg_OnInitDialog);
+		HANDLE_dlgMSG(hwnd, WM_COMMAND, CountdownCfg_OnCommand);
 	}
-	case WM_COMMAND:
-	{
-		int idcmd = GET_WM_COMMAND_ID(wParam,lParam);
-//		vaDbg(_T("Parent is 0x%X, idcmd=%d"), (UINT)hwndMain, idcmd);
-		
-		if(idcmd==IDOK)
-		{
-			TCHAR szHMS[20] = {};
-			GetDlgItemText(hDlg, IDC_EDIT1, szHMS, ARRAYSIZE(szHMS)-1);
-			int seconds = HMS_to_Seconds(szHMS);
-			if(seconds<0)
-				return TRUE;
-
-			g_seconds_countdown_cfg = seconds;
-			g_msectick_start = GetTickCount();
-
-			g_seconds_remain = 1; // arbitrary >0 value
-			DoTimer(hwndMain, ID_TIMER_SECONDS_TICK);
-
-			GetCursorPos(&g_ptClickCountDown);
-			ShowWindow(hDlg, SW_HIDE);
-
-			InvalidateRect(hwndMain, NULL, TRUE);			
-		}
-
-		return TRUE;
-	}
-	
-	default:
-		break;
-	}}
-	return FALSE ;
+	return FALSE; // Let Dlg-manager do default for current message.
 }
