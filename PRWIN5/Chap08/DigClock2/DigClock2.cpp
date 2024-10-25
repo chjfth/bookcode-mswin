@@ -357,6 +357,22 @@ void ReloadSetting(HWND hwnd)
 	InvalidateRect (hwnd, NULL, TRUE) ;
 }
 
+void Show_CountdownCfg()
+{
+	ShowWindow(g_hdlgCountdownCfg, SW_SHOW);
+
+	HWND hedit = GetDlgItem(g_hdlgCountdownCfg, IDC_EDIT1);
+	SetFocus(hedit);
+}
+
+void Hide_CountdownCfg()
+{
+	ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
+
+	HWND hwndMain = GetParent(g_hdlgCountdownCfg);
+	SetFocus(hwndMain); // so that user can use keyboard arraow to move hwndMain
+}
+
 void DoTimer(HWND hwnd, int idtimer)
 {
 	if(idtimer==ID_TIMER_SECONDS_TICK)
@@ -389,7 +405,7 @@ void DoTimer(HWND hwnd, int idtimer)
 	else if(idtimer==ID_TIMER_HIDE_CFG_PANEL)
 	{
 		if(!Is_MouseInClientRect(hwnd))
-			ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
+			Hide_CountdownCfg();
 	}
 }
 
@@ -497,8 +513,7 @@ void Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
 			{
 				s_isScratchingMainWindow = true;
 
-				//					vaDbg(_T("Re-show cfgdlg."));
-				ShowWindow(g_hdlgCountdownCfg, SW_SHOW);
+				Show_CountdownCfg();
 			}
 		}
 	}
@@ -515,7 +530,7 @@ void My_OnMouseLeave(HWND hwnd)
 
 	if(!Is_MouseInClientRect(hwnd)) // mouse outside
 	{
-		ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
+		Hide_CountdownCfg();
 	}
 }
 
@@ -596,7 +611,7 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 		g_ClockMode = ClockMode_et(!g_ClockMode);
 
 		if(g_ClockMode==CM_WallTime)
-			ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
+			Hide_CountdownCfg();
 
 		InvalidateRect(hwnd, NULL, TRUE);
 	}
@@ -690,9 +705,10 @@ BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	int textlen = GetWindowTextLength (hEdit);
 	Edit_SetSel(hEdit, textlen, textlen);
 
-	// Specify focus to the editbox, explicitly.
-	SetFocus(hEdit);
-	return FALSE; // FALSE to disobey dialog manager's suggested focus(would be IDC_EDIT1).
+	// return FALSE to tell dialog manager: Do NOT set keyboard focus to the editbox,
+	// bcz, I want the default focus on main-window itself, so that user can move the
+	// main-window by keyboard arrow keys.
+	return FALSE; 
 }
 
 void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
