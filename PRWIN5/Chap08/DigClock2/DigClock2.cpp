@@ -7,7 +7,7 @@ Since 2022.05:
 * Thin window border.
 * Drag window by clicking anywhere inside the window.
 * Move window by pressing arrow keys, Ctrl to accelerate.
-* Right-click context menu, toggle always on top.
+* Right-click context menu, toggle always-on-top.
 * Select different color by mouse clicking.
 * Scale down "second" value display(75%), so to have it stand out.
 * Toggle showing window title, with EXE file name as title text.
@@ -53,10 +53,12 @@ void ShowHelp(HWND hwndParent)
 		s_help_fmt, THISEXE_VMAJOR, THISEXE_VMINOR);
 }
 
+#define MY_TIMER_INTERVAL_1000ms 1000 // request exactly 1 seconds per WM_TIMER callback
+
 #define ID_TIMER_SECONDS_TICK   1
 #define ID_TIMER_HIDE_CFG_PANEL 2
 
-#define ADD_EXTRA_MILLISEC 16
+#define LESS_1millisec 1
 
 HINSTANCE g_hInstance;
 
@@ -384,17 +386,23 @@ void DoTimer(HWND hwnd, int idtimer)
 			// Yes, even if the UI is in walltime mode, we let the countdown go,
 			// so that the user can temporarily switch back to peek the walltime. 
 
+			DWORD msectick_end = g_msectick_start + g_seconds_countdown_cfg*1000 - LESS_1millisec;
+
 			DWORD now_msectick = GetTickCount();
-			int msec_remain = int(
-				g_msectick_start + g_seconds_countdown_cfg*1000 + ADD_EXTRA_MILLISEC
-				- now_msectick);
+
+			int msec_remain = int(msectick_end - now_msectick);
 
 			if(msec_remain>0)
-				g_seconds_remain = (msec_remain+999) / 1000;
+			{
+				// So that remaining 1ms ~ 999ms all considered "remaining one second".
+				g_seconds_remain = msec_remain / 1000 + 1;
+			}
 			else 
+			{
 				g_seconds_remain = 0;
+			}
 
-			g_seconds_remain--;
+			assert(g_seconds_remain>=0);
 
 			if(prev_remain>0 && g_seconds_remain==0)
 				MessageBeep(MB_OK); // time-up beep
@@ -411,7 +419,7 @@ void DoTimer(HWND hwnd, int idtimer)
 
 BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
-	SetTimer(hwnd, ID_TIMER_SECONDS_TICK, 1000, NULL) ;
+	SetTimer(hwnd, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL) ;
 	SetTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL, 500, NULL);
 
 	if(!s_popmenu)
@@ -726,8 +734,11 @@ void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 		g_seconds_countdown_cfg = seconds;
 		g_msectick_start = GetTickCount();
 
-		g_seconds_remain = 1; // arbitrary >0 value
+		g_seconds_remain = 1; // arbitrary >0 value, will recalculate in DoTimer()
 		DoTimer(hwndMain, ID_TIMER_SECONDS_TICK);
+
+		// Restart timer to align timing boundary.
+		SetTimer(hwndMain, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL);
 
 		GetCursorPos(&g_ptClickCountDown);
 		ShowWindow(hDlg, SW_HIDE);
