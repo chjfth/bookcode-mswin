@@ -741,7 +741,7 @@ void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 		SetTimer(hwndMain, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL);
 
 		GetCursorPos(&g_ptClickCountDown);
-		ShowWindow(hDlg, SW_HIDE);
+		Hide_CountdownCfg();
 
 		InvalidateRect(hwndMain, NULL, TRUE);			
 	}
