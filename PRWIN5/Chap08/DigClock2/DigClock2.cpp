@@ -47,9 +47,11 @@ void ShowHelp(HWND hwndParent)
 		_T("(1) Left click on the clock for next color.\r\n")
 		_T("(2) Shift+click to cycle back.\r\n")
 		_T("\r\n")
+		_T("In countdown mode, you can use keyboard Up/Down to adjust time values.\r\n")
+		_T("\r\n")
 		_T("Compiled on: ") _T(__DATE__) _T(", ") _T(__TIME__)
 		;
-	vaMsgBox(hwndParent, MB_OK,_T("Help"), 
+	vaMsgBox(hwndParent, MB_OK|MB_ICONINFORMATION,_T("Help"), 
 		s_help_fmt, THISEXE_VMAJOR, THISEXE_VMINOR);
 }
 
