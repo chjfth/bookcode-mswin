@@ -136,7 +136,7 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 			TEXT("Scratch"),                /* Title */
 			WS_OVERLAPPEDWINDOW,            /* Style */
 			CW_USEDEFAULT, CW_USEDEFAULT,   /* Position */
-			CW_USEDEFAULT, CW_USEDEFAULT,   /* Size */
+			500, 400,                       /* Size */
 			NULL,                           /* Parent */
 			NULL,                           /* No menu */
 			hinst,                          /* Instance */
