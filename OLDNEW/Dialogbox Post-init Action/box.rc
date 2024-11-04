@@ -1,4 +1,5 @@
-#include "afxres.h"
+#include "windows.h"
+#define IDC_STATIC -1 // was in afxres.h
 
 1 DIALOG DISCARDABLE  32, 32, 180, 102
 STYLE WS_CAPTION | WS_SYSMENU
@@ -6,5 +7,8 @@ CAPTION "Demo"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,66,81,50,14
-    CTEXT           "About Box Demo Program",IDC_STATIC,7,40,166,8
+    CTEXT           "Post-init Action",IDC_STATIC,7,40,166,8
 END
+
+
+1  ICON   "Pi.ico"

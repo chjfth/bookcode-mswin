@@ -4,33 +4,34 @@
 
 // In real life, this would be an instance variable
 BOOL g_fShown = FALSE;
-INT_PTR CALLBACK
-DlgProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
+
+INT_PTR CALLBACK DlgProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
-  switch (uiMsg) {
-  case WM_INITDIALOG:
-    return TRUE;
-  
-  case WM_SHOWWINDOW: // wParam==TRUE if the window is being shown
-    if (wParam && !g_fShown) {
-      g_fShown = TRUE;
-      MessageBox(hwnd,
-                 IsWindowVisible(hwnd) ? TEXT("Visible") : TEXT("Not Visible"),
-                 TEXT("t3-WM_SHOWWINDOW"), MB_OK);
-    }
-    break;
-  
-  case WM_CLOSE:
-   EndDialog(hwnd, 0);
-   break;
-  }
-  return FALSE;
+	switch (uiMsg) {
+	case WM_INITDIALOG:
+		return TRUE;
+
+	case WM_SHOWWINDOW: // wParam==TRUE if the window is being shown
+		if (wParam && !g_fShown) {
+			g_fShown = TRUE;
+			MessageBox(hwnd,
+				IsWindowVisible(hwnd) ? TEXT("Visible") : TEXT("Not Visible"),
+				TEXT("t3-WM_SHOWWINDOW"), MB_OK);
+		}
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hwnd, 0);
+		break;
+	}
+	return FALSE;
 }
+
 int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
-                   LPSTR lpCmdLine, int nShowCmd)
+	LPSTR lpCmdLine, int nShowCmd)
 {
-    DialogBox(hinst, MAKEINTRESOURCE(1), NULL, DlgProc);
-    return 0;
+	DialogBox(hinst, MAKEINTRESOURCE(1), NULL, DlgProc);
+	return 0;
 }
 
 /* Compiling commands:
