@@ -40,9 +40,9 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20241104-0000-0000-0000-193150000003}</ProjectGuid>
-    <ProjectName>t3-WM_SHOWWINDOW</ProjectName>
-     <TargetName>t3-WM_SHOWWINDOW</TargetName>
+    <ProjectGuid>{20241104-0000-0000-0000-193150000005}</ProjectGuid>
+    <ProjectName>t5-final</ProjectName>
+     <TargetName>t5-final</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
@@ -166,7 +166,7 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="t3-WM_SHOWWINDOW.cpp" />
+    <ClCompile Include="t5-final.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="box.rc" />
