@@ -48,6 +48,7 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		break;
 
 	case IDC_ERRORCODE: 
+		// [2024-11-10] Chj: Will see codeNotify=EN_UPDATE, EN_CHANGE, EN_KILLFOCUS
 		EnableWindow(GetDlgItem(hwnd, IDOK), Edit_GetTextLength(hwndCtl) > 0);
 		break;
 
@@ -63,22 +64,26 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 		// Get the error code's textual description
 		BOOL fOk = FormatMessage(
-			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
-			FORMAT_MESSAGE_ALLOCATE_BUFFER, 
-			NULL, dwError, systemLocale, 
-			(PTSTR) &hlocal, 0, NULL);
+			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER, 
+			NULL, 
+			dwError, 
+			systemLocale, 
+			(PTSTR) &hlocal, 
+			0, NULL);
 
 		if (!fOk) {
-			// Is it a network-related error?
+			// Is dwError a network-related error-code?
 			HMODULE hDll = LoadLibraryEx(TEXT("netmsg.dll"), NULL, 
 				DONT_RESOLVE_DLL_REFERENCES);
 
 			if (hDll != NULL) {
 				fOk = FormatMessage(
-					FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS |
-					FORMAT_MESSAGE_ALLOCATE_BUFFER,
-					hDll, dwError, systemLocale,
-					(PTSTR) &hlocal, 0, NULL);
+					FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+					hDll, 
+					dwError, 
+					systemLocale,
+					(PTSTR) &hlocal, 
+					0, NULL);
 				FreeLibrary(hDll);
 			}
 		}
