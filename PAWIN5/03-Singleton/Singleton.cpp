@@ -32,6 +32,7 @@ BOOL     g_bNamespaceOpened = FALSE;
 PCTSTR   g_szBoundary = TEXT("3-Boundary");
 PCTSTR   g_szNamespace = TEXT("3-Namespace");
 
+PCTSTR g_pCmdLine = NULL;
 
 #define DETAILS_CTRL GetDlgItem(g_hDlg, IDC_EDIT_DETAILS)
 
@@ -141,8 +142,7 @@ void CheckInstances()
 					AddText(TEXT("   but OpenPrivateNamespace succeeded\r\n\r\n"));
 				}
 			} else {
-				AddText(TEXT("Unexpected error occured: %u\r\n\r\n"),
-					dwLastError);
+				AddText(TEXT("Unexpected error occured: %u\r\n\r\n"), dwLastError);
 				return;
 			}
 		}
@@ -166,6 +166,62 @@ void CheckInstances()
 	}
 }
 
+void CheckInstances_chj_simple() 
+{
+	// Chj: No AddSIDToBoundaryDescriptor, NULL security attributes.
+
+	// Create the boundary descriptor
+	g_hBoundary = CreateBoundaryDescriptor(g_szBoundary, 0);
+
+	// Create the namespace for Local Administrators only
+	g_hNamespace = CreatePrivateNamespace(NULL, g_hBoundary, g_szNamespace);
+
+	// Check the private namespace creation result
+	DWORD dwLastError = GetLastError();
+	if (g_hNamespace == NULL) {
+		// Nothing to do if access is denied
+		// --> this code must run under a Local Administrator account
+		if (dwLastError == ERROR_ACCESS_DENIED) {
+			AddText(TEXT("#Access denied when creating the namespace.\r\n"));
+			AddText(TEXT("#   You must be running as Administrator.\r\n\r\n"));
+			return;
+		} else { 
+			if (dwLastError == ERROR_ALREADY_EXISTS) {
+				// If another instance has already created the namespace, 
+				// we need to open it instead. 
+				AddText(TEXT("#CreatePrivateNamespace failed: %u\r\n"), dwLastError);
+				g_hNamespace = OpenPrivateNamespace(g_hBoundary, g_szNamespace);
+				if (g_hNamespace == NULL) {
+					AddText(TEXT("#   and OpenPrivateNamespace failed: %u\r\n"), dwLastError);
+					return;
+				} else {
+					g_bNamespaceOpened = TRUE;
+					AddText(TEXT("#   but OpenPrivateNamespace succeeded\r\n\r\n"));
+				}
+			} else {
+				AddText(TEXT("#Unexpected error occured: %u\r\n\r\n"), dwLastError);
+				return;
+			}
+		}
+	}
+
+	// Try to create the mutex object with a name 
+	// based on the private namespace 
+	TCHAR szMutexName[64] = {};
+	StringCchPrintf(szMutexName, _countof(szMutexName), TEXT("%s\\%s"), 
+		g_szNamespace, TEXT("Singleton"));
+
+	g_hSingleton = CreateMutex(NULL, FALSE, szMutexName);
+	if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		// There is already an instance of this Singleton object
+		AddText(TEXT("#Another instance of Singleton is running:\r\n"));
+		AddText(TEXT("#--> Impossible to access application features.\r\n"));
+	} else  {
+		// First time the Singleton object is created
+		AddText(TEXT("#First instance of Singleton:\r\n"));
+		AddText(TEXT("#--> Access application features now.\r\n"));
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -178,7 +234,10 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	g_hDlg = hwnd;
 
 	// Check whether another instance is already running
-	CheckInstances();
+	if(g_pCmdLine[0]=='\0')
+		CheckInstances();
+	else if(g_pCmdLine[0]=='c')
+		CheckInstances_chj_simple();
 
 	return(TRUE);
 }
@@ -208,6 +267,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	g_pCmdLine = lpCmdLine;
 
 	// Show main window 
 	DialogBox(hInstance, MAKEINTRESOURCE(IDD_SINGLETON), NULL, Dlg_Proc);
