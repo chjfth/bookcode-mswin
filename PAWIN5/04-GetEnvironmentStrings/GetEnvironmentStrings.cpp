@@ -91,8 +91,33 @@ void DumpEnvStrings()
 	FreeEnvironmentStrings(pEnvBlock);
 }
 
-int _tmain(int argc, TCHAR* argv[])
+void DumpEnvVariables(PTSTR pEnvBlock[]) 
 {
+	int current = 0;
+	PTSTR* pElement = (PTSTR*)pEnvBlock;
+	PTSTR pCurrent = NULL;
+	while (pElement != NULL) {
+		pCurrent = (PTSTR)(*pElement);
+		if (pCurrent == NULL) {
+			// No more environment variable.
+			pElement = NULL;
+		} else {
+			_tprintf(TEXT("[%u] %s\r\n"), current, pCurrent);
+			current++;
+			pElement++;
+		}
+	}
+}
+
+int _tmain(int argc, TCHAR* argv[], TCHAR *env[])
+{
+	setlocale(LC_ALL, "");
+
+	printf("==== GetEnvironmentStrings() / FreeEnvironmentStrings()\n");
 	DumpEnvStrings();
+
+	printf("\n\n");
+	printf("==== Dump by main()'s env parameter.\n");
+	DumpEnvVariables(env);
 	return 0;
 }
