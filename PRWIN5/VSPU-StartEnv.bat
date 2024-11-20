@@ -11,7 +11,7 @@ set batdir=%batdir:~0,-1%
 set _vspgINDENTS=%_vspgINDENTS%.
 call :Echos START from %batdir% (Loading Env-vars affecting parent env)
 
-call "%bootsdir%\GetParentDir.bat" parentdir "%batdir%"
+call :GetAbsPath parentdir "%batdir%\.."
 
 REM We have to endlocal here, bcz the following :SetEnvVar need to change parent bat's env.
 endlocal & (
