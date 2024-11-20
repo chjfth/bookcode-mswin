@@ -247,7 +247,7 @@ static MsgRelay_et Edit_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT 
 	int startPos = 0, endPos = 0;
 	SendMessage(hEdit, EM_GETSEL, (WPARAM)&startPos, (LPARAM)&endPos);
 
-	vaDbg(_T("hEdit 0x%08X: [#%d~%d) %s | %.*s"), (UINT)hEdit, startPos, endPos, szText, 
+	vaDbg(_T("hEdit 0x%08X: [#%d~%d) %s | %.*s"), hEdit, startPos, endPos, szText, 
 		endPos-startPos, szText+startPos // the substring after |
 		);
 
@@ -300,11 +300,11 @@ static MsgRelay_et Edit_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT 
 	
 	if(hotlen<=MaxUpDownDigits)
 	{
-		vaDbg(_T("hEdit 0x%08X: hot [@%d~%d) %s"), (UINT)hEdit,	startHot, endHot_, szHot);
+		vaDbg(_T("hEdit 0x%08X: hot [@%d~%d) %s"), hEdit,	startHot, endHot_, szHot);
 	}
 	else
 	{
-		vaDbg(_T("hEdit 0x%08X: bad [@%d~%d) %s (exceed %d)"), (UINT)hEdit, startHot, endHot_, szHot, MaxUpDownDigits);
+		vaDbg(_T("hEdit 0x%08X: bad [@%d~%d) %s (exceed %d)"), hEdit, startHot, endHot_, szHot, MaxUpDownDigits);
 		return Relay_yes;
 	}
 
