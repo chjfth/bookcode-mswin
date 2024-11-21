@@ -2,6 +2,7 @@
 #define __utils_h_
 
 #include "targetver.h"
+#include <stdio.h>
 #include <tchar.h>
 #include <assert.h>
 #include <windows.h>
