@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04-GetEnvironmentStrings", "04-GetEnvironmentStrings\GetEnvironmentStrings.vcxproj", "{20241112-0000-0000-0000-215950000001}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04-ProcessInfo", "04-ProcessInfo\ProcessInfo.vcxproj", "{20241123-0000-0000-0000-113159000001}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug ANSI|Win32 = Debug ANSI|Win32
@@ -31,6 +33,22 @@ Global
 		{20241112-0000-0000-0000-215950000001}.Release|Win32.Build.0 = Release|Win32
 		{20241112-0000-0000-0000-215950000001}.Release|x64.ActiveCfg = Release|x64
 		{20241112-0000-0000-0000-215950000001}.Release|x64.Build.0 = Release|x64
+		{20241123-0000-0000-0000-113159000001}.Debug ANSI|Win32.ActiveCfg = Debug ANSI|Win32
+		{20241123-0000-0000-0000-113159000001}.Debug ANSI|Win32.Build.0 = Debug ANSI|Win32
+		{20241123-0000-0000-0000-113159000001}.Debug ANSI|x64.ActiveCfg = Debug ANSI|x64
+		{20241123-0000-0000-0000-113159000001}.Debug ANSI|x64.Build.0 = Debug ANSI|x64
+		{20241123-0000-0000-0000-113159000001}.Debug|Win32.ActiveCfg = Debug|Win32
+		{20241123-0000-0000-0000-113159000001}.Debug|Win32.Build.0 = Debug|Win32
+		{20241123-0000-0000-0000-113159000001}.Debug|x64.ActiveCfg = Debug|x64
+		{20241123-0000-0000-0000-113159000001}.Debug|x64.Build.0 = Debug|x64
+		{20241123-0000-0000-0000-113159000001}.Release ANSI|Win32.ActiveCfg = Release ANSI|Win32
+		{20241123-0000-0000-0000-113159000001}.Release ANSI|Win32.Build.0 = Release ANSI|Win32
+		{20241123-0000-0000-0000-113159000001}.Release ANSI|x64.ActiveCfg = Release ANSI|x64
+		{20241123-0000-0000-0000-113159000001}.Release ANSI|x64.Build.0 = Release ANSI|x64
+		{20241123-0000-0000-0000-113159000001}.Release|Win32.ActiveCfg = Release|Win32
+		{20241123-0000-0000-0000-113159000001}.Release|Win32.Build.0 = Release|Win32
+		{20241123-0000-0000-0000-113159000001}.Release|x64.ActiveCfg = Release|x64
+		{20241123-0000-0000-0000-113159000001}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

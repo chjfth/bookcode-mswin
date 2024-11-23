@@ -74,8 +74,8 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20241110-0000-0000-0000-161626000001}</ProjectGuid>
-    <ProjectName>01-ErrorShow</ProjectName>
+    <ProjectGuid>{20241123-0000-0000-0000-113159000001}</ProjectGuid>
+    <ProjectName>04-ProcessInfo</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
@@ -200,15 +200,17 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="ErrorShow.cpp" />
+    <ClCompile Include="ProcessInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ErrorShow.rc" />
+    <ResourceCompile Include="ProcessInfo.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ErrorShow.ico" />
+    <None Include="ProcessInfo.ico" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
   <!-- MSBuild system stock Cpp.targets -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
