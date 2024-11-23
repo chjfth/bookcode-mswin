@@ -37,8 +37,8 @@ const int			 s_cchAddress = sizeof(PVOID) * 2;
 
 
 // Add a string to an edit control
-void AddText(HWND hwnd, PCTSTR pszFormat, ...) {
-
+void AddText(HWND hwnd, PCTSTR pszFormat, ...) 
+{
 	va_list argList;
 	va_start(argList, pszFormat);
 
@@ -977,6 +977,11 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 	// By default, show the running processes
 	Dlg_PopulateProcessList(hwnd);
+
+	// Chj: Set init window size to 780*560, bcz orig DlgTemplate make it too small.
+	RECT rc = {};
+	GetWindowRect(hwnd, &rc);
+	MoveWindow(hwnd, rc.left, rc.top, 780, 560, TRUE);
 
 	return(TRUE);
 }
