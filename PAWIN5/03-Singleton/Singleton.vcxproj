@@ -178,7 +178,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <RandomizedBaseAddress Condition="!$(Platform.StartsWith('ARM64'))">false</RandomizedBaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <!-- 

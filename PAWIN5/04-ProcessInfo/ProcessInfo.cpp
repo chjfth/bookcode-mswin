@@ -347,7 +347,7 @@ VOID Dlg_PopulateModuleList(HWND hwnd)
 	{
 		CToolhelp thModules(TH32CS_SNAPMODULE, pe.th32ProcessID);
 		MODULEENTRY32 me = { sizeof(me) };
-		BOOL fOk = thModules.ModuleFirst(&me);
+		fOk = thModules.ModuleFirst(&me);
 		for (; fOk; fOk = thModules.ModuleNext(&me)) {
 			int n = ListBox_FindStringExact(hwndModuleHelp, -1, me.szExePath);
 			if (n == LB_ERR) {
@@ -815,7 +815,7 @@ VOID ShowModuleInfo(HWND hwnd, PCTSTR pszModulePath) {
 	for (; fOk; fOk = thProcesses.ProcessNext(&pe)) {
 		CToolhelp thModules(TH32CS_SNAPMODULE, pe.th32ProcessID);
 		MODULEENTRY32 me = { sizeof(me) };
-		BOOL fOk = thModules.ModuleFirst(&me);
+		fOk = thModules.ModuleFirst(&me);
 		for (; fOk; fOk = thModules.ModuleNext(&me)) {
 			if (_tcscmp(me.szExePath, pszModulePath) == 0) {
 				AddText(hwnd, TEXT("  %08X  %p  %s\r\n"), 
