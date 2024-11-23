@@ -25,6 +25,7 @@ This program requires Windows Vista+.
 #pragma comment (lib,"shlwapi.lib")
 #pragma comment (lib,"shell32.lib")
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 
 // static variables
@@ -1141,7 +1142,8 @@ INT_PTR WINAPI Dlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int WINAPI _tWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int) {
+int WINAPI _tWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int) 
+{
 
 	// Enabling the debug privilege allows the application to see
 	// information about service applications

@@ -8,6 +8,8 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 #include <tchar.h>
 #include "Resource.h"
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -127,6 +129,8 @@ INT_PTR WINAPI Dlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int) 
 {
+	InitCommonControls(); // WinXP requires this, to work with Visual-style manifest
+	
 	HWND hwnd = FindWindow(TEXT("#32770"), TEXT("Error Show"));
 	if (IsWindow(hwnd)) {
 		// An instance is already running, activate it and send it the new #
