@@ -66,30 +66,32 @@ BOOL GetProcessIntegrityLevel(HANDLE hProcess, PDWORD pIntegrityLevel,
 
 	// First, compute the size of the buffer to get the Integrity level
 	DWORD dwNeededSize = 0;
-	if (!GetTokenInformation(
-		hToken, TokenIntegrityLevel, NULL, 0, &dwNeededSize)) {
+	if (!GetTokenInformation(hToken, TokenIntegrityLevel, NULL, 0, &dwNeededSize)) 
+	{
+		PTOKEN_MANDATORY_LABEL pTokenInfo = NULL;
+		if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) 
+		{
+			// Second, allocate a memory block with the the required size 
+			pTokenInfo = (PTOKEN_MANDATORY_LABEL)LocalAlloc(0, dwNeededSize);
+			if (pTokenInfo != NULL) 
+			{
+				// And finally, ask for the integrity level
+				if (GetTokenInformation(hToken, TokenIntegrityLevel, pTokenInfo, 
+					dwNeededSize, &dwNeededSize)) 
+				{
 
-			PTOKEN_MANDATORY_LABEL pTokenInfo = NULL;
-			if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-				// Second, allocate a memory block with the the required size 
-				pTokenInfo = (PTOKEN_MANDATORY_LABEL)LocalAlloc(0, dwNeededSize);
-				if (pTokenInfo != NULL) {
-					// And finally, ask for the integrity level
-					if (GetTokenInformation(hToken, TokenIntegrityLevel, pTokenInfo, 
-						dwNeededSize, &dwNeededSize)) {
-
-							*pIntegrityLevel = 
-								*GetSidSubAuthority(
-								pTokenInfo->Label.Sid, 
-								(*GetSidSubAuthorityCount(pTokenInfo->Label.Sid)-1)
-								);
-							bReturn = TRUE;
-					}
-
-					// Don't forget to free the memory
-					LocalFree(pTokenInfo);
+						*pIntegrityLevel = 
+							*GetSidSubAuthority(
+							pTokenInfo->Label.Sid, 
+							(*GetSidSubAuthorityCount(pTokenInfo->Label.Sid)-1)
+							);
+						bReturn = TRUE;
 				}
+
+				// Don't forget to free the memory
+				LocalFree(pTokenInfo);
 			}
+		}
 	}
 
 	// Try to get the policy if the integrity level was available
@@ -109,19 +111,23 @@ BOOL GetProcessIntegrityLevel(HANDLE hProcess, PDWORD pIntegrityLevel,
 	DWORD dwResult = ERROR_SUCCESS;
 
 	// Look for the no-read-up/no-write-up policy in the SACL
-	if (hToken != NULL) {
-		dwResult = 
-			GetSecurityInfo(
+	if (hToken != NULL) 
+	{
+		dwResult = GetSecurityInfo(
 			hProcess, SE_KERNEL_OBJECT,
 			LABEL_SECURITY_INFORMATION,
 			NULL, NULL, NULL, 
 			&pSACL, &pSD
 			);
-		if (dwResult == ERROR_SUCCESS) {
-			if (pSACL != NULL) {
+		if (dwResult == ERROR_SUCCESS) 
+		{
+			if (pSACL != NULL) 
+			{
 				SYSTEM_MANDATORY_LABEL_ACE* pACE = NULL;
-				if ((pSACL->AceCount > 0) && (GetAce(pSACL, 0, (PVOID*)&pACE))) {
-					if (pACE != NULL) {
+				if ((pSACL->AceCount > 0) && (GetAce(pSACL, 0, (PVOID*)&pACE))) 
+				{
+					if (pACE != NULL) 
+					{
 						SID* pSID = (SID*)(&pACE->SidStart);
 						*pResourceIntegrityLevel = pSID->SubAuthority[0];
 						*pResourcePolicy = pACE->Mask;
@@ -199,116 +205,117 @@ VOID Dlg_PopulateProcessList(HWND hwnd)
 		TCHAR szResourceDetails[256];
 		szResourceDetails[0] = TEXT('\0');
 		if (GetProcessIntegrityLevel(pe.th32ProcessID, &dwCodeIntegrityLevel, 
-			&dwCodePolicy, &dwResourceIntegrityLevel, &dwResourcePolicy)) {
-				switch (dwCodeIntegrityLevel) {
-				case SECURITY_MANDATORY_LOW_RID:
-					_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
-						TEXT("- Low "));
-					break;
+			&dwCodePolicy, &dwResourceIntegrityLevel, &dwResourcePolicy)) 
+		{
+			switch (dwCodeIntegrityLevel) {
+			case SECURITY_MANDATORY_LOW_RID:
+				_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
+					TEXT("- Low "));
+				break;
 
-				case SECURITY_MANDATORY_MEDIUM_RID:
-					_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
-						TEXT("- Medium "));
-					break;
+			case SECURITY_MANDATORY_MEDIUM_RID:
+				_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
+					TEXT("- Medium "));
+				break;
 
-				case SECURITY_MANDATORY_HIGH_RID:
-					_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
-						TEXT("- High "));
-					break;
+			case SECURITY_MANDATORY_HIGH_RID:
+				_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
+					TEXT("- High "));
+				break;
 
-				case SECURITY_MANDATORY_SYSTEM_RID:
-					_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
-						TEXT("- System "));
-					break;
+			case SECURITY_MANDATORY_SYSTEM_RID:
+				_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
+					TEXT("- System "));
+				break;
 
-				default:
-					_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
-						TEXT("- ??? "));
-				}
+			default:
+				_tcscpy_s(szCodeDetails, _countof(szCodeDetails), 
+					TEXT("- ??? "));
+			}
 
-				if (dwCodePolicy == TOKEN_MANDATORY_POLICY_OFF) { // = 0
-					_tcscat_s(szCodeDetails, 
-						_countof(szCodeDetails), TEXT(" + no policy"));
+			if (dwCodePolicy == TOKEN_MANDATORY_POLICY_OFF) { // = 0
+				_tcscat_s(szCodeDetails, 
+					_countof(szCodeDetails), TEXT(" + no policy"));
+			} else {
+				if ((dwCodePolicy & TOKEN_MANDATORY_POLICY_VALID_MASK) == 0) {
+					_tcscat_s(szCodeDetails, _countof(szCodeDetails), 
+						TEXT(" + ???"));
 				} else {
-					if ((dwCodePolicy & TOKEN_MANDATORY_POLICY_VALID_MASK) == 0) {
-						_tcscat_s(szCodeDetails, _countof(szCodeDetails), 
-							TEXT(" + ???"));
-					} else {
-						if ((dwCodePolicy & TOKEN_MANDATORY_POLICY_NO_WRITE_UP)
-							== TOKEN_MANDATORY_POLICY_NO_WRITE_UP) { 
-								_tcscat_s(szCodeDetails, _countof(szCodeDetails), 
-									TEXT(" + no write-up"));
-						}
+					if ((dwCodePolicy & TOKEN_MANDATORY_POLICY_NO_WRITE_UP)
+						== TOKEN_MANDATORY_POLICY_NO_WRITE_UP) { 
+							_tcscat_s(szCodeDetails, _countof(szCodeDetails), 
+								TEXT(" + no write-up"));
+					}
 
-						if ((dwCodePolicy & TOKEN_MANDATORY_POLICY_NEW_PROCESS_MIN)
-							== TOKEN_MANDATORY_POLICY_NEW_PROCESS_MIN) { 
-								_tcscat_s(szCodeDetails, _countof(szCodeDetails), 
-									TEXT(" + new process min"));
-						}
+					if ((dwCodePolicy & TOKEN_MANDATORY_POLICY_NEW_PROCESS_MIN)
+						== TOKEN_MANDATORY_POLICY_NEW_PROCESS_MIN) { 
+							_tcscat_s(szCodeDetails, _countof(szCodeDetails), 
+								TEXT(" + new process min"));
 					}
 				}
+			}
 
-				switch (dwResourceIntegrityLevel) {
-				case SECURITY_MANDATORY_LOW_RID:
-					_tcscpy_s(szResourceDetails, 
-						_countof(szResourceDetails), TEXT("Low"));
-					break;
+			switch (dwResourceIntegrityLevel) {
+			case SECURITY_MANDATORY_LOW_RID:
+				_tcscpy_s(szResourceDetails, 
+					_countof(szResourceDetails), TEXT("Low"));
+				break;
 
-				case SECURITY_MANDATORY_MEDIUM_RID:
-					_tcscpy_s(szResourceDetails, 
-						_countof(szResourceDetails), TEXT("Medium"));
-					break;
+			case SECURITY_MANDATORY_MEDIUM_RID:
+				_tcscpy_s(szResourceDetails, 
+					_countof(szResourceDetails), TEXT("Medium"));
+				break;
 
-				case SECURITY_MANDATORY_HIGH_RID:
-					_tcscpy_s(szResourceDetails, 
-						_countof(szResourceDetails), TEXT("High"));
-					break;
+			case SECURITY_MANDATORY_HIGH_RID:
+				_tcscpy_s(szResourceDetails, 
+					_countof(szResourceDetails), TEXT("High"));
+				break;
 
-				case SECURITY_MANDATORY_SYSTEM_RID:
-					_tcscpy_s(szResourceDetails, 
-						_countof(szResourceDetails), TEXT("System"));
-					break;
+			case SECURITY_MANDATORY_SYSTEM_RID:
+				_tcscpy_s(szResourceDetails, 
+					_countof(szResourceDetails), TEXT("System"));
+				break;
 
-				case 0:
-					_tcscpy_s(szResourceDetails, 
-						_countof(szResourceDetails), TEXT("Not set"));
-					break;
+			case 0:
+				_tcscpy_s(szResourceDetails, 
+					_countof(szResourceDetails), TEXT("Not set"));
+				break;
 
-				default:
-					_tcscpy_s(szResourceDetails, 
-						_countof(szResourceDetails), TEXT("???"));
-				}
+			default:
+				_tcscpy_s(szResourceDetails, 
+					_countof(szResourceDetails), TEXT("???"));
+			}
 
 
-				if (dwResourcePolicy == 0) { // = 0
+			if (dwResourcePolicy == 0) { // = 0
+				_tcscat_s(szResourceDetails, 
+					_countof(szResourceDetails), TEXT(" + 0 policy"));
+			} else {
+				if ((dwResourcePolicy & TOKEN_MANDATORY_POLICY_VALID_MASK) == 0) {
 					_tcscat_s(szResourceDetails, 
-						_countof(szResourceDetails), TEXT(" + 0 policy"));
+						_countof(szResourceDetails), TEXT(" + ???"));
 				} else {
-					if ((dwResourcePolicy & TOKEN_MANDATORY_POLICY_VALID_MASK) == 0) {
-						_tcscat_s(szResourceDetails, 
-							_countof(szResourceDetails), TEXT(" + ???"));
-					} else {
-						if ((dwResourcePolicy & SYSTEM_MANDATORY_LABEL_NO_WRITE_UP)
-							== SYSTEM_MANDATORY_LABEL_NO_WRITE_UP) { 
-								_tcscat_s(szResourceDetails, 
-									_countof(szResourceDetails), 
-									TEXT(" + no write-up"));
-						}
+					if ((dwResourcePolicy & SYSTEM_MANDATORY_LABEL_NO_WRITE_UP)
+						== SYSTEM_MANDATORY_LABEL_NO_WRITE_UP) { 
+							_tcscat_s(szResourceDetails, 
+								_countof(szResourceDetails), 
+								TEXT(" + no write-up"));
+					}
 
-						if ((dwResourcePolicy & SYSTEM_MANDATORY_LABEL_NO_READ_UP)
-							== SYSTEM_MANDATORY_LABEL_NO_READ_UP) { 
-								_tcscat_s(szResourceDetails, 
-									_countof(szResourceDetails), 
-									TEXT(" + no read-up"));
-						}
-						if ((dwResourcePolicy & SYSTEM_MANDATORY_LABEL_NO_EXECUTE_UP)
-							== SYSTEM_MANDATORY_LABEL_NO_EXECUTE_UP) { 
-								_tcscat_s(szResourceDetails, 
-									_countof(szResourceDetails), 
-									TEXT(" + no execute-up"));
-						}
+					if ((dwResourcePolicy & SYSTEM_MANDATORY_LABEL_NO_READ_UP)
+						== SYSTEM_MANDATORY_LABEL_NO_READ_UP) { 
+							_tcscat_s(szResourceDetails, 
+								_countof(szResourceDetails), 
+								TEXT(" + no read-up"));
+					}
+					if ((dwResourcePolicy & SYSTEM_MANDATORY_LABEL_NO_EXECUTE_UP)
+						== SYSTEM_MANDATORY_LABEL_NO_EXECUTE_UP) { 
+							_tcscat_s(szResourceDetails, 
+								_countof(szResourceDetails), 
+								TEXT(" + no execute-up"));
 					}
 				}
+			}
 		}
 
 		StringCchPrintf(sz, _countof(sz), TEXT("%s     (0x%08X)  %s    [%s]"), 
@@ -348,7 +355,8 @@ VOID Dlg_PopulateModuleList(HWND hwnd)
 		CToolhelp thModules(TH32CS_SNAPMODULE, pe.th32ProcessID);
 		MODULEENTRY32 me = { sizeof(me) };
 		fOk = thModules.ModuleFirst(&me);
-		for (; fOk; fOk = thModules.ModuleNext(&me)) {
+		for (; fOk; fOk = thModules.ModuleNext(&me)) 
+		{
 			int n = ListBox_FindStringExact(hwndModuleHelp, -1, me.szExePath);
 			if (n == LB_ERR) {
 				// This module hasn't been added before
@@ -396,7 +404,8 @@ PVOID GetModulePreferredBaseAddr(DWORD dwProcessId, PVOID pvModuleRemote)
 		pvModuleRemote, &idh, sizeof(idh), NULL);
 
 	// Verify the DOS image header
-	if (idh.e_magic == IMAGE_DOS_SIGNATURE) {
+	if (idh.e_magic == IMAGE_DOS_SIGNATURE) 
+	{
 		// Read the remote module's NT header
 		Toolhelp32ReadProcessMemory(dwProcessId, 
 			(PBYTE) pvModuleRemote + idh.e_lfanew, &inth, sizeof(inth), NULL);
@@ -493,12 +502,12 @@ BOOL GetProcessCmdLine(HANDLE hProcess, LPTSTR szCmdLine, DWORD Size)
 	PROCESS_BASIC_INFORMATION  pbi;
 	// The PEB was supposed to always be at address 0x7ffdf000 in XP...
 	// ... but, here is the "right" way to get it now in Vista.
-	iReturn =
-		_NtQueryInformationProcess(
+	iReturn = _NtQueryInformationProcess(
 		hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), &dwSize);
 
 	// NtQueryInformationProcess returns a negative value if it fails
-	if (iReturn >= 0) {
+	if (iReturn >= 0) 
+	{
 		// 1. Find the Process Environment Block
 		__PEB PEB;
 		size = dwSize;
@@ -663,8 +672,8 @@ BOOL GetProcessOwner(HANDLE hProcess, LPTSTR szOwner, size_t cchSize)
 }
 
 
-BOOL GetProcessOwner(DWORD PID, LPTSTR szOwner, DWORD cchSize) {
-
+BOOL GetProcessOwner(DWORD PID, LPTSTR szOwner, DWORD cchSize) 
+{
 	// Sanity checks
 	if ((PID <= 0) || (szOwner == NULL))
 		return(FALSE);
@@ -715,8 +724,10 @@ VOID ShowProcessInfo(HWND hwnd, DWORD dwProcessID)
 	// Show Process details
 	PROCESSENTRY32 pe = { sizeof(pe) };
 	BOOL fOk = th.ProcessFirst(&pe);
-	for (; fOk; fOk = th.ProcessNext(&pe)) {
-		if (pe.th32ProcessID == dwProcessID) {
+	for (; fOk; fOk = th.ProcessNext(&pe)) 
+	{
+		if (pe.th32ProcessID == dwProcessID) 
+		{
 			TCHAR szCmdLine[1024];
 			if (GetProcessCmdLine(dwProcessID, szCmdLine, _countof(szCmdLine))) {
 				AddText(hwnd, 
@@ -724,12 +735,14 @@ VOID ShowProcessInfo(HWND hwnd, DWORD dwProcessID)
 			} else {
 				AddText(hwnd, TEXT("Filename: %s\r\n"), pe.szExeFile);
 			}
+
 			AddText(hwnd, TEXT("   PID=%08X, ParentPID=%08X, ")
 				TEXT("PriorityClass=%d, Threads=%d, Heaps=%d\r\n"),
 				pe.th32ProcessID, pe.th32ParentProcessID, 
 				pe.pcPriClassBase, pe.cntThreads,
 				th.HowManyHeaps());
 			TCHAR szOwner[MAX_PATH+1];
+
 			if (GetProcessOwner(dwProcessID, szOwner, MAX_PATH)) {
 				AddText(hwnd, TEXT("Owner: %s\r\n"), szOwner);
 			}
@@ -748,7 +761,8 @@ VOID ShowProcessInfo(HWND hwnd, DWORD dwProcessID)
 
 	MODULEENTRY32 me = { sizeof(me) };
 	fOk = th.ModuleFirst(&me);
-	for (; fOk; fOk = th.ModuleNext(&me)) {
+	for (; fOk; fOk = th.ModuleNext(&me)) 
+	{
 		if (me.ProccntUsage == 65535) {
 			// Module was implicitly loaded and cannot be unloaded
 			AddText(hwnd, TEXT("  Fixed"));
@@ -783,8 +797,10 @@ VOID ShowProcessInfo(HWND hwnd, DWORD dwProcessID)
 		TEXT("      TID     Priority\r\n"));
 	THREADENTRY32 te = { sizeof(te) };
 	fOk = th.ThreadFirst(&te);
-	for (; fOk; fOk = th.ThreadNext(&te)) {
-		if (te.th32OwnerProcessID == dwProcessID) {
+	for (; fOk; fOk = th.ThreadNext(&te)) 
+	{
+		if (te.th32OwnerProcessID == dwProcessID) 
+		{
 			int nPriority = te.tpBasePri + te.tpDeltaPri;
 			if ((te.tpBasePri < 16) && (nPriority > 15)) nPriority = 15;
 			if ((te.tpBasePri > 15) && (nPriority > 31)) nPriority = 31;
@@ -829,8 +845,8 @@ VOID ShowModuleInfo(HWND hwnd, PCTSTR pszModulePath) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL GetProcessElevation(TOKEN_ELEVATION_TYPE* pElevationType, BOOL* pIsAdmin) {
-
+BOOL GetProcessElevation(TOKEN_ELEVATION_TYPE* pElevationType, BOOL* pIsAdmin) 
+{
 	HANDLE hToken = NULL;
 	DWORD dwSize; 
 
@@ -842,30 +858,30 @@ BOOL GetProcessElevation(TOKEN_ELEVATION_TYPE* pElevationType, BOOL* pIsAdmin) {
 
 	// Retrieve elevation type information 
 	if (GetTokenInformation(hToken, TokenElevationType, 
-		pElevationType, sizeof(TOKEN_ELEVATION_TYPE), &dwSize)) {
-			// Create the SID corresponding to the Administrators group
-			byte adminSID[SECURITY_MAX_SID_SIZE];
-			dwSize = sizeof(adminSID);
-			CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, &adminSID, 
-				&dwSize);
+		pElevationType, sizeof(TOKEN_ELEVATION_TYPE), &dwSize)) 
+	{
+		// Create the SID corresponding to the Administrators group
+		byte adminSID[SECURITY_MAX_SID_SIZE];
+		dwSize = sizeof(adminSID);
+		CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, &adminSID, &dwSize);
 
-			if (*pElevationType == TokenElevationTypeLimited) {
-				// Get handle to linked token (will have one if we are lua)
-				HANDLE hUnfilteredToken = NULL;
-				GetTokenInformation(hToken, TokenLinkedToken, (VOID*) 
-					&hUnfilteredToken, sizeof(HANDLE), &dwSize);
+		if (*pElevationType == TokenElevationTypeLimited) {
+			// Get handle to linked token (will have one if we are lua)
+			HANDLE hUnfilteredToken = NULL;
+			GetTokenInformation(hToken, TokenLinkedToken, (VOID*) 
+				&hUnfilteredToken, sizeof(HANDLE), &dwSize);
 
-				// Check if this original token contains admin SID
-				if (CheckTokenMembership(hUnfilteredToken, &adminSID, pIsAdmin)) {
-					bResult = TRUE;
-				}
-
-				// Don't forget to close the unfiltered token
-				CloseHandle(hUnfilteredToken);
-			} else {
-				*pIsAdmin = IsUserAnAdmin();
+			// Check if this original token contains admin SID
+			if (CheckTokenMembership(hUnfilteredToken, &adminSID, pIsAdmin)) {
 				bResult = TRUE;
 			}
+
+			// Don't forget to close the unfiltered token
+			CloseHandle(hUnfilteredToken);
+		} else {
+			*pIsAdmin = IsUserAnAdmin();
+			bResult = TRUE;
+		}
 	}
 
 	// Don't forget to close the process token
@@ -995,8 +1011,8 @@ BOOL Dlg_OnSize(HWND hwnd, UINT state, int cx, int cy)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-DWORD StartElevatedProcess(LPCTSTR szExecutable, LPCTSTR szCmdLine) {
-
+DWORD StartElevatedProcess(LPCTSTR szExecutable, LPCTSTR szCmdLine) 
+{
 	// Initialize the structure.
 	SHELLEXECUTEINFO sei = { sizeof(SHELLEXECUTEINFO) };
 
@@ -1031,7 +1047,8 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 		// Restart the application when we are not running 
 		// as Elevated Administrator.
-	case IDC_BTN_SYSTEM_PROCESSES: {
+	case IDC_BTN_SYSTEM_PROCESSES: 
+	{
 		// Hide ourself before trying to start the same application
 		// but with elevated privileges.
 		ShowWindow(hwnd, SW_HIDE);
@@ -1048,8 +1065,8 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 		// In case of error, show up again.
 		ShowWindow(hwnd, SW_SHOWNORMAL);
-								   }
-								   break;
+	}
+	break;
 
 	case ID_PROCESSES:
 		s_fProcesses = TRUE;
@@ -1119,7 +1136,6 @@ INT_PTR WINAPI Dlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 int WINAPI _tWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int) {
 
 	// Enabling the debug privilege allows the application to see
@@ -1136,6 +1152,5 @@ int WINAPI _tWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int) {
 	CToolhelp::EnablePrivilege(SE_DEBUG_NAME, FALSE);
 	return(0);
 }
-
 
 //////////////////////////////// End of File //////////////////////////////////
