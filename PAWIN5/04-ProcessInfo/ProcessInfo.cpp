@@ -44,9 +44,11 @@ void AddText(HWND hwnd, PCTSTR pszFormat, ...)
 	va_list argList;
 	va_start(argList, pszFormat);
 
-	TCHAR sz[20 * 1024];
+	TCHAR sz[60 * 1024] = {}; 
+	// -- Win10.22H2 explorer.exe may have 270+ DLL's, bloating 20KB+ chars.
+	
 	Edit_GetText(hwnd, sz, _countof(sz));
-	_vstprintf_s(_tcschr(sz, TEXT('\0')), _countof(sz) - _tcslen(sz), 
+	_vsntprintf_s(_tcschr(sz, TEXT('\0')), _countof(sz)-_tcslen(sz), _TRUNCATE,
 		pszFormat, argList);
 	Edit_SetText(hwnd, sz);
 	va_end(argList);
@@ -513,27 +515,26 @@ BOOL GetProcessCmdLine(HANDLE hProcess, LPTSTR szCmdLine, DWORD Size)
 		// 1. Find the Process Environment Block
 		__PEB PEB;
 		size = dwSize;
-		if (!ReadProcessMemory(hProcess, pbi.PebBaseAddress, &PEB, 
-			sizeof(PEB), &size)) {
-				// Call GetLastError() if you need to know why
-				return(FALSE);
+		if (!ReadProcessMemory(hProcess, pbi.PebBaseAddress, &PEB, sizeof(PEB), &size)) {
+			// Call GetLastError() if you need to know why
+			return(FALSE);
 		}
 
 		// 2. From this PEB, get the address of the block containing 
 		// a pointer to the CmdLine
 		__INFOBLOCK Block;
-		if (!ReadProcessMemory(hProcess, (LPVOID)PEB.InfoBlockAddress, 
-			&Block, sizeof(Block), &size)) {
-				// Call GetLastError() if you need to know why
-				return(FALSE);
+		if (!ReadProcessMemory(hProcess, (LPVOID)PEB.InfoBlockAddress, &Block, sizeof(Block), &size)) {
+			// Call GetLastError() if you need to know why
+			return(FALSE);
 		}
 
 		// 3. Get the CmdLine
 		wchar_t wszCmdLine[MAX_PATH+1];
 		if (!ReadProcessMemory(hProcess, (LPVOID)Block.wszCmdLineAddress, 
-			wszCmdLine, MAX_PATH*sizeof(wchar_t), &size)) {
-				// Call GetLastError() if you need to know why
-				return(FALSE);
+			wszCmdLine, MAX_PATH*sizeof(wchar_t), &size)) 
+		{
+			// Call GetLastError() if you need to know why
+			return(FALSE);
 		}
 
 		// 4. Skip the application pathname
