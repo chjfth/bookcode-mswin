@@ -21,6 +21,7 @@ This program requires Windows Vista+.
 #include <tchar.h>
 #include <StrSafe.h> 
 
+#include "..\..\share\dlptr_winapi.h"
 
 #pragma comment (lib,"shlwapi.lib")
 #pragma comment (lib,"shell32.lib")
@@ -1041,6 +1042,8 @@ DWORD StartElevatedProcess(LPCTSTR szExecutable, LPCTSTR szCmdLine)
 ///////////////////////////////////////////////////////////////////////////////
 
 
+DEFINE_DLPTR_WINAPI("kernel32.dll", QueryFullProcessImageName)
+
 void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) 
 {
 	static BOOL s_fProcesses = TRUE;
@@ -1055,14 +1058,21 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		// as Elevated Administrator.
 	case IDC_BTN_SYSTEM_PROCESSES: 
 	{
+		if(!dlptr_QueryFullProcessImageName)
+		{
+			// WinXP does not have QueryFullProcessImageName() function.
+			chMB("Not for WinXP.");
+			break;
+		}
+
 		// Hide ourself before trying to start the same application
 		// but with elevated privileges.
 		ShowWindow(hwnd, SW_HIDE);
 
-		TCHAR szApplication[MAX_PATH];
+		TCHAR szApplication[MAX_PATH] = {};
 		DWORD cchLength = _countof(szApplication);
-		QueryFullProcessImageName(
-			GetCurrentProcess(), 0, szApplication, &cchLength);
+		dlptr_QueryFullProcessImageName(GetCurrentProcess(), 0, szApplication, &cchLength);
+
 		DWORD dwStatus = StartElevatedProcess(szApplication, NULL);
 		if (dwStatus == S_OK) {
 			// not need to keep on working under lower privileges.
