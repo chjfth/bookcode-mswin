@@ -84,12 +84,11 @@ BOOL GetProcessIntegrityLevel(HANDLE hProcess, PDWORD pIntegrityLevel,
 					dwNeededSize, &dwNeededSize)) 
 				{
 
-						*pIntegrityLevel = 
-							*GetSidSubAuthority(
-							pTokenInfo->Label.Sid, 
-							(*GetSidSubAuthorityCount(pTokenInfo->Label.Sid)-1)
-							);
-						bReturn = TRUE;
+					*pIntegrityLevel = *GetSidSubAuthority(
+						pTokenInfo->Label.Sid, 
+						(*GetSidSubAuthorityCount(pTokenInfo->Label.Sid)-1)
+						);
+					bReturn = TRUE;
 				}
 
 				// Don't forget to free the memory
@@ -107,7 +106,7 @@ BOOL GetProcessIntegrityLevel(HANDLE hProcess, PDWORD pIntegrityLevel,
 	}
 
 	// Look for the resource policy
-	*pResourceIntegrityLevel = 0; // 0 means none explicitely set
+	*pResourceIntegrityLevel = 0; // 0 means none explicitly set
 	*pResourcePolicy = 0;
 
 	PACL pSACL = NULL;
