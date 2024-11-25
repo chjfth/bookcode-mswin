@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <RemoteDebuggerCommand>D:\barn\Win32\__Debug\$(TargetFileName)</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>d:\</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.22.3.207</RemoteDebuggerServerName>
+    <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>param1 "param 2"</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteDebuggerCommand>D:\barn\x64\__Debug\$(TargetFileName)</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>d:\</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.22.3.207</RemoteDebuggerServerName>
+    <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <RemoteDebuggerCommand>D:\barn\x64\__Release\$(TargetFileName)</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>d:\</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.22.3.207</RemoteDebuggerServerName>
+    <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <RemoteDebuggerCommand>D:\barn\Win32\__Release\$(TargetFileName)</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>d:\</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.22.3.207</RemoteDebuggerServerName>
+    <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>

@@ -443,8 +443,8 @@ void Dlg_ApplyLimits(HWND hwnd)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) {
-
+void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) 
+{
 	switch (id) {
 	case IDCANCEL:
 		// User is terminating our app, kill the job too.
@@ -508,8 +508,8 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void WINAPI Dlg_OnTimer(HWND hwnd, UINT id) {
-
+void WINAPI Dlg_OnTimer(HWND hwnd, UINT id) 
+{
 	PostQueuedCompletionStatus(g_hIOCP, 0, COMPKEY_STATUS, NULL);
 }
 
@@ -517,8 +517,8 @@ void WINAPI Dlg_OnTimer(HWND hwnd, UINT id) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-INT_PTR WINAPI Dlg_Proc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
+INT_PTR WINAPI Dlg_Proc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
 	switch (uMsg) {
 		chHANDLE_DLGMSG(hwnd, WM_INITDIALOG, Dlg_OnInitDialog);
 		chHANDLE_DLGMSG(hwnd, WM_TIMER,      Dlg_OnTimer);
@@ -541,7 +541,7 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 	IsProcessInJob(GetCurrentProcess(), NULL, &bInJob);
 	if (bInJob) {
 		MessageBox(NULL, TEXT("Process already in a job"), 
-			TEXT(""), MB_ICONINFORMATION | MB_OK);
+			TEXT("JobLab cannot run"), MB_ICONINFORMATION | MB_OK);
 		return(-1);
 	}
 
