@@ -41,6 +41,8 @@ Purpose: Common header file containing handy macros and definitions
 #pragma warning(pop) 
 #pragma warning(push, 4)
 #include <CommCtrl.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include <process.h>       // For _beginthreadex
 
 
@@ -200,6 +202,18 @@ inline void chMB(PCSTR szMsg) {
    MessageBoxA(GetActiveWindow(), szMsg, szTitle, MB_OK);
 }
 
+inline void va_chMB(PCSTR szfmt, ...)
+{
+	char textbuf[4000] = "";
+	va_list args;
+	va_start(args, szfmt);
+
+	_vsnprintf_s(textbuf, _TRUNCATE, szfmt, args);
+
+	chMB(textbuf);
+
+	va_end(args);
+}
 
 //////////////////////////// Assert/Verify Macros /////////////////////////////
 

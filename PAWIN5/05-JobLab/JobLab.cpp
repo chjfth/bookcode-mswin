@@ -444,6 +444,7 @@ void Dlg_ApplyLimits(HWND hwnd)
 
 void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) 
 {
+	DWORD winerr = 0;
 	switch (id) {
 	case IDCANCEL:
 		// User is terminating our app, kill the job too.
@@ -494,9 +495,17 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 			HANDLE hProcess = OpenProcess(
 				PROCESS_SET_QUOTA | PROCESS_TERMINATE, FALSE, dwProcessId);
 			if (hProcess != NULL) {
-				chVERIFY(g_job.AssignProcess(hProcess));
+				BOOL succ = g_job.AssignProcess(hProcess);
+				if(!succ) {
+					// [2024-11-26] Chj: If hProcess already belongs to another job, 
+					// WinErr=5 (ERROR_ACCESS_DENIED)
+					winerr = GetLastError();
+					va_chMB("AssignProcessToJobObject() fail! WinErr=%d", winerr);
+				}
 				CloseHandle(hProcess);
-			} else chMB("Could not assign process to job.");
+			} else {
+				chMB("Could not assign process to job.");
+			}
 		}
 		PostQueuedCompletionStatus(g_hIOCP, 0, COMPKEY_STATUS, NULL);
 		break;
