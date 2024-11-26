@@ -14,6 +14,10 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 
 #include <StrSafe.h>
 
+#define JULAYOUT_IMPL
+#include "..\..\share\JULayout2.h"
+
+
 #pragma comment (lib, "psapi.lib")  
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -251,6 +255,11 @@ DWORD WINAPI JobNotify(PVOID)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static void Dlg_EnableJULayout(HWND hdlg)
+{
+	JULayout *jul = JULayout::EnableJULayout(hdlg, 0, 0, 0, 8000);
+	jul->AnchorControl(0,0, 100,100, IDC_STATUS);
+}
 
 BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) 
 {
@@ -279,6 +288,9 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	}
 	ComboBox_SetCurSel(hwndSchedulingClass, 0); // Default to "No Limit"
 	SetTimer(hwnd, 1, 10000, NULL);             // 10 second accounting update
+
+	Dlg_EnableJULayout(hwnd);
+
 	return(TRUE);
 }
 
