@@ -241,6 +241,8 @@ DWORD WINAPI JobNotify(PVOID)
 					dwProcessIdList[x], szProcessName);
 				ListBox_SetCurSel(hwndLB, ListBox_AddString(hwndLB, sz));
 			}
+
+			ListBox_SetCurSel(hwndLB, ListBox_AddString(hwndLB, _T(""))); // a blank line
 		} // if (CompKey == COMPKEY_STATUS) 
 	}
 	return(0);
