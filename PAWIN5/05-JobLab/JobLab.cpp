@@ -72,11 +72,10 @@ DWORD WINAPI JobNotify(PVOID)
 
 	while (!fDone) 
 	{
-		DWORD dwBytesXferred;
-		ULONG_PTR CompKey;
-		LPOVERLAPPED po;
-		GetQueuedCompletionStatus(g_hIOCP, 
-			&dwBytesXferred, &CompKey, &po, INFINITE);
+		DWORD dwBytesXferred = 0;
+		ULONG_PTR CompKey = 0;
+		LPOVERLAPPED po = NULL;
+		GetQueuedCompletionStatus(g_hIOCP, &dwBytesXferred, &CompKey, &po, INFINITE);
 
 		// The app is shutting down, exit this thread
 		fDone = (CompKey == COMPKEY_TERMINATE);
@@ -88,21 +87,23 @@ DWORD WINAPI JobNotify(PVOID)
 		{
 			_tcscpy_s(sz, _countof(sz), TEXT("--> Notification: "));
 			PTSTR psz = sz + _tcslen(sz);
-			switch (dwBytesXferred) {
+			switch (dwBytesXferred) 
+			{{
 			case JOB_OBJECT_MSG_END_OF_JOB_TIME:
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz), 
 					TEXT("Job time limit reached"));
 				break;
 
-			case JOB_OBJECT_MSG_END_OF_PROCESS_TIME: {
+			case JOB_OBJECT_MSG_END_OF_PROCESS_TIME: 
+			{
 				TCHAR szProcessName[MAX_PATH];
 				GetProcessName(PtrToUlong(po), szProcessName, MAX_PATH);
 
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz), 
 					TEXT("Job process %s (Id=%d) time limit reached"), 
 					szProcessName, po);
-													 }
-													 break;
+			}
+			break;
 
 			case JOB_OBJECT_MSG_ACTIVE_PROCESS_LIMIT:
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz), 
@@ -114,59 +115,64 @@ DWORD WINAPI JobNotify(PVOID)
 					TEXT("Job contains no active processes"));
 				break;
 
-			case JOB_OBJECT_MSG_NEW_PROCESS: {
+			case JOB_OBJECT_MSG_NEW_PROCESS: 
+			{
 				TCHAR szProcessName[MAX_PATH];
 				GetProcessName(PtrToUlong(po), szProcessName, MAX_PATH);
 
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz), 
 					TEXT("New process %s (Id=%d) in Job"), szProcessName, po);
-											 }
-											 break;
+			}
+			break;
 
-			case JOB_OBJECT_MSG_EXIT_PROCESS: {
+			case JOB_OBJECT_MSG_EXIT_PROCESS: 
+			{
 				TCHAR szProcessName[MAX_PATH];
 				GetProcessName(PtrToUlong(po), szProcessName, MAX_PATH);
 
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz), 
 					TEXT("Process %s (Id=%d) terminated"), szProcessName, po);
-											  }
-											  break;
+			}
+			break;
 
-			case JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS: {
+			case JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS: 
+			{
 				TCHAR szProcessName[MAX_PATH];
 				GetProcessName(PtrToUlong(po), szProcessName, MAX_PATH);
 
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz), 
 					TEXT("Process %s (Id=%d) terminated abnormally"), 
 					szProcessName, po);
-													   }
-													   break;
+			}
+			break;
 
-			case JOB_OBJECT_MSG_PROCESS_MEMORY_LIMIT: {
+			case JOB_OBJECT_MSG_PROCESS_MEMORY_LIMIT: 
+			{
 				TCHAR szProcessName[MAX_PATH];
 				GetProcessName(PtrToUlong(po), szProcessName, MAX_PATH);
 
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz), 
 					TEXT("Process (%s Id=%d) exceeded memory limit"), 
 					szProcessName, po);
-													  }
-													  break;
+			}
+			break;
 
-			case JOB_OBJECT_MSG_JOB_MEMORY_LIMIT: {
+			case JOB_OBJECT_MSG_JOB_MEMORY_LIMIT: 
+			{
 				TCHAR szProcessName[MAX_PATH];
 				GetProcessName(PtrToUlong(po), szProcessName, MAX_PATH);
 
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz),
 					TEXT("Process %s (Id=%d) exceeded job memory limit"), 
 					szProcessName, po);
-												  }
-												  break;
+			}
+			break;
 
 			default:
 				StringCchPrintf(psz, _countof(sz) - _tcslen(sz),
 					TEXT("Unknown notification: %d"), dwBytesXferred);
 				break;
-			}
+			}}
 			ListBox_SetCurSel(hwndLB, ListBox_AddString(hwndLB, sz));
 			CompKey = 1;   // Force a status update when a notification arrives
 		}
@@ -221,7 +227,7 @@ DWORD WINAPI JobNotify(PVOID)
 
 			// Show the set of Process IDs 
 			DWORD dwNumProcesses = 50;
-			DWORD dwProcessIdList[50];
+			DWORD dwProcessIdList[50] = {};
 			g_job.QueryBasicProcessIdList(dwNumProcesses, 
 				dwProcessIdList, &dwNumProcesses);
 			StringCchPrintf(sz, _countof(sz), TEXT("PIDs: %s"), 
@@ -235,7 +241,7 @@ DWORD WINAPI JobNotify(PVOID)
 					dwProcessIdList[x], szProcessName);
 				ListBox_SetCurSel(hwndLB, ListBox_AddString(hwndLB, sz));
 			}
-		}
+		} // if (CompKey == COMPKEY_STATUS) 
 	}
 	return(0);
 }
@@ -282,12 +288,11 @@ void Dlg_ApplyLimits(HWND hwnd)
 {
 	const int nNanosecondsPerSecond = 1000000000;
 	const int nMillisecondsPerSecond = 1000;
-	const int nNanosecondsPerMillisecond = 
-		nNanosecondsPerSecond / nMillisecondsPerSecond;
-	BOOL f;
-	__int64 q;
-	SIZE_T s;
-	DWORD d;
+	const int nNanosecondsPerMillisecond = nNanosecondsPerSecond / nMillisecondsPerSecond;
+	BOOL f = 0;
+	__int64 q = 0;
+	SIZE_T s = 0;
+	DWORD d = 0;
 
 	// Set Basic and Extended Limits
 	JOBOBJECT_EXTENDED_LIMIT_INFORMATION joeli = { 0 };
@@ -323,8 +328,7 @@ void Dlg_ApplyLimits(HWND hwnd)
 
 	d = GetDlgItemInt(hwnd, IDC_ACTIVEPROCESSLIMIT, &f, FALSE);
 	if (f) {
-		joeli.BasicLimitInformation.LimitFlags |= 
-			JOB_OBJECT_LIMIT_ACTIVE_PROCESS;
+		joeli.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_ACTIVE_PROCESS;
 		joeli.BasicLimitInformation.ActiveProcessLimit = d;
 	}
 
@@ -372,11 +376,9 @@ void Dlg_ApplyLimits(HWND hwnd)
 		break;
 	}
 
-	int nSchedulingClass = 
-		ComboBox_GetCurSel(GetDlgItem(hwnd, IDC_SCHEDULINGCLASS));
+	int nSchedulingClass = ComboBox_GetCurSel(GetDlgItem(hwnd, IDC_SCHEDULINGCLASS));
 	if (nSchedulingClass > 0) {
-		joeli.BasicLimitInformation.LimitFlags |= 
-			JOB_OBJECT_LIMIT_SCHEDULING_CLASS;
+		joeli.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_SCHEDULING_CLASS;
 		joeli.BasicLimitInformation.SchedulingClass = nSchedulingClass - 1;
 	}
 
@@ -388,8 +390,7 @@ void Dlg_ApplyLimits(HWND hwnd)
 
 	s = GetDlgItemInt(hwnd, IDC_MAXCOMMITPERPROCESS, &f, FALSE);
 	if (f) {
-		joeli.BasicLimitInformation.LimitFlags |= 
-			JOB_OBJECT_LIMIT_PROCESS_MEMORY;
+		joeli.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_PROCESS_MEMORY;
 		joeli.ProcessMemoryLimit = s * 1024 * 1024;
 	}
 
@@ -397,12 +398,10 @@ void Dlg_ApplyLimits(HWND hwnd)
 		joeli.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_BREAKAWAY_OK;
 
 	if (IsDlgButtonChecked(hwnd, IDC_CHILDPROCESSESDOBREAKAWAYFROMJOB))
-		joeli.BasicLimitInformation.LimitFlags |= 
-		JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK;
+		joeli.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK;
 
 	if (IsDlgButtonChecked(hwnd, IDC_TERMINATEPROCESSONEXCEPTIONS))
-		joeli.BasicLimitInformation.LimitFlags |= 
-		JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION;
+		joeli.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION;
 
 	f = g_job.SetExtendedLimitInfo(&joeli, 
 		((joeli.BasicLimitInformation.LimitFlags & JOB_OBJECT_LIMIT_JOB_TIME) 
@@ -411,21 +410,21 @@ void Dlg_ApplyLimits(HWND hwnd)
 	chASSERT(f);
 
 	// Set UI Restrictions
-	DWORD jobuir =  JOB_OBJECT_UILIMIT_NONE;  // A fancy zero (0)
+	DWORD jobuir = JOB_OBJECT_UILIMIT_NONE;  // A fancy zero (0)
 	if (IsDlgButtonChecked(hwnd, IDC_RESTRICTACCESSTOOUTSIDEUSEROBJECTS))
-		jobuir |=  JOB_OBJECT_UILIMIT_HANDLES;
+		jobuir |= JOB_OBJECT_UILIMIT_HANDLES;
 
 	if (IsDlgButtonChecked(hwnd, IDC_RESTRICTREADINGCLIPBOARD))
-		jobuir |=  JOB_OBJECT_UILIMIT_READCLIPBOARD;
+		jobuir |= JOB_OBJECT_UILIMIT_READCLIPBOARD;
 
 	if (IsDlgButtonChecked(hwnd, IDC_RESTRICTWRITINGCLIPBOARD))
-		jobuir |=  JOB_OBJECT_UILIMIT_WRITECLIPBOARD;
+		jobuir |= JOB_OBJECT_UILIMIT_WRITECLIPBOARD;
 
 	if (IsDlgButtonChecked(hwnd, IDC_RESTRICTEXITWINDOW))
-		jobuir |=  JOB_OBJECT_UILIMIT_EXITWINDOWS;
+		jobuir |= JOB_OBJECT_UILIMIT_EXITWINDOWS;
 
 	if (IsDlgButtonChecked(hwnd, IDC_RESTRICTCHANGINGSYSTEMPARAMETERS))
-		jobuir |=  JOB_OBJECT_UILIMIT_SYSTEMPARAMETERS;
+		jobuir |= JOB_OBJECT_UILIMIT_SYSTEMPARAMETERS;
 
 	if (IsDlgButtonChecked(hwnd, IDC_RESTRICTDESKTOPS))
 		jobuir |= JOB_OBJECT_UILIMIT_DESKTOP;
@@ -434,7 +433,7 @@ void Dlg_ApplyLimits(HWND hwnd)
 		jobuir |= JOB_OBJECT_UILIMIT_DISPLAYSETTINGS;
 
 	if (IsDlgButtonChecked(hwnd, IDC_RESTRICTGLOBALATOMS))
-		jobuir |=  JOB_OBJECT_UILIMIT_GLOBALATOMS;
+		jobuir |= JOB_OBJECT_UILIMIT_GLOBALATOMS;
 
 	chVERIFY(g_job.SetBasicUIRestrictions(jobuir));
 }

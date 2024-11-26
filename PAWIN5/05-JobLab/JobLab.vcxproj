@@ -203,6 +203,9 @@
     <ClCompile Include="JobLab.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Job.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ResourceCompile Include="JobLab.rc" />
   </ItemGroup>
   <ItemGroup>
