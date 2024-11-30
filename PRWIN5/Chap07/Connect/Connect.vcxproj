@@ -75,8 +75,8 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20241130-0000-0000-0000-203247000001}</ProjectGuid>
-    <ProjectName>07.1-Connect</ProjectName>
-     <TargetName>Connect</TargetName>
+    <ProjectName>07-1 Connect</ProjectName>
+     <TargetName>07-Connect</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
