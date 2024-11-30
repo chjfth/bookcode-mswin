@@ -35,6 +35,40 @@
       <Configuration>Release ANSI</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <!-- ARM64 -->
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug ANSI|ARM64">
+      <Configuration>Debug ANSI</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release ANSI|ARM64">
+      <Configuration>Release ANSI</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <!-- ARM64EC -->
+    <ProjectConfiguration Include="Debug|ARM64EC">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64EC</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64EC">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64EC</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug ANSI|ARM64EC">
+      <Configuration>Debug ANSI</Configuration>
+      <Platform>ARM64EC</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release ANSI|ARM64EC">
+      <Configuration>Release ANSI</Configuration>
+      <Platform>ARM64EC</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
 
   <!-- User project properties -->
@@ -42,7 +76,7 @@
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20230725-0000-0000-0000-120140000001}</ProjectGuid>
     <ProjectName>HelloWin</ProjectName>
-     <TargetName>HelloWin</TargetName>
+     <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
@@ -169,10 +203,10 @@
     <ClCompile Include="HelloWin.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="App.rc" />
+    <ResourceCompile Include="HelloWin.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="1.ico" />
+    <None Include="HelloWin.ico" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->
