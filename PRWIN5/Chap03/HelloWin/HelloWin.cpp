@@ -40,16 +40,16 @@ void vaDbg(const TCHAR *fmt, ...)
 	OutputDebugString(buf);
 }
 
-LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
+LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 					PSTR szCmdLine, int iCmdShow)
 {
-	(void)hPrevInstance; (void)szCmdLine; 
+	(void)hPrevInstance; (void)szCmdLine;
 	static TCHAR szAppName[] = TEXT ("HelloWin") ;
-	HWND         hwnd ;
-	MSG          msg ;
-	WNDCLASS     wndclass ;
+	HWND         hwnd = NULL;
+	MSG          msg = {};
+	WNDCLASS     wndclass = {};
 
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
 	wndclass.lpfnWndProc   = WndProc ;
@@ -87,14 +87,14 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		DispatchMessage (&msg) ;
 	}
 
-	return 0;
+	return (int)msg.wParam ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	HDC         hdc ;
-	PAINTSTRUCT ps ;
-	RECT        rect ;
+	HDC         hdc = NULL;
+	PAINTSTRUCT ps = {};
+	RECT        rect = {};
 	
 	switch (message)
 	{{
