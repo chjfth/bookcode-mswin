@@ -41,6 +41,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL) ;
 
+	SendMessage(hwnd, WM_SETICON, TRUE, (LPARAM)LoadIcon(hInstance,	TEXT("MYPROGRAM")));
+
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
 
@@ -49,7 +51,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
-	return msg.wParam ;
+	return (int)msg.wParam ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
