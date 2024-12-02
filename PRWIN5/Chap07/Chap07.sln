@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "07-2 Checker1", "Checker1\C
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "07-3 Checker2", "Checker2\Checker2.vcxproj", "{20241202-0000-0000-0000-215041000001}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "07-4 Checker3", "Checker3\Checker3.vcxproj", "{20241202-0000-0000-0000-234903000001}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug ANSI|Win32 = Debug ANSI|Win32
@@ -67,6 +69,22 @@ Global
 		{20241202-0000-0000-0000-215041000001}.Release|Win32.Build.0 = Release|Win32
 		{20241202-0000-0000-0000-215041000001}.Release|x64.ActiveCfg = Release|x64
 		{20241202-0000-0000-0000-215041000001}.Release|x64.Build.0 = Release|x64
+		{20241202-0000-0000-0000-234903000001}.Debug ANSI|Win32.ActiveCfg = Debug ANSI|Win32
+		{20241202-0000-0000-0000-234903000001}.Debug ANSI|Win32.Build.0 = Debug ANSI|Win32
+		{20241202-0000-0000-0000-234903000001}.Debug ANSI|x64.ActiveCfg = Debug ANSI|x64
+		{20241202-0000-0000-0000-234903000001}.Debug ANSI|x64.Build.0 = Debug ANSI|x64
+		{20241202-0000-0000-0000-234903000001}.Debug|Win32.ActiveCfg = Debug|Win32
+		{20241202-0000-0000-0000-234903000001}.Debug|Win32.Build.0 = Debug|Win32
+		{20241202-0000-0000-0000-234903000001}.Debug|x64.ActiveCfg = Debug|x64
+		{20241202-0000-0000-0000-234903000001}.Debug|x64.Build.0 = Debug|x64
+		{20241202-0000-0000-0000-234903000001}.Release ANSI|Win32.ActiveCfg = Release ANSI|Win32
+		{20241202-0000-0000-0000-234903000001}.Release ANSI|Win32.Build.0 = Release ANSI|Win32
+		{20241202-0000-0000-0000-234903000001}.Release ANSI|x64.ActiveCfg = Release ANSI|x64
+		{20241202-0000-0000-0000-234903000001}.Release ANSI|x64.Build.0 = Release ANSI|x64
+		{20241202-0000-0000-0000-234903000001}.Release|Win32.ActiveCfg = Release|Win32
+		{20241202-0000-0000-0000-234903000001}.Release|Win32.Build.0 = Release|Win32
+		{20241202-0000-0000-0000-234903000001}.Release|x64.ActiveCfg = Release|x64
+		{20241202-0000-0000-0000-234903000001}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
