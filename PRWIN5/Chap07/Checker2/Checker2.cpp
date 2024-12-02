@@ -1,5 +1,5 @@
 /*-------------------------------------------------
-   CHECKER1.C -- Mouse Hit-Test Demo Program No. 1
+   CHECKER2.C -- Mouse Hit-Test Demo Program No. 2
                  (c) Charles Petzold, 1998
   -------------------------------------------------*/
 
@@ -10,9 +10,9 @@
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	PSTR  szCmdLine, int iCmdShow)
+	PSTR szCmdLine, int iCmdShow)
 {
-	static TCHAR szAppName[] = TEXT ("Checker1") ;
+	static TCHAR szAppName[] = TEXT ("Checker2") ;
 	HWND         hwnd ;
 	MSG          msg ;
 	WNDCLASS     wndclass ;
@@ -35,7 +35,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
-	hwnd = CreateWindow (szAppName, TEXT ("Checker1 Mouse Hit-Test Demo"),
+	hwnd = CreateWindow (szAppName, TEXT ("Checker2 Mouse Hit-Test Demo"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT,
@@ -51,7 +51,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
-	return (int)msg.wParam ;
+	return msg.wParam ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -61,6 +61,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HDC         hdc ;
 	int         x, y ;
 	PAINTSTRUCT ps ;
+	POINT       point ;
 	RECT        rect ;
 
 	switch (message)
@@ -70,13 +71,70 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		cyBlock = HIWORD (lParam) / DIVISIONS ;
 		return 0 ;
 
+	case WM_SETFOCUS :
+		ShowCursor (TRUE) ;
+		return 0 ;
+
+	case WM_KILLFOCUS :
+		ShowCursor (FALSE) ;
+		return 0 ;
+
+	case WM_KEYDOWN :
+		GetCursorPos (&point) ;
+		ScreenToClient (hwnd, &point) ;
+
+		x = max (0, min (DIVISIONS - 1, point.x / cxBlock)) ;
+		y = max (0, min (DIVISIONS - 1, point.y / cyBlock)) ;
+
+		switch (wParam)
+		{
+		case VK_UP :
+			y-- ;
+			break ;
+
+		case VK_DOWN :
+			y++ ;
+			break ;
+
+		case VK_LEFT :
+			x-- ;
+			break ;
+
+		case VK_RIGHT :
+			x++ ;
+			break ;
+
+		case VK_HOME :
+			x = y = 0 ;
+			break ;
+
+		case VK_END :
+			x = y = DIVISIONS - 1 ;
+			break ;
+
+		case VK_RETURN :
+		case VK_SPACE :
+			SendMessage (hwnd, WM_LBUTTONDOWN, MK_LBUTTON,
+				MAKELONG (x * cxBlock, y * cyBlock)) ;
+			break ;
+		}
+		x = (x + DIVISIONS) % DIVISIONS ;
+		y = (y + DIVISIONS) % DIVISIONS ;
+
+		point.x = x * cxBlock + cxBlock / 2 ;
+		point.y = y * cyBlock + cyBlock / 2 ;
+
+		ClientToScreen (hwnd, &point) ;
+		SetCursorPos (point.x, point.y) ;
+		return 0 ;
+
 	case WM_LBUTTONDOWN :
 		x = LOWORD (lParam) / cxBlock ;
 		y = HIWORD (lParam) / cyBlock ;
 
 		if (x < DIVISIONS && y < DIVISIONS)
 		{
-			fState [x][y] ^= 1 ;
+			fState[x][y] ^= 1 ;
 
 			rect.left   = x * cxBlock ;
 			rect.top    = y * cyBlock ;
@@ -101,10 +159,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				if (fState [x][y])
 				{
-					MoveToEx (hdc,  x    * cxBlock,  y    * cyBlock, NULL) ;
-					LineTo   (hdc, (x+1) * cxBlock, (y+1) * cyBlock) ;
-					MoveToEx (hdc,  x    * cxBlock, (y+1) * cyBlock, NULL) ;
-					LineTo   (hdc, (x+1) * cxBlock,  y    * cyBlock) ;
+					MoveToEx (hdc,  x   *cxBlock,  y   *cyBlock, NULL) ;
+					LineTo   (hdc, (x+1)*cxBlock, (y+1)*cyBlock) ;
+					MoveToEx (hdc,  x   *cxBlock, (y+1)*cyBlock, NULL) ;
+					LineTo   (hdc, (x+1)*cxBlock,  y   *cyBlock) ;
 				}
 			}
 		}
