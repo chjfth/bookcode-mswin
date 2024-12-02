@@ -74,9 +74,9 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20241130-0000-0000-0000-203247000001}</ProjectGuid>
-    <ProjectName>07-1 Connect</ProjectName>
-     <TargetName>07-Connect</TargetName>
+    <ProjectGuid>{20241202-0000-0000-0000-210733000001}</ProjectGuid>
+    <ProjectName>07-2 Checker1</ProjectName>
+     <TargetName>Checker1</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
@@ -200,13 +200,13 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="Connect.cpp" />
+    <ClCompile Include="Checker1.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Connect.rc" />
+    <ResourceCompile Include="Checker1.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Connect.ico" />
+    <None Include="Checker1.ico" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->
