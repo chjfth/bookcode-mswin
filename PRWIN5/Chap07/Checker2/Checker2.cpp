@@ -1,9 +1,12 @@
 /*-------------------------------------------------
    CHECKER2.C -- Mouse Hit-Test Demo Program No. 2
                  (c) Charles Petzold, 1998
+[2024-12-03] Chj: Show ShowCursor()'s return value on window title.
   -------------------------------------------------*/
 
 #include <windows.h>
+#include <stdio.h>
+#include <tchar.h>
 
 #define DIVISIONS 5
 
@@ -54,6 +57,20 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return msg.wParam ;
 }
 
+int vaSetWindowText(HWND hwnd, const TCHAR *szfmt, ...)
+{
+	va_list args;
+	va_start(args, szfmt);
+
+	TCHAR msgtext[400] = {};
+	_vsntprintf_s(msgtext, _TRUNCATE, szfmt, args);
+
+	int ret = SetWindowText(hwnd, msgtext);
+
+	va_end(args);
+	return ret;
+}
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static BOOL fState[DIVISIONS][DIVISIONS] ;
@@ -63,6 +80,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps ;
 	POINT       point ;
 	RECT        rect ;
+	int cursordisplaycount = 0;
 
 	switch (message)
 	{
@@ -72,11 +90,15 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_SETFOCUS :
-		ShowCursor (TRUE) ;
+		cursordisplaycount = ShowCursor (TRUE) ;
+		vaSetWindowText(hwnd, _T("Checker2: ShowCursor(TRUE) returns %d"), 
+			cursordisplaycount);
 		return 0 ;
 
 	case WM_KILLFOCUS :
-		ShowCursor (FALSE) ;
+		cursordisplaycount = ShowCursor (FALSE) ;
+		vaSetWindowText(hwnd, _T("Checker2: ShowCursor(FALSE) returns %d"), 
+			cursordisplaycount);
 		return 0 ;
 
 	case WM_KEYDOWN :
