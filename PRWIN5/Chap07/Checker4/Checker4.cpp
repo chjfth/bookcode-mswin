@@ -82,7 +82,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					WS_CHILDWINDOW | WS_VISIBLE,
 					0, 0, 0, 0,
 					hwnd, (HMENU) (y << 8 | x),
-					(HINSTANCE) GetWindowLong (hwnd, GWL_HINSTANCE),
+					(HINSTANCE) GetWindowLongPtr (hwnd, GWLP_HINSTANCE),
 					NULL) ;
 			}
 		}
@@ -162,7 +162,7 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message,
 	switch (message)
 	{
 	case WM_CREATE :
-		SetWindowLong (hwnd, 0, 0) ;       // on/off flag
+		SetWindowLongPtr (hwnd, 0, 0) ;       // on/off flag
 		return 0 ;
 
 	case WM_KEYDOWN:
@@ -176,7 +176,7 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message,
 		// For Return and Space, fall through to toggle the square
 
 	case WM_LBUTTONDOWN :
-		SetWindowLong (hwnd, 0, 1 ^ GetWindowLong (hwnd, 0)) ;
+		SetWindowLongPtr (hwnd, 0, 1 ^ GetWindowLongPtr (hwnd, 0)) ;
 		SetFocus (hwnd) ;
 		InvalidateRect (hwnd, NULL, FALSE) ;
 		return 0 ;
@@ -184,7 +184,7 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message,
 		// For focus messages, invalidate the window for repaint
 
 	case WM_SETFOCUS:
-		idFocus = GetWindowLong (hwnd, GWL_ID) ;
+		idFocus = GetWindowLongPtr (hwnd, GWLP_ID) ;
 
 		// Fall through
 
@@ -200,7 +200,7 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message,
 
 		// Draw the "x" mark
 
-		if (GetWindowLong (hwnd, 0))
+		if (GetWindowLongPtr (hwnd, 0))
 		{
 			MoveToEx (hdc, 0,          0, NULL) ;
 			LineTo   (hdc, rect.right, rect.bottom) ;

@@ -80,7 +80,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					WS_CHILDWINDOW | WS_VISIBLE,
 					0, 0, 0, 0,
 					hwnd, (HMENU) (y << 8 | x),
-					(HINSTANCE) GetWindowLong (hwnd, GWL_HINSTANCE),
+					(HINSTANCE) GetWindowLongPtr (hwnd, GWLP_HINSTANCE),
 					NULL) ;
 			}
 		}
@@ -121,11 +121,11 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 	switch (message)
 	{
 	case WM_CREATE :
-		SetWindowLong (hwnd, 0, 0) ; // Set the extra `long` flag: on/off
+		SetWindowLongPtr (hwnd, 0, 0) ; // Set the extra `long` flag: on/off
 		return 0 ;
 
 	case WM_LBUTTONDOWN :
-		SetWindowLong (hwnd, 0, 1^GetWindowLong (hwnd, 0)); // Toggle the extra `long`
+		SetWindowLongPtr (hwnd, 0, 1^GetWindowLongPtr (hwnd, 0)); // Toggle the extra `long`
 		InvalidateRect (hwnd, NULL, FALSE) ;
 		return 0 ;
 
@@ -135,7 +135,7 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 		GetClientRect (hwnd, &rect) ;
 		Rectangle (hdc, 0, 0, rect.right, rect.bottom) ;
 
-		if (GetWindowLong (hwnd, 0))
+		if (GetWindowLongPtr (hwnd, 0))
 		{
 			MoveToEx (hdc, 0,          0, NULL) ;
 			LineTo   (hdc, rect.right, rect.bottom) ;
