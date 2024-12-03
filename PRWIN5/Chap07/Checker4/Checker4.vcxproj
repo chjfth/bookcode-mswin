@@ -111,8 +111,8 @@
         "v120" on VC2013
         "v140" on VC2015
         "v141" on VC2017
-          "v142" on VC2019
-          "v143" on VC2022
+        "v142" on VC2019
+        "v143" on VC2022
       -->
     <PlatformToolset Condition="$(DefaultPlatformToolset)!=''">$(DefaultPlatformToolset)</PlatformToolset>
   </PropertyGroup>
@@ -201,6 +201,10 @@
    -->
   <ItemGroup>
     <ClCompile Include="Checker4.cpp" />
+    <ClCompile Include="..\..\vaDbg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\vaDbg.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Checker4.rc" />

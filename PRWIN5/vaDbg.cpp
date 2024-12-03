@@ -8,32 +8,84 @@
 
 #include "vaDbg.h"
 
-void vaDbg(const TCHAR *fmt, ...)
+static int s_dbgcount = 0;
+
+void vaDbgTs(const TCHAR *fmt, ...)
 {
+	// Note: Each calling outputs one line, with timestamp prefix.
+	// A '\n' will be added automatically at end.
+
 	static int count = 0;
+	static DWORD s_prev_msec = GetTickCount();
+
+	DWORD now_msec = GetTickCount();
+
 	TCHAR buf[1000] = {0};
 
-#if _MSC_VER >= 1400 // VS2005+, avoid warning of deprecated _sntprintf()
-	_sntprintf_s(buf, ARRAYSIZE(buf)-3, _TRUNCATE, TEXT("[%d] "), ++count); // prefix seq
-#else
-#define ARRAYSIZE(ar) (sizeof(ar)/sizeof(ar[0]))
-	_sntprintf(buf, ARRAYSIZE(buf)-3, TEXT("[%d] "), ++count); // prefix seq
-#endif
+	// Print timestamp to show that time has elapsed for more than one second.
+	DWORD delta_msec = now_msec - s_prev_msec;
+	if(delta_msec>=1000)
+	{
+		OutputDebugString(_T(".\n"));
+	}
+
+	TCHAR timebuf[40] = {};
+	now_timestr(timebuf, ARRAYSIZE(timebuf));
+
+	_sntprintf_s(buf, _TRUNCATE, _T("[%d]%s (+%3u.%03us) "), 
+		++s_dbgcount,
+		timebuf, 
+		delta_msec/1000, delta_msec%1000);
 
 	int prefixlen = (int)_tcslen(buf);
 
 	va_list args;
 	va_start(args, fmt);
-#if _MSC_VER >= 1400 // VS2005+
+
 	_vsntprintf_s(buf+prefixlen, ARRAYSIZE(buf)-3-prefixlen, _TRUNCATE, fmt, args);
+
+	va_end(args);
+
+	// add trailing \n
+	int slen = (int)_tcslen(buf);
+	if(slen==ARRAYSIZE(buf)-1)
+		--slen;
+
+	buf[slen] = '\n';
+	buf[slen+1] = '\0';
+
+	OutputDebugString(buf);
+
+	s_prev_msec = now_msec;
+}
+
+void vaDbgS(const TCHAR *fmt, ...)
+{
+	// This only has Sequential prefix.
+
+	TCHAR buf[1000] = {0};
+
+	_sntprintf_s(buf, ARRAYSIZE(buf)-3, _TRUNCATE, TEXT("[%d] "), ++s_dbgcount); // prefix seq
+
+	int prefixlen = (int)_tcslen(buf);
+
+	va_list args;
+	va_start(args, fmt);
+
+	_vsntprintf_s(buf+prefixlen, ARRAYSIZE(buf)-3-prefixlen, _TRUNCATE, fmt, args);
+
 	prefixlen = (int)_tcslen(buf);
 	_tcsncpy_s(buf+prefixlen, 2, TEXT("\r\n"), _TRUNCATE); // add trailing \r\n
-#else
-	_vsntprintf(buf+prefixlen, ARRAYSIZE(buf)-3-prefixlen, fmt, args);
-	prefixlen = _tcslen(buf);
-	_tcsncpy(buf+prefixlen, TEXT("\r\n"), 2); // add trailing \r\n
-#endif
+
 	va_end(args);
+
+	// add trailing \n
+	int slen = (int)_tcslen(buf);
+	if(slen==ARRAYSIZE(buf)-1)
+		--slen;
+
+	buf[slen] = '\n';
+	buf[slen+1] = '\0';
 
 	OutputDebugString(buf);
 }

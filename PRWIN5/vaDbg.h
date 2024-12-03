@@ -3,7 +3,9 @@
 
 #include <tchar.h>
 
-void vaDbg(const TCHAR *fmt, ...);
+void vaDbgTs(const TCHAR *fmt, ...); // with seq+timestamp prefix
+
+void vaDbgS(const TCHAR *fmt, ...);  // with sequence-only prefix
 
 void vaSetDlgItemText(HWND hdlg, int ctrlid, const TCHAR *fmt, ...);
 

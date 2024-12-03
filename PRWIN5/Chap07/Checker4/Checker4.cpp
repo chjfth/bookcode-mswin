@@ -4,6 +4,7 @@
   -------------------------------------------------*/
 
 #include <windows.h>
+#include "../../vaDbg.h"
 
 #define DIVISIONS 5
 
@@ -106,13 +107,20 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		MessageBeep (0) ;
 		return 0 ;
 
-		// On set-focus message, set focus to child window
+	// On set-focus message, set focus to child window
 
 	case WM_SETFOCUS:
+		vaDbgTs(_T("Main-window WM_SETFOCUS. Losing-focus-guy hwnd: 0x%08X"), wParam);
+		
 		SetFocus (GetDlgItem (hwnd, idFocus)) ;
 		return 0 ;
 
-		// On key-down message, possibly change the focus window
+	case WM_KILLFOCUS:
+		vaDbgTs(_T("Main-window WM_KILLFOCUS. Gaining-focus-guy hwnd: 0x%08X"), wParam);
+		
+		return 0;
+
+	// On key-down message, possibly change the focus window
 
 	case WM_KEYDOWN:
 		x = idFocus & 0xFF ;
