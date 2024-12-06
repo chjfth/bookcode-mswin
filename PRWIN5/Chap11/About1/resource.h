@@ -2,6 +2,8 @@
 // Microsoft Developer Studio generated include file.
 // Used by About2.rc
 //
+#define IDC_STATIC -1
+
 #define IDC_BLACK                       1000
 #define IDC_BLUE                        1001
 #define IDC_GREEN                       1002
