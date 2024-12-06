@@ -3,8 +3,8 @@ PICKFONT.C -- Create Logical Font
        (c) Charles Petzold, 1998
 
 Enhancements by Jimm Chen.
-[2022-09-04] v2.0: Can be compiled with VC2010, not supporting VC6 any more.
-[2022-09-16] v2.3: Text to draw can be change inside GUI.
+[2022-09-04] v2.0: Can be compiled with VC2010+, not supporting VC6 any more.
+[2022-09-16] v2.3: Text to draw can be changed inside GUI.
 -----------------------------------------*/
 
 #include <windows.h>
@@ -18,7 +18,7 @@ Enhancements by Jimm Chen.
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#define VERSION "2.5"
+#define VERSION "2.6"
 
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
@@ -403,7 +403,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//
 		SIZE rsize = {0};
 		BOOL succ = GetTextExtentPoint32(hdc, pText, Textlen, &rsize);
-		vaDbg(TEXT("PickFont sample text dimension: %dx%d"), rsize.cx, rsize.cy);
+		vaDbgS(TEXT("PickFont sample text dimension: %dx%d"), rsize.cx, rsize.cy);
 
 		DeleteObject (SelectObject (hdc, GetStockObject (SYSTEM_FONT))) ;
 		EndPaint (hwnd, &ps) ;
@@ -758,16 +758,16 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				CHARSETINFO csi = {};
 				BOOL succ = TranslateCharsetInfo((DWORD*)(pdp->lf.lfCharSet), &csi, TCI_SRCCHARSET);
-				vaDbg(TEXT("Used TranslateCharsetInfo(TCI_SRCCHARSET) for fontface \"%s\", return %d."), pdp->szFaceName, succ);
+				vaDbgS(TEXT("Used TranslateCharsetInfo(TCI_SRCCHARSET) for fontface \"%s\", return %d."), pdp->szFaceName, succ);
 			}
 
 			if(charset2==pdp->tm.tmCharSet)
 			{
-				vaDbg(TEXT("GetTextCharsetInfo() returns CharSet=%d (match tm.tmCharSet)"), charset2);
+				vaDbgS(TEXT("GetTextCharsetInfo() returns CharSet=%d (match tm.tmCharSet)"), charset2);
 
 				if(fontsig.fsUsb[0])
 				{
-					vaDbg(TEXT("\"%s\" Unicode-subranges: %04X.%04X.%04X.%04X , Codepages: %04X.%04X"),
+					vaDbgS(TEXT("\"%s\" Unicode-subranges: %04X.%04X.%04X.%04X , Codepages: %04X.%04X"),
 						pdp->szFaceName,
 						fontsig.fsUsb[3], fontsig.fsUsb[2], fontsig.fsUsb[1], fontsig.fsUsb[0],
 						fontsig.fsCsb[1], fontsig.fsCsb[0]);
