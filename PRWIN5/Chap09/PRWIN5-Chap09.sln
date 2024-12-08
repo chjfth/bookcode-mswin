@@ -1,9 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BtnLook-Title", "BtnLook-Title\BtnLook-Title.vcxproj", "{D2296164-3A8A-4B93-F800-22C25881D898}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BtnLook-About1", "BtnLook-About1\BtnLook-About1.vcxproj", "{B56310A9-0077-F473-B656-36CC950C0AAF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "09-1 BtnLook-Title", "BtnLook-Title\BtnLook-Title.vcxproj", "{20241208-0000-0000-0000-213004000001}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,18 +10,10 @@ Global
 		Template|Win32 = Template|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D2296164-3A8A-4B93-F800-22C25881D898}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D2296164-3A8A-4B93-F800-22C25881D898}.Debug|Win32.Build.0 = Debug|Win32
-		{D2296164-3A8A-4B93-F800-22C25881D898}.Release|Win32.ActiveCfg = Release|Win32
-		{D2296164-3A8A-4B93-F800-22C25881D898}.Release|Win32.Build.0 = Release|Win32
-		{D2296164-3A8A-4B93-F800-22C25881D898}.Template|Win32.ActiveCfg = Template|Win32
-		{D2296164-3A8A-4B93-F800-22C25881D898}.Template|Win32.Build.0 = Template|Win32
-		{B56310A9-0077-F473-B656-36CC950C0AAF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B56310A9-0077-F473-B656-36CC950C0AAF}.Debug|Win32.Build.0 = Debug|Win32
-		{B56310A9-0077-F473-B656-36CC950C0AAF}.Release|Win32.ActiveCfg = Release|Win32
-		{B56310A9-0077-F473-B656-36CC950C0AAF}.Release|Win32.Build.0 = Release|Win32
-		{B56310A9-0077-F473-B656-36CC950C0AAF}.Template|Win32.ActiveCfg = Template|Win32
-		{B56310A9-0077-F473-B656-36CC950C0AAF}.Template|Win32.Build.0 = Template|Win32
+		{20241208-0000-0000-0000-213004000001}.Debug|Win32.ActiveCfg = Debug|Win32
+		{20241208-0000-0000-0000-213004000001}.Debug|Win32.Build.0 = Debug|Win32
+		{20241208-0000-0000-0000-213004000001}.Release|Win32.ActiveCfg = Release|Win32
+		{20241208-0000-0000-0000-213004000001}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

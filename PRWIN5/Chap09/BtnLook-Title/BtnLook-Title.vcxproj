@@ -1,6 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <!-- Win32(x86) -->
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -9,13 +10,200 @@
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Template|Win32">
-      <Configuration>Template</Configuration>
+    <ProjectConfiguration Include="Debug ANSI|Win32">
+      <Configuration>Debug ANSI</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release ANSI|Win32">
+      <Configuration>Release ANSI</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <!-- x64 -->
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug ANSI|x64">
+      <Configuration>Debug ANSI</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release ANSI|x64">
+      <Configuration>Release ANSI</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <!-- ARM64 -->
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug ANSI|ARM64">
+      <Configuration>Debug ANSI</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release ANSI|ARM64">
+      <Configuration>Release ANSI</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <!-- ARM64EC -->
+    <ProjectConfiguration Include="Debug|ARM64EC">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64EC</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64EC">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64EC</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug ANSI|ARM64EC">
+      <Configuration>Debug ANSI</Configuration>
+      <Platform>ARM64EC</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release ANSI|ARM64EC">
+      <Configuration>Release ANSI</Configuration>
+      <Platform>ARM64EC</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
+
+  <!-- User project properties -->
+  
+  <PropertyGroup Label="Configuration">
+    <ProjectGuid>{20241208-0000-0000-0000-213004000001}</ProjectGuid>
+    <ProjectName>09-1 BtnLook-Title</ProjectName>
+     <TargetName>09-BtnLook</TargetName>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  
+  <!-- Microsoft.Cpp.Default.props 
+  	For Linux .vcxproj, this should be after above "global" Properties. -->
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+  <!-- Debug or Release -->
+  <PropertyGroup Condition=" $(Configuration.StartsWith('Debug'))" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="!$(Configuration.StartsWith('Debug'))" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <!-- note: WholeProgramOptimization=true causes `dumpbin /linkermember:1 xxx.lib` to output nothing. -->
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+
+  <!-- Unicode or ANSI(MBCS) -->
+  <PropertyGroup Condition="!$(Configuration.Contains('ANSI'))" Label="Configuration">
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(Configuration.Contains('ANSI'))" Label="Configuration">
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Referring to $(DefaultPlatformToolset), so that this .vcxproj 
+      adapts automatically to lastest SDK on current Visual Studio version. 
+     
+      $(DefaultPlatformToolset) has such values:
+        empty  on VC2010
+        "v120" on VC2013
+        "v140" on VC2015
+        "v141" on VC2017
+        "v142" on VC2019
+        "v143" on VC2022
+      -->
+    <PlatformToolset Condition="$(DefaultPlatformToolset)!=''">$(DefaultPlatformToolset)</PlatformToolset>
+  </PropertyGroup>
+
+  <!---->
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+
+  <!-- Better .obj/.exe/.pdb output folder structure -->
+  <PropertyGroup>
+    <LinkIncremental>false</LinkIncremental>
+     <IntDir>$(ProjectDir)obj-$(PlatformToolset)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)bin-$(PlatformToolset)\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  
+  <!-- 
+  	Compiler/Linker Behavior Settings : shared 
+  -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDataBase</DebugInformationFormat>
+
+      <!-- Note: $(TargetPath) cannot receive a value in <PropertyGroup>, so it has to be in ItemDefinitionGroup. -->
+
+      <!-- LIB's .pdb is final-pdb at compile stage, we want to see whole original xxx.lib name in PDB filename. -->
+      <ProgramDataBaseFileName Condition="'$(TargetExt)'=='.lib' ">$(TargetPath).pdb</ProgramDataBaseFileName>
+      <!-- EXE/DLL's .pdb is truly intermediate, so we put it in $(IntDir), with some fancy file-naming -->
+      <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
+
+      <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDataBaseFile>$(TargetPath).pdb</ProgramDataBaseFile>
+      <ImportLibrary>$(OutDir)$(TargetName)--imp.lib</ImportLibrary>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AdditionalLibraryDirectories>;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'"  >;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ComCtl32.Lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <!-- Better build.log file naming -->
+    <BuildLog>
+      <Path>$(IntDir)__$(MSBuildProjectName).build.log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <!-- 
+  	Compiler Behavior Settings : Debug 
+  -->
+  <ItemDefinitionGroup Condition=" $(Configuration.StartsWith('Debug'))">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;DBG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <RandomizedBaseAddress Condition="!$(Platform.StartsWith('ARM64'))">false</RandomizedBaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <!-- 
+  	Compiler Behavior Settings : Release 
+  -->
+  <ItemDefinitionGroup Condition="!$(Configuration.StartsWith('Debug'))">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PreprocessorDefinitions>NDEBUG;DBG=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- 
+    Source file list:
+   -->
   <ItemGroup>
     <ClCompile Include="BtnLook.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BtnLook-Title.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -23,128 +211,8 @@
   <ItemGroup>
     <None Include="button.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="BtnLook-Title.rc" />
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectName>BtnLook-Title</ProjectName>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>false</UseOfMfc>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>false</UseOfMfc>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>.\Release\</OutDir>
-    <IntDir>.\Release\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>.\Debug\</OutDir>
-    <IntDir>.\Debug\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <StringPooling>true</StringPooling>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <Optimization>Disabled</Optimization>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Release\BtnLook.pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>.\Release\</ObjectFileName>
-      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
-    </ClCompile>
-    <Midl>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TypeLibraryName>.\Release\BtnLook.tlb</TypeLibraryName>
-      <MkTypLibCompatible>true</MkTypLibCompatible>
-      <RedirectOutputAndErrors>NUL</RedirectOutputAndErrors>
-      <TargetEnvironment>Win32</TargetEnvironment>
-    </Midl>
-    <ResourceCompile>
-      <Culture>0x0409</Culture>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release\BtnLook.bsc</OutputFile>
-    </Bscmake>
-    <Link>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <SubSystem>Windows</SubSystem>
-      <OutputFile>$(TargetPath)</OutputFile>
-      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
-      <Optimization>Disabled</Optimization>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <WarningLevel>Level3</WarningLevel>
-      <MinimalRebuild>true</MinimalRebuild>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
-      <PrecompiledHeaderOutputFile>.\Debug\BtnLook.pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>.\Debug\</ObjectFileName>
-      <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
-    </ClCompile>
-    <Midl>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TypeLibraryName>.\Debug\BtnLook.tlb</TypeLibraryName>
-      <MkTypLibCompatible>true</MkTypLibCompatible>
-      <RedirectOutputAndErrors>NUL</RedirectOutputAndErrors>
-      <TargetEnvironment>Win32</TargetEnvironment>
-    </Midl>
-    <ResourceCompile>
-      <Culture>0x0409</Culture>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug\BtnLook.bsc</OutputFile>
-    </Bscmake>
-    <Link>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OutputFile>$(TargetPath)</OutputFile>
-      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
+
+  <!-- MSBuild system stock Cpp.targets -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
@@ -154,7 +222,7 @@
     <VSPG_BootsDir_NoTBS>..\..\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(VSPG_BootsDir_NoTBS)\_VSPG.props" />
+    <Import Project="$(VSPG_BootsDir_NoTBS)\_VSPG.props" Condition="exists('$(VSPG_BootsDir_NoTBS)\_VSPG.props')"/>
   </ImportGroup>
   <!-- import VSPG end -->
 </Project>

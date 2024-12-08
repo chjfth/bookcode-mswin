@@ -5,6 +5,7 @@
 
 #include <windows.h>
 #include <shlwapi.h>
+#include <CommCtrl.h>
 #include "resource.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -35,6 +36,8 @@ LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
+	InitCommonControls(); // WinXP requires this, to work with Visual-style manifest
+
 	static TCHAR szAppName[] = TEXT ("BtnLook") ;
 	HWND         hwnd ;
 	MSG          msg ;
@@ -45,7 +48,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.cbClsExtra    = 0 ;
 	wndclass.cbWndExtra    = 0 ;
 	wndclass.hInstance     = hInstance ;
-	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
+	wndclass.hIcon         = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
 	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
 	wndclass.lpszMenuName  = NULL;
@@ -73,10 +76,6 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	wsprintf(szTitle, TEXT("%s (#%08X)"), szTitle, (UINT)hwnd);
 	SetWindowText(hwnd, szTitle);
-
-	// Set Alt+Tab icon
-	SendMessage(hwnd, WM_SETICON, ICON_BIG,   (LPARAM)LoadIcon(hInstance,	MAKEINTRESOURCE(IDI_ICON1)));
-	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)LoadIcon(hInstance,	MAKEINTRESOURCE(IDI_ICON1)));
 
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
@@ -110,13 +109,17 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		cyChar = HIWORD (GetDialogBaseUnits ()) ;
 
 		for (i = 0 ; i < NUM ; i++)
+		{
 			hwndButton[i] = CreateWindow ( TEXT("button"), 
-			button[i].szText,
-			WS_CHILD | WS_VISIBLE | button[i].iStyle,
-			cxChar, cyChar * (1 + 2 * i),
-			20 * cxChar, 7 * cyChar / 4,
-			hwnd, (HMENU) i,
-			((LPCREATESTRUCT) lParam)->hInstance, NULL) ;
+				button[i].szText,
+				WS_CHILD | WS_VISIBLE | button[i].iStyle,
+				cxChar, cyChar * (1 + 2 * i),
+				20 * cxChar, 7 * cyChar / 4,
+				hwnd, 
+				(HMENU) i,
+				((LPCREATESTRUCT) lParam)->hInstance, 
+				NULL) ;
+		}
 		return 0 ;
 
 	case WM_SIZE :
