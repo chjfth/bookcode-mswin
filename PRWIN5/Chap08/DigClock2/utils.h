@@ -28,6 +28,9 @@ extern"C"{
 	// Ref: Raymond Chen https://devblogs.microsoft.com/oldnewthing/20031107-00/?p=41923
 
 
+extern bool g_isDbg;
+void myDbg(const TCHAR *fmt, ...);
+
 const TCHAR *GetExeFilename();
 
 void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop);

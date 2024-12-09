@@ -1,5 +1,18 @@
 #include "utils.h"
 
+bool g_isDbg = false;
+
+void myDbg(const TCHAR *fmt, ...)
+{
+	if(g_isDbg)
+	{
+		va_list args;
+		va_start(args, fmt);
+		vlDbgTs(fmt, args);
+		va_end(args);
+	}
+}
+
 const TCHAR *GetExeFilename()
 {
 	static TCHAR exepath[MAX_PATH] = _T("Unknown exepath");
@@ -247,7 +260,7 @@ static MsgRelay_et Edit_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT 
 	int startPos = 0, endPos = 0;
 	SendMessage(hEdit, EM_GETSEL, (WPARAM)&startPos, (LPARAM)&endPos);
 
-	vaDbg(_T("hEdit 0x%08X: [#%d~%d) %s | %.*s"), hEdit, startPos, endPos, szText, 
+	myDbg(_T("hEdit 0x%08X: [#%d~%d) %s | %.*s"), hEdit, startPos, endPos, szText, 
 		endPos-startPos, szText+startPos // the substring after |
 		);
 
@@ -280,7 +293,7 @@ static MsgRelay_et Edit_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT 
 			isdigit(szText[startPos]) || (startPos>0 && isdigit(szText[startPos-1]))
 			) ) 
 		{
-			vaDbg(_T("Caret pos NOT on a digit, do nothing."));
+			myDbg(_T("Caret pos NOT on a digit, do nothing."));
 			return Relay_yes;
 		}
 		
@@ -300,11 +313,11 @@ static MsgRelay_et Edit_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT 
 	
 	if(hotlen<=MaxUpDownDigits)
 	{
-		vaDbg(_T("hEdit 0x%08X: hot [@%d~%d) %s"), hEdit,	startHot, endHot_, szHot);
+		myDbg(_T("hEdit 0x%08X: hot [@%d~%d) %s"), hEdit,	startHot, endHot_, szHot);
 	}
 	else
 	{
-		vaDbg(_T("hEdit 0x%08X: bad [@%d~%d) %s (exceed %d)"), hEdit, startHot, endHot_, szHot, MaxUpDownDigits);
+		myDbg(_T("hEdit 0x%08X: bad [@%d~%d) %s (exceed %d)"), hEdit, startHot, endHot_, szHot, MaxUpDownDigits);
 		return Relay_yes;
 	}
 
@@ -341,7 +354,7 @@ static MsgRelay_et Edit_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT 
 		pszNewHot = szNewHot + hotlenv - hotlen;
 	}
 
-	vaDbg(_T("    %s : %s -> %s"), is_inc?_T("INC"):_T("DEC"), szHot, pszNewHot);
+	myDbg(_T("    %s : %s -> %s"), is_inc?_T("INC"):_T("DEC"), szHot, pszNewHot);
 
 	TCHAR szNewText[TBUFSIZE] = {};
 	

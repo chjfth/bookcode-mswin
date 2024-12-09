@@ -2,10 +2,13 @@
 #define __vaDbg_h_
 
 #include <tchar.h>
+#include <stdarg.h>
 
 void vaDbgTs(const TCHAR *fmt, ...); // with seq+timestamp prefix
+void vlDbgTs(const TCHAR *fmt, va_list args);
 
 void vaDbgS(const TCHAR *fmt, ...);  // with sequence-only prefix
+void vlDbgS(const TCHAR *fmt, va_list args);
 
 void vaSetDlgItemText(HWND hdlg, int ctrlid, const TCHAR *fmt, ...);
 

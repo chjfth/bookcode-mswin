@@ -101,10 +101,21 @@ static bool s_isScratchingMainWindow = false;
 
 INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
+bool SomeInit()
+{
+	TCHAR szDbg[4] = {};
+	GetEnvironmentVariable(_T("DIGCLOCK_DBG"), szDbg, ARRAYSIZE(szDbg));
+	if(_tcscmp(szDbg, _T("1"))==0)
+		g_isDbg = 1;
+	
+	return true;
+}
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
+	SomeInit();
+
 	static TCHAR szAppName[] = TEXT (APPNAME) ;
 	HWND         hwnd ;
 	MSG          msg ;
@@ -298,6 +309,19 @@ void DisplayWallTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 
 void DisplayCountDown(HDC hdc)
 {
+	HBRUSH hbrushGray = CreateSolidBrush(RGB(220,220,220));
+	HBRUSH hbrushOrig = NULL;
+
+	//
+	// Drawing clock digits
+	//
+
+	if(g_seconds_remain==0)
+	{
+		// Show gray digits to imply count-down finished.
+		hbrushOrig = (HBRUSH) SelectObject(hdc, hbrushGray);
+	}
+
 	int zSeconds = g_seconds_remain % 60;
 	int tmp = g_seconds_remain / 60;
 	int zMinutes = tmp % 60;
@@ -316,10 +340,11 @@ void DisplayCountDown(HDC hdc)
 	OffsetWindowOrgEx(hdc, 42+42, -58, NULL);
 
 	const RECT rcBar = {0,0, 42+42-4, 12};
-	//FrameRect(hdc, &rcBar, GetStockBrush(BLACK_BRUSH));
 		
-	HBRUSH hbrushGray = CreateSolidBrush(RGB(220,220,220));
-	HBRUSH hbrushOrig = (HBRUSH) SelectObject(hdc, hbrushGray);
+	if(hbrushOrig==NULL)
+	{
+		hbrushOrig = (HBRUSH) SelectObject(hdc, hbrushGray);
+	}
 	
 	// draw background gray bar
 	Rectangle(hdc, rcBar.left, rcBar.top, rcBar.right, rcBar.bottom); 

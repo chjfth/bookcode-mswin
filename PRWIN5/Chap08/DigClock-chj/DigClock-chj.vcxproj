@@ -75,7 +75,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20230917-0000-0000-0000-070059000001}</ProjectGuid>
-    <ProjectName>DigClock-chj</ProjectName>
+    <ProjectName>DigClock-chj (old)</ProjectName>
      <TargetName>DigClock-chj</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
@@ -111,8 +111,8 @@
         "v120" on VC2013
         "v140" on VC2015
         "v141" on VC2017
-          "v142" on VC2019
-          "v143" on VC2022
+        "v142" on VC2019
+        "v143" on VC2022
       -->
     <PlatformToolset Condition="$(DefaultPlatformToolset)!=''">$(DefaultPlatformToolset)</PlatformToolset>
   </PropertyGroup>

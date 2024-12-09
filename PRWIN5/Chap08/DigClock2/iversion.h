@@ -2,7 +2,7 @@
 #define __iversion_h_
 
 #define THISEXE_VMAJOR 1
-#define THISEXE_VMINOR 4
+#define THISEXE_VMINOR 5
 #define THISEXE_VBUILD 0
 
 #define THISEXEstr__(n) #n

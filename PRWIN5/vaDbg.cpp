@@ -12,6 +12,14 @@ static int s_dbgcount = 0;
 
 void vaDbgTs(const TCHAR *fmt, ...)
 {
+	va_list args;
+	va_start(args, fmt);
+	vlDbgTs(fmt, args);
+	va_end(args);
+}
+
+void vlDbgTs(const TCHAR *fmt, va_list args)
+{
 	// Note: Each calling outputs one line, with timestamp prefix.
 	// A '\n' will be added automatically at end.
 
@@ -20,7 +28,7 @@ void vaDbgTs(const TCHAR *fmt, ...)
 
 	DWORD now_msec = GetTickCount();
 
-	TCHAR buf[1000] = {0};
+	TCHAR buf[4000] = {0};
 
 	// Print timestamp to show that time has elapsed for more than one second.
 	DWORD delta_msec = now_msec - s_prev_msec;
@@ -39,12 +47,7 @@ void vaDbgTs(const TCHAR *fmt, ...)
 
 	int prefixlen = (int)_tcslen(buf);
 
-	va_list args;
-	va_start(args, fmt);
-
 	_vsntprintf_s(buf+prefixlen, ARRAYSIZE(buf)-3-prefixlen, _TRUNCATE, fmt, args);
-
-	va_end(args);
 
 	// add trailing \n
 	int slen = (int)_tcslen(buf);
@@ -61,6 +64,14 @@ void vaDbgTs(const TCHAR *fmt, ...)
 
 void vaDbgS(const TCHAR *fmt, ...)
 {
+	va_list args;
+	va_start(args, fmt);
+	vlDbgS(fmt, args);
+	va_end(args);
+}
+
+void vlDbgS(const TCHAR *fmt, va_list args)
+{
 	// This only has Sequential prefix.
 
 	TCHAR buf[1000] = {0};
@@ -69,15 +80,10 @@ void vaDbgS(const TCHAR *fmt, ...)
 
 	int prefixlen = (int)_tcslen(buf);
 
-	va_list args;
-	va_start(args, fmt);
-
 	_vsntprintf_s(buf+prefixlen, ARRAYSIZE(buf)-3-prefixlen, _TRUNCATE, fmt, args);
 
 	prefixlen = (int)_tcslen(buf);
 	_tcsncpy_s(buf+prefixlen, 2, TEXT("\r\n"), _TRUNCATE); // add trailing \r\n
-
-	va_end(args);
 
 	// add trailing \n
 	int slen = (int)_tcslen(buf);
