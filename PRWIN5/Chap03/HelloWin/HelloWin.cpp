@@ -19,6 +19,8 @@ cl HelloWin.cpp /Od /MT /Zi /D_DEBUG /D_UNICODE /DUNICODE /link /debug kernel32.
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "vaDbg.h"
+
 void vaDbg(const TCHAR *fmt, ...)
 {
 	static int count = 0;

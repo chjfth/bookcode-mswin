@@ -19,7 +19,7 @@ DigClock.cpp -- Updated by Chj, 2022.05.
 #include <shlwapi.h>
 #include "resource.h"
 
-#include "..\..\vaDbg.h"
+#include "vaDbg.h"
 #include "..\..\BeginPaint_NoFlicker.h"
 
 void ShowHelp(HWND hwndParent)

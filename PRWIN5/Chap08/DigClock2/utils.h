@@ -9,7 +9,7 @@
 #include <windowsx.h>
 #include <Shlwapi.h>
 
-#include "..\..\vaDbg.h"
+#include "vaDbg.h"
 #include "..\..\BeginPaint_NoFlicker.h"
 
 

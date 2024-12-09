@@ -137,7 +137,7 @@
       <!-- EXE/DLL's .pdb is truly intermediate, so we put it in $(IntDir), with some fancy file-naming -->
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\..\share;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -188,7 +188,7 @@
   <ItemGroup>
     <ClCompile Include="DigClock2.cpp" />
     <ClCompile Include="..\..\BeginPaint_NoFlicker.cpp" />
-    <ClCompile Include="..\..\vaDbg.cpp" />
+    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -199,7 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\BeginPaint_NoFlicker.h" />
-    <ClInclude Include="..\..\vaDbg.h" />
+    <ClInclude Include="..\..\..\share\vaDbg.h" />
     <ClInclude Include="iversion.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="resource.h" />

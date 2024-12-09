@@ -150,7 +150,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\..\share;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -202,13 +202,13 @@
   <ItemGroup>
     <ClCompile Include="DigClock.cpp" />
     <ClCompile Include="..\..\BeginPaint_NoFlicker.cpp" />
-    <ClCompile Include="..\..\vaDbg.cpp" />
+    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
 
     <ResourceCompile Include="App.rc" />
 
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\BeginPaint_NoFlicker.h" />
-    <ClInclude Include="..\..\vaDbg.h" />
+    <ClInclude Include="..\..\..\share\vaDbg.h" />
 
     <None Include="DigClock.ico" />
   </ItemGroup>
