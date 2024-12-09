@@ -108,6 +108,8 @@ bool SomeInit()
 	if(_tcscmp(szDbg, _T("1"))==0)
 		g_isDbg = 1;
 	
+	MySaveSysDpiScaling();
+
 	return true;
 }
 
@@ -127,7 +129,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.cbClsExtra    = 0 ;
 	wndclass.cbWndExtra    = 0 ;
 	wndclass.hInstance     = hInstance ;
-	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
+	wndclass.hIcon         = LoadIcon(hInstance, _T("MYPROGRAM"));
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
 	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of BeginPaint_NoFlicker
 	wndclass.lpszMenuName  = NULL ;
@@ -149,11 +151,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		mousepos.x, mousepos.y,
 		g_init_clisize.cx, g_init_clisize.cy, // CW_USEDEFAULT, CW_USEDEFAULT, 
 		NULL, NULL, hInstance, NULL) ;
-	Hwnd_ShowTitle(hwnd, false, g_init_clisize.cx, g_init_clisize.cy);
-
-	SendMessage(hwnd, WM_SETICON, TRUE, (LPARAM)LoadIcon(hInstance, _T("MYPROGRAM")));
-
-	Hwnd_ShowTitle(hwnd, false);
+	//
+	MyAdjustClientSize(hwnd, false, g_init_clisize.cx, g_init_clisize.cy, true);
 
 	g_hdlgCountdownCfg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwnd, Dlgproc_CountdownCfg);
 	assert(g_hdlgCountdownCfg);
@@ -668,7 +667,7 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	else if(cmdid==IDM_SHOW_TITLE)
 	{
 		s_is_show_title = !s_is_show_title;
-		Hwnd_ShowTitle(hwnd, s_is_show_title);
+		MyAdjustClientSize(hwnd, s_is_show_title);
 	}
 	else if(cmdid==IDM_MINIMIZE_WINDOW)
 	{
@@ -680,7 +679,8 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	}
 	else if(cmdid==IDM_RESET_SIZE)
 	{
-		Hwnd_ShowTitle(hwnd, s_is_show_title, g_init_clisize.cx, g_init_clisize.cy);
+		MyAdjustClientSize(hwnd, s_is_show_title, 
+			g_init_clisize.cx, g_init_clisize.cy, true);
 	}
 	else if(cmdid==IDM_EXIT)
 	{

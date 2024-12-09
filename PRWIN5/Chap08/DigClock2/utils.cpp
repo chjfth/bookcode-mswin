@@ -1,6 +1,7 @@
 #include "utils.h"
 
 bool g_isDbg = false;
+double g_sysdpiScaling = 1.0;
 
 void myDbg(const TCHAR *fmt, ...)
 {
@@ -35,10 +36,25 @@ void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop)
 		);
 }
 
-void Hwnd_ShowTitle(HWND hwnd, bool istitle, int cli_width, int cli_height)
+void MySaveSysDpiScaling()
 {
-	// cli_width, cli_height: If >0, This function will adjust window size so that
-	// hwnd's client area has exactly that width & height (pixels)
+	HDC hdc = GetDC(NULL);
+	int sysdpi = GetDeviceCaps(hdc, LOGPIXELSX); // or GetDeviceCaps
+	BOOL succ = ReleaseDC(NULL, hdc);
+	
+	g_sysdpiScaling = (double)sysdpi / 96;
+	// -- This will not change without user sign-out/sign-in, even on Win10.1607+.
+}
+
+void MyAdjustClientSize(HWND hwnd, bool istitle, int cli_width, int cli_height, 
+	bool isDpiScaling)
+{
+	// cli_width, cli_height: 
+	// * If >0, This function will adjust window size so that
+	//   hwnd's client area has exactly that width & height (pixels)
+	// * If <=0, it keeps current client size, and only istitle counts.
+	//
+	// isDpiScaling: Will increase cli_width & cli_height by System DPI scaling.
 
 	struct StyleBits 
 	{ 
@@ -51,6 +67,12 @@ void Hwnd_ShowTitle(HWND hwnd, bool istitle, int cli_width, int cli_height)
 	};
 
 	int cliw_inc = 0, clih_inc = 0;
+
+	if(isDpiScaling)
+	{
+		cli_width  = int(cli_width * g_sysdpiScaling);
+		cli_height = int(cli_height* g_sysdpiScaling);
+	}
 
 	// Save original client-area absolute position first.
 	//
@@ -455,3 +477,4 @@ bool Editbox_DisableUpDownKeyAdjustNumber(HWND hEdit)
 	
 	return true;
 }
+
