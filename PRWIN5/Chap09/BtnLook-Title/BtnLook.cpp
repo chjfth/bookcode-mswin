@@ -85,7 +85,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
-	return msg.wParam ;
+	return (int)msg.wParam ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
