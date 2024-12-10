@@ -1,10 +1,23 @@
 /*-------------------------------------------------
    CHECKER3.C -- Mouse Hit-Test Demo Program No. 3
                  (c) Charles Petzold, 1998
-  -------------------------------------------------*/
+
+[2024-12-10] Chj special: 
+	I set up a 10-second timer for WndProc, that reports GetFocus() result.
+	In the timer-callback, I also check if client area size has changed. 
+	* If changed to landscape rect, I'll SetFocus to main-window.
+	* If changed to portrait rect , I'll SetFocus to the centric child window.
+	These help observe WM_SETFOCUS/WM_KILLFOCUS behavior, especially 
+	the interaction among main-window and child-window..
+				 
+-------------------------------------------------*/
 
 #include <windows.h>
 #include "vaDbg.h"
+
+#define MY_TIMER_ID 10
+
+int g_orig_clix, g_orig_cliy; // original client-area width/height
 
 #define DIVISIONS 5
 
@@ -49,7 +62,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hwnd = CreateWindow (szAppName, TEXT ("Checker3 Mouse Hit-Test Demo"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		400, 400,
 		NULL, NULL, hInstance, NULL) ;
 
 	ShowWindow (hwnd, iCmdShow) ;
@@ -71,10 +84,45 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return (int)msg.wParam ;
 }
 
+void CALLBACK ChjTimer(HWND hwnd, UINT msg, UINT_PTR timerId, DWORD tick)
+{
+	(void)hwnd; (void)msg; (void)tick;
+	if(timerId==MY_TIMER_ID)
+	{
+		RECT rc = {};
+		GetClientRect(hwnd, &rc);
+
+		HWND hwndNowFocus = GetFocus();
+		vaDbgTs(_T("GetFocus() = 0x%08X"), hwndNowFocus);
+
+		if(rc.right==g_orig_clix && rc.bottom==g_orig_cliy)
+		{
+			// window size not changed yet, do nothing more
+			return; 
+		}
+
+		if(rc.right > rc.bottom) // landscape window
+		{
+			vaDbgTs(_T(">>> SetFocus() to main window 0x%08X."), hwnd);
+			HWND prevFocus = SetFocus( hwnd );
+			vaDbgTs(_T("<<< SetFocus() reports prev-focus: 0x%08X."), prevFocus);
+		}
+
+		if(rc.right < rc.bottom) // portrait window
+		{
+			HWND hCentric = GetDlgItem(hwnd, (2<<8)|2 );
+			vaDbgTs(_T(">>> SetFocus() to centric child 0x%08X."), hCentric);
+			HWND prevFocus = SetFocus( hCentric );
+			vaDbgTs(_T("<<< SetFocus() reports prev-focus: 0x%08X."), prevFocus);
+		}
+	}
+}
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HWND hwndChild[DIVISIONS][DIVISIONS] ;
 	int         cxBlock, cyBlock, x, y ;
+	RECT rc = {};
 
 	switch (message)
 	{
@@ -89,8 +137,16 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					hwnd, (HMENU) (y << 8 | x),
 					(HINSTANCE) GetWindowLongPtr (hwnd, GWLP_HINSTANCE),
 					NULL) ;
+
+				vaDbgS(_T("Created child window: [%d,%d] hwnd=0x%08X"), x, y, hwndChild[x][y]);
 			}
 		}
+
+		// Chj special:
+		SetTimer(hwnd, MY_TIMER_ID, 10*1000, ChjTimer);
+		GetClientRect(hwnd, &rc);
+		g_orig_clix = rc.right, g_orig_cliy = rc.bottom;
+
 		return 0 ;
 
 	case WM_SIZE :
@@ -113,6 +169,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0 ;
 
 	case WM_DESTROY :
+		KillTimer(hwnd, MY_TIMER_ID);
 		PostQuitMessage (0) ;
 		return 0 ;
 
@@ -123,6 +180,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		vaDbgTs(_T("WndProc.WM_KILLFOCUS, Gaining-focus hwnd=0x%08X"), wParam);
 		return 0;
 	}
+
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
