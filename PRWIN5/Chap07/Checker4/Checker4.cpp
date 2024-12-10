@@ -4,7 +4,7 @@
   -------------------------------------------------*/
 
 #include <windows.h>
-#include "../../vaDbg.h"
+#include "vaDbg.h"
 
 #define DIVISIONS 5
 
@@ -27,7 +27,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.cbClsExtra    = 0 ;
 	wndclass.cbWndExtra    = 0 ;
 	wndclass.hInstance     = hInstance ;
-	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
+	wndclass.hIcon         = LoadIcon(hInstance, TEXT("MYPROGRAM"));
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
 	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
 	wndclass.lpszMenuName  = NULL ;
@@ -53,13 +53,18 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL) ;
 
-	SendMessage(hwnd, WM_SETICON, TRUE, (LPARAM)LoadIcon(hInstance,	TEXT("MYPROGRAM")));
-
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
 
+	vaDbgTs(_T("Checker4 main-hwnd: 0x%08X"), hwnd);
+
 	while (GetMessage (&msg, NULL, 0, 0))
 	{
+		if(msg.message==WM_KEYDOWN)
+		{
+			vaDbgTs(_T("GetMessage() sees WM_KEYDOWN, target-hwnd=0x%08X"), msg.hwnd);
+		}
+
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
@@ -110,13 +115,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	// On set-focus message, set focus to child window
 
 	case WM_SETFOCUS:
-		vaDbgTs(_T("Main-window WM_SETFOCUS. Losing-focus-guy hwnd: 0x%08X"), wParam);
+		vaDbgTs(_T("Main-window WM_SETFOCUS. Losing-focus hwnd: 0x%08X"), wParam);
 		
 		SetFocus (GetDlgItem (hwnd, idFocus)) ;
 		return 0 ;
 
 	case WM_KILLFOCUS:
-		vaDbgTs(_T("Main-window WM_KILLFOCUS. Gaining-focus-guy hwnd: 0x%08X"), wParam);
+		vaDbgTs(_T("Main-window WM_KILLFOCUS. Gaining-focus hwnd: 0x%08X"), wParam);
 		
 		return 0;
 
