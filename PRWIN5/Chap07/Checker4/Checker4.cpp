@@ -50,7 +50,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hwnd = CreateWindow (szAppName, TEXT ("Checker4 Mouse Hit-Test Demo"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		400, 300,
 		NULL, NULL, hInstance, NULL) ;
 
 	ShowWindow (hwnd, iCmdShow) ;

@@ -59,11 +59,15 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	RegisterClass (&wndclass) ;
 
-	hwnd = CreateWindow (szAppName, TEXT ("Checker3 Mouse Hit-Test Demo"),
+	hwnd = CreateWindow (szAppName, _T("set later"),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		400, 400,
 		NULL, NULL, hInstance, NULL) ;
+
+	TCHAR title[100] = {};
+	_sntprintf_s(title, _TRUNCATE, _T("Checker3 Mouse Hit-Test, hwnd=0x%X"), hwnd);
+	SetWindowText(hwnd, title);
 
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
@@ -166,6 +170,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_LBUTTONDOWN :
 		MessageBeep (0) ;
+
+		SetFocus(NULL); // Chj
+		vaDbgTs(_T("Call SetFocus(NULL) from WndProc"));
+
 		return 0 ;
 
 	case WM_DESTROY :
@@ -199,6 +207,10 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 	case WM_LBUTTONDOWN :
 		SetWindowLongPtr (hwnd, 0, 1^GetWindowLongPtr (hwnd, 0)); // Toggle the extra `long`
 		InvalidateRect (hwnd, NULL, FALSE) ;
+
+		SetFocus(NULL); // Chj
+		vaDbgTs(_T("Call SetFocus(NULL) from ChildWndProc"));
+
 		return 0 ;
 
 	case WM_PAINT :
