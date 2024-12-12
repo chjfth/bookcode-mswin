@@ -14,6 +14,7 @@ Then, WinMan will drop out(=NOT send) that trailing WM_SETFOCUS.
 
 Key code: ChildWndProc WM_SETFOCUS, WM_KILLFOCUS processing and debug message.
 
+Evernote timetag: 20241212.1
   -------------------------------------------------*/
 
 #include <windows.h>
@@ -73,13 +74,6 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	while (GetMessage (&msg, NULL, 0, 0))
 	{
-/*
-		if(msg.message==WM_KEYDOWN)
-		{
-			vaDbgTs(_T("GetMessage() sees WM_KEYDOWN, target-hwnd=0x%08X"), msg.hwnd);
-		}
-*/
-
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
