@@ -5,6 +5,8 @@
 
 #include <windows.h>
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
 #define ID_SMALLER      1
 #define ID_LARGER       2
 
@@ -30,7 +32,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.cbClsExtra    = 0 ;
 	wndclass.cbWndExtra    = 0 ;
 	wndclass.hInstance     = hInstance ;
-	wndclass.hIcon         = LoadIcon (NULL, IDI_APPLICATION) ;
+	wndclass.hIcon         = LoadIcon(hInstance, TEXT("MYPROGRAM"));
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
 	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
 	wndclass.lpszMenuName  = szAppName ;
@@ -57,7 +59,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
-	return msg.wParam ;
+	return (int)msg.wParam ;
 }
 
 void Triangle (HDC hdc, POINT pt[])
