@@ -4,6 +4,8 @@
   -------------------------------------------------------*/
 
 #include <windows.h>
+#include <windowsX.h>
+
 
 //#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -68,9 +70,16 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			WS_BORDER | 
 			ES_LEFT | 
 			ES_MULTILINE |
-			ES_AUTOHSCROLL | ES_AUTOVSCROLL,
+			ES_AUTOHSCROLL | ES_AUTOVSCROLL
+			,
 			0, 0, 0, 0, hwnd, (HMENU) ID_EDIT,
 			((LPCREATESTRUCT) lParam) -> hInstance, NULL) ;
+
+		// Chj special: Want fixed-width font in the editbox.
+		SetWindowFont(hwndEdit, 
+			GetStockFont(OEM_FIXED_FONT), // or SYSTEM_FIXED_FONT
+			TRUE);
+
 		return 0 ;
 
 	case WM_SETFOCUS :
@@ -84,9 +93,14 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND :
 		if (LOWORD (wParam) == ID_EDIT)
 		{
-			if (HIWORD(wParam)==EN_ERRSPACE || HIWORD(wParam)==EN_MAXTEXT)
+			if (HIWORD(wParam)==EN_ERRSPACE)
 			{
-				MessageBox (hwnd, TEXT ("Edit control out of space."),
+				MessageBox (hwnd, TEXT ("Edit control out of space. (EN_ERRSPACE)"),
+					szAppName, MB_OK | MB_ICONSTOP) ;
+			}
+			if (HIWORD(wParam)==EN_MAXTEXT)
+			{
+				MessageBox (hwnd, TEXT ("Edit control out of space. (EN_MAXTEXT)"),
 					szAppName, MB_OK | MB_ICONSTOP) ;
 			}
 		}
