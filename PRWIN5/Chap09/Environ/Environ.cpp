@@ -65,7 +65,9 @@ void FillListBox (HWND hwndList)
 		if (*pVarBlock != '=')   // Skip variable names beginning with '='
 		{
 			pVarBeg = pVarBlock ;              // Beginning of variable name
+			
 			while (*pVarBlock++ != '=') ;      // Scan until '='
+			
 			pVarEnd = pVarBlock - 1 ;          // Points to '=' sign
 			iLength = pVarEnd - pVarBeg ;      // Length of variable name
 
@@ -81,6 +83,7 @@ void FillListBox (HWND hwndList)
 			SendMessage (hwndList, LB_ADDSTRING, 0, (LPARAM) pVarName) ;
 			free (pVarName) ;
 		}
+
 		while (*pVarBlock++ != '\0') ;     // Scan until terminating zero
 	}
 	FreeEnvironmentStrings (pVarBlock) ;
@@ -101,10 +104,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Create listbox and static text windows.
 
 		hwndList = CreateWindow (TEXT ("listbox"), NULL,
-			WS_CHILD | WS_VISIBLE | LBS_STANDARD,
+			WS_CHILD | WS_VISIBLE | LBS_STANDARD | WS_SIZEBOX,
 			cxChar, cyChar * 3,
-			cxChar * 16 + GetSystemMetrics (SM_CXVSCROLL),
-			cyChar * 5,
+			cxChar * 30 + GetSystemMetrics (SM_CXVSCROLL),
+			cyChar * 10,
 			hwnd, (HMENU) ID_LIST,
 			(HINSTANCE) GetWindowLong (hwnd, GWL_HINSTANCE),
 			NULL) ;
