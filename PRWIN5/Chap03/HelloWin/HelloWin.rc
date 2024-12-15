@@ -54,9 +54,6 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE 
-BEGIN
-END
 
 #endif    // APSTUDIO_INVOKED
 
