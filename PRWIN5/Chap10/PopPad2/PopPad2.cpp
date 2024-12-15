@@ -4,6 +4,7 @@
   -----------------------------------------------------*/
 
 #include <windows.h>
+#include <windowsx.h>
 #include "resource.h"
 
 #define ID_EDIT     1
@@ -83,6 +84,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			0, 0, 0, 0, hwnd, (HMENU) ID_EDIT,
 			((LPCREATESTRUCT) lParam)->hInstance, NULL) ;
 
+		// Chj special: Want fixed-width font in the editbox.
+		SetWindowFont(hwndEdit, 
+			GetStockFont(SYSTEM_FIXED_FONT), // or OEM_FIXED_FONT
+			TRUE);
 		SetWindowText(hwndEdit, TEXT("Chj: You can press Ctrl+K to copy selected text."));
 
 		return 0 ;
