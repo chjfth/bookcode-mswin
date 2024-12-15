@@ -48,7 +48,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
-	return msg.wParam ;
+	return (int)msg.wParam ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -78,8 +78,10 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hdc = BeginPaint (hwnd, &ps) ;
 
 		for (y = 0 ; y < cyClient ; y += cyIcon)
+		{
 			for (x = 0 ; x < cxClient ; x += cxIcon)
 				DrawIcon (hdc, x, y, hIcon) ;
+		}
 
 		EndPaint (hwnd, &ps) ;
 		return 0 ;
