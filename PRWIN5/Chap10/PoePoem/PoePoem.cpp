@@ -5,6 +5,7 @@
 
 #include <windows.h>
 #include "resource.h"
+#include "vaDbg.h"
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -51,7 +52,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hwnd = CreateWindow (szAppName, szCaption,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		600, 500, // CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL) ;
 
 	ShowWindow (hwnd, iCmdShow) ;
@@ -67,14 +68,16 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static char  * pText ;
+	static char  * s_rsText;
+	char *pszText = NULL;
 	static HGLOBAL hResource ;
 	static HWND    hScroll ;
 	static int     iPosition, cxChar, cyChar, cyClient, iNumLines, xScroll ;
-	HDC            hdc ;
-	PAINTSTRUCT    ps ;
-	RECT           rect ;
-	TEXTMETRIC     tm ;
+	HDC            hdc = NULL;
+	PAINTSTRUCT    ps  = {};
+	RECT           rect= {};
+	TEXTMETRIC     tm  = {};
+	HRSRC hRsrc = NULL;
 
 	switch (message)
 	{
@@ -92,20 +95,29 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			0, 0, 0, 0,
 			hwnd, (HMENU) 1, hInst, NULL) ;
 
-		hResource = LoadResource (hInst, 
-			FindResource (hInst, TEXT ("AnnabelLee"),
-			TEXT ("TEXT"))) ;
+		hRsrc = FindResource (hInst, TEXT ("AnnabelLee"), TEXT ("TEXT"));
+		hResource = LoadResource (hInst, hRsrc);
+		s_rsText = (char *) LockResource (hResource) ;
 
-		pText = (char *) LockResource (hResource) ;
+		vaDbgS(_T("PoePoem resource pointers:\n")
+			_T("  FindResource() = %p\n")  // 0044E128
+			_T("  LoadResource() = %p\n")  // 0044E1A8
+			_T("  LockResource() = %p\n")  // 0044E1A8
+			,
+			hRsrc, hResource, s_rsText
+			);
+
 		iNumLines = 0 ;
 
-		while (*pText != '\\' && *pText != '\0')
+		pszText = s_rsText;
+		while (*pszText != '\\' && *pszText != '\0')
 		{
-			if (*pText == '\n')
+			if (*pszText == '\n')
 				iNumLines ++ ;
-			pText = AnsiNext (pText) ;
+			
+			pszText = AnsiNext (pszText) ;
 		}
-		*pText = '\0' ;
+		*pszText = '\0' ;
 
 		SetScrollRange (hScroll, SB_CTL, 0, iNumLines, FALSE) ;
 		SetScrollPos   (hScroll, SB_CTL, 0, FALSE) ;
@@ -158,12 +170,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT :
 		hdc = BeginPaint (hwnd, &ps) ;
 
-		pText = (char *) LockResource (hResource) ;
+//		pText = (char *) LockResource (hResource) ;
 
 		GetClientRect (hwnd, &rect) ;
 		rect.left += cxChar ;
 		rect.top  += cyChar * (1 - iPosition) ;
-		DrawTextA (hdc, pText, -1, &rect, DT_EXTERNALLEADING) ;
+		DrawTextA (hdc, s_rsText, -1, &rect, DT_EXTERNALLEADING) ;
 
 		EndPaint (hwnd, &ps) ;
 		return 0 ;
