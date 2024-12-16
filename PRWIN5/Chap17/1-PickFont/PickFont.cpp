@@ -12,8 +12,8 @@ Enhancements by Jimm Chen.
 #include <assert.h>
 #include <tchar.h>
 #include <stdio.h>
-#include "..\..\vaDbg.h"
-#include "..\..\dlptr_winapi.h"
+#include "vaDbg.h"
+#include "dlptr_winapi.h"
 #include "resource.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -798,7 +798,8 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case IDC_BTN_CHANGE_SAMPLE_TEXT:
 			{
-				INT_PTR ret = DialogBox(g_hInstanceExe, MAKEINTRESOURCE(IDD_CHANGE_SAMPLE_TEXT), hdlg, 
+				INT_PTR ret = DialogBox(g_hInstanceExe, 
+					MAKEINTRESOURCE(IDD_CHANGE_SAMPLE_TEXT), hdlg, 
 					DlgProc_ChangeSampleText);
 
 				if(ret==RELOAD_SAMPLE_TEXT)
@@ -824,6 +825,7 @@ INT_PTR CALLBACK DlgProc (HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}}
 	return FALSE ;
 }
+
 void SetLogFontFromFields (HWND hdlg, DLGPARAMS * pdp)
 {
 	pdp->lf.lfHeight      = GetDlgItemInt (hdlg, IDC_LF_HEIGHT,  NULL, TRUE) ;

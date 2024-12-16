@@ -7,17 +7,44 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#ifndef APSTUDIO_INVOKED
+#endif
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "PickFont.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+PICKFONT MENU
+BEGIN
+    POPUP "&Device"
+    BEGIN
+        MENUITEM "&Screen",                     IDM_DEVICE_SCREEN, CHECKED
+        MENUITEM "&Printer",                    IDM_DEVICE_PRINTER
+    END
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -150,33 +177,6 @@ BEGIN
     EDITTEXT        IDC_HELPTEXT,7,7,277,67,ES_MULTILINE | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    "PICKFONT", DIALOG
-    BEGIN
-        LEFTMARGIN, 8
-        RIGHTMARGIN, 341
-        BOTTOMMARGIN, 300
-    END
-
-    IDD_CHANGE_SAMPLE_TEXT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 284
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 151
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Accelerator
@@ -188,24 +188,6 @@ BEGIN
 END
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON1               ICON                    "PickFont.ico"
-#endif    // English resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -220,32 +202,16 @@ END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""afxres.h""\r\n"
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#endif\r\n"
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
 
 #endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-PICKFONT MENU
-BEGIN
-    POPUP "&Device"
-    BEGIN
-        MENUITEM "&Screen",                     IDM_DEVICE_SCREEN, CHECKED
-        MENUITEM "&Printer",                    IDM_DEVICE_PRINTER
-    END
-END
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -257,8 +223,5 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
-
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

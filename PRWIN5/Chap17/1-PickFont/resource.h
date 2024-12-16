@@ -2,6 +2,8 @@
 // Microsoft Visual C++ generated include file.
 // Used by PickFont.rc
 //
+#define IDC_STATIC (-1)
+
 #define IDD_CHANGE_SAMPLE_TEXT          103
 #define IDI_ICON1                       104
 #define IDC_LF_HEIGHT                   1000

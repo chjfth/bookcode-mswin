@@ -75,7 +75,8 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20220903-0000-0000-0000-002555000001}</ProjectGuid>
-    <ProjectName>PickFont</ProjectName>
+    <ProjectName>17-1 PickFont</ProjectName>
+     <TargetName>17-PickFont</TargetName>
 
      <!-- Chj: Use different EXE name for Unicode/ANSI build. -->
      <TargetName Condition="!$(Configuration.Contains('ANSI'))">PickFontU</TargetName>
@@ -154,7 +155,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\..\share;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -205,7 +206,7 @@
    -->
   <ItemGroup>
     <ClCompile Include="PickFont.cpp" />
-    <ClCompile Include="..\..\vaDbg.cpp" />
+    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PickFont.rc" />
