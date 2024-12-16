@@ -194,8 +194,10 @@ int HMS_to_Seconds(const TCHAR *szHMS)
     case (message): \
 	{ \
 		MsgRelay_et is_relay = FILTER_##message((hwnd), (wParam), (lParam), (fn)); \
-		if(is_relay) break; \
-		else return 0; \
+		if(is_relay) \
+			break; \
+		else \
+			return 0; \
 	}
 
 enum MsgRelay_et { Relay_no=0, Relay_yes=1 };
@@ -203,6 +205,10 @@ enum MsgRelay_et { Relay_no=0, Relay_yes=1 };
 /* MsgRelay_et Cls_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT flags) */
 #define FILTER_WM_KEYDOWN(hwnd, wParam, lParam, fn) \
     (fn)((hwnd), (UINT)(wParam), TRUE, (int)(short)LOWORD(lParam), (UINT)HIWORD(lParam))
+
+/* MsgRelay_et Edit_OnMouseMove(HWND hEdit, int x, int y, UINT keyFlags) */
+#define FILTER_WM_MOUSEMOVE(hwnd, wParam, lParam, fn) \
+	(fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam))
 
 /* MsgRelay_et Cls_OnNCDestroy(HWND hwnd) */
 #define FILTER_WM_NCDESTROY(hwnd, wParam, lParam, fn) \
@@ -224,6 +230,9 @@ struct EditCustProp_st
 	bool is_wrap_around;
 	bool is_pad_0; // "5" becomes "05" or "005" etc, according to hot length
 
+	bool is_cleanup_ready;
+	bool is_mouse_hidden;
+
 	EditCustProp_st(WNDPROC wndproc_was,
 		int min_val, int max_val, bool is_wrap_around, bool is_pad_0)
 	{
@@ -233,6 +242,27 @@ struct EditCustProp_st
 		this->max_val = max_val;
 		this->is_wrap_around = is_wrap_around;
 		this->is_pad_0 = is_pad_0;
+
+		this->is_cleanup_ready = false;
+		this->is_mouse_hidden = false;
+	}
+
+	void HideMouse()
+	{
+		// When user starts adjusting numbers with keyboard, I'll hide the mouse 
+		// temporarily so that mouse cursor does not obscure the ticking numbers.
+		if(! is_mouse_hidden) {
+			ShowCursor(FALSE);
+			is_mouse_hidden = true;
+		}
+	}
+
+	void ShowMouse()
+	{
+		if(is_mouse_hidden) {
+			ShowCursor(TRUE);
+			is_mouse_hidden = false;
+		}
 	}
 };
 
@@ -388,12 +418,33 @@ static MsgRelay_et Edit_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT 
 	Edit_SetText(hEdit, szNewText);
 	Edit_SetSel(hEdit, startHot, endHot_);
 	
+	if(myprop->is_cleanup_ready)
+	{
+		myprop->HideMouse();
+	}
+	
 	return Relay_no;
 }
 
-static MsgRelay_et Edit_OnNCDestroy(HWND hwnd)
+static MsgRelay_et Edit_OnMouseMove(HWND hEdit, int x, int y, UINT keyFlags)
 {
-	bool succ = Editbox_DisableUpDownKeyAdjustNumber(hwnd);
+	EditCustProp_st *myprop = (EditCustProp_st*)GetProp(hEdit, MYEDITBOX_PROP_STR);
+
+	if(! myprop->is_cleanup_ready)
+	{
+		// Establish WM_MOUSELEAVE tracking.
+		TRACKMOUSEEVENT tme = {sizeof(tme), TME_LEAVE, hEdit};
+		TrackMouseEvent(&tme);
+
+		myprop->is_cleanup_ready = true;
+	}
+
+	return Relay_yes;
+}
+
+static MsgRelay_et Edit_OnNCDestroy(HWND hEdit)
+{
+	bool succ = Editbox_DisableUpDownKeyAdjustNumber(hEdit);
     assert(succ);
 	return Relay_yes;
 }
@@ -412,7 +463,13 @@ static LRESULT CALLBACK Edit_MyWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
     switch (uMsg)
 	{
 		MY_FILTER_MSG0(hwnd, WM_KEYDOWN, Edit_OnKey);
+		MY_FILTER_MSG0(hwnd, WM_MOUSEMOVE, Edit_OnMouseMove);
     	MY_FILTER_MSG0(hwnd, WM_NCDESTROY, Edit_OnNCDestroy);
+	
+	case WM_MOUSELEAVE: 
+		myprop->ShowMouse();
+		myprop->is_cleanup_ready = false;
+		break;
 	}
 
     // Call the original WndProc for default processing

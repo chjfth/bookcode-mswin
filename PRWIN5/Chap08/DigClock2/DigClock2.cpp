@@ -22,6 +22,7 @@ Since 2024.10:
 #include <assert.h>
 #include <windows.h>
 #include <windowsx.h>
+#include <CommCtrl.h>
 #include <shlwapi.h>
 #include "resource.h"
 
@@ -103,6 +104,9 @@ INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, L
 
 bool SomeInit()
 {
+	InitCommonControls();
+	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
+
 	TCHAR szDbg[4] = {};
 	GetEnvironmentVariable(_T("DIGCLOCK_DBG"), szDbg, ARRAYSIZE(szDbg));
 	if(_tcscmp(szDbg, _T("1"))==0)
