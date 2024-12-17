@@ -10,8 +10,11 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 #include <stdio.h>
 #include "Resource.h"
 #include <StrSafe.h>
+#include "vaDbg.h"
 
-
+#ifndef PROCESSOR_ARCHITECTURE_ARM64
+#define PROCESSOR_ARCHITECTURE_ARM64 12 // VC2010 does not have this
+#endif
 
 
 // This function accepts a number and converts it to a
@@ -33,10 +36,9 @@ PTSTR BigNumToString(LONG lNum, PTSTR szBuf, DWORD chBufSize)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShowCPUInfo(HWND hWnd, WORD wProcessorArchitecture, WORD wProcessorLevel, 
-	WORD wProcessorRevision) 
+void ShowCPUInfo(HWND hWnd, WORD wProcessorArchitecture, 
+	WORD wProcessorLevel, WORD wProcessorRevision) 
 {
-
 		TCHAR szCPUArch[64]  = TEXT("(unknown)");
 		TCHAR szCPULevel[64] = TEXT("(unknown)");
 		TCHAR szCPURev[64]   = TEXT("(unknown)");
@@ -77,8 +79,7 @@ void ShowCPUInfo(HWND hWnd, WORD wProcessorArchitecture, WORD wProcessorLevel,
 
 				case 3:
 				case 5: 
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), 
-						TEXT("Pentium II"));
+					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium II"));
 					break; 
 
 				case 6: 
@@ -137,6 +138,12 @@ void ShowCPUInfo(HWND hWnd, WORD wProcessorArchitecture, WORD wProcessorLevel,
 				LOBYTE(wProcessorRevision));
 			break;
 
+		case PROCESSOR_ARCHITECTURE_ARM64:
+			_tcscpy_s(szCPUArch, _T("ARM64"));
+			_sntprintf_s(szCPULevel, _TRUNCATE, _T("%d"), wProcessorLevel);
+			_sntprintf_s(szCPURev, _TRUNCATE, _T("Model %c, Pass %d"),
+				HIBYTE(wProcessorRevision) + TEXT('A'),
+				LOBYTE(wProcessorRevision));
 
 		case PROCESSOR_ARCHITECTURE_UNKNOWN:
 		default:
@@ -144,9 +151,9 @@ void ShowCPUInfo(HWND hWnd, WORD wProcessorArchitecture, WORD wProcessorLevel,
 			break;
 		}
 
-		SetDlgItemText(hWnd, IDC_PROCARCH,  szCPUArch);
-		SetDlgItemText(hWnd, IDC_PROCLEVEL, szCPULevel);
-		SetDlgItemText(hWnd, IDC_PROCREV,   szCPURev);
+		vaSetDlgItemText(hWnd, IDC_PROCARCH, _T("%s (0x%04X)"), szCPUArch, wProcessorArchitecture);
+		vaSetDlgItemText(hWnd, IDC_PROCLEVEL, _T("%s (0x%04X)"), szCPULevel, wProcessorLevel);
+		vaSetDlgItemText(hWnd, IDC_PROCREV, _T("%s (0x%04X)"), szCPURev, wProcessorRevision);
 }
 
 
@@ -160,6 +167,9 @@ void ShowBitness(HWND hWnd)
 	// 64-bit applications can only run on 64-bit Windows, 
 	// so there is nothing special to check except the
 	// _WIN64 symbol set by the compiler.
+	//
+	// Chj Memo: _WIN64 implies compiler's target OS is 64bit.
+
 	StringCchPrintf(szFullTitle, _countof(szFullTitle), 
 		TEXT("64-bit %s"), szTitle);
 #else
@@ -226,8 +236,8 @@ BOOL Dlg_OnInitDialog(HWND hWnd, HWND hWndFocus, LPARAM lParam)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify) {
-
+void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify) 
+{
 	switch (id) {
 	case IDCANCEL:
 		EndDialog(hWnd, id);
@@ -237,8 +247,8 @@ void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-INT_PTR WINAPI Dlg_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-
+INT_PTR WINAPI Dlg_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) 
+{
 	switch (uMsg) {
 		chHANDLE_DLGMSG(hDlg, WM_INITDIALOG, Dlg_OnInitDialog);
 		chHANDLE_DLGMSG(hDlg, WM_COMMAND,    Dlg_OnCommand);
@@ -248,8 +258,8 @@ INT_PTR WINAPI Dlg_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int WINAPI _tWinMain(HINSTANCE hInstExe, HINSTANCE, PTSTR, int) {
-
+int WINAPI _tWinMain(HINSTANCE hInstExe, HINSTANCE, PTSTR, int)
+{
 	DialogBox(hInstExe, MAKEINTRESOURCE(IDD_SYSINFO), NULL, Dlg_Proc);
 	return(0);
 }
