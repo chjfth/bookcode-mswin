@@ -15,7 +15,7 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 #include <StrSafe.h>
 
 #define JULAYOUT_IMPL
-#include "..\..\share\JULayout2.h"
+#include "JULayout2.h"
 
 
 #pragma comment (lib, "psapi.lib")  
@@ -259,6 +259,11 @@ static void Dlg_EnableJULayout(HWND hdlg)
 {
 	JULayout *jul = JULayout::EnableJULayout(hdlg, 0, 0, 0, 8000);
 	jul->AnchorControl(0,0, 100,100, IDC_STATUS);
+
+	// Although the two groupbox does not need to be moved during WM_SIZE,
+	// we still need to add them to JUL to make their background painted correctly.
+	jul->AnchorControl(0,0, 0,0, IDC_GRBOX1);
+	jul->AnchorControl(0,0, 0,0, IDC_GRBOX2);
 }
 
 BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) 

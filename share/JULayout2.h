@@ -697,6 +697,7 @@ JULayout::GroupboxWndProc(HWND hwndGroupbox, UINT msg, WPARAM wParam, LPARAM lPa
 			HRGN hrgnSib = CreateRectRgn(rcSib.left, rcSib.top, rcSib.right, rcSib.bottom);
 		
 			int rgntype = CombineRgn(hrgnClip, hrgnClip, hrgnSib, RGN_DIFF);
+			(void)rgntype;
 
 			DeleteObject(hrgnSib);
 

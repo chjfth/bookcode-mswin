@@ -36,6 +36,9 @@
 #define IDC_PRESERVEJOBTIMEWHENAPPLYINGLIMITS 1027
 #define IDC_SPAWNCMDINJOB               1028
 
+#define IDC_GRBOX1 2001
+#define IDC_GRBOX2 2002
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
