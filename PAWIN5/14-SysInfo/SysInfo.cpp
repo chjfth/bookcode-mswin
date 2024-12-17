@@ -144,6 +144,7 @@ void ShowCPUInfo(HWND hWnd, WORD wProcessorArchitecture,
 			_sntprintf_s(szCPURev, _TRUNCATE, _T("Model %c, Pass %d"),
 				HIBYTE(wProcessorRevision) + TEXT('A'),
 				LOBYTE(wProcessorRevision));
+			break;
 
 		case PROCESSOR_ARCHITECTURE_UNKNOWN:
 		default:
