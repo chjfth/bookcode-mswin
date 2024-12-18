@@ -41,6 +41,7 @@ Purpose: Common header file containing handy macros and definitions
 #pragma warning(pop) 
 #pragma warning(push, 4)
 #include <CommCtrl.h>
+#include <tchar.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <process.h>       // For _beginthreadex
@@ -271,7 +272,24 @@ inline void chSETDLGICONS(HWND hWnd, int idi) {
       LoadIcon((HINSTANCE) GetWindowLongPtr(hWnd, GWLP_HINSTANCE), 
       MAKEINTRESOURCE(idi)));
 }
-    
+
+/////////////////////// Chj Suppliment ///////////////////////
+
+inline TCHAR* BigNum64ToString(__int64 lNum, TCHAR szBuf[], int chBufSize) 
+{
+	TCHAR szNum[100] = {};
+	_sntprintf_s(szNum, _TRUNCATE, TEXT("%I64d"), lNum);
+	NUMBERFMT nf = {};
+	nf.NumDigits = 0;
+	nf.LeadingZero = FALSE;
+	nf.Grouping = 3;
+	nf.lpDecimalSep = TEXT(".");
+	nf.lpThousandSep = TEXT(",");
+	nf.NegativeOrder = 0;
+	GetNumberFormat(LOCALE_USER_DEFAULT, 0, szNum, &nf, szBuf, chBufSize);
+	return(szBuf);
+}
+
 
 /////////////////////////// Common Linker Settings ////////////////////////////
 

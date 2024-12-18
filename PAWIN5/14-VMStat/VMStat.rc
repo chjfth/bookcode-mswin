@@ -59,8 +59,8 @@ FONT 10, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     LTEXT           "Memory load:\nTotalPhys:\nAvailPhys:\nTotalPageFile:\nAvailPageFile:\nTotalVirtual:\nAvailVirtual:",IDC_STATIC,2,5,51,56,0,WS_EX_RIGHT
     RTEXT           "Memory load:\nTotalPhys:\nAvailPhys:\nTotalPageFile:\nAvailPageFile:\nTotalVirtual:\nAvailVirtual:",IDC_DATA,56,5,61,56
-    LTEXT           "WorkingSet:\nPrivateBytes:",IDC_STATIC,2,74,51,17,0,WS_EX_RIGHT
-    LTEXT           "WorkingSet:\nPrivateBytes:",IDC_PROCESSDATA,56,74,61,17,0,WS_EX_RIGHT
+    LTEXT           "My WorkingSet:\nPrivateBytes:",IDC_STATIC,2,74,51,17,0,WS_EX_RIGHT
+    LTEXT           "My WorkingSet:\nPrivateBytes:",IDC_PROCESSDATA,56,74,61,17,0,WS_EX_RIGHT
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,7,67,115,1
 END
 
@@ -84,7 +84,7 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_VMSTAT, DIALOG
     BEGIN
-        RIGHTMARGIN, 103
+        RIGHTMARGIN, 126
         BOTTOMMARGIN, 96
     END
 END

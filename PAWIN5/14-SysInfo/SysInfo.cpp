@@ -21,9 +21,9 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 // string, inserting commas where appropriate.
 PTSTR BigNumToString(LONG lNum, PTSTR szBuf, DWORD chBufSize) 
 {
-	TCHAR szNum[100];
+	TCHAR szNum[100] = {};
 	StringCchPrintf(szNum, _countof(szNum), TEXT("%d"), lNum);
-	NUMBERFMT nf;
+	NUMBERFMT nf = {};
 	nf.NumDigits = 0;
 	nf.LeadingZero = FALSE;
 	nf.Grouping = 3;
