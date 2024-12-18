@@ -273,7 +273,7 @@ inline void chSETDLGICONS(HWND hWnd, int idi) {
       MAKEINTRESOURCE(idi)));
 }
 
-/////////////////////// Chj Suppliment ///////////////////////
+/////////////////////// Chj Supplement ///////////////////////
 
 inline TCHAR* BigNum64ToString(__int64 lNum, TCHAR szBuf[], int chBufSize) 
 {
@@ -296,7 +296,19 @@ inline TCHAR* BigNum64ToString(__int64 lNum, TCHAR szBuf[], int chBufSize)
 
 #pragma comment(linker, "/nodefaultlib:oldnames.lib")
 
-// Needed for supporting XP/Vista styles.
+// We want GUI to have XP/Vista styles.
+// For this to work on WinXP, InitCommonControls() must be explicitly called, 
+// otherwise, CreateDialog() etc may fail(Env: VS2010 SP1 Release Build).
+//
+static int PleaseInitVisualStyle()
+{
+	InitCommonControls();
+	return 0;
+}
+static int s_init_visualstyle = PleaseInitVisualStyle();
+//
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+/*
 #if defined(_M_IA64)
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='IA64' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
@@ -306,6 +318,7 @@ inline TCHAR* BigNum64ToString(__int64 lNum, TCHAR szBuf[], int chBufSize)
 #if defined(M_IX86)
 #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
+*/
 
 
 ///////////////////////////////// End of File /////////////////////////////////
