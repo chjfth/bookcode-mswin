@@ -10,7 +10,8 @@ void vlDbgTs(const TCHAR *fmt, va_list args);
 void vaDbgS(const TCHAR *fmt, ...);  // with sequence-only prefix
 void vlDbgS(const TCHAR *fmt, va_list args);
 
-void vaSetDlgItemText(HWND hdlg, int ctrlid, const TCHAR *fmt, ...);
+BOOL vaSetWindowText(HWND hwnd, const TCHAR *fmt, ...);
+BOOL vaSetDlgItemText(HWND hdlg, int ctrlid, const TCHAR *fmt, ...);
 
 TCHAR* now_timestr(TCHAR buf[], int bufchars, bool ymd=false);
 

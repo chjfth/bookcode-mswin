@@ -6,6 +6,7 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 * Use GlobalMemoryStatusEx() instead of GlobalMemoryStatus(), so that :
   this 32bit exe, when run on 64bit Win7, reports realistic values.
 * Use BigNum64ToString() to add thousand separator for easier reading.
+* Show EXE is 32bit or 64bit on window title.
 
 ******************************************************************************/
 
@@ -17,7 +18,7 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 #include "Resource.h"
 #include <psapi.h>
 #include <StrSafe.h>
-
+#include "vaDbg.h"
 
 // Look for the .lib corresponding to psapi.dll
 #pragma comment (lib,"psapi.lib")
@@ -36,6 +37,10 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) 
 {
 	chSETDLGICONS(hwnd, IDI_VMSTAT);
+
+	// Chj: Show EXE is 32bit or 64bit on window title.
+	int exebits = sizeof(void*)==4 ? 32 : 64;
+	vaSetWindowText(hwnd, _T("VMStat (%dbit exe)"), exebits);
 
 	// Set a timer so that the information updates periodically.
 	SetTimer(hwnd, IDT_UPDATE, 1 * 1000, NULL);
