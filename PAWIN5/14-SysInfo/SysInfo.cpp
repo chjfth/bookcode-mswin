@@ -8,8 +8,8 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 #include <windowsx.h>
 #include <tchar.h>
 #include <stdio.h>
-#include "Resource.h"
 #include <StrSafe.h>
+#include "Resource.h"
 #include "vaDbg.h"
 
 #ifndef PROCESSOR_ARCHITECTURE_ARM64
@@ -21,17 +21,7 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 // string, inserting commas where appropriate.
 PTSTR BigNumToString(LONG lNum, PTSTR szBuf, DWORD chBufSize) 
 {
-	TCHAR szNum[100] = {};
-	StringCchPrintf(szNum, _countof(szNum), TEXT("%d"), lNum);
-	NUMBERFMT nf = {};
-	nf.NumDigits = 0;
-	nf.LeadingZero = FALSE;
-	nf.Grouping = 3;
-	nf.lpDecimalSep = TEXT(".");
-	nf.lpThousandSep = TEXT(",");
-	nf.NegativeOrder = 0;
-	GetNumberFormat(LOCALE_USER_DEFAULT, 0, szNum, &nf, szBuf, chBufSize);
-	return(szBuf);
+	return BigNum64ToString(lNum, szBuf, chBufSize);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,122 +29,122 @@ PTSTR BigNumToString(LONG lNum, PTSTR szBuf, DWORD chBufSize)
 void ShowCPUInfo(HWND hWnd, WORD wProcessorArchitecture, 
 	WORD wProcessorLevel, WORD wProcessorRevision) 
 {
-		TCHAR szCPUArch[64]  = TEXT("(unknown)");
-		TCHAR szCPULevel[64] = TEXT("(unknown)");
-		TCHAR szCPURev[64]   = TEXT("(unknown)");
+	TCHAR szCPUArch[64]  = TEXT("(unknown)");
+	TCHAR szCPULevel[64] = TEXT("(unknown)");
+	TCHAR szCPURev[64]   = TEXT("(unknown)");
 
-		switch (wProcessorArchitecture) {
-			// Notice that AMD processors are seen as PROCESSOR_ARCHITECTURE_INTEL.
-			// In the Registry, the content of the "VendorIdentifier" key under 
-			// HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0
-			// is either "GenuineIntel" or "AuthenticAMD"
-			// 
-			// Read http://download.intel.com/design/Xeon/applnots/24161831.pdf 
-			// for Model numeric codes.
-			// http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/20734.pdf
-			// should be used for AMD processors Model numeric codes.
-			//
-		case PROCESSOR_ARCHITECTURE_INTEL: 
-			_tcscpy_s(szCPUArch, _countof(szCPUArch), TEXT("Intel")); 
-			switch (wProcessorLevel) {
-			case 3: 
-			case 4:
-				StringCchPrintf(szCPULevel, _countof(szCPULevel), TEXT("80%c86"), wProcessorLevel + '0');
-				StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("%c%d"), 
-					HIBYTE(wProcessorRevision) + TEXT('A'), 
-					LOBYTE(wProcessorRevision));
-				break;
+	switch (wProcessorArchitecture) {
+		// Notice that AMD processors are seen as PROCESSOR_ARCHITECTURE_INTEL.
+		// In the Registry, the content of the "VendorIdentifier" key under 
+		// HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0
+		// is either "GenuineIntel" or "AuthenticAMD"
+		// 
+		// Read http://download.intel.com/design/Xeon/applnots/24161831.pdf 
+		// for Model numeric codes.
+		// http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/20734.pdf
+		// should be used for AMD processors Model numeric codes.
+		//
+	case PROCESSOR_ARCHITECTURE_INTEL: 
+		_tcscpy_s(szCPUArch, _countof(szCPUArch), TEXT("Intel")); 
+		switch (wProcessorLevel) {
+		case 3: 
+		case 4:
+			StringCchPrintf(szCPULevel, _countof(szCPULevel), TEXT("80%c86"), wProcessorLevel + '0');
+			StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("%c%d"), 
+				HIBYTE(wProcessorRevision) + TEXT('A'), 
+				LOBYTE(wProcessorRevision));
+			break;
 
-			case 5:
-				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium"));
-				StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %d, Stepping %d"),
-					HIBYTE(wProcessorRevision), LOBYTE(wProcessorRevision));
-				break;
+		case 5:
+			_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium"));
+			StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %d, Stepping %d"),
+				HIBYTE(wProcessorRevision), LOBYTE(wProcessorRevision));
+			break;
 
-			case 6:
-				switch (HIBYTE(wProcessorRevision)) { // Model
-				case 1: 
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium Pro"));
-					break; 
-
-				case 3:
-				case 5: 
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium II"));
-					break; 
-
-				case 6: 
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Celeron"));
-					break; 
-
-				case 7:
-				case 8:
-				case 11: 
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium III"));
-					break; 
-
-				case 9:
-				case 13:
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium M"));
-					break; 
-
-				case 10:
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium Xeon"));
-					break; 
-
-				case 15:
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Core 2 Duo"));
-					break; 
-
-				default:
-					_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Unknown Pentium"));
-					break;
-				} 
-
-				StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %d, Stepping %d"),
-					HIBYTE(wProcessorRevision), LOBYTE(wProcessorRevision));
-				break;
-
-			case 15: 
-				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium 4"));
-				StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %d, Stepping %d"),
-					HIBYTE(wProcessorRevision), LOBYTE(wProcessorRevision));
+		case 6:
+			switch (HIBYTE(wProcessorRevision)) { // Model
+			case 1: 
+				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium Pro"));
 				break; 
-			}
+
+			case 3:
+			case 5: 
+				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium II"));
+				break; 
+
+			case 6: 
+				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Celeron"));
+				break; 
+
+			case 7:
+			case 8:
+			case 11: 
+				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium III"));
+				break; 
+
+			case 9:
+			case 13:
+				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium M"));
+				break; 
+
+			case 10:
+				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium Xeon"));
+				break; 
+
+			case 15:
+				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Core 2 Duo"));
+				break; 
+
+			default:
+				_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Unknown Pentium"));
+				break;
+			} 
+
+			StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %d, Stepping %d"),
+				HIBYTE(wProcessorRevision), LOBYTE(wProcessorRevision));
 			break;
 
-		case PROCESSOR_ARCHITECTURE_IA64:
-			_tcscpy_s(szCPUArch, _countof(szCPUArch), TEXT("IA-64"));
-			StringCchPrintf(szCPULevel, _countof(szCPULevel), TEXT("%d"), wProcessorLevel);
-			StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %c, Pass %d"), 
-				HIBYTE(wProcessorRevision) + TEXT('A'), 
-				LOBYTE(wProcessorRevision));
-			break;
-
-		case PROCESSOR_ARCHITECTURE_AMD64:
-			_tcscpy_s(szCPUArch, _countof(szCPUArch), TEXT("AMD64"));
-			StringCchPrintf(szCPULevel, _countof(szCPULevel), TEXT("%d"), wProcessorLevel);
-			StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %c, Pass %d"), 
-				HIBYTE(wProcessorRevision) + TEXT('A'), 
-				LOBYTE(wProcessorRevision));
-			break;
-
-		case PROCESSOR_ARCHITECTURE_ARM64:
-			_tcscpy_s(szCPUArch, _T("ARM64"));
-			_sntprintf_s(szCPULevel, _TRUNCATE, _T("%d"), wProcessorLevel);
-			_sntprintf_s(szCPURev, _TRUNCATE, _T("Model %c, Pass %d"),
-				HIBYTE(wProcessorRevision) + TEXT('A'),
-				LOBYTE(wProcessorRevision));
-			break;
-
-		case PROCESSOR_ARCHITECTURE_UNKNOWN:
-		default:
-			_tcscpy_s(szCPUArch, _countof(szCPUArch), TEXT("Unknown"));
-			break;
+		case 15: 
+			_tcscpy_s(szCPULevel, _countof(szCPULevel), TEXT("Pentium 4"));
+			StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %d, Stepping %d"),
+				HIBYTE(wProcessorRevision), LOBYTE(wProcessorRevision));
+			break; 
 		}
+		break;
 
-		vaSetDlgItemText(hWnd, IDC_PROCARCH, _T("%s (0x%04X)"), szCPUArch, wProcessorArchitecture);
-		vaSetDlgItemText(hWnd, IDC_PROCLEVEL, _T("%s (0x%04X)"), szCPULevel, wProcessorLevel);
-		vaSetDlgItemText(hWnd, IDC_PROCREV, _T("%s (0x%04X)"), szCPURev, wProcessorRevision);
+	case PROCESSOR_ARCHITECTURE_IA64:
+		_tcscpy_s(szCPUArch, _countof(szCPUArch), TEXT("IA-64"));
+		StringCchPrintf(szCPULevel, _countof(szCPULevel), TEXT("%d"), wProcessorLevel);
+		StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %c, Pass %d"), 
+			HIBYTE(wProcessorRevision) + TEXT('A'), 
+			LOBYTE(wProcessorRevision));
+		break;
+
+	case PROCESSOR_ARCHITECTURE_AMD64:
+		_tcscpy_s(szCPUArch, _countof(szCPUArch), TEXT("AMD64"));
+		StringCchPrintf(szCPULevel, _countof(szCPULevel), TEXT("%d"), wProcessorLevel);
+		StringCchPrintf(szCPURev, _countof(szCPURev), TEXT("Model %c, Pass %d"), 
+			HIBYTE(wProcessorRevision) + TEXT('A'), 
+			LOBYTE(wProcessorRevision));
+		break;
+
+	case PROCESSOR_ARCHITECTURE_ARM64:
+		_tcscpy_s(szCPUArch, _T("ARM64"));
+		_sntprintf_s(szCPULevel, _TRUNCATE, _T("%d"), wProcessorLevel);
+		_sntprintf_s(szCPURev, _TRUNCATE, _T("Model %c, Pass %d"),
+			HIBYTE(wProcessorRevision) + TEXT('A'),
+			LOBYTE(wProcessorRevision));
+		break;
+
+	case PROCESSOR_ARCHITECTURE_UNKNOWN:
+	default:
+		_tcscpy_s(szCPUArch, _countof(szCPUArch), TEXT("Unknown"));
+		break;
+	}
+
+	vaSetDlgItemText(hWnd, IDC_PROCARCH, _T("%s (0x%04X)"), szCPUArch, wProcessorArchitecture);
+	vaSetDlgItemText(hWnd, IDC_PROCLEVEL, _T("%s (0x%04X)"), szCPULevel, wProcessorLevel);
+	vaSetDlgItemText(hWnd, IDC_PROCREV, _T("%s (0x%04X)"), szCPURev, wProcessorRevision);
 }
 
 
