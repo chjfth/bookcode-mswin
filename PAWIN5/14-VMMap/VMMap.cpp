@@ -149,8 +149,8 @@ void ConstructRgnInfoLine(HANDLE hProcess, PVMQUERY pVMQ, PTSTR szLine, int cchM
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ConstructBlkInfoLine(PVMQUERY pVMQ, PTSTR szLine, int cchMaxLen) {
-
+void ConstructBlkInfoLine(PVMQUERY pVMQ, PTSTR szLine, int cchMaxLen) 
+{
 	_stprintf_s(szLine, cchMaxLen, TEXT("   %p\t%s\t%12u\t"),
 		pVMQ->pvBlkBaseAddress,
 		GetMemStorageText(pVMQ->dwBlkStorage),
@@ -170,8 +170,8 @@ void ConstructBlkInfoLine(PVMQUERY pVMQ, PTSTR szLine, int cchMaxLen) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Refresh(HWND hWndLB, DWORD dwProcessId, BOOL bExpandRegions) {
-
+void Refresh(HWND hWndLB, DWORD dwProcessId, BOOL bExpandRegions) 
+{
 	// Delete contents of list box & add a horizontal scroll bar
 	ListBox_ResetContent(hWndLB);
 	ListBox_SetHorizontalExtent(hWndLB, 300 * LOWORD(GetDialogBaseUnits()));

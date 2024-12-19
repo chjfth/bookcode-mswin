@@ -36,7 +36,7 @@ static BOOL VMQueryHelp(HANDLE hProcess, LPCVOID pvAddress, VMQUERY_HELP *pVMQHe
 	ZeroMemory(pVMQHelp, sizeof(*pVMQHelp));
 
 	// Get address of region containing passed memory address.
-	MEMORY_BASIC_INFORMATION mbi;
+	MEMORY_BASIC_INFORMATION mbi = {};
 	BOOL bOk = (VirtualQueryEx(hProcess, pvAddress, &mbi, sizeof(mbi)) 
 		== sizeof(mbi));
 
@@ -107,9 +107,9 @@ BOOL VMQuery(HANDLE hProcess, LPCVOID pvAddress, PVMQUERY pVMQ)
 	ZeroMemory(pVMQ, sizeof(*pVMQ));
 
 	// Get the MEMORY_BASIC_INFORMATION for the passed address.
-	MEMORY_BASIC_INFORMATION mbi;
-	BOOL bOk = (VirtualQueryEx(hProcess, pvAddress, &mbi, sizeof(mbi)) 
-		== sizeof(mbi));
+	MEMORY_BASIC_INFORMATION mbi = {};
+	SIZE_T retsize = VirtualQueryEx(hProcess, pvAddress, &mbi, sizeof(mbi));
+	BOOL bOk = (retsize == sizeof(mbi));
 
 	if (!bOk)
 		return(bOk);   // Bad memory address; return failure
