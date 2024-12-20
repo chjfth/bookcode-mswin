@@ -37,8 +37,8 @@ static BOOL VMQueryHelp(HANDLE hProcess, LPCVOID pvAddress, VMQUERY_HELP *pVMQHe
 
 	// Get address of region containing passed memory address.
 	MEMORY_BASIC_INFORMATION mbi = {};
-	BOOL bOk = (VirtualQueryEx(hProcess, pvAddress, &mbi, sizeof(mbi)) 
-		== sizeof(mbi));
+	SIZE_T retsize = VirtualQueryEx(hProcess, pvAddress, &mbi, sizeof(mbi));
+	BOOL bOk = (retsize == sizeof(mbi));
 
 	if (!bOk)
 		return(bOk);   // Bad memory address, return failure
@@ -55,8 +55,8 @@ static BOOL VMQueryHelp(HANDLE hProcess, LPCVOID pvAddress, VMQUERY_HELP *pVMQHe
 	for (;;) 
 	{
 		// Get info about the current block.
-		bOk = (VirtualQueryEx(hProcess, pvAddressBlk, &mbi, sizeof(mbi)) 
-			== sizeof(mbi));
+		retsize = VirtualQueryEx(hProcess, pvAddressBlk, &mbi, sizeof(mbi));
+		bOk = (retsize == sizeof(mbi));
 		if (!bOk)
 			break;   // Couldn't get the information; end loop.
 
@@ -180,7 +180,10 @@ BOOL VMQuery(HANDLE hProcess, LPCVOID pvAddress, PVMQUERY pVMQ)
 		pVMQ->pvRgnBaseAddress = mbi.AllocationBase;
 		pVMQ->dwRgnProtection  = mbi.AllocationProtect;
 
-		// Iterate through all blocks to get complete region information.         
+		// Iterate through all blocks to get complete region information.
+		//
+		// Chj: bcz, mbi.RegionSize is NOT the "region size", it's only partial block size.
+		//
 		VMQueryHelp(hProcess, pvAddress, &VMQHelp);
 
 		pVMQ->RgnSize          = VMQHelp.RgnSize;
