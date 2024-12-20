@@ -9,9 +9,10 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 #include <psapi.h>
 #include <windowsx.h>
 #include <tchar.h>
+#include <strsafe.h>
 #include "Resource.h"
 #include "VMQuery.h"
-#include <strsafe.h>
+#include "vaDbg.h"
 
 // Look for the .lib corresponding to psapi.dll
 #pragma comment(lib, "psapi")
@@ -195,41 +196,47 @@ void Refresh(HWND hWndLB, DWORD dwProcessId, BOOL bExpandRegions)
 	PVOID pvAddress = NULL;
 
 	SetWindowRedraw(hWndLB, FALSE);
-	while (bOk) 
+	for(;;)
 	{
-		VMQUERY vmq;
+		vaDbgTs(_T("Region-VMQuery @%p ..."), pvAddress);
+
+		VMQUERY vmq = {};
 		bOk = VMQuery(hProcess, pvAddress, &vmq);
 
-		if (bOk) 
+		if (!bOk)
+			break;
+
+		// Construct the line to be displayed, and add it to the list box.
+		TCHAR szLine[1024];
+		ConstructRgnInfoLine(hProcess, &vmq, szLine, _countof(szLine));
+		ListBox_AddString(hWndLB, szLine);
+
+		if (bExpandRegions) 
 		{
-			// Construct the line to be displayed, and add it to the list box.
-			TCHAR szLine[1024];
-			ConstructRgnInfoLine(hProcess, &vmq, szLine, _countof(szLine));
-			ListBox_AddString(hWndLB, szLine);
-
-			if (bExpandRegions) 
+			for(DWORD dwBlock = 0; 
+				bOk && (dwBlock < vmq.dwRgnBlocks); 
+				dwBlock++) 
 			{
-				for(DWORD dwBlock = 0; 
-					bOk && (dwBlock < vmq.dwRgnBlocks); 
-					dwBlock++) 
-				{
-					ConstructBlkInfoLine(&vmq, szLine, _countof(szLine));
-					ListBox_AddString(hWndLB, szLine);
+				ConstructBlkInfoLine(&vmq, szLine, _countof(szLine));
+				ListBox_AddString(hWndLB, szLine);
 
-					// Get the address of the next *Block* to test.
-					pvAddress = ((PBYTE) pvAddress + vmq.BlkSize);
-					//
-					if (dwBlock < vmq.dwRgnBlocks - 1) {
-						// Don't query the memory info after the last block.
-						bOk = VMQuery(hProcess, pvAddress, &vmq);
-					}
+				// Get the address of the next *Block* to test.
+				pvAddress = ((PBYTE) pvAddress + vmq.BlkSize);
+				//
+				if (dwBlock < vmq.dwRgnBlocks - 1) {
+					// Don't query the memory info after the last block.
+
+					vaDbgTs(_T(" Block-VMQuery @%p ..."), pvAddress);
+
+					bOk = VMQuery(hProcess, pvAddress, &vmq);
 				}
 			}
-
-			// Get the address of the next region to test.
-			pvAddress = ((PBYTE) vmq.pvRgnBaseAddress + vmq.RgnSize);
 		}
+
+		// Get the address of the next region to test.
+		pvAddress = ((PBYTE) vmq.pvRgnBaseAddress + vmq.RgnSize);
 	}
+
 	SetWindowRedraw(hWndLB, TRUE);
 	CloseHandle(hProcess);
 }
