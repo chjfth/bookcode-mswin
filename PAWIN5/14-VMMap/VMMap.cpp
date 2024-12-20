@@ -216,8 +216,9 @@ void Refresh(HWND hWndLB, DWORD dwProcessId, BOOL bExpandRegions)
 					ConstructBlkInfoLine(&vmq, szLine, _countof(szLine));
 					ListBox_AddString(hWndLB, szLine);
 
-					// Get the address of the next region to test.
+					// Get the address of the next *Block* to test.
 					pvAddress = ((PBYTE) pvAddress + vmq.BlkSize);
+					//
 					if (dwBlock < vmq.dwRgnBlocks - 1) {
 						// Don't query the memory info after the last block.
 						bOk = VMQuery(hProcess, pvAddress, &vmq);
