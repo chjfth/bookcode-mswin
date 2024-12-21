@@ -10,6 +10,37 @@
 
 static int s_dbgcount = 0;
 
+inline unsigned __int64 get_qpf()
+{
+	LARGE_INTEGER li = {};
+	BOOL succ = QueryPerformanceFrequency(&li);
+	if(!succ)
+		return -1;
+	else
+		return li.QuadPart;
+}
+
+inline unsigned __int64 get_qpc()
+{
+	LARGE_INTEGER li = {};
+	BOOL succ = QueryPerformanceCounter(&li);
+	if(!succ)
+		return -1;
+	else
+		return li.QuadPart;
+}
+
+static DWORD MyGetMillisec()
+{
+	static __int64 s_qpf = get_qpf();
+
+	// We should use QueryPerformanceCounter(), 
+	// bcz GetTickCount only has 15.6 ms resolution.
+	DWORD millisec = DWORD(get_qpc()*1000 / s_qpf);
+	return millisec;
+}
+
+
 void vaDbgTs(const TCHAR *fmt, ...)
 {
 	va_list args;
@@ -24,9 +55,9 @@ void vlDbgTs(const TCHAR *fmt, va_list args)
 	// A '\n' will be added automatically at end.
 
 	static int count = 0;
-	static DWORD s_prev_msec = GetTickCount();
+	static DWORD s_prev_msec = MyGetMillisec();
 
-	DWORD now_msec = GetTickCount();
+	DWORD now_msec = MyGetMillisec();
 
 	TCHAR buf[4000] = {0};
 
