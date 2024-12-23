@@ -75,7 +75,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20241223-0000-0000-0000-213010000001}</ProjectGuid>
-    <ProjectName>About2</ProjectName>
+    <ProjectName>11-About2</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>

@@ -73,7 +73,7 @@
   <!-- User project properties -->
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20241223-0000-0000-0000-213253000001}</ProjectGuid>
-    <ProjectName>About2exp</ProjectName>
+    <ProjectName>11-About2exp</ProjectName>
     <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
