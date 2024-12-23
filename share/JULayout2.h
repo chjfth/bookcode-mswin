@@ -13,6 +13,13 @@ Chj Note: To use this lib, pick one and only one of your xxx.cpp, write at its s
 	#define JULAYOUT_IMPL
 	#include "JULayout2.h"
 
+// In WM_INITDIALOG:
+	
+	JULayout *jul = JULayout::EnableJULayout(hdlg);
+
+	jul->AnchorControl(0,0, 100,100, IDC_EDIT_WHOLE_AREA);
+	jul->AnchorControl(...);
+
 ******************************************************************************/
 
 #ifndef __JULayout2_h_
@@ -639,6 +646,13 @@ void JULayout::SubClassTheGroupbox(HWND hwndGroupbox)
 {
 	WNDPROC prevWndproc = SubclassWindow(hwndGroupbox, GroupboxWndProc);
 	assert(prevWndproc);
+
+	if(prevWndproc==GroupboxWndProc)
+	{
+		// BAD: should not anchor twice on the same Uic
+		assert(prevWndproc != GroupboxWndProc);
+		return;
+	}
 
 	BOOL succ = SetProp(hwndGroupbox, JULAYOUT_GROUPBOX_STR, (HANDLE)prevWndproc);
 	assert(succ);
