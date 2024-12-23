@@ -3,9 +3,20 @@ About1exp.C -- About Box Demo Program No. 1
 (c) Charles Petzold, 1998
 
 [2024-12-23] Add Chj experiment code.
+
+In About1exp.rc, the ABOUTBOX DIALOG's style is *only* DS_MODALFRAME,
+This makes DlgMan erroneously calculate the window size, whose client area
+is *not* high enough to hold the whole dialog height.
+
+Key func:
+exp_DbgDialogboxDimension()
 ------------------------------------------*/
 
 #include <windows.h>
+#include <windowsx.h>
+#include <tchar.h>
+#include <assert.h>
+#include "vaDbg.h"
 #include "resource.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -54,9 +65,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return (int)msg.wParam;
 }
 
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HINSTANCE hInstance;
+	static bool s_initdone = false;
 
 	switch (message)
 	{
@@ -73,11 +86,54 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		return 0;
 
+	case WM_WINDOWPOSCHANGED:
+		if(!s_initdone)
+		{
+			s_initdone = true;
+
+			// Purpose: When main UI appears, open the About box automatically.
+			// Ref: https://devblogs.microsoft.com/oldnewthing/20060925-02/?p=29603
+			SendMessage(hwnd, WM_COMMAND, IDM_APP_ABOUT, 0);
+		}
+		break;
+
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 	}
 	return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+void exp_DbgDialogboxDimension(HWND hdlg)
+{
+	// Find the dlgbox resource template, and extract its 
+	// original dimension value in dialog base units.
+
+	HINSTANCE hInstance = GetWindowInstance(hdlg);
+
+	HRSRC hRes = FindResource(hInstance, _T("ABOUTBOX"), RT_DIALOG);
+	assert(hRes);
+
+	HGLOBAL hGlobal = LoadResource(hInstance, hRes);
+	assert(hGlobal);
+
+	DLGTEMPLATE* dlgTemplate = (DLGTEMPLATE*)hGlobal;
+
+	// Access the original dialog template dimensions
+	int x = dlgTemplate->x;
+	int y = dlgTemplate->y;
+	int width = dlgTemplate->cx;
+	int height = dlgTemplate->cy;
+
+	vaDbgS(_T("DLGTEMPLATE position(dlgunit): LT[%d,%d] WH[%d,%d] RB[%d,%d]"), 
+		x,y,   width,height,      x+width,y+height);
+
+	RECT rc = {x, y, x+width, y+height};
+	MapDialogRect(hdlg, &rc);
+	vaDbgS(_T("  Converted to pixel position: LT[%d,%d] WH[%d,%d] RB[%d,%d]"), 
+		rc.left, rc.top, 
+		rc.right-rc.left , rc.bottom-rc.top,
+		rc.right, rc.bottom);
 }
 
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message,
@@ -86,6 +142,9 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message,
 	switch (message)
 	{
 	case WM_INITDIALOG:
+
+		exp_DbgDialogboxDimension(hDlg); // Chj
+
 		return TRUE;
 
 	case WM_COMMAND:
