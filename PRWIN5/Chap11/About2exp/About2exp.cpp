@@ -10,6 +10,7 @@ Chj:
 #include <windows.h>
 #include <windowsx.h>
 #include "resource.h"
+#include "vaDbg.h"
 
 #define JULAYOUT_IMPL
 #include "JULayout2.h"
@@ -211,6 +212,9 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message,
 		break;
 
 	case WM_PAINT:
+
+		vaDbgTs(_T("AboutDlgProc.WM_PAINT"));
+
 		PaintTheBlock(hCtrlBlock, iColor, iFigure);
 		break;
 	}
