@@ -3,8 +3,8 @@
                  (c) Charles Petzold, 1998
 
 [2024-12-12] Chj: Add debug code to observe rob-focus behavior. (p288)
-When child #0 has focus and user clicks on child #1, child #0 will
-rob focus back to child #0. In such situation, we observe how 
+When child #0 has focus and user clicks on child #1, child #0 intentionally
+robs focus back to child #0 itself. In such situation, we can observe how 
 WM_SETFOCUS and WM_KILLFOCUS behave.
 
 Concise: A SetFocus() call triggers a pair of nested WM_KILLFOCUS/WM_SETFOCUS
