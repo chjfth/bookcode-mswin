@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by About2.rc
+// Microsoft Visual C++ generated include file.
+// Used by About2exp.rc
 //
 #define IDC_BLACK                       1000
 #define IDC_BLUE                        1001
@@ -13,6 +13,12 @@
 #define IDC_RECT                        1008
 #define IDC_ELLIPSE                     1009
 #define IDC_PAINT                       1010
+
+#define IDC_LBL_About2exp1     2001
+#define IDC_LBL_About2exp2     2002
+#define IDC_GBX_Color          2003
+#define IDC_GBX_Figure         2004
+
 #define IDM_APP_ABOUT                   40001
 
 // Next default values for new objects

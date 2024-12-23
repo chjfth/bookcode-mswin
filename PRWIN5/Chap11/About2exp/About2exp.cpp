@@ -1,11 +1,18 @@
 /*------------------------------------------
 About2exp.C -- About Box Demo Program No. 2
 (c) Charles Petzold, 1998
+
+Chj: 
+* Apply JULayout, so that the dlgbox can be resized. 
+  IDC_PAINT will grow with the dlgbox.
 ------------------------------------------*/
 
 #include <windows.h>
 #include <windowsx.h>
 #include "resource.h"
+
+#define JULAYOUT_IMPL
+#include "JULayout2.h"
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK AboutDlgProc(HWND, UINT, WPARAM, LPARAM);
@@ -128,6 +135,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
+static void MyDlg_EnableJulayout(HWND hdlg)
+{
+	JULayout *jul = JULayout::EnableJULayout(hdlg);
+
+	jul->AnchorControl(50,0, 50,0, IDC_LBL_About2exp1);
+	jul->AnchorControl(50,0, 50,0, IDC_LBL_About2exp2);
+
+	jul->AnchorControl(0,0, 0,100, IDC_GBX_Color);
+
+	jul->AnchorControl(0,0, 100,100, IDC_PAINT);
+
+	jul->AnchorControl(0,100, 100,100, IDC_GBX_Figure);
+	jul->AnchorControls(0,100, 0,100, IDC_RECT, IDC_ELLIPSE, -1);
+
+	jul->AnchorControl(50,100, 50,100, IDOK);
+	jul->AnchorControl(50,100, 50,100, IDCANCEL);
+}
+
 INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message,
 	WPARAM wParam, LPARAM lParam)
 {
@@ -144,6 +169,8 @@ INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message,
 		CheckRadioButton(hDlg, IDC_RECT, IDC_ELLIPSE, iFigure);
 
 		hCtrlBlock = GetDlgItem(hDlg, IDC_PAINT);
+
+		MyDlg_EnableJulayout(hDlg);
 
 		SetFocus(GetDlgItem(hDlg, iColor));
 		return FALSE;
