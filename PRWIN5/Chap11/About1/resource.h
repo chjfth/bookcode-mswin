@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by About2.rc
+// Used by About1.rc
 //
 #define IDC_STATIC -1
 
