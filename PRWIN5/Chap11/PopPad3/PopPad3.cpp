@@ -16,7 +16,7 @@ cl PopPad3.cpp PopFile.cpp PopFind.cpp PopFont.cpp PopPrnt0.cpp PopPad3.RES /lin
 #define UNTITLED TEXT ("(untitled)")
 
 LRESULT CALLBACK WndProc      (HWND, UINT, WPARAM, LPARAM) ;
-BOOL    CALLBACK AboutDlgProc (HWND, UINT, WPARAM, LPARAM) ;
+INT_PTR CALLBACK AboutDlgProc (HWND, UINT, WPARAM, LPARAM) ;
 
 // Functions in POPFILE.C
 
@@ -107,7 +107,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			}
 		}
 	}
-	return msg.wParam ;
+	return (int)msg.wParam ;
 }
 
 void DoCaption (HWND hwnd, TCHAR * szTitleName)
@@ -467,8 +467,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
-BOOL CALLBACK AboutDlgProc (HWND hDlg, UINT message, 
-	WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK AboutDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
