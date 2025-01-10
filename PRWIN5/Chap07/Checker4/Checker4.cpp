@@ -40,8 +40,10 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 0 ;
 	}
 
+	// Window-class for child window:
+	//
 	wndclass.lpfnWndProc   = ChildWndProc ;
-	wndclass.cbWndExtra    = sizeof (long) ;
+	wndclass.cbWndExtra    = sizeof (INT_PTR) ; // at least a pointer size (x64 fix)
 	wndclass.hIcon         = NULL ;
 	wndclass.lpszClassName = szChildClass ;
 
@@ -167,7 +169,7 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message,
 	switch (message)
 	{
 	case WM_CREATE :
-		SetWindowLongPtr (hwnd, 0, 0) ;       // on/off flag
+		SetWindowLongPtr(hwnd, 0, 000); // on/off flag, initially off(000)
 		return 0 ;
 
 	case WM_KEYDOWN:
@@ -189,7 +191,7 @@ LRESULT CALLBACK ChildWndProc (HWND hwnd, UINT message,
 		// For focus messages, invalidate the window for repaint
 
 	case WM_SETFOCUS:
-		idFocus = GetWindowLongPtr (hwnd, GWLP_ID) ;
+		idFocus = (int)GetWindowLongPtr (hwnd, GWLP_ID) ;
 
 		// Fall through
 
