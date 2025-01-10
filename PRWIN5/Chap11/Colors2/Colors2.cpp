@@ -25,7 +25,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hInstance     = hInstance ;
 	wndclass.hIcon         = LoadIcon (hInstance, TEXT("MYPROGRAM")) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = CreateSolidBrush (0L) ;
+	wndclass.hbrBackground = CreateSolidBrush ( RGB(0,0,0) ) ;
 	wndclass.lpszMenuName  = NULL ;
 	wndclass.lpszClassName = szAppName ;
 
@@ -79,6 +79,8 @@ INT_PTR CALLBACK ColorScrDlg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 	HWND       hwndParent, hCtrl ;
 	int        iCtrlID, iIndex ;
 
+	// Chj note: In Colors2.rc, we define the three scrollbars to have ID 10,11,12 .
+
 	switch (message)
 	{
 	case WM_INITDIALOG :
@@ -125,7 +127,9 @@ INT_PTR CALLBACK ColorScrDlg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 		SetScrollPos  (hCtrl, SB_CTL,      iColor[iIndex], TRUE) ;
 		SetDlgItemInt (hDlg,  iCtrlID + 3, iColor[iIndex], FALSE) ;
 
-		DeleteObject( (HGDIOBJ)SetClassLong 
+		// [2025-01-10] Chj: On x64, we need to use SetClassLongPtr().
+		// Using SetClassLong() will fail to "paint" the main-window in colors.
+		DeleteObject( (HGDIOBJ)SetClassLongPtr 
 				(
 					hwndParent, 
 					GCLP_HBRBACKGROUND,
