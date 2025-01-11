@@ -206,7 +206,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\share\vaDbg.h" />
   </ItemGroup>
-  <!-- MSBuild system stock Cpp.targets -->
   <ItemGroup>
     <ResourceCompile Include="HelloWin.rc" />
   </ItemGroup>
