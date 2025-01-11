@@ -283,8 +283,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				if (!PopFileRead (s_hwndEdit, s_szFileName))
 				{
-					OkMessage (hwnd, TEXT ("Could not read file %s!"),
-						s_szTitleName) ;
+					OkMessage (hwnd, TEXT ("Could not read file %s!"), s_szTitleName) ;
 					s_szFileName[0]  = '\0' ;
 					s_szTitleName[0] = '\0' ;
 				}
@@ -304,8 +303,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 				else
 				{
-					OkMessage (hwnd, TEXT ("Could not write file %s"),
-						s_szTitleName) ;
+					OkMessage (hwnd, TEXT ("Could not write file %s"), s_szTitleName) ;
 					return 0 ;
 				}
 			}
@@ -322,8 +320,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 				else
 				{
-					OkMessage (hwnd, TEXT ("Could not write file %s"),
-						s_szTitleName) ;
+					OkMessage (hwnd, TEXT ("Could not write file %s"), s_szTitleName) ;
 					return 0 ;
 				}
 			}
@@ -331,8 +328,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case IDM_FILE_PRINT:
 			if (!PopPrntPrintFile (s_hInst, hwnd, s_hwndEdit, s_szTitleName))
-				OkMessage (hwnd, TEXT ("Could not print file %s"),
-				s_szTitleName) ;
+				OkMessage (hwnd, TEXT ("Could not print file %s"), s_szTitleName) ;
 			return 0 ;
 
 		case IDM_APP_EXIT:
@@ -400,8 +396,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// Messages from Help menu
 
 		case IDM_HELP:
-			OkMessage (hwnd, TEXT ("Help not yet implemented!"), 
-				TEXT ("\0")) ;
+			OkMessage (hwnd, TEXT ("Help not yet implemented!"), TEXT ("\0")) ;
 			return 0 ;
 
 		case IDM_APP_ABOUT:
@@ -429,7 +424,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	default:
 		// Process "Find-Replace" messages
-		// [2023-01-25] Chj: Can't use `case` here, bcz messageFindReplace is a dynamic value.
+		// [2023-01-25] Chj: Can't use `case` here, bcz s_messageFindReplace is a dynamic value.
 
 		if (message == s_messageFindReplace)
 		{
@@ -444,15 +439,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (pfr->Flags & FR_FINDNEXT)
 			{
 				if (!PopFindFindText (s_hwndEdit, &iOffset, pfr))
-					OkMessage (hwnd, TEXT ("Text not found!"), 
-					TEXT ("\0")) ;
+					OkMessage (hwnd, TEXT ("Text not found!"), TEXT ("\0")) ;
 			}
 
 			if (pfr->Flags & FR_REPLACE || pfr->Flags & FR_REPLACEALL)
 			{
 				if (!PopFindReplaceText (s_hwndEdit, &iOffset, pfr))
-					OkMessage (hwnd, TEXT ("Text not found!"), 
-					TEXT ("\0")) ;
+					OkMessage (hwnd, TEXT ("Text not found!"), TEXT ("\0")) ;
 			}
 
 			if (pfr->Flags & FR_REPLACEALL)
