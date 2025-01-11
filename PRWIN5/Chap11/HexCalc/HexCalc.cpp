@@ -19,7 +19,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc   = WndProc ;
 	wndclass.cbClsExtra    = 0 ;
-	wndclass.cbWndExtra    = DLGWINDOWEXTRA ;    // Note!
+	wndclass.cbWndExtra    = DLGWINDOWEXTRA ;    // (=30, x86 & x64) Note! 
 	wndclass.hInstance     = hInstance ;
 	wndclass.hIcon         = LoadIcon (hInstance, szAppName) ;
 	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
@@ -78,6 +78,11 @@ DWORD CalcIt (UINT iFirstNum, int iOperation, UINT iNum)
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static BOOL  bNewNumber = TRUE ;
+	// --Chj: If we type-in next digit, should that digit start a new-number?
+	//
+	//   [Scene1] If we just typed an operator, then bNewNumber will be set to true.
+	//   [Scene2] If we just typed a digit, then bNewNumber will be set to false.
+
 	static int   iOperation = '=' ;
 	static UINT  iNumber, iFirstNum ;
 	HWND         hButton ;
@@ -88,13 +93,16 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (wParam != VK_LEFT)
 			break ;
 		wParam = VK_BACK ;
+
 		// fall through
+
 	case WM_CHAR:
-		if ((wParam = (WPARAM) CharUpper ((TCHAR *) wParam)) == VK_RETURN)
+		if ((wParam = (WPARAM)CharUpper((TCHAR*)wParam)) == VK_RETURN)
 			wParam = '=' ;
 
 		if (hButton = GetDlgItem (hwnd, (int)wParam))
 		{
+			// Visualize button press-down and then release.
 			SendMessage (hButton, BM_SETSTATE, 1, 0) ;
 			Sleep (100) ;
 			SendMessage (hButton, BM_SETSTATE, 0, 0) ;
@@ -113,12 +121,14 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetFocus (hwnd) ;
 
 		if (LOWORD (wParam) == VK_BACK)         // backspace
+		{
 			ShowNumber (hwnd, iNumber /= 16) ;
-
+		}
 		else if (LOWORD (wParam) == VK_ESCAPE)  // escape
+		{
 			ShowNumber (hwnd, iNumber = 0) ;
-
-		else if (isxdigit (LOWORD (wParam)))    // hex digit
+		}
+		else if (isxdigit (LOWORD (wParam)))    // hex digit (1~9, A~F)
 		{
 			if (bNewNumber)
 			{
@@ -132,16 +142,18 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				iNumber = 16 * iNumber + (int)wParam -
 					(isdigit((int)wParam) ? '0': 'A' - 10);
 				
-					ShowNumber (hwnd, iNumber) ;
+				ShowNumber (hwnd, iNumber) ;
 			}
 			else
 				MessageBeep (0) ;
 		}
-		else                                    // operation
+		else                                    // operation (+ - * /)
 		{
 			if (!bNewNumber)
-				ShowNumber (hwnd, iNumber =
-				CalcIt (iFirstNum, iOperation, iNumber)) ;
+			{
+				iNumber = CalcIt (iFirstNum, iOperation, iNumber);
+				ShowNumber (hwnd, iNumber) ;
+			}
 			bNewNumber = TRUE ;
 			iOperation = LOWORD (wParam) ;
 		}
