@@ -66,9 +66,9 @@ BOOL PopFileRead (HWND hwndEdit, PTSTR pstrFileName)
 
 	// Open the file.
 
-	if (INVALID_HANDLE_VALUE == 
-		(hFile = CreateFile (pstrFileName, GENERIC_READ, FILE_SHARE_READ,
-		NULL, OPEN_EXISTING, 0, NULL)))
+	hFile = CreateFile (pstrFileName, GENERIC_READ, FILE_SHARE_READ,
+		NULL, OPEN_EXISTING, 0, NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
 		return FALSE ;
 
 	// Get file size in bytes and allocate memory for read.

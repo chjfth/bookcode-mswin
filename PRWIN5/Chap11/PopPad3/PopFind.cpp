@@ -75,7 +75,7 @@ BOOL PopFindFindText (HWND hwndEdit, int * piSearchOffset, LPFINDREPLACE pfr)
 
 	// Find the position in the document and the new start offset
 
-	iPos = pstrPos - pstrDoc ;
+	iPos = int(pstrPos - pstrDoc) ;
 	* piSearchOffset = iPos + lstrlen (pfr->lpstrFindWhat) ;
 
 	// Select the found text
