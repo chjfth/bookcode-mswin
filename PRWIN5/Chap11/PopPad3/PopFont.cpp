@@ -5,8 +5,8 @@
 #include <windows.h>
 #include <commdlg.h>
 
-static LOGFONT logfont ;
-static HFONT   hFont ;
+static LOGFONT g_logfont ;
+static HFONT   g_hFont ;
 
 BOOL PopFontChooseFont (HWND hwnd)
 {
@@ -15,7 +15,7 @@ BOOL PopFontChooseFont (HWND hwnd)
 	cf.lStructSize    = sizeof (CHOOSEFONT) ;
 	cf.hwndOwner      = hwnd ;
 	cf.hDC            = NULL ;
-	cf.lpLogFont      = &logfont ;
+	cf.lpLogFont      = &g_logfont ;
 	cf.iPointSize     = 0 ;
 	cf.Flags          = CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS | CF_EFFECTS ;
 	cf.rgbColors      = 0 ;
@@ -34,11 +34,11 @@ BOOL PopFontChooseFont (HWND hwnd)
 void PopFontInitialize (HWND hwndEdit)
 {
 	// Chj: Better use a fixed-width font for the editbox.
-	hFont = CreateFont (0, 0, 0, 0, 0, 0, 0, 0,
+	g_hFont = CreateFont (0, 0, 0, 0, 0, 0, 0, 0,
 		DEFAULT_CHARSET, 
 		0, 0, 0, FIXED_PITCH, NULL); 
 
-	SendMessage (hwndEdit, WM_SETFONT, (WPARAM) hFont, 0) ;
+	SendMessage (hwndEdit, WM_SETFONT, (WPARAM) g_hFont, 0) ;
 }
 
 void PopFontSetFont (HWND hwndEdit)
@@ -46,15 +46,15 @@ void PopFontSetFont (HWND hwndEdit)
 	HFONT hFontNew ;
 	RECT  rect ;
 
-	hFontNew = CreateFontIndirect (&logfont) ;
+	hFontNew = CreateFontIndirect (&g_logfont) ;
 	SendMessage (hwndEdit, WM_SETFONT, (WPARAM) hFontNew, 0) ;
-	DeleteObject (hFont) ;
-	hFont = hFontNew ;
+	DeleteObject (g_hFont) ;
+	g_hFont = hFontNew ;
 	GetClientRect (hwndEdit, &rect) ;
 	InvalidateRect (hwndEdit, &rect, TRUE) ;
 }
 
 void PopFontDeinitialize (void)
 {
-	DeleteObject (hFont) ;
+	DeleteObject (g_hFont) ;
 }
