@@ -117,6 +117,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			
 			pszText = AnsiNext (pszText) ;
 		}
+
+		// [2024-12-19] Chj: Surprising! This mem-address is writable. Why?
+		//
 		*pszText = '\0' ;
 
 		SetScrollRange (hScroll, SB_CTL, 0, iNumLines, FALSE) ;
