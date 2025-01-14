@@ -201,6 +201,7 @@
    -->
   <ItemGroup>
     <ClCompile Include="AWE.cpp" />
+    <ClInclude Include="AddrWindow.h" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -120,13 +120,13 @@ public:
 	ULONG_PTR HowManyPagesAllocated() { return(m_ulPages); }
 
 	BOOL MapStorage(CAddrWindow& aw) {
-		return(MapUserPhysicalPages(aw, 
-			HowManyPagesAllocated(), m_pulUserPfnArray));
+		BOOL succ = MapUserPhysicalPages(aw, HowManyPagesAllocated(), m_pulUserPfnArray);
+		return succ;
 	}
 
 	BOOL UnmapStorage(CAddrWindow& aw) {
-		return(MapUserPhysicalPages(aw, 
-			HowManyPagesAllocated(), NULL));
+		BOOL succ = MapUserPhysicalPages(aw, HowManyPagesAllocated(), NULL);
+		return succ;
 	}
 
 private:
@@ -136,16 +136,17 @@ private:
 		HANDLE hToken;
 
 		// Try to open this process' access token
-		if (OpenProcessToken(GetCurrentProcess(), 
-			TOKEN_ADJUST_PRIVILEGES, &hToken)) {
+		if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)) 
+		{
+			// Attempt to modify the "Lock pages in Memory" privilege
+			TOKEN_PRIVILEGES tp = { 1 };
+			LookupPrivilegeValue(NULL, pszPrivName, &tp.Privileges[0].Luid);
 
-				// Attempt to modify the "Lock pages in Memory" privilege
-				TOKEN_PRIVILEGES tp = { 1 };
-				LookupPrivilegeValue(NULL, pszPrivName, &tp.Privileges[0].Luid);
-				tp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
-				AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), NULL, NULL);
-				bOk = (GetLastError() == ERROR_SUCCESS);
-				CloseHandle(hToken);
+			tp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
+			AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), NULL, NULL);
+
+			bOk = (GetLastError() == ERROR_SUCCESS);
+			CloseHandle(hToken);
 		}
 		return(bOk);
 	}

@@ -31,7 +31,7 @@ BOOL Dlg_OnInitDialog(HWND hWnd, HWND hWndFocus, LPARAM lParam)
 	// Create the 2 storage blocks
 	if (!g_aws[0].Allocate(g_cbBufferSize)) {
 		chFAIL("Failed to allocate RAM.\nMost likely reason: "
-			"you are not granted the Lock Pages in Memory user right.");
+			"you are not granted the Lock Pages in Memory (\"SeLockMemoryPrivilege\") user right.");
 	}
 	chVERIFY(g_aws[1].Allocate(g_nChars * sizeof(TCHAR)));
 
@@ -94,9 +94,11 @@ void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 			// Update the address window's text display
 			HWND hWndText = GetDlgItem(hWnd, 
 				((nWindow == 0) ? IDC_WINDOW0TEXT : IDC_WINDOW1TEXT));
-			MEMORY_BASIC_INFORMATION mbi;
+			
+			MEMORY_BASIC_INFORMATION mbi = {};
 			VirtualQuery(g_aw[nWindow], &mbi, sizeof(mbi));
-			// Note: mbi.State == MEM_RESERVE if no storage is in address window
+			
+			// Note: mbi.State==MEM_RESERVE if no storage is in address window
 			EnableWindow(hWndText, (mbi.State == MEM_COMMIT));
 			Edit_SetText(hWndText, IsWindowEnabled(hWndText) 
 				? (PCTSTR) (PVOID) g_aw[nWindow] : TEXT("(No storage)"));
