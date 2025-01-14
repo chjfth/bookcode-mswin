@@ -102,6 +102,40 @@ public:
 		return(bOk);
 	}
 
+	BOOL AllocateX(ULONG_PTR ulBytes, int AllocX) {
+		// Allocate storage intended for an address window
+
+		// Chj: AllocX: Want this many times of physical-pages.
+		// This helps test whether 32bit exe can use more than 4GB physical RAM.
+
+		Free();  // Clean up this object's existing address window
+
+		// Calculate number of pages from number of bytes
+		m_ulPages = (ulBytes + sm_sinf.dwPageSize - 1) / sm_sinf.dwPageSize;
+
+		// Allocate array of page frame numbers
+		m_pulUserPfnArray = (PULONG_PTR) 
+			HeapAlloc(GetProcessHeap(), 0, m_ulPages * sizeof(ULONG_PTR) * AllocX);
+
+		BOOL bOk = (m_pulUserPfnArray != NULL);
+		if (bOk) {
+			// The "Lock Pages in Memory" privilege must be enabled
+			EnablePrivilege(SE_LOCK_MEMORY_NAME, TRUE);
+
+			for(int i=0; i<AllocX; i++)
+			{
+				bOk = AllocateUserPhysicalPages(GetCurrentProcess(), 
+					&m_ulPages, 
+					m_pulUserPfnArray + m_ulPages*i);
+				if(!bOk)
+					break;
+			}
+
+			EnablePrivilege(SE_LOCK_MEMORY_NAME, FALSE);
+		}
+		return(bOk);
+	}
+
 	BOOL Free() {
 		BOOL bOk = TRUE;
 		if (m_pulUserPfnArray != NULL) {

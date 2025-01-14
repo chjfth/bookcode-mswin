@@ -11,13 +11,19 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 #include "Resource.h"
 #include <StrSafe.h>
 
+#include "vaDbg.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 
 CAddrWindow g_aw[2];             // 2 memory address windows
 CAddrWindowStorage g_aws[2];     // 2 storage blocks
 const ULONG_PTR g_nChars = 1024; // 1024 character buffers
 
-const DWORD g_cbBufferSize = g_nChars * sizeof(TCHAR); // may try (1024*1024)
+const INT64 g_cbBufferSize = g_nChars * sizeof(TCHAR);
+	// Chj: You may try `(INT64)512 * (1024*1024)` on x64 Win10 with 6GB+ RAM,
+	// so a total of 4GiB RAM can be seen "committed" to the 32bit 15c-AWE.exe .
+
+const int g_AllocX = 4;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -30,11 +36,11 @@ BOOL Dlg_OnInitDialog(HWND hWnd, HWND hWndFocus, LPARAM lParam)
 	chVERIFY(g_aw[1].Create(g_cbBufferSize));
 
 	// Create the 2 storage blocks
-	if (!g_aws[0].Allocate(g_cbBufferSize)) {
+	if (!g_aws[0].AllocateX(g_cbBufferSize, g_AllocX)) {
 		chFAIL("Failed to allocate RAM.\nMost likely reason: "
 			"you are not granted the Lock Pages in Memory (\"SeLockMemoryPrivilege\") user right.");
 	}
-	chVERIFY(g_aws[1].Allocate(g_cbBufferSize)); // was: g_nChars*sizeof(TCHAR)
+	chVERIFY(g_aws[1].AllocateX(g_cbBufferSize, g_AllocX));
 
 	// Put some default text in the 1st storage block
 	g_aws[0].MapStorage(g_aw[0]);
@@ -52,6 +58,12 @@ BOOL Dlg_OnInitDialog(HWND hWnd, HWND hWndFocus, LPARAM lParam)
 	//
 	g_aws[0].UnmapStorage(g_aw[0]);
 	g_aws[1].UnmapStorage(g_aw[1]);
+
+	// Chj: Show my RAM usage on window title.
+	INT64 ramuse = g_cbBufferSize *g_AllocX * 2;
+	TCHAR ramstr[20] = {};
+	BigNum64ToString(ramuse, ramstr, _countof(ramstr));
+	vaSetWindowText(hWnd, _T("15c-AWE (%s bytes)"), ramstr);
 
 	// Populate the dialog box controls
 	for (int n = 0; n <= 1; n++) {
