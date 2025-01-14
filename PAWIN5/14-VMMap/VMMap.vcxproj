@@ -75,7 +75,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20241219-0000-0000-0000-121744000001}</ProjectGuid>
-    <ProjectName>14-VMmapj</ProjectName>
+    <ProjectName>14c-VMmapj</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>

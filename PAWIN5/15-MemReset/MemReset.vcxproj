@@ -74,8 +74,8 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20241217-0000-0000-0000-203705000001}</ProjectGuid>
-    <ProjectName>14a-SysInfo</ProjectName>
+    <ProjectGuid>{20250114-0000-0000-0000-180011000001}</ProjectGuid>
+    <ProjectName>15b-MemReset</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
@@ -200,17 +200,17 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="SysInfo.cpp" />
+    <ClCompile Include="MemReset.cpp" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\share\vaDbg.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="SysInfo.rc" />
+    <ResourceCompile Include="MemReset.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SysInfo.ico" />
+    <None Include="MemReset.ico" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->

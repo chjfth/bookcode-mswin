@@ -75,7 +75,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20241218-0000-0000-0000-161239000001}</ProjectGuid>
-    <ProjectName>14-VMStat</ProjectName>
+    <ProjectName>14b-VMStat</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
