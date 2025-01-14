@@ -17,7 +17,7 @@ CAddrWindow g_aw[2];             // 2 memory address windows
 CAddrWindowStorage g_aws[2];     // 2 storage blocks
 const ULONG_PTR g_nChars = 1024; // 1024 character buffers
 
-const DWORD g_cbBufferSize = g_nChars * sizeof(TCHAR);
+const DWORD g_cbBufferSize = g_nChars * sizeof(TCHAR); // may try (1024*1024)
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -42,9 +42,16 @@ BOOL Dlg_OnInitDialog(HWND hWnd, HWND hWndFocus, LPARAM lParam)
 		TEXT("Text in Storage 0"));
 
 	// Put some default text in the 2nd storage block
-	g_aws[1].MapStorage(g_aw[0]);
-	_tcscpy_s((PTSTR) (PVOID) g_aw[0], g_cbBufferSize/sizeof(TCHAR), 
+	g_aws[1].MapStorage(g_aw[1]);
+	_tcscpy_s((PTSTR) (PVOID) g_aw[1], g_cbBufferSize/sizeof(TCHAR), 
 		TEXT("Text in Storage 1"));
+
+	// [2025-01-14] Chj: Now we unmap the AWE-storage, bcz we will map them again in
+	// Dlg_OnCommand -> `codeNotify==CBN_SELCHANGE`. We have to unmap first, bcz
+	// Calling MapUserPhysicalPages a second time will cause it fail with WinErr=87 .
+	//
+	g_aws[0].UnmapStorage(g_aw[0]);
+	g_aws[1].UnmapStorage(g_aw[1]);
 
 	// Populate the dialog box controls
 	for (int n = 0; n <= 1; n++) {
