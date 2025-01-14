@@ -75,7 +75,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20250114-0000-0000-0000-111756000001}</ProjectGuid>
-    <ProjectName>14-VMAlloc</ProjectName>
+    <ProjectName>15-VMAlloc</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
