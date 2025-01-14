@@ -79,19 +79,24 @@ void Dlg_OnDestroy(HWND hWnd)
 VOID GarbageCollect(PVOID pvBase, DWORD dwNum, DWORD dwStructSize) 
 {
 	UINT uMaxPages = dwNum * dwStructSize / g_uPageSize;
-	for (UINT uPage = 0; uPage < uMaxPages; uPage++) {
+
+	for (UINT uPage = 0; uPage < uMaxPages; uPage++) 
+	{
 		BOOL bAnyAllocsInThisPage = FALSE;
 		UINT uIndex     = uPage  * g_uPageSize / dwStructSize;
 		UINT uIndexLast = uIndex + g_uPageSize / dwStructSize;
 
 		for (; uIndex < uIndexLast; uIndex++) {
-			MEMORY_BASIC_INFORMATION mbi;
+			
+			MEMORY_BASIC_INFORMATION mbi = {};
 			VirtualQuery(&g_pSomeData[uIndex], &mbi, sizeof(mbi));
+			
 			bAnyAllocsInThisPage = ((mbi.State == MEM_COMMIT) && 
 				* (PBOOL) ((PBYTE) pvBase + dwStructSize * uIndex));
 
 			// Stop checking this page, we know we can't decommit it.
-			if (bAnyAllocsInThisPage) break;
+			if (bAnyAllocsInThisPage) 
+				break;
 		}
 
 		if (!bAnyAllocsInThisPage) {
@@ -141,7 +146,8 @@ void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 
 		uIndex = GetDlgItemInt(hWnd, id, NULL, FALSE);
 		if ((g_pSomeData != NULL) && chINRANGE(0, uIndex, MAX_SOMEDATA - 1)) {
-			MEMORY_BASIC_INFORMATION mbi;
+
+			MEMORY_BASIC_INFORMATION mbi = {};
 			VirtualQuery(&g_pSomeData[uIndex], &mbi, sizeof(mbi));
 			BOOL bOk = (mbi.State == MEM_COMMIT);
 			if (bOk)
@@ -159,6 +165,7 @@ void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 
 	case IDC_USE:
 		uIndex = GetDlgItemInt(hWnd, IDC_INDEX, NULL, FALSE);
+
 		// NOTE: New pages are always zeroed by the system
 		VirtualAlloc(&g_pSomeData[uIndex], sizeof(SOMEDATA), 
 			MEM_COMMIT, PAGE_READWRITE);
@@ -224,9 +231,12 @@ void Dlg_OnPaint(HWND hWnd)  // Update the memory map
 
 				int nBrush = 0;
 				switch (mbi.State) {
-				case MEM_FREE:    nBrush = WHITE_BRUSH; break;
-				case MEM_RESERVE: nBrush = GRAY_BRUSH;  break;
-				case MEM_COMMIT:  nBrush = BLACK_BRUSH; break;
+				case MEM_FREE:    
+					nBrush = WHITE_BRUSH; break; // will not see this
+				case MEM_RESERVE: 
+					nBrush = GRAY_BRUSH;  break;
+				case MEM_COMMIT:  
+					nBrush = BLACK_BRUSH; break;
 				}
 
 				SelectObject(ps.hdc, GetStockObject(nBrush));
