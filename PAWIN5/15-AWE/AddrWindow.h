@@ -117,7 +117,9 @@ public:
 		return(bOk);
 	}
 
-	ULONG_PTR HowManyPagesAllocated() { return(m_ulPages); }
+	ULONG_PTR HowManyPagesAllocated() { 
+		return(m_ulPages); 
+	}
 
 	BOOL MapStorage(CAddrWindow& aw) {
 		BOOL succ = MapUserPhysicalPages(aw, HowManyPagesAllocated(), m_pulUserPfnArray);

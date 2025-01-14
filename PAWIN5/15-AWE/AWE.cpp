@@ -16,6 +16,7 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 CAddrWindow g_aw[2];             // 2 memory address windows
 CAddrWindowStorage g_aws[2];     // 2 storage blocks
 const ULONG_PTR g_nChars = 1024; // 1024 character buffers
+
 const DWORD g_cbBufferSize = g_nChars * sizeof(TCHAR);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,15 +34,17 @@ BOOL Dlg_OnInitDialog(HWND hWnd, HWND hWndFocus, LPARAM lParam)
 		chFAIL("Failed to allocate RAM.\nMost likely reason: "
 			"you are not granted the Lock Pages in Memory (\"SeLockMemoryPrivilege\") user right.");
 	}
-	chVERIFY(g_aws[1].Allocate(g_nChars * sizeof(TCHAR)));
+	chVERIFY(g_aws[1].Allocate(g_cbBufferSize)); // was: g_nChars*sizeof(TCHAR)
 
 	// Put some default text in the 1st storage block
 	g_aws[0].MapStorage(g_aw[0]);
-	_tcscpy_s((PTSTR) (PVOID) g_aw[0], g_cbBufferSize, TEXT("Text in Storage 0"));
+	_tcscpy_s((PTSTR) (PVOID) g_aw[0], g_cbBufferSize/sizeof(TCHAR), 
+		TEXT("Text in Storage 0"));
 
 	// Put some default text in the 2nd storage block
 	g_aws[1].MapStorage(g_aw[0]);
-	_tcscpy_s((PTSTR) (PVOID) g_aw[0], g_cbBufferSize, TEXT("Text in Storage 1"));
+	_tcscpy_s((PTSTR) (PVOID) g_aw[0], g_cbBufferSize/sizeof(TCHAR), 
+		TEXT("Text in Storage 1"));
 
 	// Populate the dialog box controls
 	for (int n = 0; n <= 1; n++) {
