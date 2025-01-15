@@ -19,7 +19,7 @@ Purpose: Common header file containing handy macros and definitions
 
 
 //////////////////////////// Unicode Build Option /////////////////////////////
-
+/* Chj comments these out. User should be allow to compile it on ANSI chars.
 
 // Always compiler using Unicode.
 #ifndef UNICODE
@@ -32,7 +32,7 @@ Purpose: Common header file containing handy macros and definitions
       #define _UNICODE
    #endif
 #endif
-
+*/
 
 ///////////////////////// Include Windows Definitions /////////////////////////
 
