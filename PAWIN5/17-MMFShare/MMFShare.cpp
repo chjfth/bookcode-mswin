@@ -39,7 +39,9 @@ void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 
 		// Create a paging file-backed MMF to contain the edit control text.
 		// The MMF is 4 KB at most and is named MMFSharedData.
-		s_hFileMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, 
+		s_hFileMap = CreateFileMapping(
+			INVALID_HANDLE_VALUE, // want pagefile to back it
+			NULL, 
 			PAGE_READWRITE, 0, 4 * 1024, TEXT("MMFSharedData"));
 
 		if (s_hFileMap != NULL) {
@@ -66,8 +68,12 @@ void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 					// The user can't create another file right now.
 					Button_Enable(hWndCtl, FALSE);
 
-					// The user closed the file.
+					// The user can close the file mapping.
 					Button_Enable(GetDlgItem(hWnd, IDC_CLOSEFILE), TRUE);
+
+					// Chj: Changing the edit-text does not change MMF content in realtime,
+					// so disable it to avoid user confusion.
+					Edit_Enable(GetDlgItem(hWnd, IDC_DATA), FALSE);
 
 				} else {
 					chMB("Can't map view of file.");
@@ -87,6 +93,9 @@ void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 			// User closed the file, fix up the buttons.
 			Button_Enable(GetDlgItem(hWnd, IDC_CREATEFILE), TRUE);
 			Button_Enable(hWndCtl, FALSE);
+
+			// Chj: Re-enable the editbox.
+			Edit_Enable(GetDlgItem(hWnd, IDC_DATA), TRUE);
 		}
 		break;
 
