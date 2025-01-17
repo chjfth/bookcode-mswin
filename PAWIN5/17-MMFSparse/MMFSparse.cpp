@@ -1,6 +1,10 @@
 /******************************************************************************
 Module:  MMFSparse.cpp
 Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
+
+[2025-01-17] Chj update: Add option to open existing MMFSparse.bin,
+instead of always creating a brandnew MMFSparse.bin.
+
 ******************************************************************************/
 
 
@@ -78,6 +82,7 @@ BOOL CMMFSparse::Initialize(HANDLE hStream,
 		bOk = MakeSparse();  // Make the stream sparse
 		if (bOk) {
 			// Create a file-mapping object
+			// Chj: This causes disk filesize to grow to 1MB immediately.
 			m_hFileMap = ::CreateFileMapping(hStream, NULL, PAGE_READWRITE, 
 				dwStreamSizeMaxHigh, dwStreamSizeMaxLow, NULL);
 
@@ -146,7 +151,7 @@ BOOL Dlg_OnInitDialog(HWND hWnd, HWND hWndFocus, LPARAM lParam)
 
 	// Store the file in a writable folder
 	GetCurrentDirectory(_countof(g_szPathname), g_szPathname);
-	_tcscat_s(g_szPathname, _countof(g_szPathname), TEXT("\\MMFSparse"));
+	_tcscat_s(g_szPathname, _countof(g_szPathname), TEXT("\\MMFSparse.bin"));
 
 	// Check to see if the volume supports sparse files
 	TCHAR szVolume[16];
@@ -189,7 +194,7 @@ void Dlg_ShowAllocatedRanges(HWND hWnd) {
 			TCHAR *pNUL = _tcschr(sz, _T('\0'));
 			int bufremain = _countof(sz) - _tcslen(sz);
 			StringCchPrintf(pNUL, bufremain,
-				TEXT("Offset: %7u, Length: %7u\r\n"), 
+				TEXT("Offset: %-7u, Length: %-7u\r\n"), 
 				pfarb[dwEntry].FileOffset.LowPart, pfarb[dwEntry].Length.LowPart);
 		}
 		SetDlgItemText(hWnd, IDC_FILESTATUS, sz);
@@ -211,25 +216,44 @@ void Dlg_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify) {
 		break;
 
 	case IDC_CREATEMMF:
+	case IDC_OpenMMF:
 		{
-			g_hStream = CreateFile(g_szPathname, GENERIC_READ | GENERIC_WRITE, 
-				0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			if (g_hStream == INVALID_HANDLE_VALUE) {
-				chFAIL("Failed to create file.");
-				return;
-			}
+			if(id==IDC_CREATEMMF)
+			{
+				// Create a 1MB (1024 KB) MMF using the file
+				g_hStream = CreateFile(g_szPathname, GENERIC_READ | GENERIC_WRITE, 
+					0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-			// Create a 1MB (1024 KB) MMF using the file
+				if (g_hStream == INVALID_HANDLE_VALUE) {
+					chFAIL("Failed to create file.");
+					g_hStream = NULL;
+					return;
+				}
+			}
+			else
+			{	// Open existing MMFSparse.bin
+				g_hStream = CreateFile(g_szPathname, GENERIC_READ | GENERIC_WRITE, 
+					0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+				if (g_hStream == INVALID_HANDLE_VALUE) {
+					chMB("Failed to open existing MMFSparse.bin, the file may not exist yet.");
+					g_hStream = NULL;
+					return;
+				}
+			}			
+
 			if (!g_mmf.Initialize(g_hStream, STREAMSIZE)) {
 				chFAIL("Failed to initialize Sparse MMF.");
 				CloseHandle(g_hStream);
 				g_hStream = NULL;
 				return;
 			}
+
 			Dlg_ShowAllocatedRanges(hWnd);
 
 			// Enable/disable the other controls.
 			EnableWindow(GetDlgItem(hWnd, IDC_CREATEMMF), FALSE);
+			EnableWindow(GetDlgItem(hWnd, IDC_OpenMMF),   FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_OFFSET),    TRUE);
 			EnableWindow(GetDlgItem(hWnd, IDC_BYTE),      TRUE);
 			EnableWindow(GetDlgItem(hWnd, IDC_WRITEBYTE), TRUE);

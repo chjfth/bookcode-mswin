@@ -1,17 +1,18 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by MMFSparse.rc
 //
-#define IDC_STATIC              (-1)     // all static controls
 #define IDD_MMFSPARSE                   1
 #define IDC_CREATEMMF                   101
 #define IDI_MMFSPARSE                   102
+#define IDC_OpenMMF                     102
 #define IDC_OFFSET                      103
 #define IDC_WRITEBYTE                   105
 #define IDC_READBYTE                    106
 #define IDC_BYTE                        109
 #define IDC_FILESTATUS                  1000
 #define IDC_FREEALLOCATEDREGIONS        1002
+#define IDC_STATIC                      -1
 
 // Next default values for new objects
 // 

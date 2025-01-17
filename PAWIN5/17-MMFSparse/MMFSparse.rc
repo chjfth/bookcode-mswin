@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -57,16 +55,17 @@ STYLE DS_SETFONT | DS_CENTER | WS_MINIMIZEBOX | WS_VISIBLE | WS_CAPTION | WS_SYS
 CAPTION "MMF Sparse"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "&Create a 1MB (1024 KB) Sparse MMF",IDC_CREATEMMF,4,4,164,14,WS_GROUP
-    LTEXT           "&Offset (0 - 1023KB):",IDC_STATIC,4,24,63,8
-    EDITTEXT        IDC_OFFSET,72,22,44,12
-    PUSHBUTTON      "&Read byte",IDC_READBYTE,122,20,46,14
-    LTEXT           "&Byte (0-255):",IDC_STATIC,4,36,41,8
-    EDITTEXT        IDC_BYTE,72,36,44,12,ES_UPPERCASE | ES_NUMBER
-    PUSHBUTTON      "&Write byte",IDC_WRITEBYTE,122,36,46,14
-    PUSHBUTTON      "&Free all allocated regions",IDC_FREEALLOCATEDREGIONS,76,52,92,14
-    LTEXT           "&Allocated Ranges:",IDC_STATIC,4,68,59,8
-    EDITTEXT        IDC_FILESTATUS,4,80,164,116,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    DEFPUSHBUTTON   "&Create a 1MB (1024 KB) MMFSparse.bin",IDC_CREATEMMF,4,4,164,14,WS_GROUP
+    PUSHBUTTON   "Open existing &MMFSparse.bin",IDC_OpenMMF,4,22,164,14,WS_GROUP
+    LTEXT           "&Offset (0 - 1023KB):",IDC_STATIC,4,44,63,8
+    EDITTEXT        IDC_OFFSET,72,42,44,12
+    PUSHBUTTON      "&Read byte",IDC_READBYTE,122,40,46,14
+    LTEXT           "&Byte (0-255):",IDC_STATIC,4,56,41,8
+    EDITTEXT        IDC_BYTE,72,56,44,12,ES_UPPERCASE | ES_NUMBER
+    PUSHBUTTON      "&Write byte",IDC_WRITEBYTE,122,56,46,14
+    PUSHBUTTON      "&Free all allocated regions",IDC_FREEALLOCATEDREGIONS,76,72,92,14
+    LTEXT           "&Allocated Ranges:",IDC_STATIC,4,88,59,8
+    EDITTEXT        IDC_FILESTATUS,4,99,164,97,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
 END
 
 
@@ -85,7 +84,7 @@ IDI_MMFSPARSE           ICON                    "MMFSparse.Ico"
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_MMFSPARSE, DIALOG
     BEGIN
@@ -94,7 +93,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
