@@ -6,6 +6,7 @@ Notices: Copyright (c) 2007 Jeffrey Richter & Christophe Nasarre
 #pragma once
 
 #include "..\CommonFiles\CmnHdr.h"     /* See Appendix A. */
+#include <assert.h>
 #include <WinIoCtl.h>
 
 
@@ -76,9 +77,9 @@ inline BOOL CSparseStream::IsStreamSparse() const
 ///////////////////////////////////////////////////////////////////////////////
 
 
-inline BOOL CSparseStream::MakeSparse() {
-
-	DWORD dw;
+inline BOOL CSparseStream::MakeSparse() 
+{
+	DWORD dw = 0;
 	return DeviceIoControl(m_hStream, FSCTL_SET_SPARSE, 
 		NULL, 0, NULL, 0, &dw, NULL);
 }
@@ -91,12 +92,13 @@ inline BOOL CSparseStream::DecommitPortionOfStream(
 	__int64 qwOffsetStart, __int64 qwOffsetEnd) 
 {
 	// NOTE: This function does not work if this file is memory-mapped.
-	DWORD dw;
-	FILE_ZERO_DATA_INFORMATION fzdi;
+	DWORD dw = 0;
+	FILE_ZERO_DATA_INFORMATION fzdi = {};
 	fzdi.FileOffset.QuadPart = qwOffsetStart;
 	fzdi.BeyondFinalZero.QuadPart = qwOffsetEnd + 1;
-	return(DeviceIoControl(m_hStream, FSCTL_SET_ZERO_DATA, (PVOID) &fzdi, 
-		sizeof(fzdi), NULL, 0, &dw, NULL));
+
+	return DeviceIoControl(m_hStream, FSCTL_SET_ZERO_DATA, (PVOID) &fzdi, 
+		sizeof(fzdi), NULL, 0, &dw, NULL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,27 +115,28 @@ inline BOOL CSparseStream::DoesFileContainAnySparseStreams(PCTSTR pszPathname)
 inline FILE_ALLOCATED_RANGE_BUFFER* CSparseStream::QueryAllocatedRanges(
 	PDWORD pdwNumEntries) 
 {
-	FILE_ALLOCATED_RANGE_BUFFER farb;
+	FILE_ALLOCATED_RANGE_BUFFER farb = {};
 	farb.FileOffset.QuadPart = 0;
 	farb.Length.LowPart = 
 		GetFileSize(m_hStream, (PDWORD) &farb.Length.HighPart);
 
 	// There is no way to determine the correct memory block size prior to 
 	// attempting to collect this data, so I just picked 100 * sizeof(*pfarb)
+	// (note: hardcode flaw)
 	DWORD cb = 100 * sizeof(farb);
 	FILE_ALLOCATED_RANGE_BUFFER* pfarb = (FILE_ALLOCATED_RANGE_BUFFER*) 
 		HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, cb);
 
-	DeviceIoControl(m_hStream, FSCTL_QUERY_ALLOCATED_RANGES,
+	BOOL succ = DeviceIoControl(m_hStream, FSCTL_QUERY_ALLOCATED_RANGES,
 		&farb, sizeof(farb), pfarb, cb, &cb, NULL);
 
 	*pdwNumEntries = cb / sizeof(*pfarb);
-	return(pfarb);
+
+	if(*pdwNumEntries>0)
+		assert(succ);
+
+	return pfarb;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 
 inline BOOL CSparseStream::FreeAllocatedRanges(FILE_ALLOCATED_RANGE_BUFFER* pfarb) 
 {

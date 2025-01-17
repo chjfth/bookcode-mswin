@@ -182,10 +182,14 @@ void Dlg_ShowAllocatedRanges(HWND hWnd) {
 		SetDlgItemText(hWnd, IDC_FILESTATUS, 
 			TEXT("No allocated ranges in the file"));
 	} else {
+		
 		TCHAR sz[4096] = { 0 };
 		for (DWORD dwEntry = 0; dwEntry < dwNumEntries; dwEntry++) {
-			StringCchPrintf(_tcschr(sz, _T('\0')), _countof(sz) - _tcslen(sz),
-				TEXT("Offset: %7.7u, Length: %7.7u\r\n"), 
+
+			TCHAR *pNUL = _tcschr(sz, _T('\0'));
+			int bufremain = _countof(sz) - _tcslen(sz);
+			StringCchPrintf(pNUL, bufremain,
+				TEXT("Offset: %7u, Length: %7u\r\n"), 
 				pfarb[dwEntry].FileOffset.LowPart, pfarb[dwEntry].Length.LowPart);
 		}
 		SetDlgItemText(hWnd, IDC_FILESTATUS, sz);
