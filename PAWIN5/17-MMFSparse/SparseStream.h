@@ -33,7 +33,7 @@ public:
 	BOOL IsStreamSparse() const;
 	BOOL MakeSparse();
 	BOOL DecommitPortionOfStream(
-		__int64 qwFileOffsetStart, __int64 qwFileOffsetEnd);
+		__int64 qwFileOffsetStart, __int64 qwFileOffsetEnd_);
 
 	FILE_ALLOCATED_RANGE_BUFFER* QueryAllocatedRanges(PDWORD pdwNumEntries);
 	BOOL FreeAllocatedRanges(FILE_ALLOCATED_RANGE_BUFFER* pfarb);
@@ -89,13 +89,13 @@ inline BOOL CSparseStream::MakeSparse()
 
 
 inline BOOL CSparseStream::DecommitPortionOfStream(
-	__int64 qwOffsetStart, __int64 qwOffsetEnd) 
+	__int64 qwOffsetStart, __int64 qwOffsetEnd_) 
 {
 	// NOTE: This function does not work if this file is memory-mapped.
 	DWORD dw = 0;
 	FILE_ZERO_DATA_INFORMATION fzdi = {};
 	fzdi.FileOffset.QuadPart = qwOffsetStart;
-	fzdi.BeyondFinalZero.QuadPart = qwOffsetEnd + 1;
+	fzdi.BeyondFinalZero.QuadPart = qwOffsetEnd_;
 
 	return DeviceIoControl(m_hStream, FSCTL_SET_ZERO_DATA, (PVOID) &fzdi, 
 		sizeof(fzdi), NULL, 0, &dw, NULL);
