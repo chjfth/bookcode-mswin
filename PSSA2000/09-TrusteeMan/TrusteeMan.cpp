@@ -369,8 +369,7 @@ void PopulatePrivilegeList(HWND hwndDlg)
 void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory) 
 {
 	// Get state info
-	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE) 
-		GetWindowLongPtr(hwnd, DWLP_USER);
+	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	BOOL fClearMode = FALSE;
 
@@ -379,7 +378,7 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 	if (lstrlen(pszName) > 0) {
 
 		CAutoBuf<TCHAR, sizeof(TCHAR)> szDomain;
-		TCHAR szComputer[256];
+		TCHAR szComputer[256] = {};
 		SID_NAME_USE sidUse;
 		GetComputer(hwnd, szComputer, chDIMOF(szComputer));
 		BOOL fRet;
@@ -396,8 +395,7 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 		} else {
 			// Add convenience history
 			HWND hwndCtrl = GetDlgItem(hwnd, IDC_TRUSTEE);
-			if (fAddHistory && (ComboBox_FindStringExact(hwndCtrl, 0, pszName)
-				== CB_ERR))
+			if (fAddHistory && (ComboBox_FindStringExact(hwndCtrl, 0, pszName) == CB_ERR))
 				ComboBox_AddString(hwndCtrl, pszName);
 		}
 	} else {
@@ -471,8 +469,7 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 void GrantSelectedPrivileges(HWND hwnd, PTSTR pszName, BOOL fGrant) 
 {
 	// Get state info
-	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE) 
-		GetWindowLongPtr(hwnd, DWLP_USER);
+	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	// Without this handy class, the LSA_UNICODE_STRING would be tough here
 	CLSAStr* plsaString = NULL;
@@ -585,11 +582,17 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 	ULONG lIndex2 = 0;
 	ULONG lRetEntries, lTotalEntries;
 	ULONG_PTR ulPtr = 0;
-	LOCALGROUP_INFO_0* pinfoGroups;
+	LOCALGROUP_INFO_0* pinfoGroups = nullptr;
 
 	do {
-		netStatus = NetLocalGroupEnum(pszComputer, 0, (PBYTE*) &pinfoGroups,
-			1000, &lRetEntries, &lTotalEntries, &ulPtr);
+		netStatus = NetLocalGroupEnum(pszComputer, 
+			0, // for LOCALGROUP_INFO_0 info
+			(PBYTE*) &pinfoGroups, // to receive LOCALGROUP_INFO_0 array output
+			1000,     // max preferred returning entry count, each time
+			&lRetEntries,     // output: how many entries returned this time
+			&lTotalEntries,   // output: total entries produced by system
+			&ulPtr    // resume-handle, can return next 1000 groups
+			);
 		Cec_NetApiBufferFree cec = pinfoGroups;
 
 		if ((netStatus != ERROR_MORE_DATA) && (netStatus != NERR_Success)) {
@@ -607,13 +610,22 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 
 	// Enumerate users of the system and add to the trustee list
 	ULONG lIndex = 0;
-	NET_DISPLAY_USER* pnetUsers;
+	NET_DISPLAY_USER* pnetUsers = nullptr;
 	do {
 		// Because of the potentially many users on a system, this function
 		// is more appropriate than NetUserEnum for UI programs.
-		// We will return no more than 20000 users with this call in 1 k chunks
-		netStatus = NetQueryDisplayInformation(pszComputer, 1, lIndex, 20000,
-			1024, &lRetEntries, (PVOID*) &pnetUsers);
+		// We will return no more than 20000 users with this call, each time in 1024 chunks.
+
+		netStatus = NetQueryDisplayInformation(pszComputer, 
+			1,      // level 1, means we want NET_DISPLAY_USER struct output.
+			lIndex, // the first user entry to retrieve
+			20000,  // max entry count to request
+			1024,   // each call of NetQueryDisplayInformation() should return this much
+			&lRetEntries,  // output: ReturnedEntryCount
+			(PVOID*) &pnetUsers // ptr output to NET_DISPLAY_USER[] array
+			);
+		Cec_NetApiBufferFree cec = pnetUsers;
+
 		if ((netStatus != ERROR_MORE_DATA) && (netStatus != NERR_Success)) {
 			ReportError(TEXT("NetQueryDisplayInformation"), netStatus);
 			break;
@@ -624,10 +636,7 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 		}
 
 		// Start enumeration where we left off
-		lIndex = pnetUsers[lIndex2 - 1].usri1_next_index;
-
-		// Free the buffer
-		NetApiBufferFree(pnetUsers);
+		lIndex = pnetUsers[lRetEntries - 1].usri1_next_index;
 
 	} while (netStatus == ERROR_MORE_DATA);
 }
@@ -1172,8 +1181,7 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) {
 	case IDCANCEL:
 		{
 			// Get state info
-			PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE) 
-				GetWindowLongPtr(hwnd, DWLP_USER);
+			PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
 			// Cleanup policy object
 			if (ptmState->m_hPolicy != NULL)
@@ -1245,8 +1253,7 @@ void Dlg_OnContextMenu(HWND hwnd, HWND hwndContext, UINT xPos, UINT yPos) {
 
 void Dlg_OnSize(HWND hwnd, UINT state, int cx, int cy) {
 	// Get state info
-	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE) 
-		GetWindowLongPtr(hwnd, DWLP_USER);
+	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	// Simply call the adjustcontrols function of our handy resizer class
 	ptmState->m_UILayout.AdjustControls(cx, cy);
@@ -1255,8 +1262,7 @@ void Dlg_OnSize(HWND hwnd, UINT state, int cx, int cy) {
 void Dlg_OnGetMinMaxInfo(HWND hwnd, PMINMAXINFO pMinMaxInfo) {
 
 	// Get state info
-	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE) 
-		GetWindowLongPtr(hwnd, DWLP_USER);
+	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	// Just calling another resizer function
 	ptmState->m_UILayout.HandleMinMax(pMinMaxInfo);
