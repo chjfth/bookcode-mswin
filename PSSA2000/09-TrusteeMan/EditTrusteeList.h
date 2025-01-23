@@ -157,7 +157,6 @@ void RemoveSelectedTrustees(HWND hwndList, PTRUSTEELISTINFO ptlInfo)
 void TrusteeToAddedList(HWND hwndList, PTRUSTEELISTINFO ptlInfo, PSID pSid,
 	PTSTR pszDomain, PTSTR pszName, SID_NAME_USE sidUse) 
 {
-
 	try 
 	{
 		BOOL fAdd = TRUE;
@@ -458,9 +457,7 @@ leave:;
 	return(pinfoMembers);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 void TLEnableControls( HWND hwnd ) {
 
@@ -469,9 +466,7 @@ void TLEnableControls( HWND hwnd ) {
 	EnableWindow(GetDlgItem(hwnd, IDB_REMOVE), nItem != -1);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 BOOL TLDlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) {
 	int nIndex ;
@@ -524,10 +519,10 @@ BOOL TLDlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) {
 		} while (!fSuccess && (GetLastError() == ERROR_INSUFFICIENT_BUFFER));
 		if (!fSuccess) {
 
-			// No name, we try to connvert the SID to a string
+			// No name, we try to convert the SID to a string
 			PWSTR pwstr;
-			if (!ConvertSidToStringSid(
-				ptlInfo->m_pinfoTrustees[nIndex].lgrmi0_sid, &pwstr)) continue;
+			if (!ConvertSidToStringSid(ptlInfo->m_pinfoTrustees[nIndex].lgrmi0_sid, &pwstr)) 
+				continue;
 			szName = (lstrlen(pwstr) + 1);
 			lstrcpy(szName, pwstr);
 			LocalFree(pwstr);
@@ -577,12 +572,10 @@ void TLDlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) {
 	}
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-void TLDlg_OnDestroy(HWND hwnd) {
-
+void TLDlg_OnDestroy(HWND hwnd) 
+{
 	// Get State structure
 	PTRUSTEELISTINFO ptlInfo = (PTRUSTEELISTINFO) 
 		GetWindowLongPtr(hwnd, DWLP_USER);
@@ -623,12 +616,10 @@ void TLDlg_OnDestroy(HWND hwnd) {
 	}
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-void TLDlg_OnSize(HWND hwnd, UINT state, int cx, int cy) {
-
+void TLDlg_OnSize(HWND hwnd, UINT state, int cx, int cy) 
+{
 	PTRUSTEELISTINFO ptlInfo = (PTRUSTEELISTINFO) 
 		GetWindowLongPtr(hwnd, DWLP_USER);
 
@@ -636,9 +627,7 @@ void TLDlg_OnSize(HWND hwnd, UINT state, int cx, int cy) {
 	ptlInfo->m_UILayout.AdjustControls(cx, cy);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 void TLDlg_OnGetMinMaxInfo(HWND hwnd, PMINMAXINFO pMinMaxInfo) {
 
@@ -649,9 +638,7 @@ void TLDlg_OnGetMinMaxInfo(HWND hwnd, PMINMAXINFO pMinMaxInfo) {
 	ptlInfo->m_UILayout.HandleMinMax(pMinMaxInfo);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 BOOL TLDlg_OnNotify(HWND hwnd, int idCtrl, LPNMHDR pnmhdr) {
 
@@ -664,14 +651,11 @@ BOOL TLDlg_OnNotify(HWND hwnd, int idCtrl, LPNMHDR pnmhdr) {
 	return(fReturn);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 INT_PTR CALLBACK TLDlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 	LPARAM lParam)
 {
-
 	switch (uMsg) {
 		chHANDLE_DLGMSG(hwnd, WM_INITDIALOG,    TLDlg_OnInitDialog);
 		chHANDLE_DLGMSG(hwnd, WM_DESTROY,       TLDlg_OnDestroy);
@@ -683,9 +667,7 @@ INT_PTR CALLBACK TLDlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return(FALSE);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 BOOL EditTrusteeList(HWND hwnd, PTSTR szSystem,
 	LOCALGROUP_MEMBERS_INFO_0* pinfoTrustees, int nTrusteeCount,
@@ -693,7 +675,6 @@ BOOL EditTrusteeList(HWND hwnd, PTSTR szSystem,
 	LOCALGROUP_MEMBERS_INFO_0** ppinfoTrusteesRemoved, int* pnRemovedCount,
 	PTSTR szTitle) 
 {
-
 	// Fill in state structure for the dialog box
 	TRUSTEELISTINFO tlInfo;
 	tlInfo.m_nTrusteeCount = nTrusteeCount;

@@ -209,6 +209,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TrusteeMan.ico" />
+    <None Include="Deny.ico" />
+    <None Include="Grant.ico" />
+    <None Include="Images.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h" />
