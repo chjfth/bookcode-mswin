@@ -45,7 +45,7 @@ CUILayout g_pResizer;
 void SetDlgDefaultButton(HWND hwndDlg, UINT nDefault) 
 {
    // Get that last default control
-   UINT nOld = SendMessage(hwndDlg, DM_GETDEFID, 0, 0);
+   UINT nOld = (UINT) SendMessage(hwndDlg, DM_GETDEFID, 0, 0);
 
    // Reset the current default push button to a regular button.
    if (HIWORD(nOld) == DC_HASDEFID)

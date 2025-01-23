@@ -533,7 +533,7 @@ void UpdatePrivileges()
 				goto leave;
 
 			// Add the string to the enable/disable privilege list
-			DWORD dwItem = SendMessage(g_hwndEnablePrivileges, LB_ADDSTRING, 0,
+			DWORD_PTR dwItem = SendMessage(g_hwndEnablePrivileges, LB_ADDSTRING, 0,
 				(LPARAM) pszDispName);
 
 			// Now the item data
@@ -623,7 +623,7 @@ void UpdateGroups()
 
 					// If it is neither mandatory nor the logon ID then add it to
 					// the enable/disable list box
-					DWORD dwItem;
+					DWORD_PTR dwItem;
 					if (!((ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_MANDATORY)
 						|| (ptgGroups->Groups[dwIndex].Attributes
 						& SE_GROUP_LOGON_ID))) {
@@ -675,7 +675,7 @@ void PopulateProcessCombo()
 {
 	// Get the ID of our last selection so that the selection will "stick"
 	LRESULT idxItem = ComboBox_GetCurSel(g_hwndProcessCombo);
-	DWORD dwLastUsedPID = ComboBox_GetItemData(g_hwndProcessCombo, idxItem);
+	DWORD_PTR dwLastUsedPID = ComboBox_GetItemData(g_hwndProcessCombo, idxItem);
 
 	// Clear the combo box
 	ComboBox_ResetContent(g_hwndProcessCombo);
@@ -719,11 +719,11 @@ void PopulateThreadCombo()
 {
 	// Get process id
 	LRESULT idxIndex = ComboBox_GetCurSel(g_hwndProcessCombo);
-	DWORD   dwID   = ComboBox_GetItemData(g_hwndProcessCombo, idxIndex);
+	DWORD_PTR dwID   = ComboBox_GetItemData(g_hwndProcessCombo, idxIndex);
 
 	// We want the selected thread to stick, if possible
 	idxIndex = ComboBox_GetCurSel(g_hwndThreadCombo);
-	DWORD dwLastUsedThreadID = ComboBox_GetItemData(g_hwndThreadCombo, idxIndex);
+	DWORD_PTR dwLastUsedThreadID = ComboBox_GetItemData(g_hwndThreadCombo, idxIndex);
 
 	ComboBox_ResetContent(g_hwndThreadCombo);
 
@@ -759,7 +759,7 @@ void PopulateThreadCombo()
 
 void PopulateStaticCombos() 
 {
-	int nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
+	INT_PTR nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
 		(LPARAM) L"Batch");
 	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
 		LOGON32_LOGON_BATCH);
@@ -872,11 +872,11 @@ void GetToken(HWND hwnd)
 	{{
 		// Find the process ID
 		LRESULT idxIndex = ComboBox_GetCurSel(g_hwndProcessCombo);
-		DWORD dwProcessID = ComboBox_GetItemData(g_hwndProcessCombo, idxIndex);
+		DWORD dwProcessID = (DWORD)ComboBox_GetItemData(g_hwndProcessCombo, idxIndex);
 
 		// Get the thread ID
 		idxIndex = ComboBox_GetCurSel(g_hwndThreadCombo);
-		DWORD dwThreadID = ComboBox_GetItemData(g_hwndThreadCombo, idxIndex);
+		DWORD dwThreadID = (DWORD)ComboBox_GetItemData(g_hwndThreadCombo, idxIndex);
 
 		// Open the thread if we can
 		hThread = OpenThread(THREAD_QUERY_INFORMATION, FALSE, dwThreadID);
