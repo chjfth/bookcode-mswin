@@ -45,8 +45,9 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #error This module must be compiled natively using Unicode.
 #endif
 
-
 ///////////////////////////////////////////////////////////////////////////////
+
+#define EXE_VERSION "1.0.0"
 
 HINSTANCE g_hInst;
 
@@ -807,6 +808,9 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 	// We are using common controls in this sample
 	InitCommonControls();
+
+	// Chj: Tell version number on window title
+	SetWindowText(hwnd, _T("TrusteeMan ") _T(EXE_VERSION));
 
 	PTRUSTEEMANSTATE ptmState = new TRUSTEEMANSTATE;
 	chASSERT(ptmState != NULL);
