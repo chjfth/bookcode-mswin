@@ -1531,9 +1531,9 @@ ULONG WINAPI RoboThread(ServerInfo* pInfo)
 	EnterCriticalSection(&pInfo->m_csSerialize);
 	LeaveCriticalSection(&pInfo->m_csSerialize);
 
-	ULONG lBytes;
-	ULONG lKey;
-	LPOVERLAPPED pOvl;
+	ULONG lBytes = 0;
+	ULONG_PTR lKey = 0;
+	LPOVERLAPPED pOvl = nullptr;
 
 	BOOL fContinue;
 
@@ -1755,9 +1755,9 @@ void WINAPI RoboServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 	}
 
 	// Clear out remaining canceled IO and free buffers
-	ULONG lBytes;
-	ULONG lKey;
-	LPOVERLAPPED pOvl;
+	ULONG lBytes = 0;
+	ULONG_PTR lKey = 0;
+	LPOVERLAPPED pOvl = nullptr;
 	while (GetQueuedCompletionStatus(info.m_hIOCP, &lBytes, &lKey, &pOvl, 1000) 
 		|| GetLastError() != WAIT_TIMEOUT) 
 	{
