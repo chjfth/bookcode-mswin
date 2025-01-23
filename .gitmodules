@@ -1,3 +1,6 @@
 [submodule "__VSPG"]
 	path = __VSPG
 	url = ../VSPG
+[submodule "__chjcxx"]
+	path = __chjcxx
+	url = ../chjcxx
