@@ -152,10 +152,10 @@ void ConstructRgnInfoLine(HANDLE hProcess, PVMQUERY pVMQ, PTSTR szLine, int cchM
 
 void ConstructBlkInfoLine(PVMQUERY pVMQ, PTSTR szLine, int cchMaxLen) 
 {
-	_stprintf_s(szLine, cchMaxLen, TEXT("   %p\t%s\t%12u\t"),
+	_sntprintf_s(szLine, cchMaxLen, _TRUNCATE, TEXT("   %p\t%s\t%12I64u\t"),
 		pVMQ->pvBlkBaseAddress,
 		GetMemStorageText(pVMQ->dwBlkStorage),
-		pVMQ->BlkSize);
+		(UINT64)pVMQ->BlkSize);
 
 	if (pVMQ->dwBlkStorage != MEM_FREE) {
 		// add an empty cell for number of regions
