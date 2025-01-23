@@ -31,6 +31,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #define PRINTBUF_IMPL
 #include "..\ClassLib\PrintBuf.h"      // See Appendix B.
 
+#include "..\ClassLib\chjutils.h"
+
 #include "LSAStr.h"
 
 #include "EditTrusteeList.h"
@@ -46,17 +48,13 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 ///////////////////////////////////////////////////////////////////////////////
 
+HINSTANCE g_hInst;
+
 
 typedef enum TRUSTEE { 
 	User=1, 
 	Group
 };
-
-HINSTANCE g_hInst;
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 
 typedef struct _TrusteeManState {
 	// State
@@ -66,9 +64,7 @@ typedef struct _TrusteeManState {
 	CUILayout  m_UILayout;
 } TRUSTEEMANSTATE, *PTRUSTEEMANSTATE;
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 void ReportError(PTSTR pszFunction, ULONG lErr) {
 	CPrintBuf prntBuf;
@@ -78,14 +74,12 @@ void ReportError(PTSTR pszFunction, ULONG lErr) {
 	MessageBox(NULL, prntBuf, TEXT("TrusteeMan Error"), MB_OK);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
 
 void GetComputer(HWND hwnd, PTSTR szComputer, ULONG lSize) {
 	// Get state info
-	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE) 
-		GetWindowLongPtr(hwnd, DWLP_USER);
+	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
 	HWND hwndCombo = GetDlgItem(hwnd, IDC_COMPUTER);
 	int nIndex = ComboBox_GetCurSel(hwndCombo);
@@ -595,6 +589,8 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 	do {
 		netStatus = NetLocalGroupEnum(pszComputer, 0, (PBYTE*) &pinfoGroups,
 			1000, &lRetEntries, &lTotalEntries, &ulPtr);
+		Cec_NetApiBufferFree cec = pinfoGroups;
+
 		if ((netStatus != ERROR_MORE_DATA) && (netStatus != NERR_Success)) {
 			ReportError(TEXT("NetLocalGroupEnum"), netStatus);
 			break;
@@ -605,9 +601,6 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 				AddTrusteeToList(hwndList, pinfoGroups[lIndex2].lgrpi0_name, TRUE);
 			}
 		}
-
-		// Free the buffer containing the local groups
-		NetApiBufferFree(pinfoGroups);
 
 	} while (netStatus == ERROR_MORE_DATA);
 
@@ -649,14 +642,13 @@ void UpdatePolicy(HWND hwnd)
 
 	// Do we already have a valid policy object?
 	if (ptmState->m_hPolicy != NULL) {
-
 		LsaClose(ptmState->m_hPolicy);
 		ptmState->m_hPolicy = NULL;
 	}
 
-	// Get computer name
+	// Get computer name from UI
 	TCHAR szName[256] = {};
-	//GetComputer(hwnd, szName, chDIMOF(szName));
+	// GetComputer(hwnd, szName, chDIMOF(szName));
 	HWND hwndCombo = GetDlgItem(hwnd, IDC_COMPUTER);
 	int nIndex = ComboBox_GetCurSel(hwndCombo);
 	if (nIndex == 0){
@@ -669,11 +661,10 @@ void UpdatePolicy(HWND hwnd)
 
 	// Open a policy good for adjusting privileges and enumerating privileges
 	CLSAStr lsastrComputer = szName;
-	LSA_OBJECT_ATTRIBUTES lsaOA = { 0 };
-	lsaOA.Length = sizeof(lsaOA);
+	LSA_OBJECT_ATTRIBUTES lsaOA = { sizeof(lsaOA) };
 	NTSTATUS ntStatus = LsaOpenPolicy(&lsastrComputer, &lsaOA,
-		POLICY_VIEW_LOCAL_INFORMATION | POLICY_LOOKUP_NAMES
-		| POLICY_CREATE_ACCOUNT, &ptmState->m_hPolicy);
+		POLICY_VIEW_LOCAL_INFORMATION | POLICY_LOOKUP_NAMES	| POLICY_CREATE_ACCOUNT, 
+		&ptmState->m_hPolicy);
 	ULONG lErr = LsaNtStatusToWinError(ntStatus);
 
 	if (lErr != ERROR_SUCCESS) {
@@ -683,8 +674,8 @@ void UpdatePolicy(HWND hwnd)
 		// Revert to local computer
 		ComboBox_SetCurSel(GetDlgItem(hwnd, IDC_COMPUTER), 0);
 		GetComputer(hwnd, szName, chDIMOF(szName));
-		ntStatus = LsaOpenPolicy(NULL, &lsaOA, POLICY_VIEW_LOCAL_INFORMATION
-			| POLICY_LOOKUP_NAMES | POLICY_CREATE_ACCOUNT,
+		ntStatus = LsaOpenPolicy(NULL, &lsaOA, 
+			POLICY_VIEW_LOCAL_INFORMATION | POLICY_LOOKUP_NAMES | POLICY_CREATE_ACCOUNT,
 			&ptmState->m_hPolicy);
 		lErr = LsaNtStatusToWinError(ntStatus);
 		if (lErr != ERROR_SUCCESS) {
@@ -698,8 +689,7 @@ void UpdatePolicy(HWND hwnd)
 	} else {
 
 		// Success, add the computer to the combo box for convenient future use
-		if (ComboBox_FindStringExact(GetDlgItem(hwnd, IDC_COMPUTER), 0, szName)
-			== CB_ERR)
+		if (ComboBox_FindStringExact(GetDlgItem(hwnd, IDC_COMPUTER), 0, szName)	== CB_ERR)
 			ComboBox_AddString(GetDlgItem(hwnd, IDC_COMPUTER), szName);
 
 		lstrcpy(ptmState->m_szComputer, szName);
@@ -888,13 +878,13 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	ListView_InsertColumn(hwndList, 0, &column);
 
 	// Make sure there is at least one option in the computer combo box
-	ComboBox_AddString(GetDlgItem(hwnd, IDC_COMPUTER), 
-		TEXT("[Local Computer]"));
+	ComboBox_AddString(GetDlgItem(hwnd, IDC_COMPUTER), TEXT("[Local Computer]"));
 	ComboBox_SetCurSel(GetDlgItem(hwnd, IDC_COMPUTER), 0);
+	
 	// Setup Policy for the current settings
 	UpdatePolicy(hwnd);
 
-	// Populate the privilige list control
+	// Populate the privilege list control
 	PopulatePrivilegeList(hwnd);
 
 	EnableControls(hwnd); 
