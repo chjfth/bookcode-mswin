@@ -13,7 +13,7 @@ Enhancements by Jimm Chen.
 #include <tchar.h>
 #include <stdio.h>
 #include "vaDbg.h"
-#include "dlptr_winapi.h"
+#include <mswin/dlptr_winapi.h>
 #include "resource.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
