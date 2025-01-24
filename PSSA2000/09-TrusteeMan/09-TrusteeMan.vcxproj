@@ -201,8 +201,9 @@
    -->
   <ItemGroup>
     <ClCompile Include="TrusteeMan.cpp" />
-    <ClCompile Include="..\InterpretConst.cpp" />
-    <ClCompile Include="..\vaDbg.cpp" />
+    <ClCompile Include="..\chjutils\chjutils.cpp" />
+    <ClCompile Include="..\chjutils\InterpretConst.cpp" />
+    <ClCompile Include="..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TrusteeMan.rc" />
@@ -217,7 +218,9 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="EditTrusteeList.h" />
     <ClInclude Include="LSAStr.h" />
-    <ClInclude Include="..\vaDbg.h" />
+    <ClInclude Include="..\chjutils\chjutils.h" />
+    <ClInclude Include="..\chjutils\InterpretConst.h" />
+    <ClInclude Include="..\..\share\vaDbg.h" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->

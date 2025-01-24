@@ -645,7 +645,7 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void UpdatePolicy(HWND hwnd) 
+void UpdatePolicy(HWND hwnd) // chj memo: Refreshing the whole UI according to Computer selected
 {
 	// Get state info
 	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
@@ -709,8 +709,12 @@ void UpdatePolicy(HWND hwnd)
 	PopulateTrusteeList(hwnd, szName);
 
 	// Reset privilege list
-	SetDlgItemText(hwnd, IDC_TRUSTEE, TEXT(""));
-	ImagePrivilegeList(hwnd, TEXT(""), TRUE);
+	SetDlgItemText(hwnd, IDC_TRUSTEE, TEXT("")); // chj: why clear the combobox?
+	
+	for(int i=0; i<10000; i++)
+	{
+		ImagePrivilegeList(hwnd, TEXT(""), TRUE);
+	}
 }
 
 
