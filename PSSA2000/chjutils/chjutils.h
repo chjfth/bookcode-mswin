@@ -20,9 +20,11 @@ MakeCleanupPtrClass_winapi(Cec_FreeSid, PVOID, FreeSid, PSID)
 // -- for AllocateAndInitializeSid
 
 MakeCleanupPtrClass_winapi(Cec_NetApiBufferFree, NET_API_STATUS, NetApiBufferFree, PVOID)
+// -- for NetLocalGroupEnum etc
 
-
-
+inline NTSTATUS _LsaFreeMemory(LSA_UNICODE_STRING *pus){ return LsaFreeMemory(pus); }
+MakeCleanupPtrClass(Cec_LsaFreeMemory_UNICODE_STRING, NTSTATUS, _LsaFreeMemory, LSA_UNICODE_STRING*)
+// -- LsaEnumerateAccountRights() returns an LSA_UNICODE_STRING[] that needs freeing by LsaFreeMemory. 
 
 
 //// PSSA2000 specific:

@@ -12,6 +12,8 @@
 #include <assert.h>
 #include <wchar.h>
 
+#include <vaDbg.h>
+
 #include "InterpretConst.h"
 
 #include "chjutils.h"
@@ -278,7 +280,7 @@ void CH10_DumpACL( PACL pACL )
 	// Due to using ITCS(), we cannot use __try{} here.
 
 	if (pACL == NULL){
-		vaDbg(TEXT("NULL DACL"));
+		vaDbgS(TEXT("NULL DACL"));
 		return;
 	}
 
@@ -286,7 +288,7 @@ void CH10_DumpACL( PACL pACL )
 	if (!GetAclInformation(pACL, &aclSize, sizeof(aclSize), AclSizeInformation))
 		return;
 
-	vaDbg(TEXT("ACL ACE count: %d %s"), 
+	vaDbgS(TEXT("ACL ACE count: %d %s"), 
 		aclSize.AceCount, 
 		aclSize.AceCount==0 ? _T("(=empty ACL)") : _T("")
 		);
@@ -297,15 +299,15 @@ void CH10_DumpACL( PACL pACL )
 		if (!GetAce(pACL, lIndex, (PVOID*)&pACE))
 			return;
 
-		vaDbg(TEXT("ACE #%d/%d :"), lIndex+1, aclSize.AceCount);
+		vaDbgS(TEXT("ACE #%d/%d :"), lIndex+1, aclSize.AceCount);
 
 		PSID pSID = PSIDFromPACE(pACE);
 		TCHAR szSidRepr[100] = {};
 		SID2Repr(pSID, szSidRepr, ARRAYSIZE(szSidRepr));
-		vaDbg(TEXT("  ACE SID = %s"), szSidRepr);
+		vaDbgS(TEXT("  ACE SID = %s"), szSidRepr);
 
-		vaDbg(TEXT("  ACE Type = %s"), ITCS1(pACE->Header.AceType, itc_ACE_TYPE));
-		vaDbg(TEXT("  ACE Flags = %s"), ITCS1(pACE->Header.AceFlags, itc_ACE_FLAGS));
+		vaDbgS(TEXT("  ACE Type = %s"), ITCS1(pACE->Header.AceType, itc_ACE_TYPE));
+		vaDbgS(TEXT("  ACE Flags = %s"), ITCS1(pACE->Header.AceFlags, itc_ACE_FLAGS));
 
 		TCHAR bitbufs[40] = {};
 		ULONG lIndex2 = (ULONG)1<<31;
@@ -313,7 +315,7 @@ void CH10_DumpACL( PACL pACL )
 			bitbufs[i] = ((pACE->Mask & lIndex2) != 0)?TEXT('1'):TEXT('0');
 			lIndex2>>=1;
 		}
-		vaDbg(TEXT("  ACE Mask (31->0) = %s"), bitbufs);
+		vaDbgS(TEXT("  ACE Mask (31->0) = %s"), bitbufs);
 	}
 }
 
@@ -351,7 +353,7 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd )
 
 	TCHAR szOwnerRepr[BUFSIZ1]={}, szGroupRepr[BUFSIZ1]={};
 	const int BUF20=20; TCHAR szDACL[BUF20]={}, szSACL[BUF20]={};
-	vaDbg(
+	vaDbgS(
 		_T("SD Dump on (0x%p), .Revision=%d, length=%d\n")
 		_T("  Control(flags) = %s\n")
 		_T("  OwnerSID = %s\n")
@@ -367,12 +369,12 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd )
 
 	if(pDACL)
 	{
-		vaDbg(_T("Dump DACL below:"));
+		vaDbgS(_T("Dump DACL below:"));
 		CH10_DumpACL(pDACL);
 	}
 	if(pSACL)
 	{
-		vaDbg(_T("Dump SACL below:"));
+		vaDbgS(_T("Dump SACL below:"));
 		CH10_DumpACL(pSACL);
 	}
 }

@@ -31,7 +31,9 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #define PRINTBUF_IMPL
 #include "..\ClassLib\PrintBuf.h"      // See Appendix B.
 
-#include "..\ClassLib\chjutils.h"
+#include "../../share/vaDbg.h"
+#include "../chjutils/chjutils.h"
+
 
 #include "LSAStr.h"
 
@@ -404,8 +406,8 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 	}
 
 	// If not clear mode, then we get a list of privileges for the trustee
-	PLSA_UNICODE_STRING  pustrPrivileges = NULL;
-	ULONG                ulCount = 0;
+	Cec_LsaFreeMemory_UNICODE_STRING pustrPrivileges = NULL;
+	ULONG                            ulCount = 0;
 	if (!fClearMode) {
 
 		// Get the privileges for a trustee
@@ -444,13 +446,14 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 				// Use CLSAStr to ease some of the issues with LSA strings
 				lsastrPriv = pustrPrivileges[nIndex2];
 				if (lstrcmpi(szPriv, lsastrPriv) == 0) {
-
 					fFound = TRUE;
 					break;
 				}
 			}
 			nImage = fFound ? 2 : 3;
-		} else nImage = 4;
+		} else {
+			nImage = 4;
+		}
 
 		// Adjust the item
 		LVITEM lvItem = { 0 };
@@ -711,10 +714,7 @@ void UpdatePolicy(HWND hwnd) // chj memo: Refreshing the whole UI according to C
 	// Reset privilege list
 	SetDlgItemText(hwnd, IDC_TRUSTEE, TEXT("")); // chj: why clear the combobox?
 	
-	for(int i=0; i<10000; i++)
-	{
-		ImagePrivilegeList(hwnd, TEXT(""), TRUE);
-	}
+	ImagePrivilegeList(hwnd, TEXT(""), TRUE);
 }
 
 
@@ -942,16 +942,20 @@ BOOL HandleTrusteesNotify(HWND hwnd, LPNMHDR pnmhdr)
 		{
 			TCHAR szBuffer[1024];
 			pnmlListView = (LPNMLISTVIEW) pnmhdr;
-			if (pnmlListView->uNewState != pnmlListView->uOldState) {
+			if (pnmlListView->uNewState != pnmlListView->uOldState) 
+			{
 				// If selected change current trustee for privileges
 				// (Only if it is in the non-editing state)
 				if (((pnmlListView->uNewState & LVIS_SELECTED) != 0) && 
-					(pnmlListView->lParam == 0)) {
-						ListView_GetItemText(pnmhdr->hwndFrom, pnmlListView->iItem, 
-							0, szBuffer, chDIMOF(szBuffer));
-						ComboBox_SetText(GetDlgItem(hwnd, IDC_TRUSTEE), szBuffer);
-						// Update privilege list
-						ImagePrivilegeList(hwnd, szBuffer, FALSE);
+					(pnmlListView->lParam == 0)) 
+				{
+					ListView_GetItemText(pnmhdr->hwndFrom, pnmlListView->iItem, 
+						0, szBuffer, chDIMOF(szBuffer));
+					ComboBox_SetText(GetDlgItem(hwnd, IDC_TRUSTEE), szBuffer);
+						
+					// Update privilege list
+					// [2025-01-24] Chj fix LSA_UNICODE_STRING memleak inside.
+					ImagePrivilegeList(hwnd, szBuffer, FALSE);
 				}
 			}
 			EnableControls(hwnd);      
