@@ -233,17 +233,20 @@ TCHAR *parse_cmdparam_TCHARs(
 
 	In Unicode version, user will get sth. equivalent to:
 		
-		const WCHAR *outbuf = "\x0041\x0042\x0043\x0044\x0045";
+		const WCHAR *outbuf = "\x0041\x0042\x7535\x0043\x0044";
 
 	If only one parameter is given, like this:
 
 		EXENAME "AB cde"
 
 	The string of "AB cde" (6 TCHARs) will be returned.
+
+	// [2025-01-24] out_szliteral[] looks stupid, forgot why I once design that.
+
 */
 	//const TCHAR *T_cmdline = GetCommandLine();
 	const WCHAR *W_cmdline = nullptr;
-
+	
 	if(out_szliteral)
 		out_szliteral[0] = '\0';
 
@@ -286,8 +289,8 @@ TCHAR *parse_cmdparam_TCHARs(
 		outbuf[i-1] = (TCHAR)wcstoul(argv[i], nullptr, 16);
 	}
 
-	// To make it caller friendly, we always append a NULL char, but don't count it.
-	outbuf[cycles] = 0;
+	// To make it caller friendly, we always append a NUL char, but don't count it.
+	outbuf[cycles] = '\0';
 
 	if(p_retlen)
 		*p_retlen = cycles;
