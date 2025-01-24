@@ -18,7 +18,7 @@ Enhancements by Jimm Chen.
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#define VERSION "2.6"
+#define VERSION "2.6.1"
 
 // Formatting for BCHAR fields of TEXTMETRIC structure
 
@@ -100,15 +100,16 @@ void prepare_cmd_params()
 #endif
 		;
 
+	bool is_prefer_hexinput = false;
 	parse_cmdparam_TCHARs(
-		GetCommandLine(), true,
-		gar_sample_text, ARRAYSIZE(gar_sample_text), &g_sample_text_len,
-		g_dlgsamp.literal, ARRAYSIZE(g_dlgsamp.literal)
-		);
+		GetCommandLine(), 
+		gar_sample_text, ARRAYSIZE(gar_sample_text), 
+		&g_sample_text_len,
+		&is_prefer_hexinput);
 
 	if(gar_sample_text[0]=='\0')
 	{
-		// Use stock sample-text
+		// User does not supply input string, so use stock sample-text
 
 		_tcscpy_s(gar_sample_text, ARRAYSIZE(gar_sample_text), szText_stock);
 		g_sample_text_len = (int)_tcslen(gar_sample_text);
@@ -119,10 +120,10 @@ void prepare_cmd_params()
 	}
 	else
 	{
-		if(g_dlgsamp.literal[0])
-			g_dlgsamp.usehex = false;
-		else
-			g_dlgsamp.usehex = true;
+		// is_prefer_hexinput has been updated by parse_cmdparam_TCHARs()
+		g_dlgsamp.usehex = is_prefer_hexinput;
+	
+		_tcscpy_s(g_dlgsamp.literal, ARRAYSIZE(g_dlgsamp.literal), gar_sample_text);
 	}
 
 
@@ -198,9 +199,11 @@ void reload_sample_text()
 		TCHAR cmdline[10+hexform_BUFMAX]={};
 		_sntprintf_s(cmdline, _TRUNCATE, _T("EXENAME %s"), g_dlgsamp.hexform);
 
-		parse_cmdparam_TCHARs(cmdline, false,
-			gar_sample_text, ARRAYSIZE(gar_sample_text), &g_sample_text_len,
-			NULL, 0);
+		bool is_prefer_hexinput = true;
+		parse_cmdparam_TCHARs(cmdline, 
+			gar_sample_text, ARRAYSIZE(gar_sample_text), 
+			&g_sample_text_len,
+			&is_prefer_hexinput);
 	}
 }
 

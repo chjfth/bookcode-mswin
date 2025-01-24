@@ -257,12 +257,9 @@ TCHAR * charsets_to_codepages_hint(TCHAR *buf, int buflen)
 	return buf;
 }
 
-//////////////////////////////////////////////////////////////////////////
-
 TCHAR *parse_cmdparam_TCHARs(
-	const TCHAR *T_cmdline, bool single_param_as_literal,
-	TCHAR outbuf[], int outbuflen, int *p_retlen,
-	TCHAR out_szliteral[], int out_szliteral_buflen)
+	const TCHAR *T_cmdline, TCHAR outbuf[], int outbuflen, 
+	int *p_retlen, bool *p_prefer_hexinput)
 {
 /*  T_cmdline should points to string from GetCommandLineA()/GetCommandLineW().
 
@@ -271,11 +268,11 @@ TCHAR *parse_cmdparam_TCHARs(
 
 	Actual output TCHAR count will be returned in *p_retlen.
 
-	If user pass more than one parameter, like this:
+	If user passes more than one parameter, like this:
 
 		EXENAME 41 42 7535 43 44
 
-	Then each parameter will be considered a TCHAR in hex representation, 
+	Then each parameter will be considered a TCHAR in HEXRR representation, 
 	and user gets 5 TCHARs on return.
 
 	So in ANSI version, user will get sth. equivalent to:
@@ -284,19 +281,45 @@ TCHAR *parse_cmdparam_TCHARs(
 
 	In Unicode version, user will get sth. equivalent to:
 		
-		const WCHAR *outbuf = "\x0041\x0042\x0043\x0044\x0045";
+		const WCHAR *outbuf = "\x0041\x0042\x7535\x0043\x0044";
 
 	If only one parameter is given, like this:
 
 		EXENAME "AB cde"
 
 	The string of "AB cde" (6 TCHARs) will be returned.
+
+	p_prefer_hexinput: [in/out]
+		* As input, this matters only when T_cmdline has an single param, e.g.:
+			
+			EXENAME AB
+		  
+		  - If *p_prefer_hexinput==false, "AB" is considered a literal string,
+		    so outbuf[] will contain two TCHARs "AB".
+		  - If *p_prefer_hexinput==true, "AB" is considered a single TCHAR represented
+		    in HEXRR of value 0xAB, so the outbuf[] will contain a single TCHAR.
+
+		* As output, tells whether T_cmdline is considered literal or hex by the API.
+
+		I think in most user test-program scenario, user don't need to care this
+		p_prefer_hexinput and just pass nullptr for it.
+
 */
 	//const TCHAR *T_cmdline = GetCommandLine();
 	const WCHAR *W_cmdline = nullptr;
 
-	if(out_szliteral)
-		out_szliteral[0] = '\0';
+	if(outbuflen<=0)
+		return nullptr;
+
+	if(p_retlen)
+		*p_retlen = 0;
+
+	bool prefer_hexinput = false;
+	if(p_prefer_hexinput)
+	{
+		prefer_hexinput = *p_prefer_hexinput;
+		*p_prefer_hexinput = false;
+	}
 
 #ifdef UNICODE
 	W_cmdline = T_cmdline;
@@ -310,9 +333,9 @@ TCHAR *parse_cmdparam_TCHARs(
 	WCHAR **argv = CommandLineToArgvW(W_cmdline, &argc);
 	// -- argv[0] is exepath itself.
 
-	if(single_param_as_literal && argc==2)
+	if(argc==2 && !prefer_hexinput)
 	{
-		// not hexform
+		// not hexform input:
 #ifdef UNICODE
 		_tcscpy_s(outbuf, outbuflen, argv[1]);
 		int retlen = (int)wcslen(argv[1]);
@@ -322,12 +345,11 @@ TCHAR *parse_cmdparam_TCHARs(
 		if(p_retlen)
 			*p_retlen = retlen;
 
-		if(out_szliteral)
-			_tcscpy_s(out_szliteral, out_szliteral_buflen, outbuf);
-
 		LocalFree(argv);
 		return outbuf;
 	}
+
+	// hexform input: (including argc==1 case)
 
 	int cycles = min(outbuflen-1, argc-1);
 
@@ -337,13 +359,15 @@ TCHAR *parse_cmdparam_TCHARs(
 		outbuf[i-1] = (TCHAR)wcstoul(argv[i], nullptr, 16);
 	}
 
-	// To make it caller friendly, we always append a NULL char, but don't count it.
-	outbuf[cycles] = 0;
+	// To make it caller friendly, we always append a NUL char, but don't count it.
+	outbuf[cycles] = '\0';
 
 	if(p_retlen)
 		*p_retlen = cycles;
 
+	if(p_prefer_hexinput)
+		*p_prefer_hexinput = true;
+
 	LocalFree(argv);
 	return outbuf;
 }
-

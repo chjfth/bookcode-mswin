@@ -23,8 +23,9 @@ TCHAR * charsets_to_codepages_hint(TCHAR *buf, int buflen);
 
 
 TCHAR *parse_cmdparam_TCHARs(
-	const TCHAR *T_cmdline, bool single_param_as_literal,
-	TCHAR outbuf[], int outbuflen, int *p_retlen,
-	TCHAR out_szliteral[], int out_szliteral_buflen);
+	const TCHAR *T_cmdline, TCHAR outbuf[], int outbuflen, 
+	int *p_retlen=nullptr, // optional
+	bool *p_prefer_hexinput=nullptr // optional
+	);
 
 #endif
