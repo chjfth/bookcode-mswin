@@ -14,8 +14,6 @@
 
 #include <vaDbg.h>
 
-#include "InterpretConst.h"
-
 #include "chjutils.h"
 
 struct Const2Str_st
@@ -306,8 +304,8 @@ void CH10_DumpACL( PACL pACL )
 		SID2Repr(pSID, szSidRepr, ARRAYSIZE(szSidRepr));
 		vaDbgS(TEXT("  ACE SID = %s"), szSidRepr);
 
-		vaDbgS(TEXT("  ACE Type = %s"), ITCS1(pACE->Header.AceType, itc_ACE_TYPE));
-		vaDbgS(TEXT("  ACE Flags = %s"), ITCS1(pACE->Header.AceFlags, itc_ACE_FLAGS));
+		vaDbgS(TEXT("  ACE Type = %s"), ITCSv(pACE->Header.AceType, itc_ACE_TYPE));
+		vaDbgS(TEXT("  ACE Flags = %s"), ITCSv(pACE->Header.AceFlags, itc_ACE_FLAGS));
 
 		TCHAR bitbufs[40] = {};
 		ULONG lIndex2 = (ULONG)1<<31;
@@ -361,7 +359,7 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd )
 		_T("  DACL: %s ; SACL: %s")
 		,
 		(void*)psd, psd->Revision, sdlen,
-		ITCS1(psd->Control, itc_SECURITY_DESCRIPTOR_CONTROL),
+		ITCSv(psd->Control, itc_SECURITY_DESCRIPTOR_CONTROL),
 		SID2Repr(psidOwner, szOwnerRepr, BUFSIZ1), 
 		SID2Repr(psidGroup, szGroupRepr, BUFSIZ1),
 		ACL2ReprShort(fPresentDacl, pDACL, szDACL, BUF20), ACL2ReprShort(fPresentSacl, pSACL, szSACL, BUF20)

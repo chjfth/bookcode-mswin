@@ -43,7 +43,10 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd );
 
 //////////////////////////////////////////////////////////////////////////
 
-#include "InterpretConst.h"
+#include <itc/InterpretConst.h>
+#include <mswin/commctrl.itc.h>
+
+using namespace itc;
 
 extern CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uMsg;
 extern CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uPage;

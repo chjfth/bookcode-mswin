@@ -958,7 +958,7 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 BOOL HandlePrivilegesNotify(HWND hwnd, LPNMHDR pnmhdr) 
 {
-	vaDbgTs(_T("HandlePrivilegesNotify pnmhdr->code=% d"), pnmhdr->code);
+	vaDbgTs(_T("HandlePrivilegesNotify pnmhdr->code=%s"), ITCSv(pnmhdr->code, itc::NM_xxx_Generic));
 
 	switch (pnmhdr->code) {
 	case LVN_ITEMCHANGED:
@@ -978,7 +978,7 @@ BOOL HandlePrivilegesNotify(HWND hwnd, LPNMHDR pnmhdr)
 
 BOOL HandleTrusteesNotify(HWND hwnd, LPNMHDR pnmhdr) 
 {
-	vaDbgTs(_T("HandleTrusteesNotify   pnmhdr->code=% d"), pnmhdr->code);
+	vaDbgTs(_T("HandleTrusteesNotify   pnmhdr->code=%s"), ITCSv(pnmhdr->code, itc::NM_xxx_Generic));
 
 	BOOL              fReturn = FALSE;
 	LPNMLVDISPINFOW   pnmlvDispInfo = nullptr;
