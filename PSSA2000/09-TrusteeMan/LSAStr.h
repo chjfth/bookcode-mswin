@@ -64,7 +64,8 @@ private:
 				MaximumLength = nMax;
 				fReturn = TRUE;
 			}
-		} else fReturn = TRUE;
+		} else 
+			fReturn = TRUE;
 		return(fReturn);
 	}
 };

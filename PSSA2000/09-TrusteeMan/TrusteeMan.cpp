@@ -34,14 +34,11 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "../../share/vaDbg.h"
 #include "../chjutils/chjutils.h"
 
-
 #include "LSAStr.h"
 
 #include "EditTrusteeList.h"
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 #ifndef UNICODE
 #error This module must be compiled natively using Unicode.
@@ -54,9 +51,19 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 HINSTANCE g_hInst;
 
 
-typedef enum TRUSTEE { 
+enum TRUSTEE { 
 	User=1, 
 	Group
+};
+
+enum ImageCell_et { // chj supp
+	ImageCell_unset = -1,
+	ImageCell0_groupheads = 0,
+	ImageCell1_onehead = 1,
+	ImageCell2_tick = 2,
+	ImageCell3_crossout = 3,
+	ImageCell4_blank = 4,
+	ImageCell5_quesmark = 5,
 };
 
 typedef struct _TrusteeManState {
@@ -289,6 +296,10 @@ void GroupMembers(HWND hwndDlg, PTSTR pszGroup)
 
 void PopulatePrivilegeList(HWND hwndDlg) 
 {
+#ifndef SE_DELEGATE_SESSION_USER_IMPERSONATE_NAME    // Win10+
+#define SE_DELEGATE_SESSION_USER_IMPERSONATE_NAME    TEXT("SeDelegateSessionUserImpersonatePrivilege")
+#endif
+
 	// Found in "winnt.h" and "ntsecapi.h"
 	PTSTR szPrivileges[] = {
 		SE_CREATE_TOKEN_NAME,
@@ -330,6 +341,9 @@ void PopulatePrivilegeList(HWND hwndDlg)
 		// Chj adds for WinXP:
 		SE_REMOTE_INTERACTIVE_LOGON_NAME,
 		SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME,
+
+		// Win10:
+		SE_DELEGATE_SESSION_USER_IMPERSONATE_NAME,
 	};
 
 	// Clear the control
@@ -351,15 +365,14 @@ void PopulatePrivilegeList(HWND hwndDlg)
 
 		if (!fRet) {
 			szDisplayName = 64;  // Set size of buffer to 64 characters
-			lstrcpy(szDisplayName,
-				TEXT("[Unable to find friendly name for privilege]"));
+			lstrcpy(szDisplayName, TEXT("[Unable to find friendly name for privilege]"));
 		}
 
 		// Add the privilege to the list control
 		LVITEM item = { 0 };
 		item.mask = LVIF_TEXT | LVIF_IMAGE;
 		item.iItem = 0;
-		item.iImage = 4;
+		item.iImage = ImageCell4_blank;
 		item.pszText = szPrivileges[nIndex];
 		int nIndex2 = ListView_InsertItem(hwndList, &item);
 		ListView_SetItemText(hwndList, nIndex2, 1, szDisplayName);
@@ -368,8 +381,14 @@ void PopulatePrivilegeList(HWND hwndDlg)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory) 
+void ImagePrivilegeList(HWND hwnd, const PTSTR pszName, BOOL fAddHistory) 
 {
+	// Chj: pszName points to input trustee-name.
+	// Enumerate all "account right/privilge" for that trustee.
+	// Fill the enum-results into UI right-side pane.
+	//
+	// But if pszName is empty, PENDING-comment
+
 	// Get state info
 	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
@@ -425,7 +444,7 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 	}
 
 	CLSAStr  lsastrPriv;
-	TCHAR    szPriv[256];
+	TCHAR    szPriv[256] = {};
 
 	// Now update the list control
 	HWND hwndList = GetDlgItem(hwnd, IDL_PRIVILEGES);
@@ -433,7 +452,7 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 	while (nIndex-- != 0) {
 
 		// Not in clear mode? Then compare to find privileges
-		int nImage = 0;
+		int nImage = ImageCell_unset;
 		if (!fClearMode) {
 
 			// Get the item text
@@ -450,9 +469,9 @@ void ImagePrivilegeList(HWND hwnd, PTSTR pszName, BOOL fAddHistory)
 					break;
 				}
 			}
-			nImage = fFound ? 2 : 3;
+			nImage = fFound ? ImageCell2_tick : ImageCell3_crossout;
 		} else {
-			nImage = 4;
+			nImage = ImageCell4_blank;
 		}
 
 		// Adjust the item
@@ -672,12 +691,17 @@ void UpdatePolicy(HWND hwnd) // chj memo: Refreshing the whole UI according to C
 		ComboBox_GetText(hwndCombo, szName, chDIMOF(szName));
 	}
 
+	//
 	// Open a policy good for adjusting privileges and enumerating privileges
+	//
+
 	CLSAStr lsastrComputer = szName;
 	LSA_OBJECT_ATTRIBUTES lsaOA = { sizeof(lsaOA) };
+
 	NTSTATUS ntStatus = LsaOpenPolicy(&lsastrComputer, &lsaOA,
 		POLICY_VIEW_LOCAL_INFORMATION | POLICY_LOOKUP_NAMES	| POLICY_CREATE_ACCOUNT, 
 		&ptmState->m_hPolicy);
+
 	ULONG lErr = LsaNtStatusToWinError(ntStatus);
 
 	if (lErr != ERROR_SUCCESS) {
@@ -701,7 +725,7 @@ void UpdatePolicy(HWND hwnd) // chj memo: Refreshing the whole UI according to C
 
 	} else {
 
-		// Success, add the computer to the combo box for convenient future use
+		// Success, add the computer to the combobox for convenient future use
 		if (ComboBox_FindStringExact(GetDlgItem(hwnd, IDC_COMPUTER), 0, szName)	== CB_ERR)
 			ComboBox_AddString(GetDlgItem(hwnd, IDC_COMPUTER), szName);
 
@@ -712,7 +736,8 @@ void UpdatePolicy(HWND hwnd) // chj memo: Refreshing the whole UI according to C
 	PopulateTrusteeList(hwnd, szName);
 
 	// Reset privilege list
-	SetDlgItemText(hwnd, IDC_TRUSTEE, TEXT("")); // chj: why clear the combobox?
+	// chj: bcz we have "connected" to a new machine
+	SetDlgItemText(hwnd, IDC_TRUSTEE, TEXT("")); 
 	
 	ImagePrivilegeList(hwnd, TEXT(""), TRUE);
 }
