@@ -958,7 +958,7 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 BOOL HandlePrivilegesNotify(HWND hwnd, LPNMHDR pnmhdr) 
 {
-	vaDbgTs(_T("HandlePrivilegesNotify pnmhdr->code=%s"), ITCSv(pnmhdr->code, itc::NM_xxx_Generic));
+	vaDbgTs(_T("Privilege ListView notifycode=%s"), ITCSv(pnmhdr->code, itc::NM_xxx_ListView));
 
 	switch (pnmhdr->code) {
 	case LVN_ITEMCHANGED:
@@ -978,36 +978,37 @@ BOOL HandlePrivilegesNotify(HWND hwnd, LPNMHDR pnmhdr)
 
 BOOL HandleTrusteesNotify(HWND hwnd, LPNMHDR pnmhdr) 
 {
-	vaDbgTs(_T("HandleTrusteesNotify   pnmhdr->code=%s"), ITCSv(pnmhdr->code, itc::NM_xxx_Generic));
+	vaDbgTs(_T("Trustee   ListView notifycode=%s"), ITCSv(pnmhdr->code, itc::NM_xxx_ListView));
 
 	BOOL              fReturn = FALSE;
 	LPNMLVDISPINFOW   pnmlvDispInfo = nullptr;
 	LPNMLISTVIEW      pnmlListView = nullptr;
 
-	switch (pnmhdr->code) {
+	switch (pnmhdr->code) 
+	{{
 	case LVN_ITEMCHANGED: 
+	{
+		TCHAR szBuffer[1024] = {};
+		pnmlListView = (LPNMLISTVIEW) pnmhdr;
+		if (pnmlListView->uNewState != pnmlListView->uOldState) 
 		{
-			TCHAR szBuffer[1024] = {};
-			pnmlListView = (LPNMLISTVIEW) pnmhdr;
-			if (pnmlListView->uNewState != pnmlListView->uOldState) 
+			// If selected change current trustee for privileges
+			// (Only if it is in the non-editing state)
+			if (((pnmlListView->uNewState & LVIS_SELECTED) != 0) && 
+				(pnmlListView->lParam == 0)) 
 			{
-				// If selected change current trustee for privileges
-				// (Only if it is in the non-editing state)
-				if (((pnmlListView->uNewState & LVIS_SELECTED) != 0) && 
-					(pnmlListView->lParam == 0)) 
-				{
-					ListView_GetItemText(pnmhdr->hwndFrom, pnmlListView->iItem, 
-						0, szBuffer, chDIMOF(szBuffer));
-					ComboBox_SetText(GetDlgItem(hwnd, IDC_TRUSTEE), szBuffer);
+				ListView_GetItemText(pnmhdr->hwndFrom, pnmlListView->iItem, 
+					0, szBuffer, chDIMOF(szBuffer));
+				ComboBox_SetText(GetDlgItem(hwnd, IDC_TRUSTEE), szBuffer);
 						
-					// Update privilege list
-					// [2025-01-24] Chj fix LSA_UNICODE_STRING memleak inside.
-					ImagePrivilegeList(hwnd, szBuffer, FALSE);
-				}
+				// Update privilege list
+				// [2025-01-24] Chj fix LSA_UNICODE_STRING memleak inside.
+				ImagePrivilegeList(hwnd, szBuffer, FALSE);
 			}
-			EnableControls(hwnd);      
 		}
+		EnableControls(hwnd);      
 		break;
+	}
 
 	case LVN_BEGINLABELEDIT:
 		// Deny any label edit user initiated label edits
@@ -1016,50 +1017,50 @@ BOOL HandleTrusteesNotify(HWND hwnd, LPNMHDR pnmhdr)
 		break;
 
 	case LVN_ENDLABELEDIT: 
-		{
-			BOOL     fAdded = 0;
+	{
+		BOOL     fAdded = 0;
 
-			// Handle end of edit for new trustee
-			pnmlvDispInfo = (LPNMLVDISPINFOW) pnmhdr;
-			if ((pnmlvDispInfo->item.pszText == NULL) || 
-				(pnmlvDispInfo->item.pszText[0] == TEXT('['))) {
-					// Clear new item if it is empty or still has the starting text
-					fAdded = FALSE;
+		// Handle end of edit for new trustee
+		pnmlvDispInfo = (LPNMLVDISPINFOW) pnmhdr;
+		if ((pnmlvDispInfo->item.pszText == NULL) || 
+			(pnmlvDispInfo->item.pszText[0] == TEXT('['))) {
+				// Clear new item if it is empty or still has the starting text
+				fAdded = FALSE;
+		} else {
+			if (pnmlvDispInfo->item.lParam == Group) {
+				fAdded = AddGroup(hwnd, pnmlvDispInfo->item.pszText);
 			} else {
-				if (pnmlvDispInfo->item.lParam == Group) {
-					fAdded = AddGroup(hwnd, pnmlvDispInfo->item.pszText);
-				} else {
-					fAdded = AddUser(hwnd, pnmlvDispInfo->item.pszText);            
-				}
-			}
-			// If not, then delete list view entry
-			if (fAdded == FALSE) {
-				ListView_DeleteItem(pnmlvDispInfo->hdr.hwndFrom, 
-					pnmlvDispInfo->item.iItem);
-			} else {
-				// Otherwise, finish off the item, and set the lparam to zero
-				LVITEM lvItem;
-				lvItem.mask = LVIF_PARAM | LVIF_STATE;
-				lvItem.iItem = pnmlvDispInfo->item.iItem;
-				lvItem.iSubItem = 0;
-				lvItem.lParam = 0;
-				lvItem.state = 0;
-				ListView_SetItem(pnmlvDispInfo->hdr.hwndFrom, &lvItem);
-
-				ComboBox_SetText(GetDlgItem(hwnd, IDC_TRUSTEE), 
-					pnmlvDispInfo->item.pszText);
-				ImagePrivilegeList(hwnd, pnmlvDispInfo->item.pszText, FALSE);
-
-				fReturn = TRUE;
+				fAdded = AddUser(hwnd, pnmlvDispInfo->item.pszText);            
 			}
 		}
+		// If not, then delete list view entry
+		if (fAdded == FALSE) {
+			ListView_DeleteItem(pnmlvDispInfo->hdr.hwndFrom, 
+				pnmlvDispInfo->item.iItem);
+		} else {
+			// Otherwise, finish off the item, and set the lparam to zero
+			LVITEM lvItem;
+			lvItem.mask = LVIF_PARAM | LVIF_STATE;
+			lvItem.iItem = pnmlvDispInfo->item.iItem;
+			lvItem.iSubItem = 0;
+			lvItem.lParam = 0;
+			lvItem.state = 0;
+			ListView_SetItem(pnmlvDispInfo->hdr.hwndFrom, &lvItem);
+
+			ComboBox_SetText(GetDlgItem(hwnd, IDC_TRUSTEE), 
+				pnmlvDispInfo->item.pszText);
+			ImagePrivilegeList(hwnd, pnmlvDispInfo->item.pszText, FALSE);
+
+			fReturn = TRUE;
+		}
 		break;
+	}
 
 	case LVN_COLUMNCLICK:   // Sort by selected column
 		pnmlListView = (LPNMLISTVIEW) pnmhdr;
 		ListView_SortItemsEx(pnmhdr->hwndFrom, SortView, pnmlListView);
 		break;
-	}
+	}}
 	return(fReturn);
 }
 
