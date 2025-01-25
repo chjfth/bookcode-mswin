@@ -302,48 +302,56 @@ void PopulatePrivilegeList(HWND hwndDlg)
 
 	// Found in "winnt.h" and "ntsecapi.h"
 	PTSTR szPrivileges[] = {
-		SE_CREATE_TOKEN_NAME,
-		SE_ASSIGNPRIMARYTOKEN_NAME,
-		SE_LOCK_MEMORY_NAME,
-		SE_UNSOLICITED_INPUT_NAME,
-		SE_MACHINE_ACCOUNT_NAME,
-		SE_INCREASE_QUOTA_NAME,
-		SE_TCB_NAME,
-		SE_SECURITY_NAME,
-		SE_TAKE_OWNERSHIP_NAME,
-		SE_LOAD_DRIVER_NAME,
-		SE_SYSTEM_PROFILE_NAME,
-		SE_SYSTEMTIME_NAME,
-		SE_PROF_SINGLE_PROCESS_NAME,
-		SE_CREATE_PAGEFILE_NAME,
-		SE_CREATE_PERMANENT_NAME,
-		SE_UNDOCK_NAME,
-		SE_BACKUP_NAME,
-		SE_RESTORE_NAME,
-		SE_SYNC_AGENT_NAME,
-		SE_DEBUG_NAME,
-		SE_SHUTDOWN_NAME,
-		SE_SYSTEM_ENVIRONMENT_NAME,
-		SE_INC_BASE_PRIORITY_NAME,
-		SE_CHANGE_NOTIFY_NAME,
-		SE_REMOTE_SHUTDOWN_NAME,
-		SE_AUDIT_NAME,
-		SE_ENABLE_DELEGATION_NAME,
-		SE_INTERACTIVE_LOGON_NAME,
-		SE_NETWORK_LOGON_NAME,
-		SE_BATCH_LOGON_NAME,
-		SE_SERVICE_LOGON_NAME,
-		SE_DENY_INTERACTIVE_LOGON_NAME,
-		SE_DENY_NETWORK_LOGON_NAME,
-		SE_DENY_BATCH_LOGON_NAME,
-		SE_DENY_SERVICE_LOGON_NAME,
+		SE_CREATE_TOKEN_NAME,        // 1
+		SE_ASSIGNPRIMARYTOKEN_NAME,  // 2
+		SE_LOCK_MEMORY_NAME,         // 3
+		SE_INCREASE_QUOTA_NAME,      // 4
+		SE_UNSOLICITED_INPUT_NAME,   // 5
+		SE_MACHINE_ACCOUNT_NAME,     // 6
+		SE_TCB_NAME,                 // 7
+		SE_SECURITY_NAME,            // 8
+		SE_TAKE_OWNERSHIP_NAME,      // 9
+		SE_LOAD_DRIVER_NAME,         // 10
+		SE_SYSTEM_PROFILE_NAME,      // 11
+		SE_SYSTEMTIME_NAME,          // 12
+		SE_PROF_SINGLE_PROCESS_NAME, // 13
+		SE_INC_BASE_PRIORITY_NAME,   // 14
+		SE_CREATE_PAGEFILE_NAME,     // 15
+		SE_CREATE_PERMANENT_NAME,    // 16
+		SE_BACKUP_NAME,              // 17
+		SE_RESTORE_NAME,             // 18
+		SE_SHUTDOWN_NAME,            // 19
+		SE_DEBUG_NAME,               // 20
+		SE_AUDIT_NAME,               // 21
+		SE_SYSTEM_ENVIRONMENT_NAME,  // 22
+		SE_CHANGE_NOTIFY_NAME,       // 23
+		SE_REMOTE_SHUTDOWN_NAME,     // 24
+		SE_UNDOCK_NAME,              // 25
+		SE_SYNC_AGENT_NAME,          // 26
+		SE_ENABLE_DELEGATION_NAME,   // 27
+		SE_MANAGE_VOLUME_NAME,       // 28
+		SE_IMPERSONATE_NAME,         // 29
+		SE_CREATE_GLOBAL_NAME,       // 30
+		SE_TRUSTED_CREDMAN_ACCESS_NAME,   // 31
+		SE_RELABEL_NAME,             // 32
+		SE_INC_WORKING_SET_NAME,     // 33
+		SE_TIME_ZONE_NAME,           // 34
+		SE_CREATE_SYMBOLIC_LINK_NAME,// 35
+		SE_DELEGATE_SESSION_USER_IMPERSONATE_NAME, // 36 (Win10)
+
+		SE_INTERACTIVE_LOGON_NAME,   // S1
+		SE_NETWORK_LOGON_NAME,       // S2
+		SE_BATCH_LOGON_NAME,         // S3
+		SE_SERVICE_LOGON_NAME,       // S4
+		SE_DENY_INTERACTIVE_LOGON_NAME, // S5
+		SE_DENY_NETWORK_LOGON_NAME,  // S6
+		SE_DENY_BATCH_LOGON_NAME,    // S7
+		SE_DENY_SERVICE_LOGON_NAME,  // S8
 		
 		// Chj adds for WinXP:
-		SE_REMOTE_INTERACTIVE_LOGON_NAME,
-		SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME,
+		SE_REMOTE_INTERACTIVE_LOGON_NAME,         // S9
+		SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME,    // S10
 
-		// Win10:
-		SE_DELEGATE_SESSION_USER_IMPERSONATE_NAME,
 	};
 
 	// Clear the control
@@ -384,10 +392,12 @@ void PopulatePrivilegeList(HWND hwndDlg)
 void ImagePrivilegeList(HWND hwnd, const PTSTR pszName, BOOL fAddHistory) 
 {
 	// Chj: pszName points to input trustee-name.
-	// Enumerate all "account right/privilge" for that trustee.
-	// Fill the enum-results into UI right-side pane.
+	// Enumerate all "account right/privilege" for that trustee.
+	// Fill the enum-results into UI right-side pane, marking each priv with tick or crossout.
 	//
-	// But if pszName is empty, PENDING-comment
+	// But if pszName is empty, marking each priv with blank icon.
+	//
+	// So the "Image" in function name is a verb.
 
 	// Get state info
 	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
@@ -687,7 +697,7 @@ void UpdatePolicy(HWND hwnd) // chj memo: Refreshing the whole UI according to C
 		// Local system
 		ULONG lSize = chDIMOF(szName);
 		GetComputerName(szName, &lSize);
-	}else{
+	} else {
 		ComboBox_GetText(hwndCombo, szName, chDIMOF(szName));
 	}
 
@@ -732,13 +742,12 @@ void UpdatePolicy(HWND hwnd) // chj memo: Refreshing the whole UI according to C
 		lstrcpy(ptmState->m_szComputer, szName);
 	}
 
-	// Populate the trustee list for the current system
+	// Populate the trustee list for the current system (left-side pane)
 	PopulateTrusteeList(hwnd, szName);
 
 	// Reset privilege list
 	// chj: bcz we have "connected" to a new machine
 	SetDlgItemText(hwnd, IDC_TRUSTEE, TEXT("")); 
-	
 	ImagePrivilegeList(hwnd, TEXT(""), TRUE);
 }
 
@@ -926,7 +935,7 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	// Setup Policy for the current settings
 	UpdatePolicy(hwnd);
 
-	// Populate the privilege list control
+	// Populate the privilege list control (right-side pane)
 	PopulatePrivilegeList(hwnd);
 
 	EnableControls(hwnd); 
