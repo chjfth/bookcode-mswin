@@ -66,6 +66,16 @@ enum ImageCell_et { // chj supp
 	ImageCell5_quesmark = 5,
 };
 
+enum TrusteeColumn_et {
+	Col0_TrusteeName = 0,
+	Col1_TrusteeType = 1,
+};
+
+enum PriviColumn_et {
+	Col0_ProgName = 0,
+	Col1_FriendlyText = 1,
+};
+
 typedef struct _TrusteeManState {
 	// State
 	HIMAGELIST m_himage;
@@ -119,14 +129,14 @@ void EnableControls( HWND hwnd ) {
 	if(nItem!=-1){
 		fTrusteeSelected=TRUE;
 
-		TCHAR szType[256];
-		ListView_GetItemText(hwndList, nItem, 1, szType, chDIMOF(szType));
+		TCHAR szType[256] = {};
+		ListView_GetItemText(hwndList, nItem, Col1_TrusteeType, szType, chDIMOF(szType));
 		fGroupSelected = szType[0]==TEXT('G');
 	}
 
 	hwndList = GetDlgItem(hwnd, IDL_PRIVILEGES);
 	nItem = ListView_GetNextItem(hwndList, -1, LVNI_SELECTED);
-	fPrivilegeSelected = nItem != -1;
+	fPrivilegeSelected = (nItem != -1);
 
 	EnableWindow(GetDlgItem(hwnd, IDB_REMOVE), fTrusteeSelected);
 	EnableWindow(GetDlgItem(hwnd, IDB_EDITMEMBERS), fGroupSelected);
@@ -351,7 +361,6 @@ void PopulatePrivilegeList(HWND hwndDlg)
 		// Chj adds for WinXP:
 		SE_REMOTE_INTERACTIVE_LOGON_NAME,         // S9
 		SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME,    // S10
-
 	};
 
 	// Clear the control
@@ -949,6 +958,8 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 BOOL HandlePrivilegesNotify(HWND hwnd, LPNMHDR pnmhdr) 
 {
+	vaDbgTs(_T("HandlePrivilegesNotify pnmhdr->code=% d"), pnmhdr->code);
+
 	switch (pnmhdr->code) {
 	case LVN_ITEMCHANGED:
 		EnableControls(hwnd);
@@ -967,14 +978,16 @@ BOOL HandlePrivilegesNotify(HWND hwnd, LPNMHDR pnmhdr)
 
 BOOL HandleTrusteesNotify(HWND hwnd, LPNMHDR pnmhdr) 
 {
+	vaDbgTs(_T("HandleTrusteesNotify   pnmhdr->code=% d"), pnmhdr->code);
+
 	BOOL              fReturn = FALSE;
-	LPNMLVDISPINFOW   pnmlvDispInfo;
-	LPNMLISTVIEW      pnmlListView;
+	LPNMLVDISPINFOW   pnmlvDispInfo = nullptr;
+	LPNMLISTVIEW      pnmlListView = nullptr;
 
 	switch (pnmhdr->code) {
 	case LVN_ITEMCHANGED: 
 		{
-			TCHAR szBuffer[1024];
+			TCHAR szBuffer[1024] = {};
 			pnmlListView = (LPNMLISTVIEW) pnmhdr;
 			if (pnmlListView->uNewState != pnmlListView->uOldState) 
 			{
@@ -1004,7 +1017,7 @@ BOOL HandleTrusteesNotify(HWND hwnd, LPNMHDR pnmhdr)
 
 	case LVN_ENDLABELEDIT: 
 		{
-			BOOL     fAdded;
+			BOOL     fAdded = 0;
 
 			// Handle end of edit for new trustee
 			pnmlvDispInfo = (LPNMLVDISPINFOW) pnmhdr;
@@ -1166,7 +1179,7 @@ void HandleAddTrustee(HWND hwnd, TRUSTEE tType)
 
 
 void HandleGrantRevoke(HWND hwnd, BOOL fGrant) {
-	TCHAR szName[256];
+	TCHAR szName[256] = {} ;
 	// Get Trustee name
 	GetDlgItemText(hwnd, IDC_TRUSTEE, szName, chDIMOF(szName));
 
@@ -1179,7 +1192,7 @@ void HandleGrantRevoke(HWND hwnd, BOOL fGrant) {
 void HandleTrustee(HWND hwnd, UINT codeNotify, HWND hwndCtl) {
 	switch (codeNotify) {
 	case CBN_SELENDOK:
-		TCHAR szName[256];
+		TCHAR szName[256] = {} ;
 		// Trustee selected from combo box
 		int nIndex = ComboBox_GetCurSel(hwndCtl);
 		ComboBox_GetLBText(hwndCtl, nIndex, szName);

@@ -594,8 +594,10 @@ static const Enum2Val_st e2v_DBT[] =
 	ITC_NAMEPAIR(DBT_DEVICETYPESPECIFIC      ),
 	ITC_NAMEPAIR(DBT_CUSTOMEVENT             ),
 /* 
-	[2025-01-25] Weird, these four are missing from Win10 SDK.
-	D:\WinKits\10\Include\10.0.22621.0\um\Dbt.h
+	[2025-01-25] Weird, these four DBT_xxx present in VC2010, 
+	  C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\include\Dbt.h
+	but missing from Win10 SDK:
+	  D:\WinKits\10\Include\10.0.22621.0\um\Dbt.h
 
 	ITC_NAMEPAIR(DBT_DEVINSTENUMERATED       ),
 	ITC_NAMEPAIR(DBT_DEVINSTSTARTED          ),
