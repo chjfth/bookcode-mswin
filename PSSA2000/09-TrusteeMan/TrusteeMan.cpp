@@ -2,7 +2,7 @@
 Module:  TrusteeMan.cpp
 Notices: Copyright (c) 2000 Jeffrey Richter
 ******************************************************************************/
-#define EXE_VERSION "1.0.4"
+#define EXE_VERSION "1.0.5"
 
 #include "..\CmnHdr.h"                 // See Appendix A.
 #include <WindowsX.h>
@@ -35,6 +35,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "../chjutils/chjutils.h"
 
 #include "LSAStr.h"
+
+MakeDelega_CleanupCxxPtr_en(CLSAStr, Cec_LSAStr, CecArray_LSAStr)
 
 #include "EditTrusteeList.h"
 
@@ -479,14 +481,24 @@ void ImagePrivilegeList(HWND hwnd, const PTSTR pszName, BOOL fAddHistory)
 			nImage = ImageCell4_blank;
 		}
 
-		// Adjust the item
+		// Adjust the item's icon
+
 		LVITEM lvItem = { 0 };
 		lvItem.mask = LVIF_IMAGE;
-		lvItem.iImage = nImage;
 		lvItem.iItem = nIndex;
 		lvItem.iSubItem = 0;
-		ListView_SetItem(hwndList, &lvItem);
-	}
+		lvItem.iImage = -1; // neg-init
+
+		if( ListView_GetItem(hwndList, &lvItem) == TRUE )
+		{
+			// set new icon for this item only if it has become different
+			if(lvItem.iImage!=nImage)
+			{
+				lvItem.iImage = nImage;
+				ListView_SetItem(hwndList, &lvItem); 
+			}
+		}
+	} // while
 }
 
 
@@ -498,85 +510,75 @@ void GrantSelectedPrivileges(HWND hwnd, PTSTR pszName, BOOL fGrant)
 	// Get state info
 	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
-	// Without this handy class, the LSA_UNICODE_STRING would be tough here
-	CLSAStr* plsaString = NULL;
+	// Give up if the trustee name is empty
+	if (lstrlen(pszName) == 0)
+		return;
 
-	try 
-	{{
-		// Give up if the trustee name is empty
-		if (lstrlen(pszName) == 0)
-			goto leave;
+	TCHAR szComputer[256] = {};
+	GetComputer(hwnd, szComputer, chDIMOF(szComputer));
 
-		TCHAR szComputer[256];
-		GetComputer(hwnd, szComputer, chDIMOF(szComputer));
+	// Get the SID for the account given.  If not, fail
+	CAutoBuf<SID> psid;
+	SID_NAME_USE sidUse = SidTypeLabel; // neg-init
+	CAutoBuf<TCHAR, sizeof(TCHAR)> szDomain;
+	BOOL fRet;
 
-		// Get the SID for the account given.  If not, fail
-		CAutoBuf<SID> psid;
-		SID_NAME_USE sidUse;
-		CAutoBuf<TCHAR, sizeof(TCHAR)> szDomain;
-		BOOL fRet;
+	do {
+		fRet = LookupAccountName(szComputer, pszName, psid, psid, szDomain,
+			szDomain, &sidUse);
+	} while (!fRet && (GetLastError() == ERROR_INSUFFICIENT_BUFFER));
 
-		do {
-			fRet = LookupAccountName(szComputer, pszName, psid, psid, szDomain,
-				szDomain, &sidUse);
-		} while (!fRet && (GetLastError() == ERROR_INSUFFICIENT_BUFFER));
-
-		if (!fRet) {
-			ReportError(TEXT("LookupAccountName"), GetLastError());
-			goto leave;
-		}
-
-
-		// How many selected... If zero, exit the function
-		HWND hwndList = GetDlgItem(hwnd, IDL_PRIVILEGES);
-		int nPrivCount = ListView_GetSelectedCount(hwndList);
-		if (nPrivCount == 0)
-			goto leave;
-
-		// Create our array of LSA_UNICODE_STRING structures
-		plsaString = new CLSAStr[nPrivCount];
-		TCHAR szPrivilege[256];
-		nPrivCount = 0;
-		int nIndex = -1;
-		for (;;) {
-			// Get the next privilege that is selected
-			nIndex = ListView_GetNextItem(hwndList, nIndex, LVNI_SELECTED);
-			if (nIndex < 0)
-				break;
-
-			// Get its name, and create a LSA string out of it
-			ListView_GetItemText(hwndList, nIndex, 0, szPrivilege,
-				chDIMOF(szPrivilege));
-			plsaString[nPrivCount++] = szPrivilege;
-		}
-
-		// If we still don't have any, then leave
-		if (nPrivCount == 0)
-			goto leave;
-
-		// Add or remove privileges
-		NTSTATUS ntStatus;
-		if (fGrant)
-			ntStatus = LsaAddAccountRights(ptmState->m_hPolicy, psid, plsaString,
-			nPrivCount);
-		else
-			ntStatus = LsaRemoveAccountRights(ptmState->m_hPolicy, psid, FALSE,
-			plsaString, nPrivCount);
-
-		// Check errors
-		ULONG lErr = LsaNtStatusToWinError(ntStatus);
-		if (lErr == ERROR_SUCCESS)
-			ImagePrivilegeList(hwnd, pszName, TRUE);
-		else
-			ReportError(TEXT("LsaAdd / RemoveAccountRights"), lErr);
-
-	} leave:; }
-	catch (...) {
+	if (!fRet) {
+		ReportError(TEXT("LookupAccountName"), GetLastError());
+		return;
 	}
 
-	// Delete array of LSA strings
-	if (plsaString != NULL)
-		delete[] plsaString;
+	// How many selected... If zero, exit the function
+	HWND hwndList = GetDlgItem(hwnd, IDL_PRIVILEGES);
+	int nPrivCount = ListView_GetSelectedCount(hwndList);
+	if (nPrivCount == 0)
+		return;
+
+	// Create our array of LSA_UNICODE_STRING structures
+	CecArray_LSAStr plsaString = new CLSAStr[nPrivCount];
+
+	TCHAR szPrivilege[256] = {};
+	nPrivCount = 0;
+	int nIndex = -1;
+	for (;;) {
+		// Get the next privilege that is selected
+		nIndex = ListView_GetNextItem(hwndList, nIndex, LVNI_SELECTED);
+		if (nIndex < 0)
+			break;
+
+		// Get its name, and create a LSA string out of it
+		ListView_GetItemText(hwndList, nIndex, 0, szPrivilege, chDIMOF(szPrivilege));
+		plsaString[nPrivCount++] = szPrivilege;
+	}
+
+	// If we still don't have any, then leave
+	if (nPrivCount == 0)
+		return;
+
+	// Add or remove privileges
+	NTSTATUS ntStatus = 0;
+	if (fGrant) {
+		ntStatus = LsaAddAccountRights(ptmState->m_hPolicy, psid, plsaString, nPrivCount);
+	}
+	else {
+		ntStatus = LsaRemoveAccountRights(ptmState->m_hPolicy, 
+			psid,   // account SID to operate 
+			FALSE,  // FALSE: just remove the rights, do not delete account
+			plsaString, nPrivCount);
+	}
+
+	// Check errors
+	ULONG lErr = LsaNtStatusToWinError(ntStatus);
+	if (lErr == ERROR_SUCCESS)
+		ImagePrivilegeList(hwnd, pszName, TRUE);
+	else
+		ReportError(fGrant ? TEXT("LsaAddAccountRights") : TEXT("RemoveAccountRights"), lErr);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1171,7 +1173,13 @@ void HandleGrantRevoke(HWND hwnd, BOOL fGrant) {
 	GetDlgItemText(hwnd, IDC_TRUSTEE, szName, chDIMOF(szName));
 
 	// Grant or revoke selected privileges for the trustee
-	GrantSelectedPrivileges(hwnd, szName, fGrant);
+	
+// 	vaDbgTs(_T("HandleGrantRevoke 10000 times >>>"));
+// 	for(int i=0; i<10000; i++)
+// 	{
+ 	GrantSelectedPrivileges(hwnd, szName, fGrant);
+// 	}
+// 	vaDbgTs(_T("HandleGrantRevoke 10000 times <<<"));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

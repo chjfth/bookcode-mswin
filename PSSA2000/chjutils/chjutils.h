@@ -27,6 +27,7 @@ MakeCleanupPtrClass(Cec_LsaFreeMemory_UNICODE_STRING, NTSTATUS, _LsaFreeMemory, 
 // -- LsaEnumerateAccountRights() returns an LSA_UNICODE_STRING[] that needs freeing by LsaFreeMemory. 
 
 
+
 //// PSSA2000 specific:
 
 const TCHAR *WinerrStr(DWORD winerr=0);
