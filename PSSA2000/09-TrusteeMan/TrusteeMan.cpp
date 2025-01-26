@@ -49,7 +49,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define EXE_VERSION "1.0.2"
+#define EXE_VERSION "1.0.4"
 
 HINSTANCE g_hInst;
 
@@ -79,6 +79,8 @@ enum PriviColumn_et {
 	Col1_FriendlyText = 1,
 };
 
+enum { Level0=0, Level1, Level2 };
+
 typedef struct _TrusteeManState {
 	// State
 	HIMAGELIST m_himage;
@@ -94,7 +96,7 @@ void ReportError(PTSTR pszFunction, ULONG lErr) {
 	prntBuf.Print(TEXT("The Function:  %s\r\n"), pszFunction);
 	prntBuf.Print(TEXT("Caused the following error - \r\n"));
 	prntBuf.PrintError(lErr);
-	MessageBox(NULL, prntBuf, TEXT("TrusteeMan Error"), MB_OK);
+	MessageBox(GetActiveWindow(), prntBuf, TEXT("TrusteeMan Error"), MB_OK);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,6 +156,9 @@ void EnableControls( HWND hwnd ) {
 
 void PriviligedTrustees(HWND hwndDlg, PTSTR pszPrivilige) 
 {
+	// [2025-01-26] Chj: Jeffrey's original code uses C++ try/catch, seems no-sense,
+	// bcz no code in this cpp does throw().
+
 	LSA_ENUMERATION_INFORMATION* plsaEnum = NULL;
 
 	try 
@@ -241,68 +246,68 @@ void PriviligedTrustees(HWND hwndDlg, PTSTR pszPrivilige)
 
 void GroupMembers(HWND hwndDlg, PTSTR pszGroup) 
 {
-	// [2025-01-26] Chj: Jeffrey's original code uses C++ try/catch, seems no-sense.
+	// [2025-01-26] Chj: Jeffrey's original code uses C++ try/catch, seems no-sense,
+	// bcz no code in this cpp does throw().
 
 	LOCALGROUP_MEMBERS_INFO_0* pinfoCurrent = NULL;
 
-	try { {
-		TCHAR szComputer[256] = {};
-		GetComputer(hwndDlg, szComputer, chDIMOF(szComputer));
+	TCHAR szComputer[256] = {};
+	GetComputer(hwndDlg, szComputer, chDIMOF(szComputer));
 
-		// Find current group membership information
-		ULONG lEntries, lTotalEntries;
-		NET_API_STATUS netStatus = NetLocalGroupGetMembers(szComputer,
-			pszGroup, 0, (PBYTE*) &pinfoCurrent, MAX_PREFERRED_LENGTH,
-			&lEntries, &lTotalEntries, NULL);
-		if (netStatus != NERR_Success) {
-			ReportError(TEXT("NetLocalGroupGetMembers"), netStatus);
-			pinfoCurrent = NULL;
-			goto leave;
-		}
-
-		// Call the EditTrusteeList function which returns a list of trustees
-		// to add and a list to remove from your current trustee list
-		LOCALGROUP_MEMBERS_INFO_0* pinfoTrusteeAdd;
-		LOCALGROUP_MEMBERS_INFO_0* pinfoTrusteeRemove;
-		int nAddCount;
-		int nRemoveCount;
-		if (!EditTrusteeList(hwndDlg, szComputer, pinfoCurrent, lEntries,
-			&pinfoTrusteeAdd, &nAddCount, &pinfoTrusteeRemove, &nRemoveCount,
-			TEXT("Edit Member List"))) {
-				goto leave;
-		}
-
-		// Handle additions
-		if (nAddCount > 0) {
-
-			// Add members to the group
-			netStatus = NetLocalGroupAddMembers(szComputer, pszGroup, 0,
-				(PBYTE) pinfoTrusteeAdd, nAddCount);
-			if (netStatus != NERR_Success)
-				ReportError(TEXT("NetLocalGroupAddMembers"), NERR_Success);
-
-			LocalFree(pinfoTrusteeAdd);
-		}
-
-		// Handle deletions
-		if (nRemoveCount > 0) {
-
-			// Delete members from the group
-			netStatus = NetLocalGroupDelMembers(szComputer, pszGroup, 0,
-				(PBYTE) pinfoTrusteeRemove, nRemoveCount);
-			if (netStatus != NERR_Success)
-				ReportError(TEXT("NetLocalGroupDelMembers"), NERR_Success);
-
-			LocalFree(pinfoTrusteeRemove);
-		}
-	} leave:;
-	}
-	catch (...) {
+	// Find current group membership information
+	ULONG lEntries, lTotalEntries;
+	NET_API_STATUS winerr = NetLocalGroupGetMembers(szComputer,
+		pszGroup, // local groupname
+		Level0, // will output LOCALGROUP_MEMBERS_INFO_0 structures
+		(PBYTE*) &pinfoCurrent, // output pointer
+		MAX_PREFERRED_LENGTH,
+		&lEntries,
+		&lTotalEntries, 
+		NULL); // resumehandle
+	Cec_NetApiBufferFree cec_pinfoCurrent = pinfoCurrent;
+	if (winerr != NERR_Success) {
+		ReportError(TEXT("NetLocalGroupGetMembers"), winerr);
+		return;
 	}
 
-	// Free the buffer returned by NetLocalGroupGetMembers
-	if (pinfoCurrent != NULL)
-		NetApiBufferFree(pinfoCurrent);
+	// Call the EditTrusteeList function which returns a list of trustees
+	// to add and a list to remove from your current trustee list
+	LOCALGROUP_MEMBERS_INFO_0* pinfoTrusteeAdd;
+	LOCALGROUP_MEMBERS_INFO_0* pinfoTrusteeRemove;
+	int nAddCount = 0;
+	int nRemoveCount = 0;
+	if ( ! EditTrusteeList(hwndDlg, szComputer, 
+			pinfoCurrent, lEntries,
+			&pinfoTrusteeAdd, &nAddCount, 
+			&pinfoTrusteeRemove, &nRemoveCount,
+			TEXT("Edit Member List"))
+		) {
+			return;
+	}
+
+	Cec_LocalFree cec_add = pinfoTrusteeAdd;
+	Cec_LocalFree cec_del = pinfoTrusteeRemove;
+
+	// Handle member additions
+	if (nAddCount > 0) {
+
+		// Add members to the group
+		winerr = NetLocalGroupAddMembers(szComputer, pszGroup, 0,
+			(PBYTE) pinfoTrusteeAdd, nAddCount);
+		if (winerr != NERR_Success)
+			ReportError(TEXT("NetLocalGroupAddMembers"), winerr);
+	}
+
+	// Handle member deletions
+	if (nRemoveCount > 0) {
+
+		// Delete members from the group
+		winerr = NetLocalGroupDelMembers(szComputer, pszGroup, 0,
+			(PBYTE) pinfoTrusteeRemove, nRemoveCount);
+		if (winerr != NERR_Success)
+			ReportError(TEXT("NetLocalGroupDelMembers"), winerr);
+	}
+
 }
 
 
@@ -514,6 +519,9 @@ void ImagePrivilegeList(HWND hwnd, const PTSTR pszName, BOOL fAddHistory)
 
 void GrantSelectedPrivileges(HWND hwnd, PTSTR pszName, BOOL fGrant) 
 {
+	// [2025-01-26] Chj: Jeffrey's original code uses C++ try/catch, seems no-sense,
+	// bcz no code in this cpp does throw().
+
 	// Get state info
 	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
