@@ -46,7 +46,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define EXE_VERSION "1.0.0"
+#define EXE_VERSION "1.0.1"
 
 HINSTANCE g_hInst;
 
@@ -238,10 +238,12 @@ void PriviligedTrustees(HWND hwndDlg, PTSTR pszPrivilige)
 
 void GroupMembers(HWND hwndDlg, PTSTR pszGroup) 
 {
+	// [2025-01-26] Chj: Jeffrey's original code uses C++ try/catch, seems no-sense.
+
 	LOCALGROUP_MEMBERS_INFO_0* pinfoCurrent = NULL;
 
 	try { {
-		TCHAR szComputer[256];
+		TCHAR szComputer[256] = {};
 		GetComputer(hwndDlg, szComputer, chDIMOF(szComputer));
 
 		// Find current group membership information
