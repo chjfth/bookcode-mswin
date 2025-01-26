@@ -1032,7 +1032,7 @@ BOOL HandleTrusteesNotify(HWND hwnd, LPNMHDR pnmhdr)
 			ListView_DeleteItem(pnmlvDispInfo->hdr.hwndFrom, 
 				pnmlvDispInfo->item.iItem);
 		} else {
-			// Otherwise, finish off the item, and set the lparam to zero
+			// Otherwise, finish off the item, and set the lParam to zero
 			LVITEM lvItem;
 			lvItem.mask = LVIF_PARAM | LVIF_STATE;
 			lvItem.iItem = pnmlvDispInfo->item.iItem;
@@ -1143,9 +1143,10 @@ void HandleRemove(HWND hwnd)
 void HandleAddTrustee(HWND hwnd, TRUSTEE tType) 
 {
 	if (tType == User) {
-		MessageBox(hwnd, TEXT("TrusteeMan creates user accounts with a\n")
-			TEXT("password of \"Pass2000.\"  Use the MMC or \n")
-			TEXT("another tool to change the password for user \naccounts."), 
+		MessageBox(hwnd, 
+			TEXT("TrusteeMan creates user accounts with password \"Pass2000\" .\n")
+			TEXT("Use the MMC or another tool to change the password for user accounts.\n")
+			,
 			TEXT("TrusteeMan Notice"), MB_OK);
 	}
 
@@ -1158,7 +1159,7 @@ void HandleAddTrustee(HWND hwnd, TRUSTEE tType)
 	LVITEM lvItem = { 0 };
 	lvItem.mask = LVIF_PARAM;
 
-	// When edit finishes, lparam indicates type of trustee to add
+	// When edit finishes, lParam indicates type of trustee to add
 	lvItem.lParam = tType;
 	lvItem.iItem = nIndex;
 	lvItem.iSubItem = 0;
@@ -1212,6 +1213,7 @@ void HandleTrustee(HWND hwnd, UINT codeNotify, HWND hwndCtl)
 void HandleUpdatePriv(HWND hwnd) {
 
 	// Chj: Refreshing the whole UI according to Trustee from top-right combobox.
+	// And, if success, that Trustee will be appended to the combobox dropdown.
 
 	TCHAR szName[256] = {};
 	GetDlgItemText(hwnd, IDC_TRUSTEE, szName, chDIMOF(szName));
