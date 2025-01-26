@@ -507,6 +507,10 @@ void ImagePrivilegeList(HWND hwnd, const PTSTR pszName, BOOL fAddHistory)
 
 void GrantSelectedPrivileges(HWND hwnd, PTSTR pszName, BOOL fGrant) 
 {
+	// Chj: Grant or deny the user(by pszName) the privileges that are selected
+	// in UI's right-side pane. User can select multiple privileges to set them 
+	// all at once.
+
 	// Get state info
 	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
@@ -674,8 +678,10 @@ void PopulateTrusteeList(HWND hwndDlg, TCHAR* pszComputer)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void UpdatePolicy(HWND hwnd) // chj memo: Refreshing the whole UI according to Computer selected
+void UpdatePolicy(HWND hwnd) 
 {
+	// Chj: Refreshing the whole UI according to Computer selected from current UI
+
 	// Get state info
 	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
@@ -1167,8 +1173,8 @@ void HandleAddTrustee(HWND hwnd, TRUSTEE tType)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void HandleGrantRevoke(HWND hwnd, BOOL fGrant) {
-	TCHAR szName[256] = {} ;
+void Handle_GrantOrRevoke(HWND hwnd, BOOL fGrant) {
+	TCHAR szName[256] = {};
 	// Get Trustee name
 	GetDlgItemText(hwnd, IDC_TRUSTEE, szName, chDIMOF(szName));
 
@@ -1190,7 +1196,7 @@ void HandleTrustee(HWND hwnd, UINT codeNotify, HWND hwndCtl)
 
 	switch (codeNotify) {
 	case CBN_SELENDOK: // 9
-		TCHAR szName[256] = {} ;
+		TCHAR szName[256] = {};
 		// Trustee selected from combo box
 		int nIndex = ComboBox_GetCurSel(hwndCtl);
 		ComboBox_GetLBText(hwndCtl, nIndex, szName);
@@ -1204,8 +1210,12 @@ void HandleTrustee(HWND hwnd, UINT codeNotify, HWND hwndCtl)
 
 
 void HandleUpdatePriv(HWND hwnd) {
-	TCHAR szName[256];
+
+	// Chj: Refreshing the whole UI according to Trustee from top-right combobox.
+
+	TCHAR szName[256] = {};
 	GetDlgItemText(hwnd, IDC_TRUSTEE, szName, chDIMOF(szName));
+	
 	// Update privilege list for the new trustee
 	ImagePrivilegeList(hwnd, szName, TRUE);
 }
@@ -1258,11 +1268,11 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) {
 		break;
 
 	case IDB_GRANT:
-		HandleGrantRevoke(hwnd, TRUE);
+		Handle_GrantOrRevoke(hwnd, TRUE);
 		break;
 
 	case IDB_REVOKE:
-		HandleGrantRevoke(hwnd, FALSE);
+		Handle_GrantOrRevoke(hwnd, FALSE);
 		break;
 
 	case IDB_USECOMPUTER:
