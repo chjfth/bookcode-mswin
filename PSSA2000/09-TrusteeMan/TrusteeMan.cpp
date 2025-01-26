@@ -2,7 +2,7 @@
 Module:  TrusteeMan.cpp
 Notices: Copyright (c) 2000 Jeffrey Richter
 ******************************************************************************/
-#define EXE_VERSION "1.0.3"
+#define EXE_VERSION "1.0.4"
 
 #include "..\CmnHdr.h"                 // See Appendix A.
 #include <WindowsX.h>
@@ -154,90 +154,71 @@ void EnableControls( HWND hwnd ) {
 
 void PriviligedTrustees(HWND hwndDlg, PTSTR pszPrivilige) 
 {
-	// [2025-01-26] Chj: Jeffrey's original code uses C++ try/catch, seems no-sense,
-	// bcz no code in this cpp does throw().
-
 	LSA_ENUMERATION_INFORMATION* plsaEnum = NULL;
 
-	try 
-	{{
-		// Get state info
-		PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE) 
-			GetWindowLongPtr(hwndDlg, DWLP_USER);
+	// Get state info
+	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwndDlg, DWLP_USER);
 
-		// Translate the privilege name into an LSA string
-		CLSAStr lsastrPriv = pszPrivilige;
+	// Translate the privilege name into an LSA string
+	CLSAStr lsastrPriv = pszPrivilige;
 
-		// Find accounts that have the privilege
-		ULONG lCount;
-		NTSTATUS ntStatus = LsaEnumerateAccountsWithUserRight(ptmState->m_hPolicy, 
-			&lsastrPriv, (PVOID*) &plsaEnum, &lCount);
-		ULONG lErr = LsaNtStatusToWinError(ntStatus);
-		if ((lErr != ERROR_SUCCESS) && (lErr != ERROR_NO_MORE_ITEMS)) {
-			ReportError(TEXT("LsaEnumerateAccountsWithUserRight"), lErr);
-			plsaEnum = NULL;
-			goto leave;
-		}
+	// Find accounts that have the privilege
+	ULONG lCount = 0;
+	NTSTATUS ntStatus = LsaEnumerateAccountsWithUserRight(ptmState->m_hPolicy, 
+		&lsastrPriv, (PVOID*) &plsaEnum, &lCount);
+	Cec_LsaFreeMemory cec_plsaEnum = plsaEnum;
+	ULONG winerr = LsaNtStatusToWinError(ntStatus);
+	if (winerr != ERROR_SUCCESS) {
+		ReportError(TEXT("LsaEnumerateAccountsWithUserRight"), winerr);
+	}
+	// -- Chj note: Jeffrey checks for ERROR_NO_MORE_ITEMS, but MSDN refers nothing to 
+	// this WinErr, so I delete that checking.
 
-		// If none, that is fine
-		if (lErr == ERROR_NO_MORE_ITEMS) {
-			plsaEnum = NULL;
-			lCount = 0;
-		}
+	TCHAR szComputer[256] = {};
+	GetComputer(hwndDlg, szComputer, chDIMOF(szComputer));
 
-		TCHAR szComputer[256];
-		GetComputer(hwndDlg, szComputer, chDIMOF(szComputer));
-
-		// Edit existing trustee list and return additions and deletions
-		LSA_ENUMERATION_INFORMATION* pinfoTrusteeAdd;
-		LSA_ENUMERATION_INFORMATION* pinfoTrusteeRemove;
-		int nAddCount;
-		int nRemoveCount;
-		if (!EditTrusteeList(hwndDlg, szComputer,
-			(LOCALGROUP_MEMBERS_INFO_0*) plsaEnum, lCount,
-			(LOCALGROUP_MEMBERS_INFO_0**) &pinfoTrusteeAdd, &nAddCount,
-			(LOCALGROUP_MEMBERS_INFO_0**) &pinfoTrusteeRemove, &nRemoveCount,
-			TEXT("Edit Priviliged Trustee List"))) {
-				goto leave;
-		}
-
-		// Handle additions
-		if (nAddCount > 0) {
-
-			while (nAddCount-- != 0) {
-
-				// Add the privilege to this trustee
-				ntStatus = LsaAddAccountRights(ptmState->m_hPolicy,
-					pinfoTrusteeAdd[nAddCount].Sid, &lsastrPriv, 1);
-				lErr = LsaNtStatusToWinError(ntStatus);
-				if (lErr != ERROR_SUCCESS)
-					ReportError(TEXT("LsaAddAccountRights"), lErr);
-			}
-			LocalFree(pinfoTrusteeAdd);
-		}
-
-		// Handle deletions
-		if (nRemoveCount > 0) {
-
-			while (nRemoveCount-- != 0) {
-
-				// Remove the privilege from this trustee
-				ntStatus = LsaRemoveAccountRights(ptmState->m_hPolicy,
-					pinfoTrusteeRemove[nRemoveCount].Sid, FALSE, &lsastrPriv, 1);
-				lErr = LsaNtStatusToWinError(ntStatus);
-				if (lErr != ERROR_SUCCESS)
-					ReportError(TEXT("LsaRemoveAccountRights"), lErr);
-			}
-			LocalFree(pinfoTrusteeRemove);
-		}
-
-	} leave:;}
-	catch (...) {
+	// Edit existing trustee list and return additions and deletions
+	LSA_ENUMERATION_INFORMATION* pinfoTrusteeAdd = nullptr;
+	LSA_ENUMERATION_INFORMATION* pinfoTrusteeRemove = nullptr;
+	int nAddCount = 0;
+	int nRemoveCount = 0;
+	if( ! EditTrusteeList(hwndDlg, szComputer,
+		(LOCALGROUP_MEMBERS_INFO_0*) plsaEnum, lCount,
+		(LOCALGROUP_MEMBERS_INFO_0**) &pinfoTrusteeAdd, &nAddCount,
+		(LOCALGROUP_MEMBERS_INFO_0**) &pinfoTrusteeRemove, &nRemoveCount,
+		TEXT("Edit Priviliged Trustee List"))
+		) {
+		return;
 	}
 
-	// Free the buffer returned by lsaenumerateaccountswithuserright
-	if (plsaEnum != NULL)
-		LsaFreeMemory(plsaEnum);
+	Cec_LocalFree cec_add = pinfoTrusteeAdd;
+	Cec_LocalFree cec_del = pinfoTrusteeRemove;
+
+	// Handle trustee additions
+	if (nAddCount > 0) {
+
+		while (nAddCount-- != 0) {
+			// Add the privilege to this trustee
+			ntStatus = LsaAddAccountRights(ptmState->m_hPolicy,
+				pinfoTrusteeAdd[nAddCount].Sid, &lsastrPriv, 1);
+			winerr = LsaNtStatusToWinError(ntStatus);
+			if (winerr != ERROR_SUCCESS)
+				ReportError(TEXT("LsaAddAccountRights"), winerr);
+		}
+	}
+
+	// Handle trustee deletions
+	if (nRemoveCount > 0) {
+
+		while (nRemoveCount-- != 0) {
+			// Remove the privilege from this trustee
+			ntStatus = LsaRemoveAccountRights(ptmState->m_hPolicy,
+				pinfoTrusteeRemove[nRemoveCount].Sid, FALSE, &lsastrPriv, 1);
+			winerr = LsaNtStatusToWinError(ntStatus);
+			if (winerr != ERROR_SUCCESS)
+				ReportError(TEXT("LsaRemoveAccountRights"), winerr);
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -271,13 +252,13 @@ void GroupMembers(HWND hwndDlg, PTSTR pszGroup)
 	LOCALGROUP_MEMBERS_INFO_0* pinfoTrusteeRemove;
 	int nAddCount = 0;
 	int nRemoveCount = 0;
-	if ( ! EditTrusteeList(hwndDlg, szComputer, 
+	if( ! EditTrusteeList(hwndDlg, szComputer, 
 			pinfoCurrent, lEntries,
 			&pinfoTrusteeAdd, &nAddCount, 
 			&pinfoTrusteeRemove, &nRemoveCount,
 			TEXT("Edit Member List"))
 		) {
-			return;
+		return;
 	}
 
 	Cec_LocalFree cec_add = pinfoTrusteeAdd;
@@ -514,9 +495,6 @@ void ImagePrivilegeList(HWND hwnd, const PTSTR pszName, BOOL fAddHistory)
 
 void GrantSelectedPrivileges(HWND hwnd, PTSTR pszName, BOOL fGrant) 
 {
-	// [2025-01-26] Chj: Jeffrey's original code uses C++ try/catch, seems no-sense,
-	// bcz no code in this cpp does throw().
-
 	// Get state info
 	PTRUSTEEMANSTATE ptmState = (PTRUSTEEMANSTATE)GetWindowLongPtr(hwnd, DWLP_USER);
 
@@ -1096,7 +1074,7 @@ void HandlePrivileged(HWND hwnd)
 	HWND hwndList = GetDlgItem(hwnd, IDL_PRIVILEGES);
 	int nIndex = ListView_GetNextItem(hwndList, -1, LVNI_SELECTED);
 	if (nIndex >= 0) {
-		TCHAR szName[256];
+		TCHAR szName[256] = {};
 		ListView_GetItemText(hwndList, nIndex, 0, szName, chDIMOF(szName));
 		PriviligedTrustees(hwnd, szName);
 	}
