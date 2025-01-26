@@ -2,7 +2,7 @@
 Module:  TrusteeMan.cpp
 Notices: Copyright (c) 2000 Jeffrey Richter
 ******************************************************************************/
-
+#define EXE_VERSION "1.0.3"
 
 #include "..\CmnHdr.h"                 // See Appendix A.
 #include <WindowsX.h>
@@ -48,8 +48,6 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-
-#define EXE_VERSION "1.0.4"
 
 HINSTANCE g_hInst;
 
@@ -246,9 +244,6 @@ void PriviligedTrustees(HWND hwndDlg, PTSTR pszPrivilige)
 
 void GroupMembers(HWND hwndDlg, PTSTR pszGroup) 
 {
-	// [2025-01-26] Chj: Jeffrey's original code uses C++ try/catch, seems no-sense,
-	// bcz no code in this cpp does throw().
-
 	LOCALGROUP_MEMBERS_INFO_0* pinfoCurrent = NULL;
 
 	TCHAR szComputer[256] = {};
@@ -1312,7 +1307,7 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) {
 
 void Dlg_OnContextMenu(HWND hwnd, HWND hwndContext, UINT xPos, UINT yPos) {
 
-	// Which control are we creating a context menu for
+	// Which control triggered this context menu(WM_CONTEXTMENU)
 	LONG_PTR lID = GetWindowLongPtr(hwndContext, GWLP_ID);
 
 	// Load that holds the popup menus
