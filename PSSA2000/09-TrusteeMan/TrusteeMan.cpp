@@ -38,6 +38,9 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "EditTrusteeList.h"
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef UNICODE
@@ -46,7 +49,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define EXE_VERSION "1.0.1"
+#define EXE_VERSION "1.0.2"
 
 HINSTANCE g_hInst;
 
@@ -1192,9 +1195,12 @@ void HandleGrantRevoke(HWND hwnd, BOOL fGrant) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void HandleTrustee(HWND hwnd, UINT codeNotify, HWND hwndCtl) {
+void HandleTrustee(HWND hwnd, UINT codeNotify, HWND hwndCtl) 
+{
+	vaDbgTs(_T("Trustee combobox codeNotify=%s"), ITCSv(codeNotify, CBN_xxx_ComboBox));
+
 	switch (codeNotify) {
-	case CBN_SELENDOK:
+	case CBN_SELENDOK: // 9
 		TCHAR szName[256] = {} ;
 		// Trustee selected from combo box
 		int nIndex = ComboBox_GetCurSel(hwndCtl);

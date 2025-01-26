@@ -44,6 +44,7 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd );
 //////////////////////////////////////////////////////////////////////////
 
 #include <itc/InterpretConst.h>
+#include <mswin/winuser.itc.h>
 #include <mswin/commctrl.itc.h>
 
 using namespace itc;

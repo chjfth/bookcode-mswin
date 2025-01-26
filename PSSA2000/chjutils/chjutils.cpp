@@ -406,7 +406,7 @@ CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uPage(
 	e2v_CSecurityInformation_PropertySheetPageCallback_uPage, 
 	ARRAYSIZE(e2v_CSecurityInformation_PropertySheetPageCallback_uPage));
 //
-static const Bitfield2Val_st b2v_SECURITY_INFORMATION[] =
+static const SingleBit2Val_st b2v_SECURITY_INFORMATION[] =
 {
 	ITC_NAMEPAIR(OWNER_SECURITY_INFORMATION           ),
 	ITC_NAMEPAIR(GROUP_SECURITY_INFORMATION           ),
@@ -466,7 +466,7 @@ static const Enum2Val_st e2v_ACE_TYPE[] =
 CInterpretConst itc_ACE_TYPE(e2v_ACE_TYPE, ARRAYSIZE(e2v_ACE_TYPE),
 	_T("0x%04X"));
 //
-static const Bitfield2Val_st b2v_ACE_FLAGS[] =
+static const SingleBit2Val_st b2v_ACE_FLAGS[] =
 {
 	ITC_NAMEPAIR(OBJECT_INHERIT_ACE         ),
 	ITC_NAMEPAIR(CONTAINER_INHERIT_ACE      ),
@@ -479,7 +479,7 @@ static const Bitfield2Val_st b2v_ACE_FLAGS[] =
 CInterpretConst itc_ACE_FLAGS(b2v_ACE_FLAGS, ARRAYSIZE(b2v_ACE_FLAGS),
 	_T("0x%02X"));
 //
-static const Bitfield2Val_st b2v_SECURITY_DESCRIPTOR_CONTROL[] =
+static const SingleBit2Val_st b2v_SECURITY_DESCRIPTOR_CONTROL[] =
 {
 	ITC_NAMEPAIR(SE_OWNER_DEFAULTED      ),
 	ITC_NAMEPAIR(SE_GROUP_DEFAULTED      ),
@@ -500,7 +500,7 @@ CInterpretConst itc_SECURITY_DESCRIPTOR_CONTROL(
 	b2v_SECURITY_DESCRIPTOR_CONTROL, ARRAYSIZE(b2v_SECURITY_DESCRIPTOR_CONTROL),
 	_T("0x%04X"));
 //
-static const Bitfield2Val_st b2v_SI_ACCESS_flags[] =
+static const SingleBit2Val_st b2v_SI_ACCESS_flags[] =
 {
 	ITC_NAMEPAIR(SI_ACCESS_SPECIFIC  ),
 	ITC_NAMEPAIR(SI_ACCESS_GENERAL   ),
@@ -514,7 +514,7 @@ CInterpretConst itc_SI_ACCESS_flags(
 	b2v_SI_ACCESS_flags, ARRAYSIZE(b2v_SI_ACCESS_flags),
 	_T("0x%08X"));
 //
-static const Bitfield2Val_st b2v_SI_OBJECT_INFO_flags[] =
+static const SingleBit2Val_st b2v_SI_OBJECT_INFO_flags[] =
 {
 //	ITC_NAMEPAIR(SI_EDIT_PERMS               ), // 0x00000000L // always implied
 	ITC_NAMEPAIR(SI_EDIT_OWNER               ), // 0x00000001L
@@ -548,7 +548,7 @@ CInterpretConst itc_SI_OBJECT_INFO_flags(
 	b2v_SI_OBJECT_INFO_flags, ARRAYSIZE(b2v_SI_OBJECT_INFO_flags),
 	_T("0x%08X"));
 //
-static const Bitfield2Val_st b2v_SI_INHERIT_TYPE_flags[] =
+static const SingleBit2Val_st b2v_SI_INHERIT_TYPE_flags[] =
 {
 	ITC_NAMEPAIR(CONTAINER_INHERIT_ACE),
 	ITC_NAMEPAIR(INHERIT_ONLY_ACE),

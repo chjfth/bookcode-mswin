@@ -204,6 +204,7 @@
     <ClCompile Include="..\chjutils\chjutils.cpp" />
     <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\commctrl.itc.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\winuser.itc.cpp" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +223,7 @@
     <ClInclude Include="..\chjutils\chjutils.h" />
     <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h" />
     <ClInclude Include="..\..\__WinConst\mswin\commctrl.itc.h" />
+    <ClInclude Include="..\..\__WinConst\mswin\winuser.itc.h" />
     <ClInclude Include="..\..\share\vaDbg.h" />
   </ItemGroup>
 
