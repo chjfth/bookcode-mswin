@@ -150,7 +150,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;../../__chjcxx/common-include/include;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\share;..\..\__chjcxx\common-include\include;..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -201,8 +201,13 @@
    -->
   <ItemGroup>
     <ClCompile Include="AccessMaster.cpp" />
-    <ClCompile Include="..\InterpretConst.cpp" />
-    <ClCompile Include="..\vaDbg.cpp" />
+    <ClCompile Include="..\chjutils\chjutils.cpp" />
+    <ClCompile Include="..\..\share\vaDbg.cpp" />
+    <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\AclUI.itc.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\AccCtrl.itc.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\PrSht.itc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AccessMaster.rc" />
@@ -213,7 +218,8 @@
   <ItemGroup>
     <ClInclude Include="Resource.h" />
     <ClInclude Include="AccessData.h" />
-    <ClInclude Include="..\InterpretConst.h" />
+    <ClInclude Include="..\chjutils\chjutils.h" />
+    <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h" />
     <ClInclude Include="..\vaDbg.h" />
   </ItemGroup>
 

@@ -31,7 +31,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #define PRINTBUF_IMPL
 #include "..\ClassLib\PrintBuf.h"      // See Appendix B.
 
-#include "../../share/vaDbg.h"
+#include <vaDbg.h>
 #include "../chjutils/chjutils.h"
 
 #include "LSAStr.h"

@@ -47,22 +47,12 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd );
 #include <itc/InterpretConst.h>
 #include <mswin/winuser.itc.h>
 #include <mswin/commctrl.itc.h>
+#include <mswin/winnt.itc.h>
+#include <mswin/AclUI.itc.h>
+#include <mswin/AccCtrl.itc.h>
+#include <mswin/PrSht.itc.h>
 
 using namespace itc;
-
-extern CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uMsg;
-extern CInterpretConst itc_CSecurityInformation_PropertySheetPageCallback_uPage;
-extern CInterpretConst itc_SECURITY_INFORMATION;
-extern CInterpretConst itc_SE_OBJECT_TYPE;
-extern CInterpretConst itc_ACE_TYPE;
-extern CInterpretConst itc_ACE_FLAGS;
-extern CInterpretConst itc_SECURITY_DESCRIPTOR_CONTROL;
-extern CInterpretConst itc_SI_ACCESS_flags;
-extern CInterpretConst itc_SI_OBJECT_INFO_flags;
-extern CInterpretConst itc_SI_INHERIT_TYPE_flags;
-extern CInterpretConst itc_SERVICE_CONTROL;
-extern CInterpretConst itc_DBT;
-
 
 
 #endif

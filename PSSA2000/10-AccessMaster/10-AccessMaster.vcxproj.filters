@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="AccessMaster.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\AclUI.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\share\vaDbg.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\mswin\AccCtrl.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chjutils\chjutils.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\mswin\PrSht.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="AccessData.h" />
+    <ClInclude Include="..\chjutils\chjutils.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vaDbg.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AccessMaster.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AccessMaster.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="chjutils">
+      <UniqueIdentifier>{37d246e2-1eda-4342-85cc-988d0af6a3f9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
