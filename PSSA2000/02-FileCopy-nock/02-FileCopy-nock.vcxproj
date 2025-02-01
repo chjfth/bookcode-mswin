@@ -150,7 +150,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\share;..\..\__chjcxx\common-include\include;..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -201,8 +201,9 @@
    -->
   <ItemGroup>
     <ClCompile Include="FileCopy-nock.cpp" />
-    <ClCompile Include="..\InterpretConst.cpp" />
-    <ClCompile Include="..\vaDbg.cpp" />
+    <ClCompile Include="..\chjutils\chjutils.cpp" />
+    <ClCompile Include="..\..\share\vaDbg.cpp" />
+    <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FileCopy-nock.rc" />
@@ -212,7 +213,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="..\vaDbg.h" />
+    <ClInclude Include="..\chjutils\chjutils.h" />
+    <ClInclude Include="..\..\share\vaDbg.h" />
   </ItemGroup>
   
   <!-- MSBuild system stock Cpp.targets -->

@@ -201,8 +201,8 @@
    -->
   <ItemGroup>
     <ClCompile Include="TimeClient.cpp" />
-    <ClCompile Include="..\InterpretConst.cpp" />
-    <ClCompile Include="..\vaDbg.cpp" />
+    <ClCompile Include="..\..\share\vaDbg.cpp" />
+    <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TimeClient.rc" />
@@ -212,7 +212,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="..\vaDbg.h" />
+    <ClInclude Include="..\chjutils\chjutils.h" />
+    <ClInclude Include="..\..\share\vaDbg.h" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->

@@ -9,7 +9,11 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "..\ClassLib\IOCP.h"          /* See Appendix B */
 #include "..\ClassLib\EnsureCleanup.h" /* See Appendix B */
 
-#include "..\vaDbg.h"
+#include <vaDbg.h>
+#include <mswin/WinSvc.itc.h>
+#include <mswin/Dbt.itc.h>
+
+#include "../chjutils/chjutils.h"
 
 #define SERVICESTATUS_IMPL
 #include "ServiceStatus.h"
@@ -39,14 +43,14 @@ enum COMPKEY_et {
 
 DWORD WINAPI TimeHandlerEx(DWORD dwControl, DWORD dwEventType, PVOID pvEventData, PVOID pvContext) 
 {
-	vaDbg(
+	vaDbgTs(
 		_T("[tid=%d]CH03-TimeService: In TimeHandlerEx() callback,\n")
 		_T("  dwControl   = %s\n")
 		_T("  dwEventType = %s")
 		,
 		GetCurrentThreadId(),
-		ITCS(dwControl, itc_SERVICE_CONTROL),
-		ITCS(dwEventType, itc_DBT)
+		ITCS(dwControl, SERVICE_CONTROL_xxx),
+		ITCS(dwEventType, DBT_xxx)
 		);
 
 	DWORD dwReturn = ERROR_CALL_NOT_IMPLEMENTED;
@@ -113,7 +117,7 @@ inline void reset_ovlp_keep_hEvent(OVERLAPPED &ovlp)
 
 void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv) 
 {
-	vaDbg(_T("[tid=%d]CH03-TimeService: In TimeServiceMain()."),
+	vaDbgTs(_T("[tid=%d]CH03-TimeService: In TimeServiceMain()."),
 		GetCurrentThreadId());
 
 	COMPKEY_et CompKey = CK_SERVICECONTROL;
@@ -164,12 +168,12 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 					if(g_ssTime.IsDebugMode())
 					{
 						// Only show UI when not running as service.
-						vaMsgBox(MB_OK|MB_ICONEXCLAMATION, 
+						vaMsgBox(NULL, MB_OK|MB_ICONEXCLAMATION, nullptr,
 							_T("CreateNamedPipe() fail, %s"), WinerrStr(winerr));
 					}
 					else
 					{
-						vaDbg(_T("03-TimeService: CreateNamedPipe() fail, %s"), WinerrStr(winerr));
+						vaDbgTs(_T("03-TimeService: CreateNamedPipe() fail, %s"), WinerrStr(winerr));
 					}
 					exit(5);
 				}
@@ -230,7 +234,7 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 				DWORD bytesdone = 0;
 				SetLastError(0); // deliberate, will show that GetOverlappedResult re-assign WinErr. 
 				succ = GetOverlappedResult(hpipe, po, &bytesdone, TRUE);
-				vaDbg(
+				vaDbgTs(
 					_T("[INFO] CH03 TimeService.cpp: iocp.GetStatus() fail, %s")
 					_T("  -- this error can be ignored.")
 					, 
@@ -257,7 +261,7 @@ int myInstallService()
 
 	if(hSCM.IsInvalid())
 	{
-		vaMsgBox(MB_OK|MB_ICONERROR, _T("OpenSCManager() fail, %s"), WinerrStr());
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenSCManager() fail, %s"), WinerrStr());
 		return 4;
 	}
 
@@ -268,7 +272,7 @@ int myInstallService()
 	TCHAR szCmdLine[_MAX_PATH+20] = {}; // add "/service" param
 	_sntprintf_s(szCmdLine, _TRUNCATE, _T("\"%s\" /service"), szModulePath);
 
-	vaDbg(
+	vaDbgTs(
 		_T("Will call CreateService() with:\n")
 		_T("  lpServiceName = %s\n")
 		_T("  lpDisplayName = %s\n")
@@ -288,13 +292,13 @@ int myInstallService()
 
 	if(hService.IsValid())
 	{
-		vaDbg(_T("CreateService() success."));
+		vaDbgTs(_T("CreateService() success."));
 	}
 	else
 	{
 		winerr = GetLastError();
-		vaDbg(_T("CreateService() fail, %s"), WinerrStr(winerr));
-		vaMsgBox(MB_OK|MB_ICONERROR, _T("CreateService() fail, %s"), WinerrStr(winerr));
+		vaDbgTs(_T("CreateService() fail, %s"), WinerrStr(winerr));
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("CreateService() fail, %s"), WinerrStr(winerr));
 		return 4;
 	}
 
@@ -317,7 +321,7 @@ int myRemoveService()
 
 	if(hSCM.IsInvalid())
 	{
-		vaMsgBox(MB_OK|MB_ICONERROR, _T("OpenSCManager() fail, %s"), WinerrStr());
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenSCManager() fail, %s"), WinerrStr());
 		return 4;
 	}
 
@@ -327,7 +331,7 @@ int myRemoveService()
 
 	if(hService.IsInvalid())
 	{
-		vaMsgBox(MB_OK|MB_ICONERROR, _T("OpenService() fail, %s"), WinerrStr());
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenService() fail, %s"), WinerrStr());
 		return 4;
 	}
 
@@ -335,7 +339,7 @@ int myRemoveService()
 	BOOL succ = DeleteService(hService);
 	if(!succ)
 	{
-		vaMsgBox(MB_OK|MB_ICONERROR, _T("DeleteService() fail, %s"), WinerrStr());
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("DeleteService() fail, %s"), WinerrStr());
 		return 4;
 	}
 
@@ -355,7 +359,7 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 	PCTSTR *ppArgv = (PCTSTR*) __argv;
 #endif
 
-	vaDbg(_T("[tid=%d]CH03-TimeService: In _tWinMain().")
+	vaDbgTs(_T("[tid=%d]CH03-TimeService: In _tWinMain().")
 		_T("  pszCmdLine = %s")
 		,
 		GetCurrentThreadId(), pszCmdLine);

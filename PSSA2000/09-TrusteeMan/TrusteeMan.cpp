@@ -2,7 +2,7 @@
 Module:  TrusteeMan.cpp
 Notices: Copyright (c) 2000 Jeffrey Richter
 ******************************************************************************/
-#define EXE_VERSION "1.0.5"
+#define EXE_VERSION "1.0.6"
 
 #include "..\CmnHdr.h"                 // See Appendix A.
 #include <WindowsX.h>

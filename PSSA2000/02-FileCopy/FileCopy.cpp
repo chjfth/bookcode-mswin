@@ -12,10 +12,13 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include <WindowsX.h>
 #include <assert.h>
 
-#include "..\vaDbg.h"
-
 #include "..\ClassLib\IOCP.h"             // See Appendix B.
 #include "..\ClassLib\EnsureCleanup.h"    // See Appendix B.
+
+#include <vaDbg.h>
+#include "..\chjutils\chjutils.h"
+
+
 #include "Resource.h"
 
 
@@ -170,7 +173,7 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 			if(*pWinErr==0)
 				*pWinErr = nowerr; // record first error
 			
-			vaDbg(_T("%s iocp.GetStatus(%s) fail. %s"), 
+			vaDbgS(_T("%s iocp.GetStatus(%s) fail. %s"), 
 				now_timestr(timebuf, ARRAYSIZE(timebuf)), 
 				CompKey==CK_READ ? _T("read") : _T("WRITE"),
 				app_WinErrStr(nowerr));
@@ -295,11 +298,11 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 			// Show time-used and speed.
 			if(msec_used==0)
 			{
-				vaMsgBox(MB_OK, TEXT("File Copy Successful. Time used: 0 msec."));
+				vaMsgBox(NULL, MB_OK, nullptr, TEXT("File Copy Successful. Time used: 0 msec."));
 			}
 			else
 			{
-				vaMsgBox(MB_OK, TEXT("File Copy Successful. \n\n")
+				vaMsgBox(NULL, MB_OK, nullptr, TEXT("File Copy Successful. \n\n")
 					TEXT("Time used: %d.%03d seconds, %g MB/s")
 					,
 					msec_used/1000, msec_used%1000, (double)filesize/1000/msec_used
@@ -308,7 +311,7 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		}
 		else
 		{
-			vaMsgBox(MB_OK|MB_ICONERROR, 
+			vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr,
 				_T("File Copy Failed. %s"), app_WinErrStr(winerr));
 		}
 

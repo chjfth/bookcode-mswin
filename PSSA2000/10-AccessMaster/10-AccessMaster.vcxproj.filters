@@ -33,7 +33,7 @@
     <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h">
       <Filter>chjutils</Filter>
     </ClInclude>
-    <ClInclude Include="..\vaDbg.h">
+    <ClInclude Include="..\..\share\vaDbg.h">
       <Filter>chjutils</Filter>
     </ClInclude>
   </ItemGroup>

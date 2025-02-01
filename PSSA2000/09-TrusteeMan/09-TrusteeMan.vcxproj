@@ -203,6 +203,7 @@
     <ClCompile Include="TrusteeMan.cpp" />
     <ClCompile Include="..\chjutils\chjutils.cpp" />
     <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\commctrl.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\winuser.itc.cpp" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />

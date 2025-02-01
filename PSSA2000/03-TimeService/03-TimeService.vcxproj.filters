@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="TimeService.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\WinSvc.itc.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\Dbt.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\share\vaDbg.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="ServiceStatus.h" />
+    <ClInclude Include="Gate.h" />
+    <ClInclude Include="..\chjutils\chjutils.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\share\vaDbg.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TimeService.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TimeService.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="chjutils">
+      <UniqueIdentifier>{256cb27a-20ec-448e-996c-a4f676ff8335}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -25,6 +25,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include <itc/InterpretConst.h>
 
 #include "../chjutils/chjutils.h"
+#include "../chjutils/ch10-debug.h"
 
 #include "AccessData.h"
 
@@ -32,7 +33,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 using namespace itc;
 
-#define VERSION_STR "1.1.0"
+#define EXE_VERSION "1.1.0"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -103,7 +104,7 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) {
    DWORD bufchars = ARRAYSIZE(username);
    GetUserName(username, &bufchars);
 
-   vaSetWindowText(hwnd, _T("v%s AccessMaster run as \"%s\""), _T(VERSION_STR), username);
+   vaSetWindowText(hwnd, _T("v%s AccessMaster run as \"%s\""), _T(EXE_VERSION), username);
 
    // Set-up the object type combo
    int nIndex = chDIMOF(g_objMap);

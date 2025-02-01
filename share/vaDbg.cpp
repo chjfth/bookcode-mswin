@@ -205,6 +205,12 @@ int vaMsgBox(HWND hwnd, UINT utype, const TCHAR *szTitle, const TCHAR *szfmt, ..
 	TCHAR msgtext[4000] = {};
 	_vsntprintf_s(msgtext, _TRUNCATE, szfmt, args);
 
+	if(!hwnd)
+		hwnd = GetActiveWindow();
+
+	if(!szTitle)
+		szTitle = _T("Info"); // maybe show current exe name?
+
 	int ret = MessageBox(hwnd, msgtext, szTitle, utype);
 
 	va_end(args);
