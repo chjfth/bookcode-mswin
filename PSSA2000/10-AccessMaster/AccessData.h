@@ -12,14 +12,6 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef UNICODE
-#error This module must be compiled natively using Unicode.
-#endif
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 typedef enum AM_SECURETYPE{
    AM_FILE = 0, AM_DIR, AM_SERVICE, 
    AM_PRINTER, AM_REGISTRY, AM_SHARE,   

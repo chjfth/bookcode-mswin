@@ -28,15 +28,11 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "AccessData.h"
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
 using namespace itc;
 
-///////////////////////////////////////////////////////////////////////////////
-
-
-#ifndef UNICODE
-#error This module must be compiled natively using Unicode.
-#endif
-
+#define VERSION_STR "1.1.0"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -103,12 +99,11 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) {
 
    CheckDlgButton(hwnd, IDR_NAME, BST_CHECKED);
 
-   TCHAR szTitle[1024];
-   lstrcpy(szTitle, TEXT("AccessMaster is running as \""));
-   ULONG lSize = chDIMOF(szTitle)-lstrlen(szTitle);
-   GetUserName(szTitle+lstrlen(szTitle),&lSize);
-   lstrcat(szTitle, TEXT("\""));
-   SetWindowText(hwnd, szTitle);
+   TCHAR username[256] = {};
+   DWORD bufchars = ARRAYSIZE(username);
+   GetUserName(username, &bufchars);
+
+   vaSetWindowText(hwnd, _T("v%s AccessMaster run as \"%s\""), _T(VERSION_STR), username);
 
    // Set-up the object type combo
    int nIndex = chDIMOF(g_objMap);
@@ -352,12 +347,12 @@ SI_INHERIT_TYPE CSecurityInformation::m_sPropagateType[] = // was named: m_siInh
 	{
 		&m_guidNULL, 
 		CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE,
-		TEXT("Apply to me, and to my children")
+		L"Apply to me, and to my children"
 	},
 	{
 		&m_guidNULL, 
 		CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE | INHERIT_ONLY_ACE, 
-		TEXT("Apply to my children, but not me")
+		L"Apply to my children, but not me"
 	},
 };
 
