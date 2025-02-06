@@ -35,10 +35,13 @@ HWND g_hwndLogonProviders;
 HWND g_hwndImpersonationLevels;
 HWND g_hwndTokenTypes;
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
 HINSTANCE g_hInst;
 
 CUILayout g_pResizer;
 
+#define EXE_VERSION "1.0.1"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -465,7 +468,7 @@ void Cmd_AddRestricted(HWND hwnd)
 
 void Cmd_RemoveRestricted() 
 {
-	int nIndex = ListBox_GetCurSel(g_hwndRestrictedSids, LB_GETCURSEL, 0, 0);
+	int nIndex = ListBox_GetCurSel(g_hwndRestrictedSids, LB_GETCURSEL);
 	if (nIndex != LB_ERR)
 		ListBox_DeleteString(g_hwndRestrictedSids, nIndex);
 }
@@ -854,8 +857,9 @@ void Dlg_OnGetMinMaxInfo(HWND hwnd, PMINMAXINFO pMinMaxInfo) {
 
 BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) 
 {
-
 	chSETDLGICONS(hwnd, IDI_TOKENMASTER);
+
+	SetWindowText(hwnd, _T("TokenMaster v") _T(EXE_VERSION));
 
 	// Create a resizer object.  This is a helper class for resizing controls.
 	// See "CmnCls.h" for an explanation of use, as well as the source for
