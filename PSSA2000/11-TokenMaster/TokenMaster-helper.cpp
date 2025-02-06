@@ -1,6 +1,7 @@
 #include "shareinc.h"
 #include "TokenMaster-helper.h"
 
+#include <vaDbg.h>
 
 BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled) 
 {
@@ -376,7 +377,7 @@ BOOL GetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize)
 }
 
 
-void Status(PTSTR szStatus, DWORD dwLastError) 
+void RefreshStatus(PTSTR szStatus, DWORD dwLastError) 
 {
 	CPrintBuf* pbufStatus = NULL;
 
@@ -463,7 +464,7 @@ PVOID AllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass)
 	} catch(...) {}
 
 	dwStatus = GetLastError();
-	Status(pszStatus, dwStatus);
+	RefreshStatus(pszStatus, dwStatus);
 	SetLastError(dwStatus);
 
 	// Return locally allocated buffer
@@ -664,6 +665,8 @@ void RefreshSnapShot()
 	if (g_hSnapShot != NULL)
 		CloseHandle(g_hSnapShot);
 
+	vaDbgTs(_T("RefreshSnapShot()"));
+
 	g_hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS | TH32CS_SNAPTHREAD, 0);
 }
 
@@ -673,12 +676,16 @@ void RefreshSnapShot()
 
 void PopulateProcessCombo() 
 {
+	// chjmemo: Implicit input: `g_hSnapShot`
+
 	// Get the ID of our last selection so that the selection will "stick"
 	LRESULT idxItem = ComboBox_GetCurSel(g_hwndProcessCombo);
-	DWORD_PTR dwLastUsedPID = ComboBox_GetItemData(g_hwndProcessCombo, idxItem);
+	DWORD dwLastUsedPID = (DWORD) ComboBox_GetItemData(g_hwndProcessCombo, idxItem);
 
 	// Clear the combo box
 	ComboBox_ResetContent(g_hwndProcessCombo);
+
+	int count = 0;
 
 	// No snapshot means we empty the combo
 	if (g_hSnapShot != NULL) 
@@ -688,6 +695,8 @@ void PopulateProcessCombo()
 		BOOL fIsProcess = Process32First(g_hSnapShot, &pentry);
 		while (fIsProcess) 
 		{
+			count++;
+
 			if (pentry.th32ProcessID != 0)
 			{
 				TCHAR szitem[200] = {};
@@ -711,6 +720,8 @@ void PopulateProcessCombo()
 
 			fIsProcess = Process32Next(g_hSnapShot, &pentry);
 		}
+
+		vaDbgTs(_T("PopulateProcessCombo(): Found %d processes."), count);
 	}
 }
 
@@ -759,94 +770,72 @@ void PopulateThreadCombo()
 
 void PopulateStaticCombos() 
 {
-	INT_PTR nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"Batch");
-	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
-		LOGON32_LOGON_BATCH);
+	// LogonUser() dwLogonType: LOGON32_LOGON_xxx
 
-	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"Network");
-	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
-		LOGON32_LOGON_NETWORK);
+	INT_PTR nIndex = ComboBox_AddString(g_hwndLogonTypes, _T("Batch"));
+	ComboBox_SetItemData(g_hwndLogonTypes, nIndex, LOGON32_LOGON_BATCH);
 
-	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"Network Cleartext");
-	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
-		LOGON32_LOGON_NETWORK_CLEARTEXT);
+	nIndex = ComboBox_AddString(g_hwndLogonTypes, _T("Network"));
+	ComboBox_SetItemData(g_hwndLogonTypes, nIndex, LOGON32_LOGON_NETWORK);
 
-	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"New Credentials");
-	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
-		LOGON32_LOGON_NEW_CREDENTIALS);
+	nIndex = ComboBox_AddString(g_hwndLogonTypes, _T("Network Cleartext"));
+	ComboBox_SetItemData(g_hwndLogonTypes, nIndex, LOGON32_LOGON_NETWORK_CLEARTEXT);
 
-	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"Service");
-	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
-		LOGON32_LOGON_SERVICE);
+	nIndex = ComboBox_AddString(g_hwndLogonTypes, _T("New Credentials"));
+	ComboBox_SetItemData(g_hwndLogonTypes, nIndex, LOGON32_LOGON_NEW_CREDENTIALS);
 
-	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"Unlock");
-	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
-		LOGON32_LOGON_UNLOCK);
+	nIndex = ComboBox_AddString(g_hwndLogonTypes, _T("Service"));
+	ComboBox_SetItemData(g_hwndLogonTypes, nIndex, LOGON32_LOGON_SERVICE);
 
-	nIndex = SendMessage(g_hwndLogonTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"Interactive");
-	SendMessage(g_hwndLogonTypes, CB_SETITEMDATA, nIndex,
-		LOGON32_LOGON_INTERACTIVE);
-	SendMessage(g_hwndLogonTypes, CB_SETCURSEL, nIndex, 0);
+	nIndex = ComboBox_AddString(g_hwndLogonTypes, _T("Unlock"));
+	ComboBox_SetItemData(g_hwndLogonTypes, nIndex, LOGON32_LOGON_UNLOCK);
 
+	nIndex = ComboBox_AddString(g_hwndLogonTypes, _T("Interactive"));
+	ComboBox_SetItemData(g_hwndLogonTypes, nIndex, LOGON32_LOGON_INTERACTIVE);
 
-	nIndex = SendMessage(g_hwndLogonProviders, CB_ADDSTRING, 0,
-		(LPARAM) L"Windows 2000");
-	SendMessage(g_hwndLogonProviders, CB_SETITEMDATA, nIndex,
-		LOGON32_PROVIDER_WINNT50);
+	ComboBox_SetCurSel(g_hwndLogonTypes, nIndex);
 
-	nIndex = SendMessage(g_hwndLogonProviders, CB_ADDSTRING, 0,
-		(LPARAM) L"Windows NT 4.0");
-	SendMessage(g_hwndLogonProviders, CB_SETITEMDATA, nIndex,
-		LOGON32_PROVIDER_WINNT40);
+	// LogonUser() dwLogonProvider: LOGON32_LOGON_xxx 
 
-	nIndex = SendMessage(g_hwndLogonProviders, CB_ADDSTRING, 0,
-		(LPARAM) L"Windows NT 3.5");
-	SendMessage(g_hwndLogonProviders, CB_SETITEMDATA, nIndex,
-		LOGON32_PROVIDER_WINNT35);
+	nIndex = ComboBox_AddString(g_hwndLogonProviders, _T("Windows 2000"));
+	ComboBox_SetItemData(g_hwndLogonProviders, nIndex, LOGON32_PROVIDER_WINNT50);
 
-	nIndex = SendMessage(g_hwndLogonProviders, CB_ADDSTRING, 0,
-		(LPARAM) L"Default");
-	SendMessage(g_hwndLogonProviders, CB_SETITEMDATA, nIndex,
-		LOGON32_PROVIDER_DEFAULT);
-	SendMessage(g_hwndLogonProviders, CB_SETCURSEL, nIndex, 0);
+	nIndex = ComboBox_AddString(g_hwndLogonProviders, _T("Windows NT 4.0"));
+	ComboBox_SetItemData(g_hwndLogonProviders, nIndex, LOGON32_PROVIDER_WINNT40);
 
-	nIndex = SendMessage(g_hwndImpersonationLevels, CB_ADDSTRING, 0,
-		(LPARAM) L"SecurityAnonymous");
-	SendMessage(g_hwndImpersonationLevels, CB_SETITEMDATA, nIndex,
-		SecurityAnonymous);
+	nIndex = ComboBox_AddString(g_hwndLogonProviders,  _T("Windows NT 3.5"));
+	ComboBox_SetItemData(g_hwndLogonProviders, nIndex, LOGON32_PROVIDER_WINNT35);
 
-	nIndex = SendMessage(g_hwndImpersonationLevels, CB_ADDSTRING, 0,
-		(LPARAM) L"SecurityIdentification");
-	SendMessage(g_hwndImpersonationLevels, CB_SETITEMDATA, nIndex,
-		SecurityIdentification);
+	nIndex = ComboBox_AddString(g_hwndLogonProviders, _T("Default"));
+	ComboBox_SetItemData(g_hwndLogonProviders, nIndex, LOGON32_PROVIDER_DEFAULT);
+	
+	ComboBox_SetCurSel(g_hwndLogonProviders, nIndex);
 
-	nIndex = SendMessage(g_hwndImpersonationLevels, CB_ADDSTRING, 0,
-		(LPARAM) L"SecurityDelegation");
-	SendMessage(g_hwndImpersonationLevels, CB_SETITEMDATA, nIndex,
-		SecurityDelegation);
+	// DuplicateTokenEx(): SECURITY_IMPERSONATION_LEVEL
 
-	nIndex = SendMessage(g_hwndImpersonationLevels, CB_ADDSTRING, 0,
-		(LPARAM) L"SecurityImpersonation");
-	SendMessage(g_hwndImpersonationLevels, CB_SETITEMDATA, nIndex,
-		SecurityImpersonation);
-	SendMessage(g_hwndImpersonationLevels, CB_SETCURSEL, nIndex, 0);
+	nIndex = ComboBox_AddString(g_hwndImpersonationLevels, _T("SecurityAnonymous"));
+	ComboBox_SetItemData(g_hwndImpersonationLevels, nIndex, SecurityAnonymous);
 
-	nIndex = SendMessage(g_hwndTokenTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"Impersonation");
-	SendMessage(g_hwndTokenTypes, CB_SETITEMDATA, nIndex,
-		TokenImpersonation);
+	nIndex = ComboBox_AddString(g_hwndImpersonationLevels, _T("SecurityIdentification"));
+	ComboBox_SetItemData(g_hwndImpersonationLevels, nIndex, SecurityIdentification);
 
-	nIndex = SendMessage(g_hwndTokenTypes, CB_ADDSTRING, 0,
-		(LPARAM) L"Primary");
-	SendMessage(g_hwndTokenTypes, CB_SETITEMDATA, nIndex, TokenPrimary);
-	SendMessage(g_hwndTokenTypes, CB_SETCURSEL, nIndex, 0);
+	nIndex = ComboBox_AddString(g_hwndImpersonationLevels, _T("SecurityDelegation"));
+	ComboBox_SetItemData(g_hwndImpersonationLevels, nIndex, SecurityDelegation);
+
+	nIndex = ComboBox_AddString(g_hwndImpersonationLevels, _T("SecurityImpersonation"));
+	ComboBox_SetItemData(g_hwndImpersonationLevels, nIndex, SecurityImpersonation);
+
+	ComboBox_SetCurSel(g_hwndImpersonationLevels, nIndex);
+
+	// DuplicateTokenEx(): TOKEN_TYPE
+
+	nIndex = ComboBox_AddString(g_hwndTokenTypes, _T("Impersonation"));
+	ComboBox_SetItemData(g_hwndTokenTypes, nIndex, TokenImpersonation);
+
+	nIndex = ComboBox_AddString(g_hwndTokenTypes, _T("Primary"));
+	ComboBox_SetItemData(g_hwndTokenTypes, nIndex, TokenPrimary);
+	
+	ComboBox_SetCurSel(g_hwndTokenTypes, nIndex);
 }
 
 
@@ -987,7 +976,7 @@ void GetToken(HWND hwnd)
 	if (pSD != NULL)
 		GlobalFree(pSD);
 
-	Status(pszStatus, dwStatus);
+	RefreshStatus(pszStatus, dwStatus);
 }
 
 

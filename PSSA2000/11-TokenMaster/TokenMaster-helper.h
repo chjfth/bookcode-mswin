@@ -29,7 +29,7 @@ BOOL TryRelaunch();
 BOOL GetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize);
 
 
-void Status(PTSTR szStatus, DWORD dwLastError);
+void RefreshStatus(PTSTR szStatus, DWORD dwLastError);
 
 PVOID AllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass);
 

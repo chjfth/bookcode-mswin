@@ -17,6 +17,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #define AUTOBUF_IMPL
 #include "..\ClassLib\AutoBuf.h"       // See Appendix B.
 
+#include <vaDbg.h>
 
 HANDLE g_hSnapShot = NULL;
 HANDLE g_hToken = NULL;
@@ -160,7 +161,7 @@ void Cmd_LogonUser(HWND hwnd)
 	}
 
 	// Display the status either way
-	Status(szStatus, dwStatus);
+	RefreshStatus(szStatus, dwStatus);
 }
 
 
@@ -212,7 +213,7 @@ void Cmd_DuplicateToken(HWND hwnd)
 	}
 
 	// Display the status either way
-	Status(szStatus, dwStatus);
+	RefreshStatus(szStatus, dwStatus);
 }
 
 void Cmd_DumpToken(HWND hwnd) 
@@ -245,7 +246,7 @@ void Cmd_AdjustGroups()
 
 		// No token?  Give up
 		if (g_hToken == NULL) {
-			Status(TEXT("No Token"), 0);
+			RefreshStatus(TEXT("No Token"), 0);
 			goto leave;
 		}
 
@@ -268,7 +269,7 @@ void Cmd_AdjustGroups()
 
 		// Actually adjust the token groups for the token
 		if (!AdjustTokenGroups(g_hToken, FALSE, ptgGroups, 0, NULL, NULL))
-			Status(TEXT("AdjustTokenGroups"), GetLastError());
+			RefreshStatus(TEXT("AdjustTokenGroups"), GetLastError());
 		else
 			DumpToken();   // Display the new token
 
@@ -288,7 +289,7 @@ void Cmd_AdjustTokenPrivileges()
 
 		// No token?  Buh-Bye
 		if (g_hToken == NULL) {
-			Status(TEXT("No Token"), 0);
+			RefreshStatus(TEXT("No Token"), 0);
 			goto leave;
 		}
 
@@ -314,7 +315,7 @@ void Cmd_AdjustTokenPrivileges()
 		// Adjust the privileges for the token
 		if (!AdjustTokenPrivileges(g_hToken, FALSE, ptpPrivileges, 0, NULL,
 			NULL))
-			Status(TEXT("AdjustTokenPrivileges"), GetLastError());
+			RefreshStatus(TEXT("AdjustTokenPrivileges"), GetLastError());
 		else
 			DumpToken();   // Display the new token
 
@@ -389,7 +390,7 @@ void Cmd_SetDACL(HWND hwnd)
 	} catch(...) {}
 
 	// Cleanup
-	Status(szStatus, GetLastError());
+	RefreshStatus(szStatus, GetLastError());
 
 	if (pSD != NULL)
 		GlobalFree(pSD);
@@ -429,7 +430,7 @@ void Cmd_CreateProcess(HWND hwnd)
 
 		// No token?  Adios!
 		if (g_hToken == NULL) {
-			Status(TEXT("No Token"), 0);
+			RefreshStatus(TEXT("No Token"), 0);
 			goto leave;
 		}
 
@@ -449,7 +450,7 @@ void Cmd_CreateProcess(HWND hwnd)
 				CloseHandle(pi.hProcess);
 				CloseHandle(pi.hThread);
 		} else
-			Status(TEXT("CreateProcessAsUser"), GetLastError());
+			RefreshStatus(TEXT("CreateProcessAsUser"), GetLastError());
 
 	} leave:;
 	} catch(...) {}
@@ -468,7 +469,7 @@ void Cmd_AddRestricted(HWND hwnd)
 
 void Cmd_RemoveRestricted() 
 {
-	int nIndex = ListBox_GetCurSel(g_hwndRestrictedSids, LB_GETCURSEL);
+	int nIndex = ListBox_GetCurSel(g_hwndRestrictedSids);
 	if (nIndex != LB_ERR)
 		ListBox_DeleteString(g_hwndRestrictedSids, nIndex);
 }
@@ -533,7 +534,7 @@ void Cmd_SetOwnerGroup(HWND hwnd, BOOL fOwner)
 	} catch(...) {}
 
 	// Cleanup
-	Status(szStatus, GetLastError());
+	RefreshStatus(szStatus, GetLastError());
 
 	if (psid != NULL)
 		GlobalFree(psid);
@@ -728,7 +729,7 @@ void Cmd_CreateRestrictedToken()
 	} leave:;
 	} catch(...) {}
 
-	Status(szStatus, GetLastError());
+	RefreshStatus(szStatus, GetLastError());
 
 	// We have to loop to remove all of those sids we allocated
 	if (psidToDisableAttrib != NULL) {
@@ -916,7 +917,7 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	DWORD dwLen = lstrlen(szName);
 	DWORD dwSize = chDIMOF(szName) - dwLen;
 	GetUserName(szName + dwLen, &dwSize);
-	Status(szName, 0);
+	RefreshStatus(szName, NOERROR);
 
 	return(TRUE);
 }
