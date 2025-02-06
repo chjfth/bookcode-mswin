@@ -96,16 +96,14 @@ void Cmd_Processes(UINT codeNotify)
 
 	case CBN_SELCHANGE:
 		PopulateThreadCombo();
-		EnableWindow(g_hwndThreadCombo, SendMessage(g_hwndProcessCombo,
-			CB_GETCURSEL, 0, 0));
+		EnableWindow(g_hwndThreadCombo, ComboBox_GetCurSel(g_hwndProcessCombo));
 		break;
 	}
 }
 
 void Cmd_Threads(HWND hwnd, UINT codeNotify) 
 {
-
-	int nSel = SendMessage(g_hwndThreadCombo, CB_GETCURSEL, 0, 0);
+	int nSel = ComboBox_GetCurSel(g_hwndThreadCombo);
 	if (nSel == 0)
 		SetDlgItemText(hwnd, IDB_DUMPTOKEN, TEXT("OpenProcessToken"));
 	else
@@ -128,12 +126,11 @@ void Cmd_LogonUser(HWND hwnd)
 	TCHAR szPassword[1024];
 	GetDlgItemText(hwnd, IDE_PASSWORD, szPassword, chDIMOF(szPassword));
 
-	int nLogonType = SendMessage(g_hwndLogonTypes, CB_GETCURSEL, 0, 0);
-	nLogonType = SendMessage(g_hwndLogonTypes, CB_GETITEMDATA, nLogonType, 0);
+	int nLogonType = ComboBox_GetCurSel(g_hwndLogonTypes);
+	nLogonType = (int)ComboBox_GetItemData(g_hwndLogonTypes, nLogonType);
 
-	int nLogonProvider = SendMessage(g_hwndLogonProviders, CB_GETCURSEL, 0, 0);
-	nLogonProvider = SendMessage(g_hwndLogonProviders, CB_GETITEMDATA,
-		nLogonProvider, 0);
+	int nLogonProvider = ComboBox_GetCurSel(g_hwndLogonProviders);
+	nLogonProvider = (int)ComboBox_GetItemData(g_hwndLogonProviders, nLogonProvider);
 
 	DWORD dwStatus = 0;
 	PTSTR szStatus = TEXT("User Logon Succeeded, Dumped Token");
@@ -152,11 +149,11 @@ void Cmd_LogonUser(HWND hwnd)
 		szStatus = TEXT("LogonUser");
 		g_hToken = NULL;
 		SetDlgItemText(hwnd, IDE_TOKEN, TEXT(""));
-		SendMessage(g_hwndEnablePrivileges, LB_RESETCONTENT, 0, 0);
-		SendMessage(g_hwndEnableGroups, LB_RESETCONTENT, 0, 0);
-		SendMessage(g_hwndDeletedPrivileges, LB_RESETCONTENT, 0, 0);
-		SendMessage(g_hwndDisabledSids, LB_RESETCONTENT, 0, 0);
-		SendMessage(g_hwndRestrictedSids, LB_RESETCONTENT, 0, 0);
+		ListBox_ResetContent(g_hwndEnablePrivileges);
+		ListBox_ResetContent(g_hwndEnableGroups);
+		ListBox_ResetContent(g_hwndDeletedPrivileges);
+		ListBox_ResetContent(g_hwndDisabledSids);
+		ListBox_ResetContent(g_hwndRestrictedSids);
 	}
 
 	// Display the status either way
@@ -179,13 +176,12 @@ void Cmd_DuplicateToken(HWND hwnd)
 		HANDLE hOldToken = g_hToken;
 		g_hToken = NULL;
 
-		int nIndex = SendMessage(g_hwndImpersonationLevels, CB_GETCURSEL, 0, 0);
+		int nIndex = ComboBox_GetCurSel(g_hwndImpersonationLevels);
 		SECURITY_IMPERSONATION_LEVEL nLevel = (SECURITY_IMPERSONATION_LEVEL)
-			SendMessage( g_hwndImpersonationLevels, CB_GETITEMDATA, nIndex, 0);
+			ComboBox_GetItemData( g_hwndImpersonationLevels, nIndex);
 
-		nIndex = SendMessage(g_hwndTokenTypes, CB_GETCURSEL, 0, 0);
-		TOKEN_TYPE nType = (TOKEN_TYPE) SendMessage(g_hwndTokenTypes,
-			CB_GETITEMDATA, nIndex, 0);
+		nIndex = ComboBox_GetCurSel(g_hwndTokenTypes);
+		TOKEN_TYPE nType = (TOKEN_TYPE)ComboBox_GetItemData(g_hwndTokenTypes, nIndex);
 
 		// Copy our token
 		HANDLE hNewToken;
@@ -201,11 +197,11 @@ void Cmd_DuplicateToken(HWND hwnd)
 			dwStatus = GetLastError();
 			szStatus = TEXT("DuplicateTokenEx");
 			SetDlgItemText(hwnd, IDE_TOKEN, TEXT(""));
-			SendMessage(g_hwndEnablePrivileges, LB_RESETCONTENT, 0, 0);
-			SendMessage(g_hwndEnableGroups, LB_RESETCONTENT, 0, 0);
-			SendMessage(g_hwndDeletedPrivileges, LB_RESETCONTENT, 0, 0);
-			SendMessage(g_hwndDisabledSids, LB_RESETCONTENT, 0, 0);
-			SendMessage(g_hwndRestrictedSids, LB_RESETCONTENT, 0, 0);
+			ListBox_ResetContent(g_hwndEnablePrivileges);
+			ListBox_ResetContent(g_hwndEnableGroups);
+			ListBox_ResetContent(g_hwndDeletedPrivileges);
+			ListBox_ResetContent(g_hwndDisabledSids);
+			ListBox_ResetContent(g_hwndRestrictedSids);
 		}
 
 		// No matter what, we kill the last token and take on the new
@@ -229,11 +225,11 @@ void Cmd_DumpToken(HWND hwnd)
 
 		// No?   Then clear out the dialog box
 		SetDlgItemText(hwnd, IDE_TOKEN, TEXT(""));
-		SendMessage(g_hwndEnablePrivileges, LB_RESETCONTENT, 0, 0);
-		SendMessage(g_hwndEnableGroups, LB_RESETCONTENT, 0, 0);
-		SendMessage(g_hwndDeletedPrivileges, LB_RESETCONTENT, 0, 0);
-		SendMessage(g_hwndDisabledSids, LB_RESETCONTENT, 0, 0);
-		SendMessage(g_hwndRestrictedSids, LB_RESETCONTENT, 0, 0);
+		ListBox_ResetContent(g_hwndEnablePrivileges);
+		ListBox_ResetContent(g_hwndEnableGroups);
+		ListBox_ResetContent(g_hwndDeletedPrivileges);
+		ListBox_ResetContent(g_hwndDisabledSids);
+		ListBox_ResetContent(g_hwndRestrictedSids);
 	}
 }
 
@@ -256,12 +252,11 @@ void Cmd_AdjustGroups()
 			goto leave;
 
 		// Enumerate through the list box and find groups to enable in the token
-		DWORD dwItem = SendMessage(g_hwndEnableGroups, LB_GETCOUNT, 0, 0);
+		DWORD dwItem = ListBox_GetCount(g_hwndEnableGroups);
 		while (dwItem-- != 0) {
 
-			DWORD dwIndex = SendMessage(g_hwndEnableGroups, LB_GETITEMDATA,
-				dwItem, 0);
-			BOOL fSel = SendMessage(g_hwndEnableGroups, LB_GETSEL, dwItem, 0);
+			DWORD dwIndex = (DWORD) ListBox_GetItemData(g_hwndEnableGroups, dwItem); // chj to check
+			BOOL fSel = ListBox_GetSel(g_hwndEnableGroups, dwItem);
 			if (fSel)
 				ptgGroups->Groups[dwIndex].Attributes |= SE_GROUP_ENABLED;
 			else
@@ -300,12 +295,11 @@ void Cmd_AdjustTokenPrivileges()
 			goto leave;
 
 		// Enumerate privileges to enable
-		DWORD dwItem = SendMessage(g_hwndEnablePrivileges, LB_GETCOUNT, 0, 0);
+		DWORD dwItem = ListBox_GetCount(g_hwndEnablePrivileges);
 		while (dwItem-- != 0) {
 
-			DWORD dwIndex = SendMessage(g_hwndEnablePrivileges, LB_GETITEMDATA,
-				dwItem, 0);
-			BOOL fSel = SendMessage(g_hwndEnablePrivileges, LB_GETSEL, dwItem, 0);
+			DWORD dwIndex = (DWORD) ListBox_GetItemData(g_hwndEnablePrivileges, dwItem);
+			BOOL fSel = ListBox_GetSel(g_hwndEnablePrivileges, dwItem);
 			if (fSel)
 				ptpPrivileges->Privileges[dwIndex].Attributes |=
 				SE_PRIVILEGE_ENABLED;
@@ -459,29 +453,21 @@ void Cmd_CreateProcess(HWND hwnd)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-
-
 void Cmd_AddRestricted(HWND hwnd) 
 {
-
 	// Add the new name to the restricted sids list control
 	TCHAR szName[1024];
 	if (g_hToken && GetAccountName(hwnd, szName, chDIMOF(szName), TRUE, TRUE))
-		SendMessage(g_hwndRestrictedSids, LB_ADDSTRING, 0, (LPARAM) szName);
+	{
+		ListBox_AddString(g_hwndRestrictedSids, szName);
+	}
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 
 void Cmd_RemoveRestricted() 
 {
-
-	LRESULT nIndex = SendMessage(g_hwndRestrictedSids, LB_GETCURSEL, 0, 0);
+	int nIndex = ListBox_GetCurSel(g_hwndRestrictedSids, LB_GETCURSEL, 0, 0);
 	if (nIndex != LB_ERR)
-		SendMessage(g_hwndRestrictedSids, LB_DELETESTRING, nIndex, 0);
-
+		ListBox_DeleteString(g_hwndRestrictedSids, nIndex);
 }
 
 
@@ -573,7 +559,7 @@ void Cmd_CreateRestrictedToken()
 		}
 
 		// How big of a structure do I allocate for restricted sids
-		dwRestrictSize = SendMessage(g_hwndRestrictedSids, LB_GETCOUNT, 0 , 0);
+		dwRestrictSize = ListBox_GetCount(g_hwndRestrictedSids);
 		psidToRestrictAttrib = (PSID_AND_ATTRIBUTES) LocalAlloc(LPTR,
 			dwRestrictSize * sizeof(SID_AND_ATTRIBUTES));
 		if (psidToRestrictAttrib == NULL) {
@@ -596,8 +582,7 @@ void Cmd_CreateRestrictedToken()
 		// For each sid, we find the sid and add it to our array
 		for (dwIndex = 0; dwIndex < dwRestrictSize; dwIndex++) {
 
-			dwData = SendMessage(g_hwndRestrictedSids, LB_GETTEXT, dwIndex,
-				(LPARAM) szBuffer);
+			dwData = ListBox_GetText(g_hwndRestrictedSids, dwIndex, szBuffer);
 			if (dwData == LB_ERR) {
 				dwIndex--;
 				break;
@@ -630,7 +615,7 @@ void Cmd_CreateRestrictedToken()
 		dwRestrictSize = dwIndex;
 
 		// How much memory do we need for our disabled SIDS?
-		dwDisableSize = SendMessage(g_hwndDisabledSids, LB_GETCOUNT, 0 , 0);
+		dwDisableSize = ListBox_GetCount(g_hwndDisabledSids);
 		psidToDisableAttrib = (PSID_AND_ATTRIBUTES)
 			LocalAlloc(LPTR, dwDisableSize * sizeof(SID_AND_ATTRIBUTES));     
 		if (psidToDisableAttrib == NULL) {
@@ -647,10 +632,9 @@ void Cmd_CreateRestrictedToken()
 		// For each one, add it to our array
 		for (dwIndex = 0; dwIndex < dwEnd; dwIndex++) 
 		{
-			if (SendMessage(g_hwndDisabledSids, LB_GETSEL, dwIndex, 0)) {
+			if (ListBox_GetSel(g_hwndDisabledSids, dwIndex)) {
 
-				dwData = SendMessage(g_hwndDisabledSids, LB_GETTEXT,
-					dwIndex, (LPARAM) szBuffer);
+				dwData = ListBox_GetText(g_hwndDisabledSids, dwIndex, szBuffer);
 				if (dwData == LB_ERR) {
 
 					dwIndex--;
@@ -684,8 +668,7 @@ void Cmd_CreateRestrictedToken()
 		}
 
 		// Now we find out how much memory we need for our privileges
-		DWORD dwPrivSize = SendMessage(g_hwndDeletedPrivileges, LB_GETCOUNT,
-			0, 0);
+		DWORD dwPrivSize = ListBox_GetCount(g_hwndDeletedPrivileges);
 		pluidPrivAttribs = (PLUID_AND_ATTRIBUTES) LocalAlloc(LPTR, dwPrivSize
 			* sizeof(LUID_AND_ATTRIBUTES));
 		if (pluidPrivAttribs == NULL) {
@@ -699,10 +682,9 @@ void Cmd_CreateRestrictedToken()
 		dwPrivSize = 0;
 		for (dwIndex = 0; dwIndex < dwEnd; dwIndex++) {
 
-			if (SendMessage(g_hwndDeletedPrivileges, LB_GETSEL, dwIndex, 0)) {
+			if (ListBox_GetSel(g_hwndDeletedPrivileges, dwIndex)) {
 
-				dwData = SendMessage(g_hwndDeletedPrivileges, LB_GETTEXT, dwIndex,
-					(LPARAM) szBuffer);
+				dwData = ListBox_GetText(g_hwndDeletedPrivileges, dwIndex, szBuffer);
 				if (dwData == LB_ERR) {
 					dwIndex--;
 					break;
