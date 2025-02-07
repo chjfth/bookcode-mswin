@@ -3,7 +3,7 @@
 
 #include <vaDbg.h>
 
-BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled) 
+BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled) 
 {
 	HANDLE hToken   = NULL;
 	BOOL   fSuccess = FALSE;
@@ -52,7 +52,7 @@ BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-HANDLE OpenSystemProcess() 
+HANDLE myOpenSystemProcess() 
 {
 	HANDLE hSnapshot = NULL;
 	HANDLE hProc     = NULL;
@@ -95,7 +95,7 @@ HANDLE OpenSystemProcess()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL ModifySecurity(HANDLE hKobj, DWORD dwAccess) 
+BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess) 
 {
 	PACL pAcl        = NULL;
 	PACL pNewAcl     = NULL;
@@ -216,7 +216,7 @@ BOOL ModifySecurity(HANDLE hKobj, DWORD dwAccess)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-HANDLE GetLSAToken() 
+HANDLE myGetLSAToken() 
 {
 	HANDLE hProc  = NULL;
 	HANDLE hToken = NULL;
@@ -224,11 +224,11 @@ HANDLE GetLSAToken()
 	try {{
 
 		// Enable the SE_DEBUG_NAME privilege in our process token
-		if (!EnablePrivilege(SE_DEBUG_NAME, TRUE))
+		if (!myEnablePrivilege(SE_DEBUG_NAME, TRUE))
 			goto leave;
 
 		// Retrieve a handle to the "System" process
-		hProc = OpenSystemProcess();
+		hProc = myOpenSystemProcess();
 		if (hProc == NULL)
 			goto leave;
 
@@ -243,7 +243,7 @@ HANDLE GetLSAToken()
 
 		// Add an ACE for the current user for the token.  This ACE will add
 		// TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY rights.
-		if (!ModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY)) 
+		if (!myModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY)) 
 		{
 			CloseHandle(hToken);
 			hToken = NULL;
@@ -274,7 +274,7 @@ HANDLE GetLSAToken()
 }
 
 
-BOOL RunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword, PTSTR pszDesktop) 
+BOOL myRunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword, PTSTR pszDesktop) 
 {
 	HANDLE hToken   = NULL;
 	BOOL   fProcess = FALSE;
@@ -286,7 +286,7 @@ BOOL RunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword, PTSTR pszDesk
 
 		if (pszUserName == NULL) {
 
-			hToken = GetLSAToken();
+			hToken = myGetLSAToken();
 			if (hToken == NULL)
 				goto leave;
 
@@ -337,7 +337,7 @@ BOOL TryRelaunch()
 		if (!GetModuleFileName(NULL, szFilename, chDIMOF(szFilename)))
 			goto leave;
 
-		fSuccess = RunAsUser(szFilename, NULL, NULL, TEXT("Winsta0\\Default"));
+		fSuccess = myRunAsUser(szFilename, NULL, NULL, TEXT("Winsta0\\Default"));
 
 	} leave:;
 	} catch(...) {}
@@ -346,7 +346,7 @@ BOOL TryRelaunch()
 }
 
 
-BOOL GetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize) 
+BOOL myGetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize) 
 {
 	BOOL   fSuccess = FALSE;
 	HANDLE hToken   = NULL;
@@ -412,8 +412,10 @@ void RefreshStatus(PTSTR szStatus, DWORD dwLastError)
 }
 
 
-PVOID AllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass) 
+PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass) 
 {
+	// Caller should LocalFree() the returned pointer.
+
 	PVOID pvBuffer  = NULL;
 	PTSTR pszStatus = NULL;
 	DWORD dwStatus;
@@ -474,7 +476,7 @@ PVOID AllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void UpdatePrivileges() 
+void guiUpdatePrivileges() 
 {
 	PTOKEN_PRIVILEGES ptpPrivileges = NULL;
 
@@ -492,15 +494,15 @@ void UpdatePrivileges()
 			goto leave;
 
 		// Get that token-privilege information
-		ptpPrivileges = (PTOKEN_PRIVILEGES) AllocateTokenInfo(g_hToken,
+		ptpPrivileges = (PTOKEN_PRIVILEGES) myAllocateTokenInfo(g_hToken,
 			TokenPrivileges);
 		if (ptpPrivileges == NULL)
 			goto leave;
 
 		// Iterate through the privileges
 		DWORD dwIndex;
-		for (dwIndex = 0; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) {
-
+		for (dwIndex = 0; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) 
+		{
 			// Get size of the name
 			DWORD dwSize = 0;
 			LookupPrivilegeName(NULL, &(ptpPrivileges->Privileges[dwIndex].Luid),
@@ -578,7 +580,7 @@ void UpdatePrivileges()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void UpdateGroups() 
+void guiUpdateGroups() 
 {
 	PTOKEN_GROUPS ptgGroups = NULL;
 
@@ -592,14 +594,14 @@ void UpdateGroups()
 			goto leave;
 
 		// Get that group information
-		ptgGroups = (PTOKEN_GROUPS) AllocateTokenInfo(g_hToken, TokenGroups);
+		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(g_hToken, TokenGroups);
 		if (ptgGroups == NULL)
 			goto leave;
 
 		// Iterate through them
 		DWORD dwIndex;
-		for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++) {
-
+		for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++) 
+		{
 			DWORD dwSize = 0;
 			TCHAR szDomName[255] = {TEXT("")};
 			DWORD dwSizeDom = chDIMOF(szDomName);
@@ -615,34 +617,34 @@ void UpdateGroups()
 			// Get the name
 			TCHAR szCompositeName[1024];
 			if (LookupAccountSid(NULL, (ptgGroups->Groups[dwIndex].Sid), pszName,
-				&dwSize, szDomName, &dwSizeDom, &sNameUse)) {
+				&dwSize, szDomName, &dwSizeDom, &sNameUse)) 
+			{
+				// Make the composite string
+				lstrcpy(szCompositeName, szDomName);
+				lstrcat(szCompositeName, TEXT("\\"));
+				lstrcat(szCompositeName, pszName);
 
-					// Make the composite string
-					lstrcpy(szCompositeName, szDomName);
-					lstrcat(szCompositeName, TEXT("\\"));
-					lstrcat(szCompositeName, pszName);
-
-					// If it is neither mandatory nor the logon ID then add it to
-					// the enable/disable list box
-					DWORD_PTR dwItem;
-					if (!((ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_MANDATORY)
-						|| (ptgGroups->Groups[dwIndex].Attributes
-						& SE_GROUP_LOGON_ID))) {
-
-							// Add the string to the list box
-							dwItem = SendMessage(g_hwndEnableGroups, LB_ADDSTRING, 0,
-								(LPARAM) szCompositeName);
-							SendMessage(g_hwndEnableGroups, LB_SETITEMDATA, dwItem,
-								(LPARAM) dwIndex);
-							if (ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_ENABLED)
-								SendMessage(g_hwndEnableGroups, LB_SETSEL, TRUE, dwItem);
-					}
-
-					// Add to the CreateRestrictedToken list
-					dwItem = SendMessage(g_hwndDisabledSids, LB_ADDSTRING, 0,
+				// If it is neither mandatory nor the logon ID then add it to
+				// the enable/disable list box
+				DWORD_PTR dwItem;
+				if (!((ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_MANDATORY)
+					|| (ptgGroups->Groups[dwIndex].Attributes
+					& SE_GROUP_LOGON_ID))) 
+				{
+					// Add the string to the list box
+					dwItem = SendMessage(g_hwndEnableGroups, LB_ADDSTRING, 0,
 						(LPARAM) szCompositeName);
-					SendMessage(g_hwndDisabledSids, LB_SETITEMDATA, dwItem,
+					SendMessage(g_hwndEnableGroups, LB_SETITEMDATA, dwItem,
 						(LPARAM) dwIndex);
+					if (ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_ENABLED)
+						SendMessage(g_hwndEnableGroups, LB_SETSEL, TRUE, dwItem);
+				}
+
+				// Add to the CreateRestrictedToken list
+				dwItem = SendMessage(g_hwndDisabledSids, LB_ADDSTRING, 0,
+					(LPARAM) szCompositeName);
+				SendMessage(g_hwndDisabledSids, LB_SETITEMDATA, dwItem,
+					(LPARAM) dwIndex);
 			}
 			LocalFree(pszName);
 		}
@@ -674,7 +676,7 @@ void RefreshSnapShot()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void PopulateProcessCombo() 
+void guiPopulateProcessCombo() 
 {
 	// chjmemo: Implicit input: `g_hSnapShot`
 
@@ -726,7 +728,7 @@ void PopulateProcessCombo()
 }
 
 
-void PopulateThreadCombo() 
+void guiPopulateThreadCombo() 
 {
 	// Get process id
 	LRESULT idxIndex = ComboBox_GetCurSel(g_hwndProcessCombo);
@@ -768,7 +770,7 @@ void PopulateThreadCombo()
 }
 
 
-void PopulateStaticCombos() 
+void guiPopulateStaticCombos() 
 {
 	// LogonUser() dwLogonType: LOGON32_LOGON_xxx
 
@@ -842,8 +844,10 @@ void PopulateStaticCombos()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void GetToken(HWND hwnd) 
+void guiGetToken(HWND hwnd) 
 {
+	// chjmemo: This function will modify g_hToken.
+
 	DWORD  dwStatus;
 	HANDLE hThread    = NULL;
 	HANDLE hProcess   = NULL;
@@ -941,11 +945,12 @@ void GetToken(HWND hwnd)
 		if (IDNO == MessageBox(hwnd, TEXT("Would you like to make a copy of ")
 			TEXT("this process token?\n(Selecting \"No\" will cause the ")
 			TEXT("\"AdjustToken\" and \"SetToken\"\nfeatures to affect the ")
-			TEXT("owning process.) "), TEXT("Duplicate Token?"), MB_YESNO)) {
-				g_hToken = hToken;
-
-		}  else {
-
+			TEXT("owning process.) "), TEXT("Duplicate Token?"), MB_YESNO)) 
+		{
+			g_hToken = hToken;
+		}  
+		else 
+		{
 			// Duplicate the token
 			if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, &sa,
 				SecurityImpersonation, TokenPrimary, &g_hToken)) 

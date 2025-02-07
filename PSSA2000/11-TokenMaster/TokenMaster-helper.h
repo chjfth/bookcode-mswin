@@ -14,38 +14,38 @@ extern HWND g_hwndLogonProviders;
 extern HWND g_hwndImpersonationLevels;
 extern HWND g_hwndTokenTypes;
 
-BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled);
+BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled);
 
-HANDLE OpenSystemProcess();
+HANDLE myOpenSystemProcess();
 
-BOOL ModifySecurity(HANDLE hProc, DWORD dwAccess);
+BOOL myModifySecurity(HANDLE hProc, DWORD dwAccess);
 
-HANDLE GetLSAToken();
+HANDLE myGetLSAToken();
 
-BOOL RunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword, PTSTR pszDesktop);
+BOOL myRunAsUser(PTSTR pszEXE, PTSTR pszUserName, PTSTR pszPassword, PTSTR pszDesktop);
 
 BOOL TryRelaunch();
 
-BOOL GetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize);
+BOOL myGetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize);
 
 
 void RefreshStatus(PTSTR szStatus, DWORD dwLastError);
 
-PVOID AllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass);
+PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass);
 
-void UpdatePrivileges();
+void guiUpdatePrivileges();
 
-void UpdateGroups();
+void guiUpdateGroups();
 
 void RefreshSnapShot();
 
-void PopulateProcessCombo();
+void guiPopulateProcessCombo();
 
-void PopulateThreadCombo();
+void guiPopulateThreadCombo();
 
-void PopulateStaticCombos();
+void guiPopulateStaticCombos();
 
-void GetToken(HWND hwnd);
+void guiGetToken(HWND hwnd);
 
 BOOL GetAccountName(HWND hwnd, PTSTR szBuf, DWORD dwSize, BOOL fAllowGroups,
 	BOOL fAllowUsers);

@@ -1,4 +1,5 @@
 #include "shareinc.h"
+#include "TokenMaster-helper.h"
 
 BOOL GetTextualSid(PSID pSid, PTSTR TextualSid, PDWORD pdwBufferLen) 
 {
@@ -189,7 +190,7 @@ BOOL DumpTokenGroups(HANDLE hToken, CPrintBuf* pbufToken)
 	try {{
 
 		// Get token information
-		ptgGroups = (PTOKEN_GROUPS) AllocateTokenInfo(hToken, TokenGroups);
+		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken, TokenGroups);
 		if (ptgGroups == NULL)
 			goto leave;
 
@@ -226,7 +227,7 @@ void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken)
 
 		// Get the token privilege information
 		ptpPrivileges = (PTOKEN_PRIVILEGES)
-			AllocateTokenInfo(hToken, TokenPrivileges);
+			myAllocateTokenInfo(hToken, TokenPrivileges);
 		if (ptpPrivileges == NULL)
 			goto leave;
 
@@ -277,7 +278,7 @@ void DumpTokenOwner(HANDLE hToken, CPrintBuf* pbufToken)
 
 	try {{
 
-		ptoOwner = (PTOKEN_OWNER) AllocateTokenInfo(hToken, TokenOwner);
+		ptoOwner = (PTOKEN_OWNER) myAllocateTokenInfo(hToken, TokenOwner);
 		if (ptoOwner == NULL)
 			goto leave;
 
@@ -302,7 +303,7 @@ void DumpTokenPrimaryGroup(HANDLE hToken, CPrintBuf* pbufToken)
 
 	try {{
 
-		ptgGroup = (PTOKEN_OWNER) AllocateTokenInfo(hToken, TokenPrimaryGroup);
+		ptgGroup = (PTOKEN_OWNER) myAllocateTokenInfo(hToken, TokenPrimaryGroup);
 		if (ptgGroup == NULL)
 			goto leave;
 
@@ -329,7 +330,7 @@ void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken)
 	try {{
 
 		// Get the DACL info
-		ptdDacl = (PTOKEN_DEFAULT_DACL) AllocateTokenInfo(hToken,
+		ptdDacl = (PTOKEN_DEFAULT_DACL) myAllocateTokenInfo(hToken,
 			TokenDefaultDacl);
 		if (ptdDacl == NULL)
 			goto leave;
@@ -455,7 +456,7 @@ void DumpTokenSource(HANDLE hToken, CPrintBuf* pbufToken)
 
 	try {{
 
-		ptsSource = (PTOKEN_SOURCE) AllocateTokenInfo(hToken, TokenSource);
+		ptsSource = (PTOKEN_SOURCE) myAllocateTokenInfo(hToken, TokenSource);
 		if (ptsSource == NULL)
 			goto leave;
 
@@ -486,7 +487,7 @@ void DumpTokenImpersonationLevel(HANDLE hToken, CPrintBuf* pbufToken)
 
 	try {{
 
-		psilImpersonation = (PSECURITY_IMPERSONATION_LEVEL) AllocateTokenInfo(
+		psilImpersonation = (PSECURITY_IMPERSONATION_LEVEL) myAllocateTokenInfo(
 			hToken, TokenImpersonationLevel);
 		if (psilImpersonation == NULL)
 			goto leave;
@@ -531,7 +532,7 @@ void DumpTokenType(HANDLE hToken, CPrintBuf* pbufToken)
 
 	try {{
 
-		pttType = (PTOKEN_TYPE) AllocateTokenInfo(hToken, TokenType);
+		pttType = (PTOKEN_TYPE) myAllocateTokenInfo(hToken, TokenType);
 		if (pttType == NULL)
 			goto leave;
 
@@ -570,7 +571,7 @@ BOOL DumpTokenUser(HANDLE hToken, CPrintBuf* pbufToken)
 	try {{
 
 		// Get the token information
-		ptuUser = (PTOKEN_USER) AllocateTokenInfo(hToken, TokenUser);
+		ptuUser = (PTOKEN_USER) myAllocateTokenInfo(hToken, TokenUser);
 		if (ptuUser == NULL)
 			goto leave;
 
@@ -597,7 +598,7 @@ BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken)
 	try {{
 
 		BOOL fRestricted = IsTokenRestricted(hToken);
-		ptgGroups = (PTOKEN_GROUPS) AllocateTokenInfo(hToken,
+		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken,
 			TokenRestrictedSids);
 		if (ptgGroups == NULL)
 			goto leave;
@@ -645,8 +646,8 @@ void DumpToken()
 			goto leave;
 
 		// Update other controls
-		UpdatePrivileges();
-		UpdateGroups();
+		guiUpdatePrivileges();
+		guiUpdateGroups();
 		SendMessage(g_hwndRestrictedSids, LB_RESETCONTENT, 0, 0);
 
 		// Create a print buf object for buffering output to the edit control.

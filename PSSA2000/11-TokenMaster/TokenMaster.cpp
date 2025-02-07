@@ -95,11 +95,11 @@ void Cmd_Processes(UINT codeNotify)
 
 	case CBN_DROPDOWN:
 		RefreshSnapShot();
-		PopulateProcessCombo();
+		guiPopulateProcessCombo();
 		break;
 
 	case CBN_SELCHANGE:
-		PopulateThreadCombo();
+		guiPopulateThreadCombo();
 		EnableWindow(g_hwndThreadCombo, ComboBox_GetCurSel(g_hwndProcessCombo));
 		break;
 	}
@@ -219,7 +219,7 @@ void Cmd_DuplicateToken(HWND hwnd)
 void Cmd_DumpToken(HWND hwnd) 
 {
 	// Get the token for the process
-	GetToken(hwnd);
+	guiGetToken(hwnd);
 	if (g_hToken != NULL) {
 
 		// Success? Display it
@@ -251,7 +251,7 @@ void Cmd_AdjustGroups()
 		}
 
 		// Allocate a buffer with the token information
-		ptgGroups = (PTOKEN_GROUPS) AllocateTokenInfo(g_hToken, TokenGroups);
+		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(g_hToken, TokenGroups);
 		if (ptgGroups == NULL)
 			goto leave;
 
@@ -294,7 +294,7 @@ void Cmd_AdjustTokenPrivileges()
 		}
 
 		// Get the token information for privileges
-		ptpPrivileges = (PTOKEN_PRIVILEGES) AllocateTokenInfo(g_hToken, TokenPrivileges);
+		ptpPrivileges = (PTOKEN_PRIVILEGES) myAllocateTokenInfo(g_hToken, TokenPrivileges);
 		if (ptpPrivileges == NULL)
 			goto leave;
 
@@ -344,7 +344,7 @@ void Cmd_SetDACL(HWND hwnd)
 		}
 
 		// Get the default dacl for the token
-		PTOKEN_DEFAULT_DACL ptdDacl = (PTOKEN_DEFAULT_DACL) AllocateTokenInfo(
+		PTOKEN_DEFAULT_DACL ptdDacl = (PTOKEN_DEFAULT_DACL) myAllocateTokenInfo(
 			g_hToken, TokenDefaultDacl);
 		if (ptdDacl == NULL) {
 			szStatus = TEXT("Unable to get default DACL");
@@ -908,8 +908,8 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 	// Refresh the Process snapshot and combo boxes
 	RefreshSnapShot();
-	PopulateProcessCombo();
-	PopulateStaticCombos();
+	guiPopulateProcessCombo();
+	guiPopulateStaticCombos();
 
 	// Status... Who is this program running as?
 	TCHAR szName[1024];

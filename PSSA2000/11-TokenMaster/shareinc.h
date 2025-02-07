@@ -22,15 +22,9 @@
 
 extern HANDLE g_hSnapShot;
 extern HANDLE g_hToken;
-extern HWND g_hwndToken;
 
-extern HWND g_hwndRestrictedSids;
+//extern HWND g_hwndToken;
 
 
-void UpdatePrivileges();
-void UpdateGroups();
-
-PVOID AllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass);
-
-BOOL GetTextualSid(PSID pSid, PTSTR TextualSid, PDWORD pdwBufferLen);
+//BOOL GetTextualSid(PSID pSid, PTSTR TextualSid, PDWORD pdwBufferLen);
 
