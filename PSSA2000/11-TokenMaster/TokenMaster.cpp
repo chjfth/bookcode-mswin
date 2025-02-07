@@ -952,7 +952,7 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 
 	GetUserName(szUserName, &dwSize);
 
-	try {{
+	try {{  // Jeffrey-style dual-wrap try/leave/catch
 
 		if ((lstrcmpi(szUserName, TEXT("System")) != 0)
 			&& (lstrcmpi(pszCmdLine, TEXT("NoRelaunch")) != 0))

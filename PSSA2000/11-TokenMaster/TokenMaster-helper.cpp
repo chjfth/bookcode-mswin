@@ -11,7 +11,7 @@ BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled)
 	try {{
 
 		// First lookup the system unique luid for the privilege
-		LUID luid;
+		LUID luid = {};
 		if (!LookupPrivilegeValue(NULL, szPriv, &luid)) {
 
 			// If the name is bogus...
@@ -25,9 +25,9 @@ BOOL EnablePrivilege(PTSTR szPriv, BOOL fEnabled)
 		}
 
 		// Set up our token privileges "array" (in our case an array of one)
-		TOKEN_PRIVILEGES tp;
-		tp.PrivilegeCount             = 1;
-		tp.Privileges[0].Luid         = luid;
+		TOKEN_PRIVILEGES tp = {};
+		tp.PrivilegeCount           = 1;
+		tp.Privileges[0].Luid       = luid;
 		tp.Privileges[0].Attributes = fEnabled ? SE_PRIVILEGE_ENABLED : 0;
 
 		// Adjust our token privileges by enabling or disabling this one
@@ -137,7 +137,7 @@ BOOL ModifySecurity(HANDLE hKobj, DWORD dwAccess)
 			goto leave;
 
 		// Build an EXPLICIT_ACCESS structure for the ace we wish to add.
-		EXPLICIT_ACCESS ea;
+		EXPLICIT_ACCESS ea = {};
 		BuildExplicitAccessWithName(&ea, szName, dwAccess, GRANT_ACCESS, 0);
 		ea.Trustee.TrusteeType = TRUSTEE_IS_USER;
 
@@ -191,22 +191,22 @@ BOOL ModifySecurity(HANDLE hKobj, DWORD dwAccess)
 	} catch(...) {}
 
 	// Cleanup
-	if (pNewAcl == NULL)
+	if (pNewAcl)
 		LocalFree(pNewAcl);
 
-	if (pSD == NULL)
+	if (pSD)
 		LocalFree(pSD);
 
-	if (pAcl == NULL)
+	if (pAcl)
 		LocalFree(pAcl);
 
-	if (pSacl == NULL)
+	if (pSacl)
 		LocalFree(pSacl);
 
-	if (pSidOwner == NULL)
+	if (pSidOwner)
 		LocalFree(pSidOwner);
 
-	if (pSidPrimary == NULL)
+	if (pSidPrimary)
 		LocalFree(pSidPrimary);
 
 	return(fSuccess);
