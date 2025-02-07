@@ -231,7 +231,7 @@ void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken)
 		if (ptpPrivileges == NULL)
 			goto leave;
 
-		pbufToken->Print(DIVIDERL TEXT("Priveleges\r\n"));
+		pbufToken->Print(DIVIDERL TEXT("Privileges\r\n"));
 		pbufToken->Print(DIVIDERL);
 
 		DWORD dwIndex;
