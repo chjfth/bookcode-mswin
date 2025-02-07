@@ -218,7 +218,9 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess)
 
 HANDLE myGetLSAToken() 
 {
-	HANDLE hProc  = NULL;
+	// chjmemo: Get Local-System Account's token
+
+	HANDLE hProcSys  = NULL;
 	HANDLE hToken = NULL;
 
 	try {{
@@ -228,14 +230,14 @@ HANDLE myGetLSAToken()
 			goto leave;
 
 		// Retrieve a handle to the "System" process
-		hProc = myOpenSystemProcess();
-		if (hProc == NULL)
+		hProcSys = myOpenSystemProcess();
+		if (hProcSys == NULL)
 			goto leave;
 
 		// Open the process token with READ_CONTROL and WRITE_DAC access.  We
 		// will use this access to modify the security of the token so that we
 		// retrieve it again with a more complete set of rights.
-		BOOL fResult = OpenProcessToken(hProc, READ_CONTROL | WRITE_DAC, &hToken);
+		BOOL fResult = OpenProcessToken(hProcSys, READ_CONTROL | WRITE_DAC, &hToken);
 		if (FALSE == fResult)  {
 			hToken = NULL;
 			goto leave;
@@ -250,12 +252,12 @@ HANDLE myGetLSAToken()
 			goto leave;
 		}
 
-		CloseHandle(hToken); // Chj: I think we should close the old token handle.
+		CloseHandle(hToken); // Fix Jeffrey's bug: we should close the old token handle.
 		hToken = nullptr;
 
 		// Reopen the process token now that we have added the rights to
 		// query the token, duplicate it, and assign it.
-		fResult = OpenProcessToken(hProc, 
+		fResult = OpenProcessToken(hProcSys, 
 			TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY, 
 			&hToken);
 		if (FALSE == fResult)  {
@@ -267,8 +269,8 @@ HANDLE myGetLSAToken()
 	} catch(...) {}
 
 	// Close the System process handle
-	if (hProc != NULL)
-		CloseHandle(hProc);
+	if (hProcSys != NULL)
+		CloseHandle(hProcSys);
 
 	return(hToken);
 }
