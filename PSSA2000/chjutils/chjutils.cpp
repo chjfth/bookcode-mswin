@@ -185,4 +185,53 @@ TCHAR *parse_cmdparam_TCHARs(
 	return outbuf;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+//
+// User-callbacks for CH10_DumpSD()
+//
+
+#define DUMP_ONE_BIT_PERLINE(bitnames) \
+	if( (rights & (bitnames)) == bitnames ) \
+	_sntprintf_s(pbuf, BufChars, _TRUNCATE, _T("%s%*s (0x%08X) %s\r\n"), pbuf, indents, _T(""), \
+	(bitnames), _T(#bitnames));
+
+
+TCHAR* InterpretRights_Token(DWORD rights, void *userctx)
+{
+	(void)userctx;
+	const int indents = 4;
+	const int BufChars = 4000;
+	TCHAR *pbuf = new TCHAR[BufChars];
+//	pbuf[0] = '\0';
+	_sntprintf_s(pbuf, BufChars, _TRUNCATE, _T("Interpret enabled-bits:\r\n"));
+
+	DUMP_ONE_BIT_PERLINE(TOKEN_ASSIGN_PRIMARY); // 0x01
+	DUMP_ONE_BIT_PERLINE(TOKEN_DUPLICATE);      // 0x02
+	DUMP_ONE_BIT_PERLINE(TOKEN_IMPERSONATE);    // 0x04
+	DUMP_ONE_BIT_PERLINE(TOKEN_QUERY);          // 0x08
+	DUMP_ONE_BIT_PERLINE(TOKEN_QUERY_SOURCE);   // 0x10
+	DUMP_ONE_BIT_PERLINE(TOKEN_ADJUST_PRIVILEGES); //0x20
+	DUMP_ONE_BIT_PERLINE(TOKEN_ADJUST_GROUPS);  // 0x40
+	DUMP_ONE_BIT_PERLINE(TOKEN_ADJUST_SESSIONID);  // 0x100
+	DUMP_ONE_BIT_PERLINE(TOKEN_ALL_ACCESS);
+	DUMP_ONE_BIT_PERLINE(TOKEN_READ);
+	DUMP_ONE_BIT_PERLINE(TOKEN_WRITE);
+	DUMP_ONE_BIT_PERLINE(TOKEN_EXECUTE);
+
+	// remove trailing \r\n
+	int tlen = (int)_tcslen(pbuf);
+	for(; tlen>0 && (pbuf[tlen-1]=='\r' || pbuf[tlen-1]=='\n'); tlen--) 
+		pbuf[tlen-1] = '\0';
+
+	DWORD unknown_bits = rights & ~0xF01F01FF;
+	if(unknown_bits)
+	{
+		_sntprintf_s(pbuf, BufChars, _TRUNCATE, 
+			_T("%s%*s Meet unknown access-right-bits: 0x%08X\r\n"), pbuf, indents, _T(""), 
+			unknown_bits);
+	}
+
+	return pbuf;
+}
 

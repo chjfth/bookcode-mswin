@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../chjutils/ch10-DumpSD.h"
+
 extern HWND g_hwndProcessCombo;
 extern HWND g_hwndThreadCombo;
 extern HWND g_hwndToken;
@@ -18,7 +20,8 @@ BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled);
 
 HANDLE myOpenSystemProcess();
 
-BOOL myModifySecurity(HANDLE hProc, DWORD dwAccess);
+BOOL myModifySecurity(HANDLE hProc, DWORD dwAccess,
+	FUNC_InterpretRights procItr=nullptr, void *userctx=0);
 
 HANDLE myGetLSAToken();
 

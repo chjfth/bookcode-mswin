@@ -34,6 +34,13 @@ const TCHAR *WinerrStr(DWORD winerr=0);
 const TCHAR *app_WinErrStr(DWORD winerr); // same as above
 
 
+//
+// User-callbacks for CH10_DumpSD()
+//
+TCHAR* InterpretRights_Token(DWORD rights, void *userctx);
+
+
+
 //////////////////////////////////////////////////////////////////////////
 
 #include <itc/InterpretConst.h>

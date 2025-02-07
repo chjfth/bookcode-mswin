@@ -1,6 +1,7 @@
 #include "shareinc.h"
 #include "TokenMaster-helper.h"
 #include "../chjutils/ch10-DumpSD.h"
+#include "../chjutils/chjutils.h"
 
 #include <vaDbg.h>
 
@@ -96,7 +97,8 @@ HANDLE myOpenSystemProcess()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess) 
+BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess, 
+	FUNC_InterpretRights procItr, void *itrctx) 
 {
 	// chjmemo: Modify hKobj's SD, so that I(current user) have dwAccess for that hKobj.
 
@@ -136,7 +138,7 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess)
 			goto leave;
 
 		vaDbgTs(_T("==== Starting SD dump:"));
-		CH10_DumpSD(pSD);
+		CH10_DumpSD(pSD, procItr, itrctx);
 
 		// Get the current user's name
 		TCHAR szName[1024];
@@ -185,8 +187,7 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess)
 			goto leave;
 
 		// Now set the security descriptor DACL
-		if (!SetSecurityDescriptorDacl(pAbsSD, fDaclPresent, pNewAcl,
-			fDaclDefaulted))
+		if (!SetSecurityDescriptorDacl(pAbsSD, fDaclPresent, pNewAcl, fDaclDefaulted))
 			goto leave;
 
 		// And set the security for the object
@@ -195,8 +196,13 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess)
 
 		fSuccess = TRUE;
 
+		vaDbgTs(_T("==== Leaving myModifySecurity(), hKobj=0x%08X, dwAccess=0x%X."), (int)hKobj, dwAccess);
+		vaDbgTs(_T("==== Ending  SD dump:"));
+		CH10_DumpSD(pAbsSD, procItr, itrctx);
+
 	} leave:;
 	} catch(...) {}
+
 
 	// Cleanup
 	if (pNewAcl)
@@ -253,7 +259,8 @@ HANDLE myGetLSAToken()
 
 		// Add an ACE for the current user for the token.  This ACE will add
 		// TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY rights.
-		if (!myModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY)) 
+		if (! myModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY,
+				InterpretRights_Token, nullptr)) 
 		{
 			CloseHandle(hToken);
 			hToken = NULL;
