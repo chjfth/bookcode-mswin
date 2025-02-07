@@ -1,13 +1,14 @@
-#include "ch10-debug.h"
+#include "ch10-DumpSD.h"
 
 #include <vaDbg.h>
 #include "chjutils.h"
 
-void functionbody_NeedDebugInfo()
-{
-	SECURITY_DESCRIPTOR sd = {};
-	SID sid = {};
-}
+// void functionbody_NeedDebugInfo()
+// {
+// 	SECURITY_DESCRIPTOR sd = {};
+// 	SID sid = {};
+// }
+
 
 TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen)
 {
@@ -45,13 +46,14 @@ TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen)
 		// corresponding name found.
 		assert(succ);
 
-		_sntprintf_s(buf, buflen, _TRUNCATE,
-			_T("%s ( %s\\%s )")
-			,
-			pszSid, 
-			szTrusteeDom[0] ? szTrusteeDom : _T("."), 
-			szTrusteeNam
-			);
+		if(szTrusteeDom[0])	{
+			_sntprintf_s(buf, buflen, _TRUNCATE,
+				_T("%s ( \"%s\\%s\" )"), pszSid, szTrusteeDom, szTrusteeNam);
+		} else {
+			_sntprintf_s(buf, buflen, _TRUNCATE,
+				_T("%s ( \"%s\" )"), pszSid, szTrusteeNam);
+		}
+
 	}
 	else
 	{
@@ -85,8 +87,21 @@ TCHAR * ACL2ReprShort(BOOL isPresent, PACL pAcl, TCHAR *buf, int buflen)
 	return nullptr; // Guard for future code-adjusting
 }
 
+bool Is_OBJCT_ACE_TYPE(BYTE acetype)
+{
+	if(acetype>=ACCESS_MIN_MS_OBJECT_ACE_TYPE && acetype<=ACCESS_MAX_MS_OBJECT_ACE_TYPE)
+		return true;
 
-void CH10_DumpACL( PACL pACL )
+	if( acetype==ACCESS_ALLOWED_CALLBACK_OBJECT_ACE_TYPE ||
+		acetype==ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE ||
+		acetype==SYSTEM_AUDIT_CALLBACK_OBJECT_ACE_TYPE ||
+		acetype==SYSTEM_ALARM_CALLBACK_OBJECT_ACE_TYPE)
+		return true;
+
+	return false;
+}
+
+void CH10_DumpACL( PACL pACL, FUNC_InterpretRights *procItr, void *userctx )
 {
 	// Due to using ITCS(), we cannot use __try{} here.
 
@@ -106,13 +121,25 @@ void CH10_DumpACL( PACL pACL )
 
 	for (ULONG lIndex = 0;lIndex < aclSize.AceCount;lIndex++)
 	{
-		ACCESS_ALLOWED_ACE* pACE;
+		ACCESS_ALLOWED_ACE* pACE = nullptr;
+
 		if (!GetAce(pACL, lIndex, (PVOID*)&pACE))
 			return;
 
 		vaDbgS(TEXT("ACE #%d/%d :"), lIndex+1, aclSize.AceCount);
 
-		PSID pSID = PSIDFromPACE(pACE);
+		PSID pSID = nullptr;
+
+		if(!Is_OBJCT_ACE_TYPE(pACE->Header.AceType))
+		{
+			pSID = PSIDFromPACE(pACE);
+		}
+		else
+		{
+			ACCESS_ALLOWED_OBJECT_ACE* pObjACE = (ACCESS_ALLOWED_OBJECT_ACE*)pACE;
+			pSID = PSIDFromPACE(pObjACE);
+		}
+
 		TCHAR szSidRepr[100] = {};
 		SID2Repr(pSID, szSidRepr, ARRAYSIZE(szSidRepr));
 		vaDbgS(TEXT("  ACE SID = %s"), szSidRepr);
@@ -120,13 +147,26 @@ void CH10_DumpACL( PACL pACL )
 		vaDbgS(TEXT("  ACE Type = %s"), ITCSv(pACE->Header.AceType, xxx_ACE_TYPE));
 		vaDbgS(TEXT("  ACE Flags = %s"), ITCSv(pACE->Header.AceFlags, xxx_ACE_flags));
 
+		DWORD rights = pACE->Mask;
+
 		TCHAR bitbufs[40] = {};
 		ULONG lIndex2 = (ULONG)1<<31;
-		for(int i=0; i<32; i++){
-			bitbufs[i] = ((pACE->Mask & lIndex2) != 0)?TEXT('1'):TEXT('0');
-			lIndex2>>=1;
+		for(int i=0, j=0; i<32; i++){
+			bitbufs[j++] = ((rights & lIndex2) != 0)?TEXT('1'):TEXT('0');
+			lIndex2 >>= 1;
+
+			if((i+1)%8==0)
+				bitbufs[j++] = ' '; // extra space-char every 8 bits
 		}
-		vaDbgS(TEXT("  ACE Mask (31->0) = %s"), bitbufs);
+		vaDbgS(TEXT("  ACE Mask 0x%X , (bit 31->0) = %s"), rights, bitbufs);
+
+		if(procItr)
+		{
+			TCHAR * ptext_to_delete = procItr(rights, userctx);
+			vaDbgS(TEXT("%s"), ptext_to_delete);
+			delete ptext_to_delete;
+		}
+
 	}
 }
 
@@ -135,7 +175,7 @@ static bool IsSameBool(BOOL a, BOOL b)
 	return (a ^ b)==0;
 }
 
-void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd )
+void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd, FUNC_InterpretRights *procItr, void *userctx )
 {
 	BOOL succ = 0;
 	SECURITY_DESCRIPTOR *psd = (SECURITY_DESCRIPTOR*)pvsd;
@@ -165,10 +205,11 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd )
 	TCHAR szOwnerRepr[BUFSIZ1]={}, szGroupRepr[BUFSIZ1]={};
 	const int BUF20=20; TCHAR szDACL[BUF20]={}, szSACL[BUF20]={};
 	vaDbgS(
-		_T("SD Dump on (0x%p), .Revision=%d, length=%d\n")
-		_T("  Control(flags) = %s\n")
-		_T("  OwnerSID = %s\n")
-		_T("  GroupSID = %s\n")
+		_T("SECURITY_DESCRIPTOR at address: 0x%p\r\n")
+		_T("  .Revision=%d, length=%d\r\n")
+		_T("  Control(flags) = %s\r\n")
+		_T("  OwnerSID = %s\r\n")
+		_T("  GroupSID = %s\r\n")
 		_T("  DACL: %s ; SACL: %s")
 		,
 		(void*)psd, psd->Revision, sdlen,
@@ -181,11 +222,30 @@ void CH10_DumpSD( PSECURITY_DESCRIPTOR pvsd )
 	if(pDACL)
 	{
 		vaDbgS(_T("Dump DACL below:"));
-		CH10_DumpACL(pDACL);
+		CH10_DumpACL(pDACL, procItr, userctx);
 	}
 	if(pSACL)
 	{
 		vaDbgS(_T("Dump SACL below:"));
-		CH10_DumpACL(pSACL);
+		CH10_DumpACL(pSACL, nullptr, nullptr);
+	}
+
+	// Show string-form Security-descriptor 
+	TCHAR *pTextSD = nullptr;
+	ULONG nCharsSD = 0;
+	succ = ConvertSecurityDescriptorToStringSecurityDescriptor(
+		pvsd,
+		SDDL_REVISION_1,
+		OWNER_SECURITY_INFORMATION|GROUP_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,
+		&pTextSD, &nCharsSD);
+	Cec_LocalFree cec_textsd = pTextSD;
+	if(succ)
+	{
+		vaDbgS(_T("Text-form SD:\r\n%s"), pTextSD);
+	}
+	else
+	{
+		DWORD winerr = GetLastError();
+		vaDbgS(_T("Unexpect! ConvertSecurityDescriptorToStringSecurityDescriptor() error, winerr=%d"), winerr);
 	}
 }

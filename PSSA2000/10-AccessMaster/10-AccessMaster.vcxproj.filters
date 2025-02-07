@@ -23,6 +23,9 @@
     <ClCompile Include="..\..\__WinConst\mswin\PrSht.itc.cpp">
       <Filter>chjutils</Filter>
     </ClCompile>
+    <ClCompile Include="..\chjutils\ch10-DumpSD.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h" />
@@ -34,6 +37,9 @@
       <Filter>chjutils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\share\vaDbg.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chjutils\ch10-DumpSD.h">
       <Filter>chjutils</Filter>
     </ClInclude>
   </ItemGroup>

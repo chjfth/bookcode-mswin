@@ -1,5 +1,6 @@
 #include "shareinc.h"
 #include "TokenMaster-helper.h"
+#include "../chjutils/ch10-DumpSD.h"
 
 #include <vaDbg.h>
 
@@ -97,6 +98,8 @@ HANDLE myOpenSystemProcess()
 
 BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess) 
 {
+	// chjmemo: Modify hKobj's SD, so that I(current user) have dwAccess for that hKobj.
+
 	PACL pAcl        = NULL;
 	PACL pNewAcl     = NULL;
 	PACL pSacl       = NULL;
@@ -105,6 +108,8 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess)
 	BOOL fSuccess    = TRUE;
 
 	PSECURITY_DESCRIPTOR pSD = NULL;
+
+	vaDbgTs(_T("==== Entering myModifySecurity(), hKobj=0x%08X, dwAccess=0x%X."), (int)hKobj, dwAccess);
 
 	try {{
 
@@ -129,6 +134,9 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess)
 		if (!GetSecurityDescriptorDacl(pSD, &fDaclPresent, &pAcl,
 			&fDaclDefaulted))
 			goto leave;
+
+		vaDbgTs(_T("==== Starting SD dump:"));
+		CH10_DumpSD(pSD);
 
 		// Get the current user's name
 		TCHAR szName[1024];

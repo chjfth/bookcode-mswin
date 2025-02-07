@@ -25,7 +25,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include <itc/InterpretConst.h>
 
 #include "../chjutils/chjutils.h"
-#include "../chjutils/ch10-debug.h"
+#include "../chjutils/ch10-DumpSD.h"
 
 #include "AccessData.h"
 

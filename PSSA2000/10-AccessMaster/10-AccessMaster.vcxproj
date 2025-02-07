@@ -201,7 +201,7 @@
    -->
   <ItemGroup>
     <ClCompile Include="AccessMaster.cpp" />
-    <ClCompile Include="..\chjutils\ch10-debug.cpp" />
+    <ClCompile Include="..\chjutils\ch10-DumpSD.cpp" />
     <ClCompile Include="..\chjutils\chjutils.cpp" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />
     <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
@@ -219,7 +219,7 @@
   <ItemGroup>
     <ClInclude Include="Resource.h" />
     <ClInclude Include="AccessData.h" />
-    <ClInclude Include="..\chjutils\ch10-debug.h" />
+    <ClInclude Include="..\chjutils\ch10-DumpSD.h" />
     <ClInclude Include="..\chjutils\chjutils.h" />
     <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h" />
     <ClInclude Include="..\..\share\vaDbg.h" />

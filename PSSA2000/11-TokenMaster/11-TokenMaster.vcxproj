@@ -205,8 +205,10 @@
     <ClCompile Include="DaclPage.cpp" />
     <ClCompile Include="DumpInfo.cpp" />
     <ClCompile Include="..\chjutils\chjutils.cpp" />
+    <ClCompile Include="..\chjutils\ch10-DumpSD.cpp" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />
     <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TokenMaster.rc" />
@@ -221,6 +223,7 @@
     <ClInclude Include="DumpInfo.h" />
     <ClInclude Include="DaclPage.h" />
     <ClInclude Include="..\chjutils\chjutils.h" />
+    <ClInclude Include="..\chjutils\ch10-DumpSD.h" />
     <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h" />
     <ClInclude Include="..\..\share\vaDbg.h" />
   </ItemGroup>
