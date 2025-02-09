@@ -42,31 +42,42 @@ HINSTANCE g_hInst;
 
 CUILayout g_pResizer;
 
-#define EXE_VERSION "1.0.1"
+#define EXE_VERSION "1.0.2"
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void SetDlgDefaultButton(HWND hwndDlg, UINT nDefault) 
+void SetDlgDefaultButton(HWND hwndDlg, UINT idDefault) 
 {
 	// Get that last default control
 	UINT nOld = (UINT) SendMessage(hwndDlg, DM_GETDEFID, 0, 0);
 
 	// Reset the current default push button to a regular button.
 	if (HIWORD(nOld) == DC_HASDEFID)
-		SendDlgItemMessage(hwndDlg, LOWORD(nOld), BM_SETSTYLE, BS_PUSHBUTTON,
-		(LPARAM) TRUE);
+	{
+		SendDlgItemMessage(hwndDlg, LOWORD(nOld), BM_SETSTYLE, 
+			BS_PUSHBUTTON, // make it a normal button
+			(LPARAM) TRUE);
+	}
 
 	// Update the default push button's control ID.
-	SendMessage(hwndDlg, DM_SETDEFID, nDefault, 0L);
+	SendMessage(hwndDlg, DM_SETDEFID, idDefault, 0L);
 
 	// Set the new style.
-	SendDlgItemMessage(hwndDlg, nDefault, BM_SETSTYLE, BS_DEFPUSHBUTTON,
-		(LPARAM) TRUE);
+	SendDlgItemMessage(hwndDlg, idDefault, BM_SETSTYLE, 
+		BS_DEFPUSHBUTTON, // make it a stand-out button
+		(LPARAM) TRUE); 
 }
 
-void SmartDefaultButton(HWND hwndDlg, int id) 
+void SmartDefaultButton(HWND hwndDlg, int idCtrl) 
 {
+	// chjmemo: For the input idCtrl, check whether it has mapping in nCtrlMap[],
+	// If yes, set the target Uic(must be a "button") to have BS_DEFPUSHBUTTON style.
+	// This caters the paradigm: When user shifts dialog focus to some Uic-F,
+	// user want current default-push-button to be some Uic-B, -- so that, 
+	// user pressing Enter-key would execute that Uic-B button.
+
 	int nCtrlMap[][2] = {
+		// Uic-F                  Uic-B
 		{ IDC_PROCESSES,          IDB_DUMPTOKEN },
 		{ IDC_THREADS,            IDB_DUMPTOKEN },
 		{ IDC_IMPERSONATIONLEVEL, IDB_DUPLICATE },
@@ -80,8 +91,8 @@ void SmartDefaultButton(HWND hwndDlg, int id)
 	};
 
 	int nIndex = 0;
-	while (nCtrlMap[nIndex][0] != nCtrlMap[nIndex][1]) {
-		if (nCtrlMap[nIndex][0] == id) {
+	while (nCtrlMap[nIndex][0] != -1) {
+		if (nCtrlMap[nIndex][0] == idCtrl) {
 			SetDlgDefaultButton(hwndDlg, nCtrlMap[nIndex][1]);
 			break;
 		}
