@@ -1,23 +1,19 @@
 #ifndef __chjutils_h_20250123_
 #define __chjutils_h_20250123_
 
-#include <EnsureClnup_mswin.h>
-
 #include <Ntsecapi.h> // for LSA_HANDLE
 #include <Lm.h> // for NetApiBufferFree 
 
+//////////////////////////////////////////////////////////////////////////
+
+
+#include <EnsureClnup_mswin.h>
 
 MakeCleanupPtrClass_winapi(Cec_LsaClose, NTSTATUS, LsaClose, LSA_HANDLE)
 // -- for LsaOpenPolicy
 
 MakeCleanupPtrClass_winapi(Cec_LsaFreeMemory, NTSTATUS, LsaFreeMemory, PVOID)
 // -- for LsaLookupNames2
-
-MakeCleanupPtrClass_winapi(Cec_LocalFree, HLOCAL, LocalFree, HLOCAL)
-// -- for ConvertSidToStringSid
-
-MakeCleanupPtrClass_winapi(Cec_FreeSid, PVOID, FreeSid, PSID)
-// -- for AllocateAndInitializeSid
 
 MakeCleanupPtrClass_winapi(Cec_NetApiBufferFree, NET_API_STATUS, NetApiBufferFree, PVOID)
 // -- for NetLocalGroupEnum etc
@@ -26,7 +22,24 @@ inline NTSTATUS _LsaFreeMemory(LSA_UNICODE_STRING *pus){ return LsaFreeMemory(pu
 MakeCleanupPtrClass(Cec_LsaFreeMemory_UNICODE_STRING, NTSTATUS, _LsaFreeMemory, LSA_UNICODE_STRING*)
 // -- LsaEnumerateAccountRights() returns an LSA_UNICODE_STRING[] that needs freeing by LsaFreeMemory. 
 
+//////////////////////////////////////////////////////////////////////////
 
+#include <JAutoBuf.h>
+
+typedef JAutoBuf<TCHAR, sizeof(TCHAR), 1> AutoTCHARs;
+
+inline bool Is_LessBuffer(DWORD winerr)
+{
+	if( winerr==ERROR_INSUFFICIENT_BUFFER ||
+		winerr==ERROR_MORE_DATA ||
+		winerr==ERROR_BUFFER_OVERFLOW)
+		return true;
+	else
+		return false;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 
 //// PSSA2000 specific:
 

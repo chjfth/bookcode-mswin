@@ -501,8 +501,8 @@ void guiUpdatePrivileges()
 	PTSTR pszDispName = NULL;
 
 	// Clear out both list boxes
-	SendMessage(g_hwndEnablePrivileges, LB_RESETCONTENT , 0, 0);
-	SendMessage(g_hwndDeletedPrivileges, LB_RESETCONTENT , 0, 0);
+	ListBox_ResetContent(g_hwndEnablePrivileges);
+	ListBox_ResetContent(g_hwndDeletedPrivileges);
 
 	try {{
 
@@ -599,79 +599,74 @@ void guiUpdatePrivileges()
 
 void guiUpdateGroups() 
 {
+	DWORD winerr = 0;
 	PTOKEN_GROUPS ptgGroups = NULL;
 
 	// Clear out both list boxes
-	SendMessage(g_hwndEnableGroups, LB_RESETCONTENT , 0, 0);
-	SendMessage(g_hwndDisabledSids, LB_RESETCONTENT , 0, 0);
+	ListBox_ResetContent(g_hwndEnableGroups);
+	ListBox_ResetContent(g_hwndDisabledSids);
 
-	try {{
+	if (g_hToken == NULL)
+		return;
 
-		if (g_hToken == NULL)
-			goto leave;
+	// Get that group information
+	ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(g_hToken, TokenGroups);
+	Cec_LocalFree cec_tokengroups = ptgGroups;
+	if (ptgGroups == NULL)
+		return;
 
-		// Get that group information
-		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(g_hToken, TokenGroups);
-		if (ptgGroups == NULL)
-			goto leave;
+	// Iterate through them
+	DWORD dwIndex;
+	for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++)
+	{
+		SID_AND_ATTRIBUTES &sidaa = ptgGroups->Groups[dwIndex];
+		SID &sid = *(SID*)(sidaa.Sid);
 
-		// Iterate through them
-		DWORD dwIndex;
-		for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++) 
+		TCHAR *sidtext = nullptr;
+		ConvertSidToStringSid(&sid, &sidtext);
+		Cec_LocalFree cec_sidtext = sidtext;
+
+		SID_NAME_USE sNameUse = SidTypeInvalid; // neg-init
+		AutoTCHARs SidName, SidDomain;
+		do {
+			winerr = LookupAccountSid(NULL, &sid, 
+				SidName, SidName,
+				SidDomain, SidDomain,
+				&sNameUse);
+		} while(!winerr && Is_LessBuffer(winerr));
+
+		if(winerr)
 		{
-			DWORD dwSize = 0;
-			TCHAR szDomName[255] = {TEXT("")};
-			DWORD dwSizeDom = chDIMOF(szDomName);
-
-			// Get the text name size
-			SID_NAME_USE sNameUse;
-			LookupAccountSid(NULL, (ptgGroups->Groups[dwIndex].Sid), NULL,
-				&dwSize, szDomName, &dwSizeDom, &sNameUse);
-			PTSTR pszName = (PTSTR) LocalAlloc(LPTR, dwSize * sizeof(TCHAR));
-			if (pszName == NULL)
-				goto leave;
-
-			// Get the name
-			TCHAR szCompositeName[1024];
-			if (LookupAccountSid(NULL, (ptgGroups->Groups[dwIndex].Sid), pszName,
-				&dwSize, szDomName, &dwSizeDom, &sNameUse)) 
-			{
-				// Make the composite string
-				lstrcpy(szCompositeName, szDomName);
-				lstrcat(szCompositeName, TEXT("\\"));
-				lstrcat(szCompositeName, pszName);
-
-				// If it is neither mandatory nor the logon ID then add it to
-				// the enable/disable list box
-				DWORD_PTR dwItem;
-				if (!((ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_MANDATORY)
-					|| (ptgGroups->Groups[dwIndex].Attributes
-					& SE_GROUP_LOGON_ID))) 
-				{
-					// Add the string to the list box
-					dwItem = SendMessage(g_hwndEnableGroups, LB_ADDSTRING, 0,
-						(LPARAM) szCompositeName);
-					SendMessage(g_hwndEnableGroups, LB_SETITEMDATA, dwItem,
-						(LPARAM) dwIndex);
-					if (ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_ENABLED)
-						SendMessage(g_hwndEnableGroups, LB_SETSEL, TRUE, dwItem);
-				}
-
-				// Add to the CreateRestrictedToken list
-				dwItem = SendMessage(g_hwndDisabledSids, LB_ADDSTRING, 0,
-					(LPARAM) szCompositeName);
-				SendMessage(g_hwndDisabledSids, LB_SETITEMDATA, dwItem,
-					(LPARAM) dwIndex);
-			}
-			LocalFree(pszName);
+			vaDbgTs(
+				_T("In guiUpdateGroups(): LookupAccountSid() winerr=%d\r\n")
+				_T("    SID to lookup: %s")
+				,
+				winerr,	sidtext);
+			return;
 		}
 
-	} leave:;
-	} catch(...) {}
+		// Make the composite string
+		TCHAR szCompositeName[1024] = {};
+		_sntprintf_s(szCompositeName, _TRUNCATE, _T("%s\\%s"), (TCHAR*)SidDomain, (TCHAR*)SidName);
 
-	// Cleanup
-	if (ptgGroups != NULL)
-		LocalFree(ptgGroups);
+		// If it is neither mandatory nor the logon ID then add it to
+		// the enable/disable list box
+		DWORD_PTR dwItem = 0;
+		if (!((sidaa.Attributes & SE_GROUP_MANDATORY) || (sidaa.Attributes & SE_GROUP_LOGON_ID))) 
+		{
+			// Add the string to the list box
+			dwItem = ListBox_AddString(g_hwndEnableGroups, szCompositeName);
+			ListBox_SetItemData(g_hwndEnableGroups, dwItem, dwIndex);
+					
+			if (ptgGroups->Groups[dwIndex].Attributes & SE_GROUP_ENABLED)
+				ListBox_SetSel(g_hwndEnableGroups, TRUE, dwItem);
+		}
+
+		// Add to the CreateRestrictedToken list
+		dwItem = ListBox_AddString(g_hwndDisabledSids, szCompositeName);
+		ListBox_SetItemData(g_hwndDisabledSids, dwItem, dwIndex);
+
+	} // for dwIndex++
 }
 
 

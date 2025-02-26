@@ -648,7 +648,7 @@ void DumpToken()
 		// Update other controls
 		guiUpdatePrivileges();
 		guiUpdateGroups();
-		SendMessage(g_hwndRestrictedSids, LB_RESETCONTENT, 0, 0);
+		ListBox_ResetContent(g_hwndRestrictedSids);
 
 		// Create a print buf object for buffering output to the edit control.
 		// This class and usage instructions can be found in the "CmnCls.h"
