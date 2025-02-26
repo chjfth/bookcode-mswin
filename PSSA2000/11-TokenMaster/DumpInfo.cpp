@@ -294,125 +294,115 @@ void DumpTokenPrimaryGroup(HANDLE hToken, CPrintBuf* pbufToken)
 void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken) 
 {
 	PTOKEN_DEFAULT_DACL ptdDacl  = NULL;
-	PEXPLICIT_ACCESS    pEntries = NULL;
+//	PEXPLICIT_ACCESS    pEntries = NULL; // no use
 
-	try {{
+	// Get the DACL info
+	ptdDacl = (PTOKEN_DEFAULT_DACL) myAllocateTokenInfo(hToken, TokenDefaultDacl);
+	Cec_LocalFree cec_ptd = ptdDacl;
+	if (ptdDacl == NULL)
+		return;
 
-		// Get the DACL info
-		ptdDacl = (PTOKEN_DEFAULT_DACL) myAllocateTokenInfo(hToken,
-			TokenDefaultDacl);
-		if (ptdDacl == NULL)
-			goto leave;
+	pbufToken->Print(DIVIDERL TEXT("Token Default DACL\r\n") DIVIDERL);
 
-		pbufToken->Print(DIVIDERL TEXT("Token Default DACL\r\n"));
-		pbufToken->Print(DIVIDERL);
+	// Get ACL size information
+	ACL_SIZE_INFORMATION sizeInfo = {};
+	if (!GetAclInformation(ptdDacl->DefaultDacl, &sizeInfo, sizeof(sizeInfo), AclSizeInformation))
+		return;
 
-		// Get ACL size information
-		ACL_SIZE_INFORMATION sizeInfo;
-		if (!GetAclInformation(ptdDacl->DefaultDacl, &sizeInfo, sizeof(sizeInfo),
-			AclSizeInformation))
-			goto leave;
-
-		// Iterate through the aces
-		DWORD dwCount = sizeInfo.AceCount;
-		DWORD dwIndex;
-		for (dwIndex = 0; dwIndex < dwCount; dwIndex++) 
+	// Iterate through the ACEs
+	DWORD dwCount = sizeInfo.AceCount;
+	DWORD dwIndex;
+	for (dwIndex = 0; dwIndex < dwCount; dwIndex++) 
+	{
+		// Get the ACE by index
+		PACCESS_ALLOWED_ACE paceAllowed = NULL;
+		if (GetAce(ptdDacl->DefaultDacl, dwIndex, (PVOID*)&paceAllowed)) 
 		{
-			// Get the ACE by index
-			PACCESS_ALLOWED_ACE paceAllowed;
-			if (GetAce(ptdDacl->DefaultDacl, dwIndex, (PVOID*) &paceAllowed)) 
-			{
-				// Output what type of ACE it is
-				switch (paceAllowed->Header.AceFlags) {
+			// Output what type of ACE it is
+			switch (paceAllowed->Header.AceFlags) {
 
-				case ACCESS_ALLOWED_OBJECT_ACE_TYPE:
-					pbufToken->Print(TEXT("ACCESS ALLOWED OBJECT"));
-					break;
+			case ACCESS_ALLOWED_OBJECT_ACE_TYPE:
+				pbufToken->Print(TEXT("ACCESS ALLOWED OBJECT"));
+				break;
 
-				case ACCESS_ALLOWED_ACE_TYPE:
-					pbufToken->Print(TEXT("ACCESS ALLOWED"));
-					break;
+			case ACCESS_ALLOWED_ACE_TYPE:
+				pbufToken->Print(TEXT("ACCESS ALLOWED"));
+				break;
 
-				case ACCESS_DENIED_ACE_TYPE:
-					pbufToken->Print(TEXT("ACCESS DENIED"));
-					break;
+			case ACCESS_DENIED_ACE_TYPE:
+				pbufToken->Print(TEXT("ACCESS DENIED"));
+				break;
 
-				case ACCESS_DENIED_OBJECT_ACE_TYPE:
-					pbufToken->Print(TEXT("ACCESS DENIED OBJECT"));
-					break;
-				}
-
-				// Get the account name associated with the ace and output it
-				TCHAR szName[255];
-				TCHAR szDomain[255];
-
-				DWORD dwSize       = chDIMOF(szName);
-				DWORD dwDomainSize = chDIMOF(szDomain);
-
-				SID_NAME_USE snuUse;
-				LookupAccountSid(NULL, &(paceAllowed->SidStart), szName, &dwSize,
-					szDomain, &dwDomainSize, &snuUse);
-
-				TCHAR szAccount[255];
-				lstrcpy(szAccount, szDomain);
-				lstrcat(szAccount, TEXT("/"));
-				lstrcat(szAccount, szName);
-
-				pbufToken->Print(TEXT("\t"));
-				pbufToken->Print(szAccount);
-
-				// Now we output the access mask in binary
-				pbufToken->Print(TEXT("\r\nACCESS_MASK:  "));
-				DWORD dwMask = paceAllowed->Mask;
-				DWORD dwIndex2;
-			
-				for (dwIndex2 = 0; dwIndex2 < 32; dwIndex2++) {
-					if (dwMask&(1 << 31))
-						pbufToken->Print(TEXT("1"));
-					else
-						pbufToken->Print(TEXT("0"));
-					dwMask = (dwMask << 1);
-				}
-
-				// Determine the bits that map to standard access rights and print
-				// the flag name
-				pbufToken->Print(TEXT("\r\n"));
-				if (paceAllowed->Mask & (1 << 16))
-					pbufToken->Print(TEXT("\tDELETE\r\n"));
-				if (paceAllowed->Mask & (1 << 17))
-					pbufToken->Print(TEXT("\tREAD_CONTROL\r\n"));
-				if (paceAllowed->Mask & (1 << 18))
-					pbufToken->Print(TEXT("\tWRITE_DAC\r\n"));
-				if (paceAllowed->Mask & (1 << 19))
-					pbufToken->Print(TEXT("\tWRITE_OWNER\r\n"));
-				if (paceAllowed->Mask & (1 << 20))
-					pbufToken->Print(TEXT("\tSYNCHRONIZE\r\n"));
-				if (paceAllowed->Mask & (1 << 24))
-					pbufToken->Print(TEXT("\tACCESS_SYSTEM_SECURITY\r\n"));
-				if (paceAllowed->Mask & (1 << 25))
-					pbufToken->Print(TEXT("\tMAXIMUM_ALLOWED\r\n"));
-				if (paceAllowed->Mask & (1 << 28))
-					pbufToken->Print(TEXT("\tGENERIC_ALL\r\n"));
-				if (paceAllowed->Mask & (1 << 29))
-					pbufToken->Print(TEXT("\tGENERIC_EXECUTE\r\n"));
-				if (paceAllowed->Mask & (1 << 30))
-					pbufToken->Print(TEXT("\tGENERIC_WRITE\r\n"));
-				if (paceAllowed->Mask & (1 << 31))
-					pbufToken->Print(TEXT("\tGENERIC_READ\r\n"));
-				pbufToken->Print(TEXT("\r\n"));
+			case ACCESS_DENIED_OBJECT_ACE_TYPE:
+				pbufToken->Print(TEXT("ACCESS DENIED OBJECT"));
+				break;
 			}
+
+			// Chj: Here we should dump the SID text, bcz some SID results in ERROR_NONE_MAPPED.
+			TCHAR *psidtext = NULL;
+			ConvertSidToStringSid(&(paceAllowed->SidStart), &psidtext);
+			Cec_LocalFree cec_psidtext = psidtext;
+			pbufToken->Print(_T("\t SID=%s "), psidtext);
+
+			// Get the account name associated with the ace and output it
+			TCHAR szName[255] = {};
+			TCHAR szDomain[255] = {};
+			DWORD dwSize       = ARRAYSIZE(szName);
+			DWORD dwDomainSize = ARRAYSIZE(szDomain);
+
+			SID_NAME_USE snuUse = SidTypeInvalid; // neg-init
+			BOOL succ = LookupAccountSid(NULL, &(paceAllowed->SidStart), szName, &dwSize,
+				szDomain, &dwDomainSize, &snuUse);
+			if(succ)
+			{
+				TCHAR szAccount[255] = {};
+				Combine_DomAndName(szAccount, szDomain, szName);
+				pbufToken->Print(TEXT("(\"%s\")"), szAccount);
+			}
+
+			// Now we output the access mask in binary
+			pbufToken->Print(TEXT("\r\nACCESS_MASK:  "));
+			DWORD dwMask = paceAllowed->Mask;
+			DWORD dwIndex2;
+			
+			for (dwIndex2 = 0; dwIndex2 < 32; dwIndex2++) {
+				if (dwMask&(1 << 31))
+					pbufToken->Print(TEXT("1"));
+				else
+					pbufToken->Print(TEXT("0"));
+				dwMask = (dwMask << 1);
+			}
+
+			// Determine the bits that map to standard access rights and print
+			// the flag name
+			pbufToken->Print(TEXT("\r\n"));
+			if (paceAllowed->Mask & (1 << 16))
+				pbufToken->Print(TEXT("\tDELETE\r\n"));
+			if (paceAllowed->Mask & (1 << 17))
+				pbufToken->Print(TEXT("\tREAD_CONTROL\r\n"));
+			if (paceAllowed->Mask & (1 << 18))
+				pbufToken->Print(TEXT("\tWRITE_DAC\r\n"));
+			if (paceAllowed->Mask & (1 << 19))
+				pbufToken->Print(TEXT("\tWRITE_OWNER\r\n"));
+			if (paceAllowed->Mask & (1 << 20))
+				pbufToken->Print(TEXT("\tSYNCHRONIZE\r\n"));
+			if (paceAllowed->Mask & (1 << 24))
+				pbufToken->Print(TEXT("\tACCESS_SYSTEM_SECURITY\r\n"));
+			if (paceAllowed->Mask & (1 << 25))
+				pbufToken->Print(TEXT("\tMAXIMUM_ALLOWED\r\n"));
+			if (paceAllowed->Mask & (1 << 28))
+				pbufToken->Print(TEXT("\tGENERIC_ALL\r\n"));
+			if (paceAllowed->Mask & (1 << 29))
+				pbufToken->Print(TEXT("\tGENERIC_EXECUTE\r\n"));
+			if (paceAllowed->Mask & (1 << 30))
+				pbufToken->Print(TEXT("\tGENERIC_WRITE\r\n"));
+			if (paceAllowed->Mask & (1 << 31))
+				pbufToken->Print(TEXT("\tGENERIC_READ\r\n"));
+			pbufToken->Print(TEXT("\r\n"));
 		}
+	}
 
-		pbufToken->Print(TEXT("\r\n"));
-
-	} leave:;
-	} catch(...) {}
-
-	if (ptdDacl != NULL)
-		LocalFree(ptdDacl);
-
-	if (pEntries != NULL)
-		LocalFree(pEntries);
+	pbufToken->Print(TEXT("\r\n"));
 }
 
 

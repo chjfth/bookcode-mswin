@@ -19,7 +19,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include <vaDbg.h>
 
-#define EXE_VERSION "1.0.8"
+#define EXE_VERSION "1.0.9"
 
 HANDLE g_hSnapShot = NULL;
 HANDLE g_hToken = NULL;
