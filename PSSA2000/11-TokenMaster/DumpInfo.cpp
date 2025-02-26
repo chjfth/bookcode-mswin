@@ -1,6 +1,9 @@
 #include "shareinc.h"
 #include "TokenMaster-helper.h"
+#include "../chjutils/chjutils.h"
 
+#if 0
+// [2025-02-26] Chj: I'll use stock ConvertSidToStringSid() instead.
 BOOL GetTextualSid(PSID pSid, PTSTR TextualSid, PDWORD pdwBufferLen) 
 {
 	BOOL fSuccess = FALSE;
@@ -65,98 +68,89 @@ BOOL GetTextualSid(PSID pSid, PTSTR TextualSid, PDWORD pdwBufferLen)
 
 	return(fSuccess);
 }
+#endif
 
-void DumpSID(PSID psid, CPrintBuf* pbufToken) 
+void DumpSID(PSID _psid, CPrintBuf* pbufToken) 
 {
-	PTSTR szSIDText = NULL;
+	SID *psid = (SID*)_psid;
 
-	try {{
+	SID_NAME_USE snuUse = SidTypeInvalid; // neg-init
+	PTSTR pszUse = NULL;
+	TCHAR szName[255]    = {TEXT("[Logon SID]")};
+	DWORD dwSize         = ARRAYSIZE(szName);
+	TCHAR szDomName[255] = {TEXT("")};
+	DWORD dwDomSize      = ARRAYSIZE(szDomName);
 
-		SID_NAME_USE snuUse;
-		PTSTR pszUse;
-		TCHAR szName[255]    = {TEXT("[Logon SID]")};
-		DWORD dwSize         = chDIMOF(szName);
-		TCHAR szDomName[255] = {TEXT("")};
-		DWORD dwDomSize      = chDIMOF(szDomName);
+	// What is the SID type
+	if (LookupAccountSid(NULL, psid, szName, &dwSize, szDomName, &dwDomSize, &snuUse)) 
+	{
+		switch (snuUse) {
 
-		// What is the SID type
-		if (LookupAccountSid(NULL, psid, szName, &dwSize, szDomName, &dwDomSize, &snuUse)) 
-		{
-			switch (snuUse) {
+		case SidTypeUser:
+			pszUse = TEXT("User SID");
+			break;
 
-			case SidTypeUser:
-				pszUse = TEXT("User SID");
-				break;
+		case SidTypeGroup:
+			pszUse = TEXT("Group SID");
+			break;
 
-			case SidTypeGroup:
-				pszUse = TEXT("Group SID");
-				break;
+		case SidTypeDomain:
+			pszUse = TEXT("Domain SID");
+			break;
 
-			case SidTypeDomain:
-				pszUse = TEXT("Domain SID");
-				break;
+		case SidTypeAlias:
+			pszUse = TEXT("Alias SID");
+			break;
 
-			case SidTypeAlias:
-				pszUse = TEXT("Alias SID");
-				break;
+		case SidTypeWellKnownGroup:
+			pszUse = TEXT("Well-Known Group SID");
+			break;
 
-			case SidTypeWellKnownGroup:
-				pszUse = TEXT("Well-Known Group SID");
-				break;
+		case SidTypeDeletedAccount:
+			pszUse = TEXT("Deleted Account");
+			break;
 
-			case SidTypeDeletedAccount:
-				pszUse = TEXT("Deleted Account");
-				break;
+		case SidTypeInvalid:
+			pszUse = TEXT("Invalid SID");
+			break;
 
-			case SidTypeInvalid:
-				pszUse = TEXT("Invalid SID");
-				break;
-
-			default:
-				pszUse = TEXT("Unknown SID");
-				break;
-			}
-
-		} else {
-
-			// We couldn't look it up, maybe it is the logon SID
-			PSID_IDENTIFIER_AUTHORITY psia = GetSidIdentifierAuthority(psid);
-			DWORD dwFirstSub = *GetSidSubAuthority(psid, 0);
-			if (dwFirstSub == 5 && psia->Value[6] == 5)
-				pszUse = TEXT("Logon SID");
-			else
-				pszUse = TEXT("");
+		default:
+			pszUse = TEXT("Unknown SID");
+			break;
 		}
 
-		// Get the textual SID
-		dwSize = 0;
-		GetTextualSid(psid, szSIDText, &dwSize);
-		szSIDText = (PTSTR) LocalAlloc(LPTR, dwSize);
-		if (szSIDText == NULL)
-			goto leave;
-		if (!GetTextualSid(psid, szSIDText, &dwSize))
-			goto leave;
+	} else {
 
-		// Output the things we have learned
-		pbufToken->Print(TEXT("SID:\t\t"));
-		pbufToken->Print(szSIDText);
+		// We couldn't look it up, maybe it is the logon SID.
+		// Chjmemo: sth like: S-1-5-5-0-448978
 
-		pbufToken->Print(TEXT("\r\nUse:\t\t"));
-		pbufToken->Print(pszUse);
+		PSID_IDENTIFIER_AUTHORITY psia = GetSidIdentifierAuthority(psid);
+		DWORD dwFirstSub = *GetSidSubAuthority(psid, 0);
+		if (dwFirstSub == 5 && psia->Value[6] == 5)
+			pszUse = TEXT("Logon SID");
+		else
+			pszUse = TEXT("");
+	}
 
-		pbufToken->Print(TEXT("\r\nName:\t\t"));
-		pbufToken->Print(szName);
+	// Get the textual SID
+	TCHAR *pszSIDText = NULL;
+	ConvertSidToStringSid(psid, &pszSIDText);
+	Cec_LocalFree cec_sidtext = pszSIDText;
 
-		pbufToken->Print(TEXT("\r\nDomain Name:\t"));
-		pbufToken->Print(szDomName);
+	// Output the things we have learned
+	pbufToken->Print(TEXT("SID:\t\t"));
+	pbufToken->Print(pszSIDText);
 
-		pbufToken->Print(TEXT("\r\n\r\n"));
+	pbufToken->Print(TEXT("\r\nUse:\t\t"));
+	pbufToken->Print(pszUse);
 
-	} leave:;
-	} catch(...) {}
+	pbufToken->Print(TEXT("\r\nName:\t\t"));
+	pbufToken->Print(szName);
 
-	if (szSIDText != NULL)
-		LocalFree(szSIDText);
+	pbufToken->Print(TEXT("\r\nDomain Name:\t"));
+	pbufToken->Print(szDomName);
+
+	pbufToken->Print(TEXT("\r\n\r\n"));
 }
 
 void DumpSIDAttributes(DWORD dwAttrib, CPrintBuf* pbufToken) 
@@ -565,29 +559,15 @@ void DumpTokenType(HANDLE hToken, CPrintBuf* pbufToken)
 
 BOOL DumpTokenUser(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	BOOL        fSuccess = FALSE;
-	PTOKEN_USER ptuUser  = NULL;
+	PTOKEN_USER ptuUser  = (PTOKEN_USER) myAllocateTokenInfo(hToken, TokenUser);
+	Cec_LocalFree cec_ptu = ptuUser;
+	if (ptuUser == NULL)
+		return FALSE;
 
-	try {{
+	pbufToken->Print(DIVIDERL TEXT("USER SID\r\n") DIVIDERL TEXT("\r\n"));
+	DumpSID(ptuUser->User.Sid, pbufToken);
 
-		// Get the token information
-		ptuUser = (PTOKEN_USER) myAllocateTokenInfo(hToken, TokenUser);
-		if (ptuUser == NULL)
-			goto leave;
-
-		pbufToken->Print(DIVIDERL TEXT("USER SID\r\n") DIVIDERL
-			TEXT("\r\n"));
-		DumpSID(ptuUser->User.Sid, pbufToken);
-
-		fSuccess = TRUE;
-
-	} leave:;
-	} catch(...) {}
-
-	if (ptuUser != NULL)
-		LocalFree(ptuUser);
-
-	return(fSuccess);
+	return TRUE;
 }
 
 BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken) 
@@ -598,8 +578,7 @@ BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken)
 	try {{
 
 		BOOL fRestricted = IsTokenRestricted(hToken);
-		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken,
-			TokenRestrictedSids);
+		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken, TokenRestrictedSids);
 		if (ptgGroups == NULL)
 			goto leave;
 
@@ -646,8 +625,11 @@ void DumpToken()
 			goto leave;
 
 		// Update other controls
+		
 		guiUpdatePrivileges();
+		
 		guiUpdateGroups();
+		
 		ListBox_ResetContent(g_hwndRestrictedSids);
 
 		// Create a print buf object for buffering output to the edit control.
