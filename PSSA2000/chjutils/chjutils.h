@@ -24,6 +24,16 @@ MakeCleanupPtrClass(Cec_LsaFreeMemory_UNICODE_STRING, NTSTATUS, _LsaFreeMemory, 
 
 //////////////////////////////////////////////////////////////////////////
 
+template<int nEle>
+TCHAR* Combine_DomAndName(TCHAR (&outbuf)[nEle], const TCHAR *szDom, const TCHAR *szName)
+{
+	if(!szDom || !szDom[0])
+		_sntprintf_s(outbuf, _TRUNCATE, _T("%s"), szName);
+	else
+		_sntprintf_s(outbuf, _TRUNCATE, _T("%s\\%s"), szDom, szName);
+	return outbuf;
+}
+
 #include <JAutoBuf.h>
 
 typedef JAutoBuf<TCHAR, sizeof(TCHAR), 1> AutoTCHARs;

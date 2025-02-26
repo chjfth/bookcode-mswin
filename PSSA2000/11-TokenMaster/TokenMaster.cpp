@@ -19,6 +19,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include <vaDbg.h>
 
+#define EXE_VERSION "1.0.5"
+
 HANDLE g_hSnapShot = NULL;
 HANDLE g_hToken = NULL;
 
@@ -41,8 +43,6 @@ HWND g_hwndTokenTypes;
 HINSTANCE g_hInst;
 
 CUILayout g_pResizer;
-
-#define EXE_VERSION "1.0.4"
 
 ///////////////////////////////////////////////////////////////////////////////
 

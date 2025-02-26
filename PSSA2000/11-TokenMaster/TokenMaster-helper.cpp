@@ -599,6 +599,8 @@ void guiUpdatePrivileges()
 
 void guiUpdateGroups() 
 {
+	vaDbgTs(_T("In guiUpdateGroups()... g_hToken=0x%X"), (int)g_hToken);
+
 	DWORD winerr = 0;
 	BOOL succ = FALSE;
 	PTOKEN_GROUPS ptgGroups = NULL;
@@ -639,17 +641,17 @@ void guiUpdateGroups()
 
 		if(!succ)
 		{
-			vaDbgTs(
-				_T("In guiUpdateGroups(): LookupAccountSid() winerr=%d\r\n")
-				_T("    SID to lookup: %s")
-				,
-				winerr,	sidtext);
-			return;
+			// Typically, we can get ERROR_NONE_MAPPED(1332). But don't quit, go on for next group.
+			// [2025-02-26] see such error on S-1-5-5-0-448978 (the Logon SID).
+			vaDbgTs(_T("LookupAccountSid() on '%s' winerr=%s"), sidtext, ITCSv(winerr, WinError));
+			continue;
 		}
 
 		// Make the composite string
 		TCHAR szCompositeName[1024] = {};
-		_sntprintf_s(szCompositeName, _TRUNCATE, _T("%s\\%s"), (TCHAR*)SidDomain, (TCHAR*)SidName);
+		Combine_DomAndName(szCompositeName, SidDomain, SidName);
+
+		vaDbgTs(_T("In token, see group #%d: SID=%s , name=\"%s\""), dwIndex+1, sidtext, szCompositeName);
 
 		// If it is neither mandatory nor the logon ID then add it to
 		// the enable/disable list box

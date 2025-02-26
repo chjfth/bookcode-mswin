@@ -11,6 +11,9 @@
 
 #include "..\ClassLib\PrintBuf.h"      // See Appendix B.
 
+#include <mswin/WinError.itc.h>
+using namespace itc;
+
 #include "DumpInfo.h"
 
 #define DIVIDERL  TEXT("****************************************") \
