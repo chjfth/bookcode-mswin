@@ -460,8 +460,8 @@ PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass)
 			}
 
 			// Try again
-			fSuccess = GetTokenInformation(hToken, tokenClass, pvBuffer, dwSize,
-				&dwSize);
+			fSuccess = GetTokenInformation(hToken, tokenClass, pvBuffer, dwSize, &dwSize);
+
 			// while it is failing on ERROR_INSUFFICIENT_BUFFER
 		} while (!fSuccess && (GetLastError() == ERROR_INSUFFICIENT_BUFFER));
 

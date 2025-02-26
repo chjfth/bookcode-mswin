@@ -219,51 +219,39 @@ BOOL DumpTokenGroups(HANDLE hToken, CPrintBuf* pbufToken)
 
 void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	PTOKEN_PRIVILEGES ptpPrivileges = NULL;
+	PTOKEN_PRIVILEGES ptpPrivileges = 
+		(PTOKEN_PRIVILEGES) myAllocateTokenInfo(hToken, TokenPrivileges);
+	Cec_LocalFree cec_ptp = ptpPrivileges;
+	if (ptpPrivileges == NULL)
+		return;
 
-	try {{
+	pbufToken->Print(DIVIDERL TEXT("Privileges\r\n") DIVIDERL);
 
-		// Get the token privilege information
-		ptpPrivileges = (PTOKEN_PRIVILEGES)
-			myAllocateTokenInfo(hToken, TokenPrivileges);
-		if (ptpPrivileges == NULL)
-			goto leave;
-
-		pbufToken->Print(DIVIDERL TEXT("Privileges\r\n"));
-		pbufToken->Print(DIVIDERL);
-
-		DWORD dwIndex;
-		for (dwIndex = 0; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) 
+	DWORD dwIndex = 0;
+	for (; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) 
+	{
+		// Get the privilege name and print it with attribute information
+		TCHAR szName[255] = {};
+		DWORD dwSize = ARRAYSIZE(szName);
+		if (LookupPrivilegeName(NULL,
+			&(ptpPrivileges->Privileges[dwIndex].Luid), szName, &dwSize)) 
 		{
-			// Get the privilege name and print it with attribute information
-			TCHAR szName[255];
-			DWORD dwSize = chDIMOF(szName);
-			if (LookupPrivilegeName(NULL,
-				&(ptpPrivileges->Privileges[dwIndex].Luid), szName, &dwSize)) 
-			{
-				pbufToken->Print(szName);
-				if (ptpPrivileges->Privileges[dwIndex].Attributes
-					& SE_PRIVILEGE_ENABLED_BY_DEFAULT)
-					pbufToken->Print(TEXT("\r\n\t")
-					TEXT("SE_PRIVILEGE_ENABLED_BY_DEFAULT"));
+			pbufToken->Print(szName);
+			if (ptpPrivileges->Privileges[dwIndex].Attributes & SE_PRIVILEGE_ENABLED_BY_DEFAULT)
+				pbufToken->Print(TEXT("\r\n\t") TEXT("SE_PRIVILEGE_ENABLED_BY_DEFAULT"));
 
-				if (ptpPrivileges->Privileges[dwIndex].Attributes
-					& SE_PRIVILEGE_ENABLED)
-					pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_ENABLED"));
+			if (ptpPrivileges->Privileges[dwIndex].Attributes & SE_PRIVILEGE_ENABLED)
+				pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_ENABLED"));
 
-				if (ptpPrivileges->Privileges[dwIndex].Attributes
-					& SE_PRIVILEGE_USED_FOR_ACCESS)
-					pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_USED_FOR_ACCESS"));
+			if (ptpPrivileges->Privileges[dwIndex].Attributes & SE_PRIVILEGE_REMOVED) // Vista+
+				pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_REMOVED"));
 
-				pbufToken->Print(TEXT("\r\n"));
-			}
+			if (ptpPrivileges->Privileges[dwIndex].Attributes & SE_PRIVILEGE_USED_FOR_ACCESS)
+				pbufToken->Print(TEXT("\r\n\tSE_PRIVILEGE_USED_FOR_ACCESS"));
+
+			pbufToken->Print(TEXT("\r\n"));
 		}
-
-	} leave:;
-	} catch(...) {}
-
-	if (ptpPrivileges != NULL)
-		LocalFree(ptpPrivileges);
+	}
 }
 
 
@@ -272,23 +260,14 @@ void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken)
 
 void DumpTokenOwner(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	PTOKEN_OWNER ptoOwner = NULL;
+	PTOKEN_OWNER ptoOwner = (PTOKEN_OWNER) myAllocateTokenInfo(hToken, TokenOwner);
+	Cec_LocalFree cec_pto = ptoOwner;
+	if (ptoOwner == NULL)
+		return;
 
-	try {{
-
-		ptoOwner = (PTOKEN_OWNER) myAllocateTokenInfo(hToken, TokenOwner);
-		if (ptoOwner == NULL)
-			goto leave;
-
-		pbufToken->Print(DIVIDERL TEXT("Token Owner\r\n"));
-		pbufToken->Print(DIVIDERL);
-		DumpSID(ptoOwner->Owner, pbufToken);
-
-	} leave:;
-	} catch(...) {}
-
-	if (ptoOwner != NULL)
-		LocalFree(ptoOwner);
+	pbufToken->Print(DIVIDERL TEXT("Token Owner\r\n") DIVIDERL);
+	
+	DumpSID(ptoOwner->Owner, pbufToken);
 }
 
 
@@ -297,23 +276,15 @@ void DumpTokenOwner(HANDLE hToken, CPrintBuf* pbufToken)
 
 void DumpTokenPrimaryGroup(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	PTOKEN_OWNER ptgGroup = NULL;
+	PTOKEN_PRIMARY_GROUP ptgGroup = 
+		(PTOKEN_PRIMARY_GROUP) myAllocateTokenInfo(hToken, TokenPrimaryGroup);
+	Cec_LocalFree cec_ptg = ptgGroup;
+	if (ptgGroup == NULL)
+		return;
 
-	try {{
-
-		ptgGroup = (PTOKEN_OWNER) myAllocateTokenInfo(hToken, TokenPrimaryGroup);
-		if (ptgGroup == NULL)
-			goto leave;
-
-		pbufToken->Print(DIVIDERL TEXT("Token Primary Group\r\n"));
-		pbufToken->Print(DIVIDERL);
-		DumpSID(ptgGroup->Owner, pbufToken);
-
-	} leave:;
-	} catch(...) {}
-
-	if (ptgGroup != NULL)
-		LocalFree(ptgGroup);
+	pbufToken->Print(DIVIDERL TEXT("Token Primary Group\r\n") DIVIDERL);
+	
+	DumpSID(ptgGroup->PrimaryGroup, pbufToken);
 }
 
 
