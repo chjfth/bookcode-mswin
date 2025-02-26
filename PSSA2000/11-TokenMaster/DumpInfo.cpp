@@ -114,6 +114,10 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 			pszUse = TEXT("Invalid SID");
 			break;
 
+		case SidTypeLabel:
+			pszUse = TEXT("Integrity Level Label");
+			break;
+
 		default:
 			pszUse = TEXT("Unknown SID");
 			break;
@@ -172,45 +176,45 @@ void DumpSIDAttributes(DWORD dwAttrib, CPrintBuf* pbufToken)
 	if (dwAttrib & SE_GROUP_USE_FOR_DENY_ONLY)
 		pbufToken->Print(TEXT("\t\tSE_GROUP_USE_FOR_DENY_ONLY\r\n"));
 
+	if (dwAttrib & SE_GROUP_INTEGRITY) // Vista+
+		pbufToken->Print(TEXT("\t\tSE_GROUP_INTEGRITY\r\n"));
+
+	if (dwAttrib & SE_GROUP_INTEGRITY_ENABLED) // Vista+
+		pbufToken->Print(TEXT("\t\tSE_GROUP_INTEGRITY_ENABLED\r\n"));
+
 	if (dwAttrib & SE_GROUP_LOGON_ID)
 		pbufToken->Print(TEXT("\t\tSE_GROUP_LOGON_ID\r\n"));
+
+	if (dwAttrib & SE_GROUP_RESOURCE) // Vista+
+		pbufToken->Print(TEXT("\t\tSE_GROUP_RESOURCE\r\n"));
 }
 
 BOOL DumpTokenGroups(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	BOOL          fSuccess  = FALSE;
-	PTOKEN_GROUPS ptgGroups = NULL;
+//	BOOL          fSuccess  = FALSE;
+	PTOKEN_GROUPS ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken, TokenGroups);
+	Cec_LocalFree cec_ptg = ptgGroups;
+	if (ptgGroups == NULL)
+		return FALSE;
 
-	try {{
+	pbufToken->Print(DIVIDERL TEXT("GROUP SIDs\r\n"));
+	pbufToken->Print(TEXT("Group Count:\t%lu"), ptgGroups->GroupCount);
+	pbufToken->Print(TEXT("\r\n") DIVIDERL);
 
-		// Get token information
-		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken, TokenGroups);
-		if (ptgGroups == NULL)
-			goto leave;
+	// Dump the SID and Attributes for each group
+	DWORD dwIndex = 0;
+	for (; dwIndex < ptgGroups->GroupCount; dwIndex++) 
+	{
+		pbufToken->Print(TEXT("Sid #%d\r\n"), dwIndex);
+		
+		DumpSID(ptgGroups->Groups[dwIndex].Sid, pbufToken);
+		
+		DumpSIDAttributes(ptgGroups->Groups[dwIndex].Attributes, pbufToken);
+		
+		pbufToken->Print(DIVIDERS);
+	}
 
-		pbufToken->Print(DIVIDERL TEXT("GROUP SIDS\r\n"));
-		pbufToken->Print(TEXT("Group Count:\t%lu"), ptgGroups->GroupCount);
-		pbufToken->Print(TEXT("\r\n") DIVIDERL);
-
-		// Dump the SID and Attributes for each group
-		DWORD dwIndex = ptgGroups->GroupCount;
-		for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++) 
-		{
-			pbufToken->Print(TEXT("Sid #%d\r\n"), dwIndex);
-			DumpSID(ptgGroups->Groups[dwIndex].Sid, pbufToken);
-			DumpSIDAttributes(ptgGroups->Groups[dwIndex].Attributes, pbufToken);
-			pbufToken->Print(DIVIDERS);
-		}
-
-		fSuccess = TRUE;
-
-	} leave:;
-	} catch(...) {}
-
-	if (ptgGroups != NULL)
-		LocalFree(ptgGroups);
-
-	return(fSuccess);
+	return TRUE;
 }
 
 void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken) 
