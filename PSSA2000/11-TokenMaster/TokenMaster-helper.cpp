@@ -858,7 +858,7 @@ void guiPopulateStaticCombos()
 
 void guiGetToken(HWND hwnd) 
 {
-	// chjmemo: This function will modify g_hToken.
+	// chjmemo: This function will re-assign g_hToken.
 
 	DWORD  dwStatus;
 	HANDLE hThread    = NULL;
@@ -907,7 +907,7 @@ void guiGetToken(HWND hwnd)
 			}
 		}
 
-		// So we don't have a token yet, lets get it from the process
+		// So we don't have a (thread) token yet, lets get it from the process
 		if (hToken == NULL) 
 		{
 			// Get the handle to the process
@@ -947,17 +947,16 @@ void guiGetToken(HWND hwnd)
 
 		// We made the security descriptor just in case they want a duplicate.
 		// We make the duplicate have all access to everyone.
-		SECURITY_ATTRIBUTES sa;
-		sa.nLength              = sizeof(sa);
+		SECURITY_ATTRIBUTES sa = {sizeof(sa)};
 		sa.lpSecurityDescriptor = pSD;
 		sa.bInheritHandle       = TRUE;
 
 		// If the user chooses not to copy the token, then changes made to it
 		// will effect the owning process
-		if (IDNO == MessageBox(hwnd, TEXT("Would you like to make a copy of ")
-			TEXT("this process token?\n(Selecting \"No\" will cause the ")
-			TEXT("\"AdjustToken\" and \"SetToken\"\nfeatures to affect the ")
-			TEXT("owning process.) "), TEXT("Duplicate Token?"), MB_YESNO)) 
+		const TCHAR *prompt = 
+			TEXT("Would you like to make a copy of this process token?\n\n")
+			TEXT("Selecting \"No\" will cause the \"AdjustToken\" and \"SetToken\" features to affect the owning process.");
+		if (IDNO == MessageBox(hwnd, prompt, TEXT("Duplicate Token?"), MB_YESNO))
 		{
 			g_hToken = hToken;
 		}  
