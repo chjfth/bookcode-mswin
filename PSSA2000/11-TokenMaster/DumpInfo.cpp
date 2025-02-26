@@ -411,29 +411,20 @@ void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken)
 
 void DumpTokenSource(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	PTOKEN_SOURCE ptsSource = NULL;
+	PTOKEN_SOURCE ptsSource = (PTOKEN_SOURCE) myAllocateTokenInfo(hToken, TokenSource);
+	Cec_LocalFree cec_pts = ptsSource;
+	if (ptsSource == NULL)
+		return;
 
-	try {{
+	TCHAR szName[TOKEN_SOURCE_LENGTH+1] = {}; // TOKEN_SOURCE_LENGTH=8
+	int nIndex = TOKEN_SOURCE_LENGTH;
+	while (nIndex-- != 0) // copy the 8 Chars ( char -> TCHAR )
+		szName[nIndex] = ptsSource->SourceName[nIndex];
 
-		ptsSource = (PTOKEN_SOURCE) myAllocateTokenInfo(hToken, TokenSource);
-		if (ptsSource == NULL)
-			goto leave;
-
-		TCHAR szName[9];
-		int nIndex = 8;
-		while (nIndex-- != 0)
-			szName[nIndex] = ptsSource->SourceName[nIndex];
-
-		szName[8] = 0;
-		pbufToken->Print(DIVIDERL TEXT("Token Source:  "));
-		pbufToken->Print(szName);
-		pbufToken->Print(TEXT("\r\n") DIVIDERL);
-
-	} leave:;
-	} catch(...) {}
-
-	if (ptsSource != NULL)
-		LocalFree(ptsSource);
+	szName[TOKEN_SOURCE_LENGTH] = '\0';
+	
+	pbufToken->Print(DIVIDERL TEXT("Token Source: %s\r\n") DIVIDERL, szName);
+	// -- [2025-02-26] Chj sees "User32"
 }
 
 
@@ -442,43 +433,33 @@ void DumpTokenSource(HANDLE hToken, CPrintBuf* pbufToken)
 
 void DumpTokenImpersonationLevel(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	PSECURITY_IMPERSONATION_LEVEL psilImpersonation = NULL;
+	PSECURITY_IMPERSONATION_LEVEL psilImpersonation = 
+		(PSECURITY_IMPERSONATION_LEVEL) myAllocateTokenInfo(hToken, TokenImpersonationLevel);
+	Cec_LocalFree cec_psil = psilImpersonation;
+	if (psilImpersonation == NULL)
+		return;
 
-	try {{
+	pbufToken->Print(DIVIDERL TEXT("Token Impersonation Level:  "));
 
-		psilImpersonation = (PSECURITY_IMPERSONATION_LEVEL) myAllocateTokenInfo(
-			hToken, TokenImpersonationLevel);
-		if (psilImpersonation == NULL)
-			goto leave;
+	switch (*psilImpersonation) {
+	case SecurityAnonymous:
+		pbufToken->Print(TEXT("Anonymous"));
+		break;
 
-		pbufToken->Print(DIVIDERL TEXT("Token Impersonation Level:  "));
+	case SecurityIdentification:
+		pbufToken->Print(TEXT("Identification"));
+		break;
 
-		switch (*psilImpersonation) {
+	case SecurityImpersonation:
+		pbufToken->Print(TEXT("Impersonation"));
+		break;
 
-		case SecurityAnonymous:
-			pbufToken->Print(TEXT("Anonymous"));
-			break;
+	case SecurityDelegation:
+		pbufToken->Print(TEXT("Delegation"));
+		break;
+	}
 
-		case SecurityIdentification:
-			pbufToken->Print(TEXT("Identification"));
-			break;
-
-		case SecurityImpersonation:
-			pbufToken->Print(TEXT("Impersonation"));
-			break;
-
-		case SecurityDelegation:
-			pbufToken->Print(TEXT("Delegation"));
-			break;
-		}
-
-		pbufToken->Print(TEXT("\r\n") DIVIDERL);
-
-	} leave:;
-	} catch(...) {}
-
-	if (psilImpersonation != NULL)
-		LocalFree(psilImpersonation );
+	pbufToken->Print(TEXT("\r\n") DIVIDERL);
 }
 
 
@@ -487,39 +468,29 @@ void DumpTokenImpersonationLevel(HANDLE hToken, CPrintBuf* pbufToken)
 
 void DumpTokenType(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	PTOKEN_TYPE pttType = NULL;
+	PTOKEN_TYPE pttType = (PTOKEN_TYPE) myAllocateTokenInfo(hToken, TokenType);
+	Cec_LocalFree cec_ptt = pttType;
+	if (pttType == NULL)
+		return;
 
-	try {{
+	pbufToken->Print(DIVIDERL TEXT("Token Type:  "));
 
-		pttType = (PTOKEN_TYPE) myAllocateTokenInfo(hToken, TokenType);
-		if (pttType == NULL)
-			goto leave;
+	BOOL fImpersonation = FALSE;
+	switch (*pttType) {
+	case TokenPrimary:
+		pbufToken->Print(TEXT("Primary"));
+		break;
 
-		pbufToken->Print(DIVIDERL TEXT("Token Type:  "));
+	case TokenImpersonation:
+		pbufToken->Print(TEXT("Impersonation"));
+		fImpersonation = TRUE;
+		break;
+	}
 
-		BOOL fImpersonation = FALSE;
-		switch (*pttType) {
+	pbufToken->Print(TEXT("\r\n") DIVIDERL);
 
-		case TokenPrimary:
-			pbufToken->Print(TEXT("Primary"));
-			break;
-
-		case TokenImpersonation:
-			pbufToken->Print(TEXT("Impersonation"));
-			fImpersonation = TRUE;
-			break;
-		}
-
-		pbufToken->Print(TEXT("\r\n") DIVIDERL);
-
-		if (fImpersonation)
-			DumpTokenImpersonationLevel(hToken, pbufToken);
-
-	} leave:;
-	} catch(...) {}
-
-	if (pttType != NULL)
-		LocalFree(pttType);
+	if (fImpersonation)
+		DumpTokenImpersonationLevel(hToken, pbufToken);
 }
 
 BOOL DumpTokenUser(HANDLE hToken, CPrintBuf* pbufToken) 
