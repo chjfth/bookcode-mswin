@@ -16,6 +16,8 @@ extern HWND g_hwndLogonProviders;
 extern HWND g_hwndImpersonationLevels;
 extern HWND g_hwndTokenTypes;
 
+typedef DWORD WinError_t;
+
 BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled);
 
 HANDLE myOpenSystemProcess();
@@ -32,7 +34,7 @@ BOOL TryRelaunch();
 BOOL myGetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize);
 
 
-void RefreshStatus(PTSTR szStatus, DWORD dwLastError);
+void RefreshStatus(PCTSTR szStatus, DWORD dwLastError);
 
 PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass);
 

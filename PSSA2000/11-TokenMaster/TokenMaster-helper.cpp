@@ -394,7 +394,7 @@ BOOL myGetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize)
 }
 
 
-void RefreshStatus(PTSTR szStatus, DWORD dwLastError) 
+void RefreshStatus(PCTSTR szStatus, DWORD dwLastError) 
 {
 	CPrintBuf* pbufStatus = NULL;
 
@@ -600,6 +600,7 @@ void guiUpdatePrivileges()
 void guiUpdateGroups() 
 {
 	DWORD winerr = 0;
+	BOOL succ = FALSE;
 	PTOKEN_GROUPS ptgGroups = NULL;
 
 	// Clear out both list boxes
@@ -629,13 +630,14 @@ void guiUpdateGroups()
 		SID_NAME_USE sNameUse = SidTypeInvalid; // neg-init
 		AutoTCHARs SidName, SidDomain;
 		do {
-			winerr = LookupAccountSid(NULL, &sid, 
+			succ = LookupAccountSid(NULL, &sid, 
 				SidName, SidName,
 				SidDomain, SidDomain,
 				&sNameUse);
-		} while(!winerr && Is_LessBuffer(winerr));
+			winerr = GetLastError();
+		} while(!succ && Is_LessBuffer(winerr));
 
-		if(winerr)
+		if(!succ)
 		{
 			vaDbgTs(
 				_T("In guiUpdateGroups(): LookupAccountSid() winerr=%d\r\n")
@@ -856,143 +858,134 @@ void guiPopulateStaticCombos()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void guiGetToken(HWND hwnd) 
+WinError_t in_guiGetToken(HWND hwnd, const TCHAR *&pszStatus) 
 {
 	// chjmemo: This function will re-assign g_hToken.
 
-	DWORD  dwStatus;
+	DWORD  winerr = 0;
 	HANDLE hThread    = NULL;
+	Cec_PTRHANDLE cec_hThread;
 	HANDLE hProcess   = NULL;
+	Cec_PTRHANDLE cec_hProcess;
 	HANDLE hToken     = NULL;
-	PTSTR  pszStatus  = TEXT("Dumped Process Token");
+	Cec_PTRHANDLE cec_hToken;
 
-	PSECURITY_DESCRIPTOR pSD = NULL;
+	pszStatus  = TEXT("Dumped Process Token");
 
 	if (g_hToken != NULL) {
 		CloseHandle(g_hToken);
 		g_hToken = NULL;
 	}
 
-	try 
-	{{
-		// Find the process ID
-		LRESULT idxIndex = ComboBox_GetCurSel(g_hwndProcessCombo);
-		DWORD dwProcessID = (DWORD)ComboBox_GetItemData(g_hwndProcessCombo, idxIndex);
+	// Find the process ID
+	LRESULT idxIndex = ComboBox_GetCurSel(g_hwndProcessCombo);
+	DWORD dwProcessID = (DWORD)ComboBox_GetItemData(g_hwndProcessCombo, idxIndex);
 
-		// Get the thread ID
-		idxIndex = ComboBox_GetCurSel(g_hwndThreadCombo);
-		DWORD dwThreadID = (DWORD)ComboBox_GetItemData(g_hwndThreadCombo, idxIndex);
+	// Get the thread ID
+	idxIndex = ComboBox_GetCurSel(g_hwndThreadCombo);
+	DWORD dwThreadID = (DWORD)ComboBox_GetItemData(g_hwndThreadCombo, idxIndex);
 
-		// Open the thread if we can
-		hThread = OpenThread(THREAD_QUERY_INFORMATION, FALSE, dwThreadID);
+	// Open the thread if we can
+	hThread = OpenThread(THREAD_QUERY_INFORMATION, FALSE, dwThreadID);
+	cec_hThread = hThread;
 
-		// Thread?
-		if (hThread != NULL) 
+	// Thread?
+	if (hThread != NULL) 
+	{
+		// Get its token
+		if (!OpenThreadToken(hThread, TOKEN_READ|TOKEN_QUERY_SOURCE, TRUE, &hToken)) 
 		{
-			// Get its token
-			if (!OpenThreadToken(hThread, TOKEN_READ|TOKEN_QUERY_SOURCE, TRUE, &hToken)) 
-			{
-				hToken = NULL;
-				if (GetLastError() == ERROR_NO_TOKEN) {
+			winerr = GetLastError();
+			assert(hToken == NULL);
+			if (winerr == ERROR_NO_TOKEN) {
 
-					// Not a critical error, the thread doesn't have a token
-					pszStatus = TEXT("Thread does not have a token, dumping process token");
-					SetLastError(0);
+				// Not a critical error, the thread doesn't have a token
+				pszStatus = TEXT("Thread does not have a token, dumping process token.");
+				winerr = 0;
 
-				} else {
-
-					pszStatus = TEXT("OpenThreadToken");
-					goto leave;
-				}
-			}
-		}
-
-		// So we don't have a (thread) token yet, lets get it from the process
-		if (hToken == NULL) 
-		{
-			// Get the handle to the process
-			hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessID);
-			if (hProcess == NULL) {
-				pszStatus = TEXT("OpenProcess");
-				goto leave;
+			} else {
+				pszStatus = TEXT("OpenThreadToken");
 			}
 
-			// Get the token (All access so we can change and launch things
-			if (!OpenProcessToken(hProcess, TOKEN_ALL_ACCESS, &hToken)) {
-				hToken = NULL;
-				pszStatus = TEXT("OpenProcessToken");
-				goto leave;
-			}
+			return winerr;
 		}
 
-		// Get memory for an SD
-		pSD = (PSECURITY_DESCRIPTOR) GlobalAlloc(GPTR, SECURITY_DESCRIPTOR_MIN_LENGTH);
+		cec_hToken = hToken;
+	}
 
-		if (pSD == NULL) {
-			pszStatus = TEXT("GlobalAlloc");
-			goto leave;
+	// So we don't have a (thread) token yet, lets get it from the process
+	if (hToken == NULL)
+	{
+		// Get the handle to the process
+		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessID);
+		cec_hProcess = hProcess;
+		if (hProcess == NULL) {
+			pszStatus = TEXT("OpenProcess");
+			return GetLastError();
 		}
 
-		// Initialize it
-		if (!InitializeSecurityDescriptor(pSD, SECURITY_DESCRIPTOR_REVISION)) {
-			pszStatus = TEXT("InitializeSecurityDescriptor");
-			goto leave;
+		// Get the token (All access so we can change and launch things
+		if (!OpenProcessToken(hProcess, TOKEN_ALL_ACCESS, &hToken)) {
+			assert(hToken == NULL);
+			pszStatus = TEXT("OpenProcessToken");
+			return GetLastError();
 		}
 
-		// Add a NULL DACL to the security descriptor..
-		if (!SetSecurityDescriptorDacl(pSD, TRUE, (PACL)NULL, FALSE)) {
-			pszStatus = TEXT("SetSecurityDescriptorDacl");
-			goto leave;
-		}
+		cec_hToken = hToken;
+	}
 
-		// We made the security descriptor just in case they want a duplicate.
-		// We make the duplicate have all access to everyone.
-		SECURITY_ATTRIBUTES sa = {sizeof(sa)};
-		sa.lpSecurityDescriptor = pSD;
-		sa.bInheritHandle       = TRUE;
+	// alloc memory for an SD
+	SECURITY_DESCRIPTOR minSD = {}, *pSD = &minSD;
 
-		// If the user chooses not to copy the token, then changes made to it
-		// will effect the owning process
-		const TCHAR *prompt = 
-			TEXT("Would you like to make a copy of this process token?\n\n")
-			TEXT("Selecting \"No\" will cause the \"AdjustToken\" and \"SetToken\" features to affect the owning process.");
-		if (IDNO == MessageBox(hwnd, prompt, TEXT("Duplicate Token?"), MB_YESNO))
+	// Initialize it
+	if (!InitializeSecurityDescriptor(pSD, SECURITY_DESCRIPTOR_REVISION)) {
+		pszStatus = TEXT("InitializeSecurityDescriptor");
+		return GetLastError();
+	}
+
+	// Add a NULL DACL to the security descriptor..
+	if (!SetSecurityDescriptorDacl(pSD, TRUE, (PACL)NULL, FALSE)) {
+		pszStatus = TEXT("SetSecurityDescriptorDacl");
+		return GetLastError();
+	}
+
+	// We made the security descriptor just in case they want a duplicate.
+	// We make the duplicate have all access to everyone.
+	SECURITY_ATTRIBUTES sa = {sizeof(sa)};
+	sa.lpSecurityDescriptor = pSD;
+	sa.bInheritHandle       = TRUE;
+
+	// If the user chooses not to copy the token, then changes made to it
+	// will effect the owning process
+	const TCHAR *prompt = 
+		TEXT("Would you like to make a copy of this process token?\n\n")
+		TEXT("Selecting \"No\" will cause the \"AdjustToken\" and \"SetToken\" features to affect the owning process.");
+	if (IDNO == MessageBox(hwnd, prompt, TEXT("Duplicate Token?"), MB_YESNO))
+	{
+		g_hToken = hToken;
+		cec_hToken.Cleanup(false); // Give up resource life-management for hToken
+	}  
+	else 
+	{
+		// Duplicate the token
+		if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, &sa,
+			SecurityImpersonation, TokenPrimary, &g_hToken)) 
 		{
-			g_hToken = hToken;
-		}  
-		else 
-		{
-			// Duplicate the token
-			if (!DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, &sa,
-				SecurityImpersonation, TokenPrimary, &g_hToken)) 
-			{
-				g_hToken = NULL;
-				pszStatus = TEXT("DuplicateTokenEx");
-				goto leave;
-			}
+			assert(g_hToken == NULL);
+			pszStatus = TEXT("DuplicateTokenEx");
+			return GetLastError();
 		}
+	}
 
-		SetLastError(0);
+	return NOERROR;
+}
 
-	} leave:;
-	} catch(...) {}
+void guiGetToken(HWND hwnd) 
+{
+	const TCHAR *pszStatus = NULL;
+	WinError_t winerr = in_guiGetToken(hwnd, pszStatus);
 
-	// Status and Cleanup
-	dwStatus = GetLastError();
-
-	if (hToken && hToken != g_hToken)
-		CloseHandle(hToken);
-
-	if (hProcess != NULL)
-		CloseHandle(hProcess);
-
-	if (hThread != NULL)
-		CloseHandle(hThread);
-
-	if (pSD != NULL)
-		GlobalFree(pSD);
-
-	RefreshStatus(pszStatus, dwStatus);
+	RefreshStatus(pszStatus, winerr);
 }
 
 

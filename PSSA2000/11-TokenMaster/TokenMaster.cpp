@@ -42,7 +42,7 @@ HINSTANCE g_hInst;
 
 CUILayout g_pResizer;
 
-#define EXE_VERSION "1.0.3"
+#define EXE_VERSION "1.0.4"
 
 ///////////////////////////////////////////////////////////////////////////////
 
