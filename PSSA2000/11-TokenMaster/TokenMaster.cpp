@@ -12,8 +12,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "Resource.h"
 
-#define UILAYOUT_IMPL
-#include "..\ClassLib\UILayout.h"      // See Appendix B.
+#define JULAYOUT_IMPL
+#include <mswin/JULayout2.h>
 
 #define AUTOBUF_IMPL
 #include "..\ClassLib\AutoBuf.h"       // See Appendix B.
@@ -40,8 +40,6 @@ HWND g_hwndTokenTypes;
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 HINSTANCE g_hInst;
-
-CUILayout g_pResizer;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -854,17 +852,54 @@ void Dlg_OnDestroy(HWND hwnd) {
 		CloseHandle(g_hSnapShot);
 }
 
-void Dlg_OnSize(HWND hwnd, UINT state, int cx, int cy) {
+static void Dlg_EnableJULayout(HWND hdlg)
+{
+	JULayout *jul = JULayout::EnableJULayout(hdlg);
 
-	// Simply call the AdjustControls function of our handy resizer class
-	g_pResizer.AdjustControls(cx, cy);
+	const int x30=30, x45=45, x60=60, x80=80, x100=100;
+	const int y50=50, y70=70, y85=85, y100=100;
+
+	//// Right-side of GUI ////
+
+	// Retrieve a token groupbox
+	jul->AnchorControl(0,0, 0,0, IDS_RETRIEVE); 
+
+	// Create a process with the current token (groupbox area)
+	jul->AnchorControl(x60,0, x100,0, IDS_CREATEPROCESS);
+	jul->AnchorControl(x60,0, x100,0, IDE_FILENAME);
+	jul->AnchorControl(x100,0, x100,0, IDB_BROWSE);
+	jul->AnchorControl(x60,0, x60,0, IDB_CREATEPROCESS);
+
+	// Enable or Disable token groups (groupbox area)
+	jul->AnchorControls(x60,0, x100,y50, IDS_ADJUSTGROUPS, IDL_ENABLEGROUPS, -1);
+	jul->AnchorControl(x80,y50, x80,y50, IDB_ADJUSTTOKENGROUPS);
+
+	// Enable or Disable token privileges (groupbox area)
+	jul->AnchorControls(x60,y50, x100,y100, IDS_ADJUSTPRIV, IDL_ENABLEPRIVILEGES, -1);
+	jul->AnchorControl(x80,y100, x80,y100, IDB_ADJUSTTOKENPRIVILEGES);
+
+	// SetTokenInformation buttons (groupbox area)
+	jul->AnchorControl(x60,y100, x100,y100, IDS_SETTOKENINFORMATION);
+	jul->AnchorControls(x80,y100, x80,y100, IDB_SETOWNER, IDB_SETGROUP, IDB_SETDACL, -1);
+
+	//// Left-side of GUI ////
+
+	jul->AnchorControl(0,0, x60,0, IDE_STATUS);  // Status readonly editbox
+	jul->AnchorControl(0,0, x60,y70, IDE_TOKEN); // Token-info readonly editbox
+
+	// Create a restricted token (groupbox area)
+	jul->AnchorControl(0,y70, x60,y100, IDS_CREATEARESTRICTEDTOKEN); // the big groupbox
+	//
+	jul->AnchorControl(0,y70, x30,y70, IDS_DELETEDPRIVILEGES);
+	jul->AnchorControl(0,y70, x30,y85, IDL_DELETEDPRIVILEGES);
+	//
+	jul->AnchorControl(0,y85, x30,y85, IDS_DISABLEDSIDS);
+	jul->AnchorControl(0,y85, x30,y100, IDL_DISABLEDSIDS);
+	//
+	jul->AnchorControls(x30,y70, x60,y100, IDS_ADDREMOVERESTRICTED, IDL_RESTRICTEDSIDS, -1);
+	jul->AnchorControls(x45,y100, x45,y100, IDB_ADDRESTRICTED, IDB_REMOVERESTRICTED, IDB_CREATERESTRICTEDTOKEN, -1);
 }
 
-void Dlg_OnGetMinMaxInfo(HWND hwnd, PMINMAXINFO pMinMaxInfo) {
-
-	// Just calling another resizer function
-	g_pResizer.HandleMinMax(pMinMaxInfo);
-}
 
 BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam) 
 {
@@ -872,35 +907,46 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 	SetWindowText(hwnd, _T("TokenMaster v") _T(EXE_VERSION));
 
+	Dlg_EnableJULayout(hwnd);
+#if 0
 	// Create a resizer object.  This is a helper class for resizing controls.
 	// See "CmnCls.h" for an explanation of use, as well as the source for
 	// The CResizeHandler class
 	g_pResizer.Initialize(hwnd);
 
 	// Submit most of the controls to the will of the resizer class
-	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_TOPRIGHT, IDS_CREATEPROCESS, TRUE);
-	g_pResizer.AnchorControl(CUILayout::AP_CENTER, CUILayout::AP_BOTTOMRIGHT, IDS_ADJUSTPRIV, TRUE);
-	g_pResizer.AnchorControl(CUILayout::AP_BOTTOMMIDDLE, CUILayout::AP_BOTTOMRIGHT, IDS_SETTOKENINFORMATION, TRUE);
-	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_MIDDLERIGHT, IDS_ADJUSTGROUPS, TRUE);
+//	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_TOPRIGHT, IDS_CREATEPROCESS, TRUE);
+//	g_pResizer.AnchorControl(CUILayout::AP_CENTER, CUILayout::AP_BOTTOMRIGHT, IDS_ADJUSTPRIV, TRUE);
+//	g_pResizer.AnchorControl(CUILayout::AP_BOTTOMMIDDLE, CUILayout::AP_BOTTOMRIGHT, IDS_SETTOKENINFORMATION, TRUE);
+//	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_MIDDLERIGHT, IDS_ADJUSTGROUPS, TRUE);
 	g_pResizer.AnchorControl(CUILayout::AP_TOPLEFT, CUILayout::AP_BOTTOMMIDDLE, IDE_TOKEN);
-	g_pResizer.AnchorControl(CUILayout::AP_CENTER, CUILayout::AP_BOTTOMRIGHT, IDL_ENABLEPRIVILEGES);
-	g_pResizer.AnchorControl(CUILayout::AP_CENTER, CUILayout::AP_MIDDLERIGHT, IDB_ADJUSTTOKENGROUPS);
-	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_MIDDLERIGHT, IDL_ENABLEGROUPS);
-	g_pResizer.AnchorControl(CUILayout::AP_TOPRIGHT, CUILayout::AP_TOPRIGHT, IDB_BROWSE);
-	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_TOPRIGHT, IDE_FILENAME);
-	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_TOPMIDDLE, IDB_CREATEPROCESS);
-	g_pResizer.AnchorControl(CUILayout::AP_TOPLEFT, CUILayout::AP_TOPMIDDLE, IDE_STATUS);
+//	g_pResizer.AnchorControl(CUILayout::AP_CENTER, CUILayout::AP_BOTTOMRIGHT, IDL_ENABLEPRIVILEGES);
+//	g_pResizer.AnchorControl(CUILayout::AP_CENTER, CUILayout::AP_MIDDLERIGHT, IDB_ADJUSTTOKENGROUPS);
+//	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_MIDDLERIGHT, IDL_ENABLEGROUPS);
+//	g_pResizer.AnchorControl(CUILayout::AP_TOPRIGHT, CUILayout::AP_TOPRIGHT, IDB_BROWSE);
+//	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_TOPRIGHT, IDE_FILENAME);
+//	g_pResizer.AnchorControl(CUILayout::AP_TOPMIDDLE, CUILayout::AP_TOPMIDDLE, IDB_CREATEPROCESS);
+//	g_pResizer.AnchorControl(CUILayout::AP_TOPLEFT, CUILayout::AP_TOPMIDDLE, IDE_STATUS);
 
-	g_pResizer.AnchorControls(CUILayout::AP_BOTTOMLEFT, CUILayout::AP_BOTTOMLEFT, FALSE, IDL_DELETEDPRIVILEGES,
-		IDL_DISABLEDSIDS, IDL_RESTRICTEDSIDS, IDB_ADDRESTRICTED,
-		IDB_REMOVERESTRICTED, IDB_CREATERESTRICTEDTOKEN, (UINT)-1);
+	g_pResizer.AnchorControls(CUILayout::AP_BOTTOMLEFT, CUILayout::AP_BOTTOMLEFT, FALSE, 
+//		IDL_DELETEDPRIVILEGES,
+//		IDL_DISABLEDSIDS, 
+//		IDL_RESTRICTEDSIDS, 
+//		IDB_ADDRESTRICTED,
+//		IDB_REMOVERESTRICTED, 
+//		IDB_CREATERESTRICTEDTOKEN, (UINT)-1);
 
-	g_pResizer.AnchorControls(CUILayout::AP_BOTTOMLEFT, CUILayout::AP_BOTTOMLEFT, TRUE, IDS_CREATEARESTRICTEDTOKEN,
-		IDS_DELETEDPRIVILEGES, IDS_DISABLEDSIDS, IDS_ADDREMOVERESTRICTED, (UINT)-1);
+	g_pResizer.AnchorControls(CUILayout::AP_BOTTOMLEFT, CUILayout::AP_BOTTOMLEFT, TRUE, 
+		IDS_CREATEARESTRICTEDTOKEN,
+//		IDS_DELETEDPRIVILEGES, 
+//		IDS_DISABLEDSIDS, 
+//		IDS_ADDREMOVERESTRICTED, 
+		(UINT)-1);
 
-	g_pResizer.AnchorControls(CUILayout::AP_BOTTOMMIDDLE, CUILayout::AP_BOTTOMRIGHT, FALSE, IDB_ADJUSTTOKENPRIVILEGES,
-		IDB_SETOWNER, IDB_SETGROUP, IDB_SETDACL, (UINT)-1);
-
+	g_pResizer.AnchorControls(CUILayout::AP_BOTTOMMIDDLE, CUILayout::AP_BOTTOMRIGHT, FALSE, 
+//		IDB_ADJUSTTOKENPRIVILEGES,
+//		IDB_SETOWNER, 	IDB_SETGROUP, 	IDB_SETDACL, (UINT)-1);
+#endif
 	// Store some window handles
 	g_hwndProcessCombo = GetDlgItem(hwnd, IDC_PROCESSES);
 	g_hwndThreadCombo = GetDlgItem(hwnd, IDC_THREADS);
@@ -942,9 +988,7 @@ INT_PTR WINAPI Dlg_Proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	switch (uMsg) {
 		HANDLE_MSG(hwnd, WM_INITDIALOG, Dlg_OnInitDialog);
-		HANDLE_MSG(hwnd, WM_SIZE, Dlg_OnSize);
 		HANDLE_MSG(hwnd, WM_CLOSE, Dlg_OnClose);
-		HANDLE_MSG(hwnd, WM_GETMINMAXINFO, Dlg_OnGetMinMaxInfo);
 		HANDLE_MSG(hwnd, WM_COMMAND, Dlg_OnCommand);
 		HANDLE_MSG(hwnd, WM_DESTROY, Dlg_OnDestroy);
 	}

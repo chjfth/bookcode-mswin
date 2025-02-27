@@ -629,7 +629,7 @@ void guiUpdateGroups()
 				ListBox_SetSel(g_hwndEnableGroups, TRUE, dwItem);
 		}
 
-		// Add to the CreateRestrictedToken list
+		// Add to the CreateRestrictedToken list ([2025-02-27] chj??)
 		dwItem = ListBox_AddString(g_hwndDisabledSids, szCompositeName);
 		ListBox_SetItemData(g_hwndDisabledSids, dwItem, dwIndex);
 
