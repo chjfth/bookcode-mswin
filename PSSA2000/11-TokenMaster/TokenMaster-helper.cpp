@@ -495,102 +495,65 @@ PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass)
 
 void guiUpdatePrivileges() 
 {
-	PTOKEN_PRIVILEGES ptpPrivileges = NULL;
-
-	PTSTR pszName     = NULL;
-	PTSTR pszDispName = NULL;
-
 	// Clear out both list boxes
 	ListBox_ResetContent(g_hwndEnablePrivileges);
 	ListBox_ResetContent(g_hwndDeletedPrivileges);
 
-	try {{
+	// No token?  Then we fly
+	if (g_hToken == NULL)
+		return;
 
-		// No token?  Then we fly
-		if (g_hToken == NULL)
-			goto leave;
+	// Get that token-privilege information
+	PTOKEN_PRIVILEGES ptpPrivileges = 
+		(PTOKEN_PRIVILEGES) myAllocateTokenInfo(g_hToken, TokenPrivileges);
+	Cec_LocalFree cec_ptp = ptpPrivileges;
+	if (ptpPrivileges == NULL)
+		return;
 
-		// Get that token-privilege information
-		ptpPrivileges = (PTOKEN_PRIVILEGES) myAllocateTokenInfo(g_hToken,
-			TokenPrivileges);
-		if (ptpPrivileges == NULL)
-			goto leave;
+	BOOL succ = 0;
+	DWORD winerr = 0;
+	AutoTCHARs abName, abDispName, abListBoxText;
 
-		// Iterate through the privileges
-		DWORD dwIndex;
-		for (dwIndex = 0; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) 
-		{
-			// Get size of the name
-			DWORD dwSize = 0;
-			LookupPrivilegeName(NULL, &(ptpPrivileges->Privileges[dwIndex].Luid),
-				pszName, &dwSize);
-			pszName = (PTSTR) LocalAlloc(LPTR, dwSize * sizeof(TCHAR));
-			if (pszName == NULL)
-				goto leave;
+	// Iterate through the privileges
+	DWORD dwIndex;
+	for (dwIndex = 0; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) 
+	{
+		LUID_AND_ATTRIBUTES &luidaa = ptpPrivileges->Privileges[dwIndex];
 
-			// Get the name itself
-			if (!LookupPrivilegeName(NULL,
-				&(ptpPrivileges->Privileges[dwIndex].Luid), pszName, &dwSize))
-				goto leave;
+		do {
+			succ = LookupPrivilegeName(NULL, &luidaa.Luid, abName, abName);
+			winerr = GetLastError();
+		} while(!succ && Is_LessBuffer(winerr));
 
-			// Get the display name size
-			DWORD dwDispSize = 0;
-			DWORD dwLangID;
-			LookupPrivilegeDisplayName(NULL, pszName, NULL, &dwDispSize,
+		DWORD dwLangID = 0;
+		do {
+			succ = LookupPrivilegeDisplayName(NULL, abName, 
+				abDispName, abDispName,
 				&dwLangID);
-			pszDispName = (PTSTR) LocalAlloc(LPTR, (dwDispSize + dwSize + 3)
-				* sizeof(TCHAR));
-			if (pszDispName == NULL)
-				goto leave;
+			winerr = GetLastError();
+		} while(!succ && Is_LessBuffer(winerr));
 
-			// Create the composite string
-			lstrcpy(pszDispName, pszName);
-			lstrcat(pszDispName, TEXT("--"));
+		const TCHAR hypens[] = _T(" -- ");
 
-			// Get the display name
-			if (!LookupPrivilegeDisplayName(NULL, pszName, pszDispName
-				+ lstrlen(pszDispName), &dwDispSize, &dwLangID))
-				goto leave;
+		abListBoxText = _tcslen(abName) + _tcslen(hypens) + _tcslen(abDispName) + 1; // set buffer-size
 
-			// Add the string to the enable/disable privilege list
-			DWORD_PTR dwItem = SendMessage(g_hwndEnablePrivileges, LB_ADDSTRING, 0,
-				(LPARAM) pszDispName);
+		_sntprintf_s(abListBoxText, abListBoxText.Size(), _TRUNCATE, _T("%s%s%s"),
+			abName.Bufptr(), hypens, abDispName.Bufptr());
 
-			// Now the item data
-			SendMessage(g_hwndEnablePrivileges, LB_SETITEMDATA, dwItem,
-				(LPARAM) dwIndex);
+		// Add the string to the enable/disable privilege list
+		DWORD_PTR dwItem = ListBox_AddString(g_hwndEnablePrivileges, abListBoxText);
 
-			// If it is enabled then enable it in the list box
-			if (ptpPrivileges->Privileges[dwIndex].Attributes
-				& SE_PRIVILEGE_ENABLED)
-				SendMessage(g_hwndEnablePrivileges, LB_SETSEL, TRUE, dwItem);
+		// Now the item data
+		ListBox_SetItemData(g_hwndEnablePrivileges, dwItem, dwIndex);
+		//
+		// If it is enabled, then enable it in the list box
+		if (luidaa.Attributes & SE_PRIVILEGE_ENABLED)
+			ListBox_SetSel(g_hwndEnablePrivileges, TRUE, dwItem);
 
-			// Now the deleted privileges
-			dwItem = SendMessage(g_hwndDeletedPrivileges, LB_ADDSTRING, 0,
-				(LPARAM) pszName);
-			SendMessage(g_hwndDeletedPrivileges, LB_SETITEMDATA, dwItem,
-				(LPARAM) dwIndex);
-
-			// Free up our recurring buffers
-			LocalFree(pszName);
-			pszName = NULL;
-
-			LocalFree(pszDispName);
-			pszDispName = NULL;
-		}
-
-	} leave:;
-	} catch(...) {}
-
-	// Cleanup
-	if (ptpPrivileges != NULL)
-		LocalFree(ptpPrivileges);
-
-	if (pszName != NULL)
-		LocalFree(pszName);
-
-	if (pszDispName != NULL)
-		LocalFree(pszDispName);
+		// Now the deleted privileges
+		dwItem = ListBox_AddString(g_hwndDeletedPrivileges, abName);
+		ListBox_SetItemData(g_hwndDeletedPrivileges, dwItem, dwIndex);
+	}
 }
 
 
