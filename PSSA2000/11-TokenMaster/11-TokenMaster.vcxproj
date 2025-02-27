@@ -219,6 +219,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="exe_version.h" />
     <ClInclude Include="TokenMaster-helper.h" />
     <ClInclude Include="shareinc.h" />
     <ClInclude Include="DumpInfo.h" />

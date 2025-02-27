@@ -76,9 +76,9 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 
 	SID_NAME_USE snuUse = SidTypeInvalid; // neg-init
 	PTSTR pszUse = NULL;
-	TCHAR szName[255]    = {TEXT("[Logon SID]")};
+	TCHAR szName[255]    = {};
 	DWORD dwSize         = ARRAYSIZE(szName);
-	TCHAR szDomName[255] = {TEXT("")};
+	TCHAR szDomName[255] = {};
 	DWORD dwDomSize      = ARRAYSIZE(szDomName);
 
 	// What is the SID type
@@ -131,7 +131,7 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 		PSID_IDENTIFIER_AUTHORITY psia = GetSidIdentifierAuthority(psid);
 		DWORD dwFirstSub = *GetSidSubAuthority(psid, 0);
 		if (dwFirstSub == 5 && psia->Value[6] == 5)
-			pszUse = TEXT("Logon SID");
+			pszUse = TEXT("(Logon SID)");
 		else
 			pszUse = TEXT("");
 	}
@@ -142,19 +142,15 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 	Cec_LocalFree cec_sidtext = pszSIDText;
 
 	// Output the things we have learned
-	pbufToken->Print(TEXT("SID:\t\t"));
-	pbufToken->Print(pszSIDText);
+	pbufToken->Print(TEXT("SID:\t\t%s\r\n"), pszSIDText);
 
-	pbufToken->Print(TEXT("\r\nUse:\t\t"));
-	pbufToken->Print(pszUse);
+	pbufToken->Print(TEXT("Use:\t\t%s\r\n"), pszUse);
 
-	pbufToken->Print(TEXT("\r\nName:\t\t"));
-	pbufToken->Print(szName);
+	pbufToken->Print(TEXT("\r\nName:\t\t\"%s\"\r\n"), szName);
 
-	pbufToken->Print(TEXT("\r\nDomain Name:\t"));
-	pbufToken->Print(szDomName);
+	pbufToken->Print(TEXT("\r\nDomain Name:\t\"%s\"\r\n"), szDomName);
 
-	pbufToken->Print(TEXT("\r\n\r\n"));
+	pbufToken->Print(TEXT("\r\n"));
 }
 
 void DumpSIDAttributes(DWORD dwAttrib, CPrintBuf* pbufToken) 

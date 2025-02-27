@@ -8,6 +8,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "shareinc.h"
 #include "DaclPage.h"
 #include "TokenMaster-helper.h"
+#include "exe_version.h"
 
 #include "Resource.h"
 
@@ -18,8 +19,6 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "..\ClassLib\AutoBuf.h"       // See Appendix B.
 
 #include <vaDbg.h>
-
-#define EXE_VERSION "1.1.0"
 
 HANDLE g_hSnapShot = NULL;
 HANDLE g_hToken = NULL;
