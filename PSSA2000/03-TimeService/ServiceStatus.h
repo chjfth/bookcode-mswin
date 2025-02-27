@@ -31,7 +31,7 @@ public:
 	VOID AcceptControls(DWORD dwFlags, BOOL fAccept = TRUE);
 	BOOL ReportStatus();
 
-	BOOL SetUltimateState(DWORD dwUltimateState, DWORD dwWaitHint = 0);
+	BOOL SetUltimateState(DWORD dwUltimateState, DWORD WaitHint = 0);
 	BOOL AdvanceState(DWORD dwWaitHint, DWORD dwCheckPoint = 0);
 	BOOL ReportUltimateState();
 	BOOL ReportWin32Error(DWORD dwError);
@@ -124,7 +124,7 @@ BOOL CServiceStatus::Initialize(PCTSTR szServiceName,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-BOOL CServiceStatus::SetUltimateState(DWORD dwUltimateState, DWORD dwWaitHint) 
+BOOL CServiceStatus::SetUltimateState(DWORD dwUltimateState, DWORD WaitHint) 
 {
 	// Chj memo: Original function naming is wacky!
 	// Set dwUltimateState as the new wish-for service state.
@@ -151,10 +151,10 @@ BOOL CServiceStatus::SetUltimateState(DWORD dwUltimateState, DWORD dwWaitHint)
 	}
 
 	// When creating a new ServiceMain thread, the system assumes 
-	// dwCurrentState=SERVICE_START_PENDING, dwCheckPoint=0, dwWaitHint=2000
+	// dwCurrentState=SERVICE_START_PENDING, dwCheckPoint=0, WaitHint=2000
 	// So, since we must always increment the checkpoint, let's start at 1
 	dwCheckPoint = 1;
-	this->dwWaitHint = dwWaitHint;
+	this->dwWaitHint = WaitHint;
 
 	// No error to report
 	dwWin32ExitCode = NO_ERROR;
@@ -169,7 +169,7 @@ BOOL CServiceStatus::SetUltimateState(DWORD dwUltimateState, DWORD dwWaitHint)
 		dwCurrentState = dwPendingState; // Update the state in the structure
 
 		// If no wait hint, we reached the desired state
-		fOk = (dwWaitHint != 0) ? ReportStatus() : ReportUltimateState();
+		fOk = (WaitHint != 0) ? ReportStatus() : ReportUltimateState();
 	}
 
 	return(fOk);
@@ -179,13 +179,13 @@ BOOL CServiceStatus::SetUltimateState(DWORD dwUltimateState, DWORD dwWaitHint)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-BOOL CServiceStatus::AdvanceState(DWORD dwWaitHint, DWORD dwCheckPoint) 
+BOOL CServiceStatus::AdvanceState(DWORD WaitHint, DWORD CheckPoint) 
 {
 	// A checkpoint of 0 is invalid, so we'll increment the checkpoint by 1
 	this->dwCheckPoint = 
-		(dwCheckPoint == 0) ? this->dwCheckPoint + 1 : dwCheckPoint;
+		(CheckPoint == 0) ? this->dwCheckPoint + 1 : CheckPoint;
 
-	this->dwWaitHint = dwWaitHint;
+	this->dwWaitHint = WaitHint;
 
 	// No error to report
 	dwWin32ExitCode = NO_ERROR;

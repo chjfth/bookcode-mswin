@@ -12,7 +12,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef enum AM_SECURETYPE{
+enum AM_SECURETYPE {
    AM_FILE = 0, AM_DIR, AM_SERVICE, 
    AM_PRINTER, AM_REGISTRY, AM_SHARE,   
    AM_PROCESS, AM_THREAD, AM_JOB,     

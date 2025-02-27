@@ -149,8 +149,8 @@ BOOL FillInfo(HWND hwnd, ObjInf* pInfo)
 
 	// Map object type to data block in the object map
 	HWND hwndCtrl = GetDlgItem(hwnd, IDC_TYPE);
-	int nIndex = ComboBox_GetCurSel(hwndCtrl);
-	pInfo->m_pEntry = g_objMap + nIndex;
+	int iIndex = ComboBox_GetCurSel(hwndCtrl);
+	pInfo->m_pEntry = g_objMap + iIndex;
 
 	// Copy the object's name into the info block for building the title text
 	lstrcpy(pInfo->m_szObjectName, pInfo->m_pEntry->m_pszComboText);
