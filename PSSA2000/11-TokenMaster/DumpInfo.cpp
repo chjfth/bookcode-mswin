@@ -504,42 +504,35 @@ BOOL DumpTokenUser(HANDLE hToken, CPrintBuf* pbufToken)
 
 BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken) 
 {
-	BOOL          fSuccess  = FALSE;
-	PTOKEN_GROUPS ptgGroups = NULL;
+	BOOL fRestricted = IsTokenRestricted(hToken);
 
-	try {{
+	PTOKEN_GROUPS ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken, TokenRestrictedSids);
+	Cec_LocalFree cec_ptg = ptgGroups;
+	if (ptgGroups == NULL)
+		return FALSE;
 
-		BOOL fRestricted = IsTokenRestricted(hToken);
-		ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken, TokenRestrictedSids);
-		if (ptgGroups == NULL)
-			goto leave;
+	pbufToken->Print(DIVIDERL);
+	pbufToken->Print(fRestricted 
+		? TEXT("Token is Restricted\r\n")
+		: TEXT("Token is not Restricted\r\n"));
+	pbufToken->Print(TEXT("Restricted SID Count:\t%lu\r\n"), ptgGroups->GroupCount);
 
-		pbufToken->Print(DIVIDERL);
-		pbufToken->Print(fRestricted ? TEXT("Token is Restricted\r\n") :
-			TEXT("Token is not Restricted\r\n"));
-		pbufToken->Print(TEXT("Restricted SID Count:\t%lu\r\n"),
-			ptgGroups->GroupCount);
-		pbufToken->Print(TEXT("Restricted SIDs\r\n"));
-		pbufToken->Print(DIVIDERL);
+	pbufToken->Print(TEXT("Restricted SIDs\r\n"));
 
-		DWORD dwIndex = ptgGroups->GroupCount;
-		for (dwIndex = 0; dwIndex < ptgGroups->GroupCount; dwIndex++) {
-			pbufToken->Print(TEXT("Sid #%d\r\n"), dwIndex);
-			DumpSIDAttributes(ptgGroups->Groups[dwIndex].Attributes,
-				pbufToken);
-			DumpSID(ptgGroups->Groups[dwIndex].Sid, pbufToken);
-			pbufToken->Print(DIVIDERS);
-		}
+	DWORD dwIndex = 0;
+	for (; dwIndex < ptgGroups->GroupCount; dwIndex++) {
+		pbufToken->Print(TEXT("  Sid #%d\r\n"), dwIndex);
+		DumpSIDAttributes(ptgGroups->Groups[dwIndex].Attributes, pbufToken);
+		DumpSID(ptgGroups->Groups[dwIndex].Sid, pbufToken);
+		// pbufToken->Print(DIVIDERS);
+	}
 
-		fSuccess = TRUE;
+	if(dwIndex==0) {
+		pbufToken->Print(TEXT("  (none)\r\n"));
+	}
 
-	} leave:;
-	} catch(...) {}
-
-	if (ptgGroups != NULL)
-		LocalFree(ptgGroups);
-
-	return(fSuccess);
+	pbufToken->Print(DIVIDERL);
+	return TRUE;
 }
 
 
@@ -587,7 +580,7 @@ void DumpToken()
 		// Display the token primary group
 		DumpTokenPrimaryGroup(g_hToken, pbufToken);
 
-		// Display the token default dacl
+		// Display the token default DACL
 		DumpTokenDefaultDacl(g_hToken, pbufToken);
 
 		// Display the token source
