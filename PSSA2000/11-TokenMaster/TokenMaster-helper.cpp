@@ -111,7 +111,7 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess,
 
 	PSECURITY_DESCRIPTOR pSD = NULL;
 
-	vaDbgTs(_T("==== Entering myModifySecurity(), hKobj=0x%08X, dwAccess=0x%X."), (int)hKobj, dwAccess);
+	vaDbgTs(_T("==== Entering myModifySecurity(), hKobj=0x%08X, dwAccess=0x%X."), PtrToUint(hKobj), dwAccess);
 
 	try {{
 
@@ -196,7 +196,7 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess,
 
 		fSuccess = TRUE;
 
-		vaDbgTs(_T("==== Leaving myModifySecurity(), hKobj=0x%08X, dwAccess=0x%X."), (int)hKobj, dwAccess);
+		vaDbgTs(_T("==== Leaving myModifySecurity(), hKobj=0x%08X, dwAccess=0x%X."), PtrToUint(hKobj), dwAccess);
 		vaDbgTs(_T("==== Ending  SD dump:"));
 		CH10_DumpSD(pAbsSD, procItr, itrctx);
 
@@ -599,7 +599,7 @@ void guiUpdatePrivileges()
 
 void guiUpdateGroups() 
 {
-	vaDbgTs(_T("In guiUpdateGroups()... g_hToken=0x%X"), (int)g_hToken);
+	vaDbgTs(_T("In guiUpdateGroups()... g_hToken=0x%X"), PtrToUint(g_hToken));
 
 	DWORD winerr = 0;
 	BOOL succ = FALSE;

@@ -12,7 +12,7 @@
 
 #define PSIDFromPACE(pACE) ((PSID)(&((pACE)->SidStart))) // CH10.2
 
-TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen);
+TCHAR* SID2Repr(PSID pvSid, TCHAR buf[], int buflen);
 
 
 typedef TCHAR* FUNC_InterpretRights(DWORD RightBits, void *userctx);

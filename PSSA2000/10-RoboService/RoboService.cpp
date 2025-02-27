@@ -8,10 +8,11 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include <Process.h>
 #include <LMAccess.h>
+#include <vaDbg.h>
 
 #include "RoboShare.h"
 
-#include "..\vaDbg.h"
+#include "..\chjutils\ch10-DumpSD.h"
 
 #define SERVICESTATUS_IMPL
 #include "..\03-TimeService\ServiceStatus.h"
@@ -177,7 +178,7 @@ PSID GetCurrentSID()
 	{
 		// debug info:
 		TCHAR szSid[100];
-		vaDbg(_T("GetCurrentSID() returns SID: %s"), SID2Repr(psid, szSid, ARRAYSIZE(szSid)));
+		vaDbgTs(_T("GetCurrentSID() returns SID: %s"), SID2Repr(psid, szSid, ARRAYSIZE(szSid)));
 	}
 
 	if (pUser != NULL)
@@ -1390,9 +1391,9 @@ void HandleMsg(ServerInfo* pInfo, MessageReceiver* pMsg,
 void HandleIO(ServerInfo* pInfo, IOStruct* pIOS, ULONG lBytes) 
 {
 	switch (pIOS->m_nPurpose) 
-	{
+	{{
 	case IOS_CONNECT:
-
+	{
 		// Update active and downgrade pending
 		InterlockedIncrement(&pInfo->m_lActiveConnections);
 		InterlockedDecrement(&pInfo->m_lPendingConnections);
@@ -1408,28 +1409,28 @@ void HandleIO(ServerInfo* pInfo, IOStruct* pIOS, ULONG lBytes)
 		// Post our first read for reading a message
 		PostReadMessage(pInfo, NULL, pinfoConnection);
 		break;
-
+	}
 	case IOS_WRITE: // When writes complete we just free the IO struct
 		FreeIOStruct(pIOS);
 		break;
 
 	case IOS_READ:
-
+	{
 		// Store token with connection info if this is our first read.
-		if (pIOS->m_pinfoConnection->m_hToken == NULL) 
+		if (pIOS->m_pinfoConnection->m_hToken == NULL)
 		{
 
 			BOOL fSuccess = FALSE;
-			if (ImpersonateNamedPipeClient(pIOS->m_pinfoConnection->m_hPipe)) 
+			if (ImpersonateNamedPipeClient(pIOS->m_pinfoConnection->m_hPipe))
 			{
 				HANDLE hToken;
-				if (OpenThreadToken(GetCurrentThread(),TOKEN_QUERY 
-					| TOKEN_ADJUST_DEFAULT | TOKEN_ADJUST_PRIVILEGES 
-					| TOKEN_IMPERSONATE | TOKEN_DUPLICATE 
-					| TOKEN_ADJUST_GROUPS, TRUE, &hToken)) 
+				if (OpenThreadToken(GetCurrentThread(), TOKEN_QUERY
+					| TOKEN_ADJUST_DEFAULT | TOKEN_ADJUST_PRIVILEGES
+					| TOKEN_IMPERSONATE | TOKEN_DUPLICATE
+					| TOKEN_ADJUST_GROUPS, TRUE, &hToken))
 				{
-						fSuccess = TRUE;
-						pIOS->m_pinfoConnection->m_hToken = hToken;
+					fSuccess = TRUE;
+					pIOS->m_pinfoConnection->m_hToken = hToken;
 				}
 				RevertToSelf();
 			}
@@ -1448,35 +1449,36 @@ void HandleIO(ServerInfo* pInfo, IOStruct* pIOS, ULONG lBytes)
 			pIOS->m_pMessageRcv->m_lDataBytesRead += lBytes;
 
 			// If we finished data read, then handle the msg and post new read
-			if (pIOS->m_pMessageRcv->m_lDataBytesRead 
+			if (pIOS->m_pMessageRcv->m_lDataBytesRead
 				== pIOS->m_pMessageRcv->m_baseMsg.m_lExtraDataSize) {
 
-					HandleMsg(pInfo, pIOS->m_pMessageRcv, pIOS->m_pinfoConnection);
-					ConnectionInfo* pinfoConnection;
-					pinfoConnection = pIOS->m_pinfoConnection;
-					FreeIOStruct(pIOS);
+				HandleMsg(pInfo, pIOS->m_pMessageRcv, pIOS->m_pinfoConnection);
+				ConnectionInfo* pinfoConnection;
+				pinfoConnection = pIOS->m_pinfoConnection;
+				FreeIOStruct(pIOS);
 
-					// Read next message
-					PostReadMessage(pInfo, NULL, pinfoConnection);
+				// Read next message
+				PostReadMessage(pInfo, NULL, pinfoConnection);
 			}
 
-		} 
-		else 
-		{ 
+		}
+		else
+		{
 			// We haven't yet read the main message part
 
 			pIOS->m_pMessageRcv->m_lMsgBytesRead += lBytes;
 
 			// If it is completely read then we handle or read for data
-			if (pIOS->m_pMessageRcv->m_lMsgBytesRead == MSGSIZE) { 
+			if (pIOS->m_pMessageRcv->m_lMsgBytesRead == MSGSIZE) {
 
 				// finished read
-				if (pIOS->m_pMessageRcv->m_baseMsg.m_lExtraDataSize > 0) { 
+				if (pIOS->m_pMessageRcv->m_baseMsg.m_lExtraDataSize > 0) {
 
 					// If there is MSG data
 					PostReadMessageData(pInfo, pIOS);
 
-				} else { // if there is not MSG data
+				}
+				else { // if there is not MSG data
 
 					HandleMsg(pInfo, pIOS->m_pMessageRcv,
 						pIOS->m_pinfoConnection);
@@ -1491,6 +1493,9 @@ void HandleIO(ServerInfo* pInfo, IOStruct* pIOS, ULONG lBytes)
 		}
 		break;
 	}
+	default:
+		break;
+	}}
 }
 
 
