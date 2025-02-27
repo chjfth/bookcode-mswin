@@ -14,7 +14,7 @@
 
 #include <vaDbg.h>
 
-#define AUTOBUF_IMPL
+#define JAUTOBUF_IMPL
 #include "chjutils.h"
 
 struct Const2Str_st

@@ -85,6 +85,9 @@ Purpose: Common header file containing handy macros and definitions
 // cast truncates constant value
 #pragma warning(disable:4310)
 
+// Warning of GetVersionEx deprecated on VS2019
+#pragma warning(disable:4996)
+
 
 ///////////////////////// Pragma message helper macro /////////////////////////
 
