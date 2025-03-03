@@ -535,10 +535,12 @@ void guiUpdatePrivileges()
 
 		const TCHAR hypens[] = _T(" -- ");
 
-		abListBoxText = _tcslen(abName) + _tcslen(hypens) + _tcslen(abDispName) + 1; // set buffer-size
+		abListBoxText = _tcslen(abName) + _tcslen(hypens) + _tcslen(abDispName) + 40; // set buffer-size
 
-		_sntprintf_s(abListBoxText, abListBoxText.Size(), _TRUNCATE, _T("%s%s%s"),
-			abName.Bufptr(), hypens, abDispName.Bufptr());
+		LARGE_INTEGER li = {luidaa.Luid.LowPart, luidaa.Luid.HighPart};
+
+		_sntprintf_s(abListBoxText, abListBoxText.Size(), _TRUNCATE, _T("%s%s%s (LUID=%I64d)"),
+			abName.Bufptr(), hypens, abDispName.Bufptr(), li.QuadPart);
 
 		// Add the string to the enable/disable privilege list
 		DWORD_PTR dwItem = ListBox_AddString(g_hwndEnablePrivileges, abListBoxText);
