@@ -861,9 +861,6 @@ static void Dlg_EnableJULayout(HWND hdlg)
 
 	//// Right-side of GUI ////
 
-	// Retrieve a token groupbox
-	jul->AnchorControl(0,0, 0,0, IDS_RETRIEVE); 
-
 	// Create a process with the current token (groupbox area)
 	jul->AnchorControl(x60,0, x100,0, IDS_CREATEPROCESS);
 	jul->AnchorControl(x60,0, x100,0, IDE_FILENAME);
