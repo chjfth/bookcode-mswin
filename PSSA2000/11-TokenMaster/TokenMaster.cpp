@@ -133,10 +133,10 @@ void Cmd_LogonUser(HWND hwnd)
 
 	// Get the credentials
 	TCHAR szName[1024];
-	GetDlgItemText(hwnd, IDE_USERNAME, szName, chDIMOF(szName));
+	GetDlgItemText(hwnd, IDE_USERNAME, szName, ARRAYSIZE(szName));
 
 	TCHAR szPassword[1024];
-	GetDlgItemText(hwnd, IDE_PASSWORD, szPassword, chDIMOF(szPassword));
+	GetDlgItemText(hwnd, IDE_PASSWORD, szPassword, ARRAYSIZE(szPassword));
 
 	int nLogonType = ComboBox_GetCurSel(g_hwndLogonTypes);
 	nLogonType = (int)ComboBox_GetItemData(g_hwndLogonTypes, nLogonType);
@@ -148,11 +148,10 @@ void Cmd_LogonUser(HWND hwnd)
 	PTSTR szStatus = TEXT("User Logon Succeeded, Dumped Token");
 
 	// Get a token for the credentials.
-	if (LogonUser(szName, NULL, szPassword, nLogonType, nLogonProvider,
-		&g_hToken))      {
-
-			// Success?  Display it
-			DumpToken();
+	if (LogonUser(szName, NULL, szPassword, nLogonType, nLogonProvider, &g_hToken))
+	{
+		// Success?  Display it
+		guiDumpToken();
 
 	} else {
 
@@ -201,7 +200,7 @@ void Cmd_DuplicateToken(HWND hwnd)
 			&hNewToken) == TRUE) {
 
 				g_hToken = hNewToken;
-				DumpToken();
+				guiDumpToken();
 
 		} else {
 
@@ -231,7 +230,7 @@ void Cmd_DumpToken(HWND hwnd)
 	if (g_hToken != NULL) {
 
 		// Success? Display it
-		DumpToken();
+		guiDumpToken();
 
 	} else {
 
@@ -279,7 +278,7 @@ void Cmd_AdjustGroups()
 		if (!AdjustTokenGroups(g_hToken, FALSE, ptgGroups, 0, NULL, NULL))
 			RefreshStatus(TEXT("AdjustTokenGroups"), GetLastError());
 		else
-			DumpToken();   // Display the new token
+			guiDumpToken();   // Display the new token
 
 	} leave:;
 	} catch(...) {}
@@ -325,7 +324,7 @@ void Cmd_AdjustTokenPrivileges()
 			NULL))
 			RefreshStatus(TEXT("AdjustTokenPrivileges"), GetLastError());
 		else
-			DumpToken();   // Display the new token
+			guiDumpToken();   // Display the new token
 
 	} leave:;
 	} catch(...) {}
@@ -390,7 +389,7 @@ void Cmd_SetDACL(HWND hwnd)
 
 		// Common dialog box for ACL editing
 		if (EditSecurity(hwnd, pSec) && pSec->IsModified())
-			DumpToken(); // If success, then redisplay
+			guiDumpToken(); // If success, then redisplay
 
 		SetLastError(0);
 
@@ -534,7 +533,7 @@ void Cmd_SetOwnerGroup(HWND hwnd, BOOL fOwner)
 				goto leave;
 		}
 
-		DumpToken();
+		guiDumpToken();
 
 		SetLastError(0);
 
@@ -730,7 +729,7 @@ void Cmd_CreateRestrictedToken()
 		g_hToken = hNewToken;
 
 		// Display it
-		DumpToken();
+		guiDumpToken();
 
 		SetLastError(0);
 
@@ -857,7 +856,7 @@ static void Dlg_EnableJULayout(HWND hdlg)
 	JULayout *jul = JULayout::EnableJULayout(hdlg);
 
 	const int x30=30, x45=45, x60=60, x80=80, x100=100;
-	const int y50=50, y70=70, y85=85, y100=100;
+	const int y50=50, y70=60, y85=75, y100=100;
 
 	//// Right-side of GUI ////
 

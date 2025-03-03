@@ -23,7 +23,7 @@ void DumpTokenType(HANDLE hToken, CPrintBuf* pbufToken);
 
 BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken);
 
-void DumpToken();
+void guiDumpToken();
 
 
 
