@@ -8,6 +8,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "shareinc.h"
 #include "DaclPage.h"
 #include "TokenMaster-helper.h"
+#include "../chjutils/chjutils.h"
 #include "exe_version.h"
 
 #include "Resource.h"
@@ -290,48 +291,36 @@ void Cmd_AdjustGroups()
 
 void Cmd_AdjustTokenPrivileges() 
 {
-	PTOKEN_PRIVILEGES ptpPrivileges = NULL;
+	// No token?  Buh-Bye
+	if (g_hToken == NULL) {
+		RefreshStatus(TEXT("No Token"), 0);
+		return;
+	}
 
-	try {{
+	// Get the token information for privileges
+	PTOKEN_PRIVILEGES ptpPrivileges = 
+		(PTOKEN_PRIVILEGES) myAllocateTokenInfo(g_hToken, TokenPrivileges);
+	Cec_LocalFree cec_ptp = ptpPrivileges;
+	if (ptpPrivileges == NULL)
+		return;
 
-		// No token?  Buh-Bye
-		if (g_hToken == NULL) {
-			RefreshStatus(TEXT("No Token"), 0);
-			goto leave;
-		}
+	// Enumerate privileges to enable
+	DWORD dwItem = ListBox_GetCount(g_hwndEnablePrivileges);
+	while (dwItem-- != 0) {
 
-		// Get the token information for privileges
-		ptpPrivileges = (PTOKEN_PRIVILEGES) myAllocateTokenInfo(g_hToken, TokenPrivileges);
-		if (ptpPrivileges == NULL)
-			goto leave;
-
-		// Enumerate privileges to enable
-		DWORD dwItem = ListBox_GetCount(g_hwndEnablePrivileges);
-		while (dwItem-- != 0) {
-
-			DWORD dwIndex = (DWORD) ListBox_GetItemData(g_hwndEnablePrivileges, dwItem);
-			BOOL fSel = ListBox_GetSel(g_hwndEnablePrivileges, dwItem);
-			if (fSel)
-				ptpPrivileges->Privileges[dwIndex].Attributes |=
-				SE_PRIVILEGE_ENABLED;
-			else
-				ptpPrivileges->Privileges[dwIndex].Attributes &=
-				~SE_PRIVILEGE_ENABLED;
-		}
-
-		// Adjust the privileges for the token
-		if (!AdjustTokenPrivileges(g_hToken, FALSE, ptpPrivileges, 0, NULL,
-			NULL))
-			RefreshStatus(TEXT("AdjustTokenPrivileges"), GetLastError());
+		DWORD dwIndex = (DWORD) ListBox_GetItemData(g_hwndEnablePrivileges, dwItem);
+		BOOL fSel = ListBox_GetSel(g_hwndEnablePrivileges, dwItem);
+		if (fSel)
+			ptpPrivileges->Privileges[dwIndex].Attributes |= SE_PRIVILEGE_ENABLED;
 		else
-			guiDumpToken();   // Display the new token
+			ptpPrivileges->Privileges[dwIndex].Attributes &= ~SE_PRIVILEGE_ENABLED;
+	}
 
-	} leave:;
-	} catch(...) {}
-
-	// Cleanup
-	if (ptpPrivileges != NULL)
-		LocalFree(ptpPrivileges);
+	// Adjust the privileges for the token
+	if (!AdjustTokenPrivileges(g_hToken, FALSE, ptpPrivileges, 0, NULL, NULL))
+		RefreshStatus(TEXT("AdjustTokenPrivileges"), GetLastError());
+	else
+		guiDumpToken();   // Display the new token
 }
 
 
