@@ -865,7 +865,7 @@ WinError_t in_guiGetToken(HWND hwnd, const TCHAR *&pszStatus)
 			if (winerr == ERROR_NO_TOKEN) {
 
 				// Not a critical error, the thread doesn't have a token
-				pszStatus = TEXT("Thread does not have a token, dumping process token.");
+				pszStatus = TEXT("OpenThreadToken() fails with ERROR_NO_TOKEN. Thread does not have a token. You can dump process token instead.");
 				winerr = 0;
 
 			} else {
