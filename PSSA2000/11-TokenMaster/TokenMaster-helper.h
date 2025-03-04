@@ -20,7 +20,7 @@ typedef DWORD WinError_t;
 
 BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled);
 
-HANDLE myOpenSystemProcess();
+HANDLE myOpenSystemProcess(WinError_t *pwinerr=nullptr);
 
 BOOL myModifySecurity(HANDLE hProc, DWORD dwAccess,
 	FUNC_InterpretRights procItr=nullptr, void *userctx=0);

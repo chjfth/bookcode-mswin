@@ -37,13 +37,17 @@ BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-HANDLE myOpenSystemProcess() 
+HANDLE myOpenSystemProcess(WinError_t *pwinerr)
 {
 	// Get a snapshot of the processes in the system
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	Cec_PTRHANDLE cec_hSnapshot = hSnapshot;
-	if (hSnapshot == NULL)
+	Cec_FILEHANDLE cec_hSnapshot = hSnapshot;
+	if (hSnapshot == INVALID_HANDLE_VALUE) {
+		// almost impossible to fail
+		if(pwinerr)
+			*pwinerr = GetLastError();
 		return NULL;
+	}
 
 	// Find the "System" process
 	PROCESSENTRY32 pe32 = {sizeof(pe32)};
@@ -57,6 +61,9 @@ HANDLE myOpenSystemProcess()
 
 	// Open the process with PROCESS_QUERY_INFORMATION access
 	HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
+	if(!hProc && pwinerr)
+		*pwinerr = GetLastError();
+
 	return(hProc); // NULL if fail
 }
 
@@ -211,17 +218,24 @@ HANDLE myGetLSAToken()
 		return NULL;
 
 	// Retrieve a handle to the "System" process
-	HANDLE hProcSys = myOpenSystemProcess();
+	
+	HANDLE hProcSys = myOpenSystemProcess(&winerr);
+	
 	Cec_PTRHANDLE cec_hProcSys = hProcSys;
-	vaDbgTs(_T("  myOpenSystemProcess() %s."), sorf(hProcSys?TRUE:FALSE));
-	if (hProcSys == NULL)
+	if(hProcSys)
+		vaDbgTs(_T("  myOpenSystemProcess() success."));
+	else {
+		vaDbgTs(_T("  myOpenSystemProcess() fail. WinErr=%s"), ITCSv(winerr, WinError));
 		return NULL;
+	}
 
 	// Open the process token with READ_CONTROL and WRITE_DAC access.  We
 	// will use this access to modify the security of the token so that we
 	// retrieve it again with a more complete set of rights.
 	HANDLE hToken = NULL;
+	
 	succ = OpenProcessToken(hProcSys, READ_CONTROL | WRITE_DAC, &hToken);
+	
 	if(succ) {
 		vaDbgTs(_T("  OpenProcessToken() of the SYSTEM process, success."));
 	} else {
@@ -232,7 +246,9 @@ HANDLE myGetLSAToken()
 
 	// Add an ACE for the current user for the token.  
 	const DWORD reqrights = TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY;
+	
 	succ = myModifySecurity(hToken, reqrights, InterpretRights_Token, nullptr);
+	
 	vaDbgTs(_T("  [%s] adding to myself Token right: %s."), sorf(succ), ITCSv(reqrights, TokenRights));
 	if(!succ)
 	{
@@ -246,6 +262,7 @@ HANDLE myGetLSAToken()
 	// Reopen the process token now that we just added the rights to
 	// query the token, duplicate it, and assign it.
 	succ = OpenProcessToken(hProcSys, reqrights, &hToken);
+	
 	if(succ)
 		vaDbgTs(_T("  Reopen SYSTEM process's token with new rights, success."));
 	else {
@@ -253,6 +270,7 @@ HANDLE myGetLSAToken()
 		vaDbgTs(_T("  Reopen SYSTEM process's token with new rights, fail! WinErr=%s"), ITCSv(winerr, WinError));
 	}
 	
+	vaDbgTs(_T("Out myGetLSAToken()."));
 	return hToken;
 }
 
