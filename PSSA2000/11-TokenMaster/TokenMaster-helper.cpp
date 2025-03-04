@@ -7,47 +7,30 @@
 
 BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled) 
 {
-	HANDLE hToken   = NULL;
-	BOOL   fSuccess = FALSE;
+	// First lookup the system unique luid for the privilege
+	LUID luid = {};
+	if (!LookupPrivilegeValue(NULL, szPriv, &luid)) {
+		return FALSE;
+	}
 
-	try {{
+	// Then get the processes token
+	HANDLE hToken = NULL;
+	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)) 
+		return FALSE;
 
-		// First lookup the system unique luid for the privilege
-		LUID luid = {};
-		if (!LookupPrivilegeValue(NULL, szPriv, &luid)) {
+	Cec_PTRHANDLE cec_hToken = hToken;
 
-			// If the name is bogus...
-			goto leave;
-		}
+	// Set up our token privileges "array" (in our case an array of one)
+	TOKEN_PRIVILEGES tp = {};
+	tp.PrivilegeCount           = 1;
+	tp.Privileges[0].Luid       = luid;
+	tp.Privileges[0].Attributes = fEnabled ? SE_PRIVILEGE_ENABLED : 0;
 
-		// Then get the processes token
-		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)) 
-		{
-			goto leave;
-		}
+	// Adjust our token privileges by enabling or disabling this one
+	if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) 
+		return FALSE;
 
-		// Set up our token privileges "array" (in our case an array of one)
-		TOKEN_PRIVILEGES tp = {};
-		tp.PrivilegeCount           = 1;
-		tp.Privileges[0].Luid       = luid;
-		tp.Privileges[0].Attributes = fEnabled ? SE_PRIVILEGE_ENABLED : 0;
-
-		// Adjust our token privileges by enabling or disabling this one
-		if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) 
-		{
-			goto leave;
-		}
-
-		fSuccess = TRUE;
-
-	} leave:;
-	} catch(...) {}
-
-	// Cleanup
-	if (hToken != NULL)
-		CloseHandle(hToken);
-
-	return(fSuccess);
+	return TRUE;
 }
 
 
@@ -56,41 +39,25 @@ BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled)
 
 HANDLE myOpenSystemProcess() 
 {
-	HANDLE hSnapshot = NULL;
-	HANDLE hProc     = NULL;
+	// Get a snapshot of the processes in the system
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	Cec_PTRHANDLE cec_hSnapshot = hSnapshot;
+	if (hSnapshot == NULL)
+		return NULL;
 
-	try {{
+	// Find the "System" process
+	PROCESSENTRY32 pe32 = {sizeof(pe32)};
+	BOOL fProcess = Process32First(hSnapshot, &pe32);
 
-		// Get a snapshot of the processes in the system
-		hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-		if (hSnapshot == NULL)
-			goto leave;
+	while (fProcess && (lstrcmpi(pe32.szExeFile, TEXT("SYSTEM")) != 0))
+		fProcess = Process32Next(hSnapshot, &pe32);
 
-		PROCESSENTRY32 pe32;
-		pe32.dwSize = sizeof(pe32);
+	if (!fProcess)
+		return NULL;    // Didn't find "System" process
 
-		// Find the "System" process
-		BOOL fProcess = Process32First(hSnapshot, &pe32);
-
-		while (fProcess && (lstrcmpi(pe32.szExeFile, TEXT("SYSTEM")) != 0))
-			fProcess = Process32Next(hSnapshot, &pe32);
-
-		if (!fProcess)
-			goto leave;    // Didn't find "System" process
-
-		// Open the process with PROCESS_QUERY_INFORMATION access
-		hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
-		if (hProc == NULL)
-			goto leave;
-
-	} leave:;
-	} catch(...) {}
-
-	// Cleanup the snapshot
-	if (hSnapshot != NULL)
-		CloseHandle(hSnapshot);
-
-	return(hProc);
+	// Open the process with PROCESS_QUERY_INFORMATION access
+	HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
+	return(hProc); // NULL if fail
 }
 
 
@@ -151,8 +118,8 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess,
 		BuildExplicitAccessWithName(&ea, szName, dwAccess, GRANT_ACCESS, 0);
 		ea.Trustee.TrusteeType = TRUSTEE_IS_USER;
 
-		// We are allocating a new ACL with a new ace inserted.  The new
-		// ACL must be LocalFree'd
+		// We are allocating a new ACL with a new ACE inserted.
+		// The new ACL must be LocalFree'd
 		if (ERROR_SUCCESS != SetEntriesInAcl(1, &ea, pAcl, &pNewAcl)) 
 		{
 			pNewAcl = NULL;
@@ -229,65 +196,64 @@ BOOL myModifySecurity(HANDLE hKobj, DWORD dwAccess,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 HANDLE myGetLSAToken() 
 {
-	// chjmemo: Get Local-System Account's token
+	// chjmemo: Try to Get Local-System Account's token
+	BOOL succ = 0;
+	DWORD winerr = 0;
 
-	HANDLE hProcSys  = NULL;
+	vaDbgTs(_T("In myGetLSAToken()... trying to get SYSTEM process's token."));
+
+	// Enable the SE_DEBUG_NAME privilege in our process token
+	succ = myEnablePrivilege(SE_DEBUG_NAME, TRUE);
+	vaDbgTs(_T("  myEnablePrivilege(SE_DEBUG_NAME) %s."), sorf(succ));
+	if(!succ)
+		return NULL;
+
+	// Retrieve a handle to the "System" process
+	HANDLE hProcSys = myOpenSystemProcess();
+	Cec_PTRHANDLE cec_hProcSys = hProcSys;
+	vaDbgTs(_T("  myOpenSystemProcess() %s."), sorf(hProcSys?TRUE:FALSE));
+	if (hProcSys == NULL)
+		return NULL;
+
+	// Open the process token with READ_CONTROL and WRITE_DAC access.  We
+	// will use this access to modify the security of the token so that we
+	// retrieve it again with a more complete set of rights.
 	HANDLE hToken = NULL;
+	succ = OpenProcessToken(hProcSys, READ_CONTROL | WRITE_DAC, &hToken);
+	if(succ) {
+		vaDbgTs(_T("  OpenProcessToken() of the SYSTEM process, success."));
+	} else {
+		winerr = GetLastError();
+		vaDbgTs(_T("  OpenProcessToken() of the SYSTEM process, FAIL, WinErr=%s"), ITCSv(winerr, WinError));
+		return NULL;
+	}
 
-	try {{
+	// Add an ACE for the current user for the token.  
+	const DWORD reqrights = TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY;
+	succ = myModifySecurity(hToken, reqrights, InterpretRights_Token, nullptr);
+	vaDbgTs(_T("  [%s] adding to myself Token right: %s."), sorf(succ), ITCSv(reqrights, TokenRights));
+	if(!succ)
+	{
+		CloseHandle(hToken); 
+		return NULL;
+	}
 
-		// Enable the SE_DEBUG_NAME privilege in our process token
-		if (!myEnablePrivilege(SE_DEBUG_NAME, TRUE))
-			goto leave;
+	CloseHandle(hToken); // Fix Jeffrey's bug: we should close the old token handle anyway.
+	hToken = nullptr;
 
-		// Retrieve a handle to the "System" process
-		hProcSys = myOpenSystemProcess();
-		if (hProcSys == NULL)
-			goto leave;
-
-		// Open the process token with READ_CONTROL and WRITE_DAC access.  We
-		// will use this access to modify the security of the token so that we
-		// retrieve it again with a more complete set of rights.
-		BOOL fResult = OpenProcessToken(hProcSys, READ_CONTROL | WRITE_DAC, &hToken);
-		if (FALSE == fResult)  {
-			hToken = NULL;
-			goto leave;
-		}
-
-		// Add an ACE for the current user for the token.  This ACE will add
-		// TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY rights.
-		if (! myModifySecurity(hToken, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY,
-				InterpretRights_Token, nullptr)) 
-		{
-			CloseHandle(hToken);
-			hToken = NULL;
-			goto leave;
-		}
-
-		CloseHandle(hToken); // Fix Jeffrey's bug: we should close the old token handle.
-		hToken = nullptr;
-
-		// Reopen the process token now that we have added the rights to
-		// query the token, duplicate it, and assign it.
-		fResult = OpenProcessToken(hProcSys, 
-			TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY, 
-			&hToken);
-		if (FALSE == fResult)  {
-			hToken = NULL;
-			goto leave;
-		}
-
-	} leave:;
-	} catch(...) {}
-
-	// Close the System process handle
-	if (hProcSys != NULL)
-		CloseHandle(hProcSys);
-
-	return(hToken);
+	// Reopen the process token now that we just added the rights to
+	// query the token, duplicate it, and assign it.
+	succ = OpenProcessToken(hProcSys, reqrights, &hToken);
+	if(succ)
+		vaDbgTs(_T("  Reopen SYSTEM process's token with new rights, success."));
+	else {
+		winerr = GetLastError();
+		vaDbgTs(_T("  Reopen SYSTEM process's token with new rights, fail! WinErr=%s"), ITCSv(winerr, WinError));
+	}
+	
+	return hToken;
 }
 
 

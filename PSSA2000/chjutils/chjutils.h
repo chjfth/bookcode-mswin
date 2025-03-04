@@ -48,6 +48,10 @@ inline bool Is_LessBuffer(DWORD winerr)
 		return false;
 }
 
+inline const TCHAR* sorf(BOOL succ)
+{
+	return succ ? _T("success") : _T("fail");
+}
 
 //////////////////////////////////////////////////////////////////////////
 
