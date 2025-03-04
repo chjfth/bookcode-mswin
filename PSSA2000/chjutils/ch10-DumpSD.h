@@ -19,6 +19,9 @@ typedef TCHAR* FUNC_InterpretRights(DWORD RightBits, void *userctx);
 // -- RightBits refers to ACCESS_ALLOWED_ACE.Mask
 //    The returned string pointer should be C++-deleted by caller
 
+void CH10_DumpACL( PACL pACL, 
+	FUNC_InterpretRights *procItr=nullptr, void *userctx=nullptr);
+
 void CH10_DumpSD(PSECURITY_DESCRIPTOR pvsd, 
 	FUNC_InterpretRights *procItr=nullptr, void *userctx=nullptr);
 

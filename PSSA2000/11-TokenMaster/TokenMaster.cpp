@@ -348,9 +348,11 @@ void Cmd_SetDACL(HWND hwnd)
 			goto leave;
 		}
 
+		vaDbgTs(_T("In Cmd_SetDACL(), dumping the ACL from TokenDefaultDacl:"));
+		CH10_DumpACL(ptdDacl->DefaultDacl, InterpretRights_Generic, nullptr); 
+
 		// Allocate memory for an SD
-		pSD = (PSECURITY_DESCRIPTOR) GlobalAlloc(GPTR,
-			SECURITY_DESCRIPTOR_MIN_LENGTH);
+		pSD = (PSECURITY_DESCRIPTOR) GlobalAlloc(GPTR, SECURITY_DESCRIPTOR_MIN_LENGTH);
 		if (pSD == NULL) {
 			szStatus = TEXT("GlobalAlloc");
 			goto leave;
@@ -378,7 +380,7 @@ void Cmd_SetDACL(HWND hwnd)
 
 		// Common dialog box for ACL editing
 		if (EditSecurity(hwnd, pSec) && pSec->IsModified())
-			guiDumpToken(); // If success, then redisplay
+			guiDumpToken(); // If success, then re-display
 
 		SetLastError(0);
 
