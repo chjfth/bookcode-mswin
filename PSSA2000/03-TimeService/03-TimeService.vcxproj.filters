@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="TimeService.cpp" />
-    <ClCompile Include="..\..\__WinConst\mswin\WinSvc.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\Dbt.itc.cpp">
       <Filter>chjutils</Filter>
     </ClCompile>
@@ -10,6 +9,13 @@
       <Filter>chjutils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\share\vaDbg.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chjutils\chjutils.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\WinSvc.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp">
       <Filter>chjutils</Filter>
     </ClCompile>
   </ItemGroup>

@@ -204,6 +204,7 @@
     <ClCompile Include="..\chjutils\chjutils.cpp" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />
     <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\WinSvc.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\Dbt.itc.cpp" />
   </ItemGroup>

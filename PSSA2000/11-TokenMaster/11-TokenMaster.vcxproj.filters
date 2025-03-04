@@ -27,7 +27,6 @@
   <ItemGroup>
     <ClInclude Include="Resource.h" />
     <ClInclude Include="TokenMaster-helper.h" />
-    <ClInclude Include="shareinc.h" />
     <ClInclude Include="DumpInfo.h" />
     <ClInclude Include="DaclPage.h" />
     <ClInclude Include="..\chjutils\chjutils.h">
@@ -40,6 +39,12 @@
       <Filter>chjutils</Filter>
     </ClInclude>
     <ClInclude Include="..\chjutils\ch10-DumpSD.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+    <ClInclude Include="shareinc.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+    <ClInclude Include="exe_version.h">
       <Filter>chjutils</Filter>
     </ClInclude>
   </ItemGroup>

@@ -249,7 +249,7 @@ HANDLE myGetLSAToken()
 	
 	succ = myModifySecurity(hToken, reqrights, InterpretRights_Token, nullptr);
 	
-	vaDbgTs(_T("  [%s] adding to myself Token right: %s."), sorf(succ), ITCSv(reqrights, TokenRights));
+	vaDbgTs(_T("  [%s] adding to myself Token rights: %s."), sorf(succ), ITCSv(reqrights, TokenRights));
 	if(!succ)
 	{
 		CloseHandle(hToken); 
