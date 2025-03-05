@@ -300,7 +300,7 @@ void Cmd_AdjustTokenPrivileges()
 	// Get the token information for privileges
 	PTOKEN_PRIVILEGES ptpPrivileges = 
 		(PTOKEN_PRIVILEGES) myAllocateTokenInfo(g_hToken, TokenPrivileges);
-	Cec_LocalFree cec_ptp = ptpPrivileges;
+	CEC_LocalFree cec_ptp = ptpPrivileges;
 	if (ptpPrivileges == NULL)
 		return;
 

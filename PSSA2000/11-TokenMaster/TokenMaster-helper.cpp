@@ -18,7 +18,7 @@ BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled)
 	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)) 
 		return FALSE;
 
-	Cec_PTRHANDLE cec_hToken = hToken;
+	CEC_PTRHANDLE cec_hToken = hToken;
 
 	// Set up our token privileges "array" (in our case an array of one)
 	TOKEN_PRIVILEGES tp = {};
@@ -41,7 +41,7 @@ HANDLE myOpenSystemProcess(WinError_t *pwinerr)
 {
 	// Get a snapshot of the processes in the system
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	Cec_FILEHANDLE cec_hSnapshot = hSnapshot;
+	CEC_FILEHANDLE cec_hSnapshot = hSnapshot;
 	if (hSnapshot == INVALID_HANDLE_VALUE) {
 		// almost impossible to fail
 		if(pwinerr)
@@ -221,7 +221,7 @@ HANDLE myGetLSAToken()
 	
 	HANDLE hProcSys = myOpenSystemProcess(&winerr);
 	
-	Cec_PTRHANDLE cec_hProcSys = hProcSys;
+	CEC_PTRHANDLE cec_hProcSys = hProcSys;
 	if(hProcSys)
 		vaDbgTs(_T("  myOpenSystemProcess() success."));
 	else {
@@ -490,7 +490,7 @@ void guiUpdatePrivileges()
 	// Get that token-privilege information
 	PTOKEN_PRIVILEGES ptpPrivileges = 
 		(PTOKEN_PRIVILEGES) myAllocateTokenInfo(g_hToken, TokenPrivileges);
-	Cec_LocalFree cec_ptp = ptpPrivileges;
+	CEC_LocalFree cec_ptp = ptpPrivileges;
 	if (ptpPrivileges == NULL)
 		return;
 
@@ -563,7 +563,7 @@ void guiUpdateGroups()
 
 	// Get that group information
 	ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(g_hToken, TokenGroups);
-	Cec_LocalFree cec_tokengroups = ptgGroups;
+	CEC_LocalFree cec_tokengroups = ptgGroups;
 	if (ptgGroups == NULL)
 		return;
 
@@ -576,7 +576,7 @@ void guiUpdateGroups()
 
 		TCHAR *sidtext = nullptr;
 		ConvertSidToStringSid(&sid, &sidtext);
-		Cec_LocalFree cec_sidtext = sidtext;
+		CEC_LocalFree cec_sidtext = sidtext;
 
 		SID_NAME_USE sNameUse = SidTypeInvalid; // neg-init
 		AutoTCHARs SidName, SidDomain;
@@ -815,11 +815,11 @@ WinError_t in_guiGetToken(HWND hwnd, const TCHAR *&pszStatus)
 
 	DWORD  winerr = 0;
 	HANDLE hThread    = NULL;
-	Cec_PTRHANDLE cec_hThread;
+	CEC_PTRHANDLE cec_hThread;
 	HANDLE hProcess   = NULL;
-	Cec_PTRHANDLE cec_hProcess;
+	CEC_PTRHANDLE cec_hProcess;
 	HANDLE hToken     = NULL;
-	Cec_PTRHANDLE cec_hToken;
+	CEC_PTRHANDLE cec_hToken;
 
 	pszStatus  = TEXT("Dumped Process Token");
 

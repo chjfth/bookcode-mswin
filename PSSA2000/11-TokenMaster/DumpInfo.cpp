@@ -139,7 +139,7 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 	// Get the textual SID
 	TCHAR *pszSIDText = NULL;
 	ConvertSidToStringSid(psid, &pszSIDText);
-	Cec_LocalFree cec_sidtext = pszSIDText;
+	CEC_LocalFree cec_sidtext = pszSIDText;
 
 	// Output the things we have learned
 	pbufToken->Print(TEXT("SID:\t\t%s\r\n"), pszSIDText);
@@ -189,7 +189,7 @@ BOOL DumpTokenGroups(HANDLE hToken, CPrintBuf* pbufToken)
 {
 //	BOOL          fSuccess  = FALSE;
 	PTOKEN_GROUPS ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken, TokenGroups);
-	Cec_LocalFree cec_ptg = ptgGroups;
+	CEC_LocalFree cec_ptg = ptgGroups;
 	if (ptgGroups == NULL)
 		return FALSE;
 
@@ -217,7 +217,7 @@ void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken)
 {
 	PTOKEN_PRIVILEGES ptpPrivileges = 
 		(PTOKEN_PRIVILEGES) myAllocateTokenInfo(hToken, TokenPrivileges);
-	Cec_LocalFree cec_ptp = ptpPrivileges;
+	CEC_LocalFree cec_ptp = ptpPrivileges;
 	if (ptpPrivileges == NULL)
 		return;
 
@@ -257,7 +257,7 @@ void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken)
 void DumpTokenOwner(HANDLE hToken, CPrintBuf* pbufToken) 
 {
 	PTOKEN_OWNER ptoOwner = (PTOKEN_OWNER) myAllocateTokenInfo(hToken, TokenOwner);
-	Cec_LocalFree cec_pto = ptoOwner;
+	CEC_LocalFree cec_pto = ptoOwner;
 	if (ptoOwner == NULL)
 		return;
 
@@ -274,7 +274,7 @@ void DumpTokenPrimaryGroup(HANDLE hToken, CPrintBuf* pbufToken)
 {
 	PTOKEN_PRIMARY_GROUP ptgGroup = 
 		(PTOKEN_PRIMARY_GROUP) myAllocateTokenInfo(hToken, TokenPrimaryGroup);
-	Cec_LocalFree cec_ptg = ptgGroup;
+	CEC_LocalFree cec_ptg = ptgGroup;
 	if (ptgGroup == NULL)
 		return;
 
@@ -294,7 +294,7 @@ void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken)
 
 	// Get the DACL info
 	ptdDacl = (PTOKEN_DEFAULT_DACL) myAllocateTokenInfo(hToken, TokenDefaultDacl);
-	Cec_LocalFree cec_ptd = ptdDacl;
+	CEC_LocalFree cec_ptd = ptdDacl;
 	if (ptdDacl == NULL)
 		return;
 
@@ -337,7 +337,7 @@ void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken)
 			// Chj: Here we should dump the SID text, bcz some SID results in ERROR_NONE_MAPPED.
 			TCHAR *psidtext = NULL;
 			ConvertSidToStringSid(&(paceAllowed->SidStart), &psidtext);
-			Cec_LocalFree cec_psidtext = psidtext;
+			CEC_LocalFree cec_psidtext = psidtext;
 			pbufToken->Print(_T("\t SID=%s "), psidtext);
 
 			// Get the account name associated with the ace and output it
@@ -408,7 +408,7 @@ void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken)
 void DumpTokenSource(HANDLE hToken, CPrintBuf* pbufToken) 
 {
 	PTOKEN_SOURCE ptsSource = (PTOKEN_SOURCE) myAllocateTokenInfo(hToken, TokenSource);
-	Cec_LocalFree cec_pts = ptsSource;
+	CEC_LocalFree cec_pts = ptsSource;
 	if (ptsSource == NULL)
 		return;
 
@@ -431,7 +431,7 @@ void DumpTokenImpersonationLevel(HANDLE hToken, CPrintBuf* pbufToken)
 {
 	PSECURITY_IMPERSONATION_LEVEL psilImpersonation = 
 		(PSECURITY_IMPERSONATION_LEVEL) myAllocateTokenInfo(hToken, TokenImpersonationLevel);
-	Cec_LocalFree cec_psil = psilImpersonation;
+	CEC_LocalFree cec_psil = psilImpersonation;
 	if (psilImpersonation == NULL)
 		return;
 
@@ -465,7 +465,7 @@ void DumpTokenImpersonationLevel(HANDLE hToken, CPrintBuf* pbufToken)
 void DumpTokenType(HANDLE hToken, CPrintBuf* pbufToken) 
 {
 	PTOKEN_TYPE pttType = (PTOKEN_TYPE) myAllocateTokenInfo(hToken, TokenType);
-	Cec_LocalFree cec_ptt = pttType;
+	CEC_LocalFree cec_ptt = pttType;
 	if (pttType == NULL)
 		return;
 
@@ -492,7 +492,7 @@ void DumpTokenType(HANDLE hToken, CPrintBuf* pbufToken)
 BOOL DumpTokenUser(HANDLE hToken, CPrintBuf* pbufToken) 
 {
 	PTOKEN_USER ptuUser  = (PTOKEN_USER) myAllocateTokenInfo(hToken, TokenUser);
-	Cec_LocalFree cec_ptu = ptuUser;
+	CEC_LocalFree cec_ptu = ptuUser;
 	if (ptuUser == NULL)
 		return FALSE;
 
@@ -507,7 +507,7 @@ BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken)
 	BOOL fRestricted = IsTokenRestricted(hToken);
 
 	PTOKEN_GROUPS ptgGroups = (PTOKEN_GROUPS) myAllocateTokenInfo(hToken, TokenRestrictedSids);
-	Cec_LocalFree cec_ptg = ptgGroups;
+	CEC_LocalFree cec_ptg = ptgGroups;
 	if (ptgGroups == NULL)
 		return FALSE;
 

@@ -193,8 +193,8 @@ void PriviligedTrustees(HWND hwndDlg, PTSTR pszPrivilige)
 		return;
 	}
 
-	Cec_LocalFree cec_add = pinfoTrusteeAdd;
-	Cec_LocalFree cec_del = pinfoTrusteeRemove;
+	CEC_LocalFree cec_add = pinfoTrusteeAdd;
+	CEC_LocalFree cec_del = pinfoTrusteeRemove;
 
 	// Handle trustee additions
 	if (nAddCount > 0) {
@@ -263,8 +263,8 @@ void GroupMembers(HWND hwndDlg, PTSTR pszGroup)
 		return;
 	}
 
-	Cec_LocalFree cec_add = pinfoTrusteeAdd;
-	Cec_LocalFree cec_del = pinfoTrusteeRemove;
+	CEC_LocalFree cec_add = pinfoTrusteeAdd;
+	CEC_LocalFree cec_del = pinfoTrusteeRemove;
 
 	// Handle member additions
 	if (nAddCount > 0) {
