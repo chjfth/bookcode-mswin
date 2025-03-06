@@ -886,8 +886,6 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
 	chSETDLGICONS(hwnd, IDI_TOKENMASTER);
 
-	SetWindowText(hwnd, _T("TokenMaster v") _T(EXE_VERSION));
-
 	Dlg_EnableJULayout(hwnd);
 
 	// Store some window handles
@@ -911,12 +909,22 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	guiPopulateStaticCombos();
 
 	// Status... Who is this program running as?
-	TCHAR szName[1024];
-	lstrcpy(szName, TEXT("Token Master running as "));
-	DWORD dwLen = lstrlen(szName);
-	DWORD dwSize = chDIMOF(szName) - dwLen;
-	GetUserName(szName + dwLen, &dwSize);
-	RefreshStatus(szName, NOERROR);
+	TCHAR szUserName[1024] = {}, szStatus[1024] = {};
+	DWORD nUserName = ARRAYSIZE(szUserName);
+	GetUserName(szUserName, &nUserName);
+
+	_sntprintf_s(szStatus, _TRUNCATE, TEXT("Token Master running as %s"), szUserName);
+	RefreshStatus(szStatus, NOERROR);
+
+	// Prepare dialogbox window title (will show whether RunAsAdmin).
+	//
+	TCHAR *pszRunAs = _T("");
+	if( _tcscmp(szUserName, _T("SYSTEM"))==0 )
+		pszRunAs = _T("(Run as SYSTEM)");
+	else if(IsRunAsAdmin())
+		pszRunAs = _T("(RunAsAdmin)");
+	//
+	vaSetWindowText(hwnd, _T("TokenMaster v%s %s"), _T(EXE_VERSION), pszRunAs);
 
 	return(TRUE);
 }
