@@ -204,6 +204,7 @@
     <ClCompile Include="..\chjutils\ch10-DumpSD.cpp" />
     <ClCompile Include="..\chjutils\chjutils.cpp" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\WinError.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\AclUI.itc.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="..\chjutils\ch10-DumpSD.h" />
     <ClInclude Include="..\chjutils\chjutils.h" />
     <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h" />
+    <ClInclude Include="..\..\__WinConst\mswin\WinError.itc.h" />
     <ClInclude Include="..\..\share\vaDbg.h" />
   </ItemGroup>
 

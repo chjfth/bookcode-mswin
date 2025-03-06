@@ -203,6 +203,7 @@
     <ClCompile Include="TrusteeMan.cpp" />
     <ClCompile Include="..\chjutils\chjutils.cpp" />
     <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\WinError.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\commctrl.itc.cpp" />
     <ClCompile Include="..\..\__WinConst\mswin\winuser.itc.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="LSAStr.h" />
     <ClInclude Include="..\chjutils\chjutils.h" />
     <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h" />
+    <ClInclude Include="..\..\__WinConst\mswin\WinError.itc.h" />
     <ClInclude Include="..\..\__WinConst\mswin\commctrl.itc.h" />
     <ClInclude Include="..\..\__WinConst\mswin\winuser.itc.h" />
     <ClInclude Include="..\..\share\vaDbg.h" />
