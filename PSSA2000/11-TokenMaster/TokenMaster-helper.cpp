@@ -397,7 +397,8 @@ void RefreshStatus(PCTSTR szStatus, DWORD dwLastError)
 
 		SYSTEMTIME st = {};
 		GetLocalTime(&st);
-		pbufStatus->Print(_T("[%02d:%02d:%02d] "), st.wHour, st.wMinute, st.wSecond);
+		pbufStatus->Print(_T("[%04d-%02d-%02d_%02d:%02d:%02d.%03d] "), 
+			st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
 		pbufStatus->Print(TEXT("Token Master, Status - "));
 		pbufStatus->Print(szStatus);
@@ -523,7 +524,7 @@ void guiUpdatePrivileges()
 
 		const TCHAR hypens[] = _T(" -- ");
 
-		abListBoxText = _tcslen(abName) + _tcslen(hypens) + _tcslen(abDispName) + 40; // set buffer-size
+		abListBoxText = int(_tcslen(abName)+_tcslen(hypens)+_tcslen(abDispName)+40); // set buffer-size
 
 		LARGE_INTEGER li = {luidaa.Luid.LowPart, luidaa.Luid.HighPart};
 

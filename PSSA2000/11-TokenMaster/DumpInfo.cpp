@@ -563,6 +563,9 @@ void guiDumpToken()
 		if (pbufToken == NULL)
 			goto leave;
 
+		// Chj: Show token handle value.
+		pbufToken->Print(_T("Token handle value: 0x%X\r\n"), PtrToUint(g_hToken));
+
 		// Display the token user
 		if (!DumpTokenUser(g_hToken, pbufToken))
 			pbufToken->Print(TEXT("Unable to dump Token User\r\n"));
