@@ -395,6 +395,10 @@ void RefreshStatus(PCTSTR szStatus, DWORD dwLastError)
 		if (pbufStatus == NULL)
 			goto leave;
 
+		SYSTEMTIME st = {};
+		GetLocalTime(&st);
+		pbufStatus->Print(_T("[%02d:%02d:%02d] "), st.wHour, st.wMinute, st.wSecond);
+
 		pbufStatus->Print(TEXT("Token Master, Status - "));
 		pbufStatus->Print(szStatus);
 

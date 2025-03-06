@@ -154,7 +154,7 @@ BOOL CPrintBuf::PrintError(DWORD dwErr) {
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, 
 		dwErr, 0, (PTSTR) &pszMsg, 0, NULL));
 	
-	fOk = fOk && (Print(TEXT("Error %d(%s): %s"), dwErr, ITCS(dwErr, itc::WinError), pszMsg) >= 0);
+	fOk = fOk && (Print(TEXT("WinError=%d (%s): %s"), dwErr, ITCS(dwErr, itc::WinError), pszMsg) >= 0);
 	
 	if (pszMsg != NULL)
 		LocalFree(pszMsg);

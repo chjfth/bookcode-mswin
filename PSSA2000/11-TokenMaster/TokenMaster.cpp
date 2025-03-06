@@ -422,36 +422,30 @@ void Cmd_Browse(HWND hwnd)
 }
 
 
-void Cmd_CreateProcess(HWND hwnd) 
+void Cmd_CreateProcessAsUser(HWND hwnd) 
 {
-	try {{
+	// No token?  Adios! (Spanish Bye)
+	if (g_hToken == NULL) {
+		RefreshStatus(TEXT("No Token"), 0);
+		return;
+	}
 
-		// No token?  Adios!
-		if (g_hToken == NULL) {
-			RefreshStatus(TEXT("No Token"), 0);
-			goto leave;
-		}
+	// Get current filename text
+	TCHAR szFileBuf[MAX_PATH] = {};
+	GetDlgItemText(hwnd, IDE_FILENAME, szFileBuf, chDIMOF(szFileBuf));
 
-		// Get current filename text
-		TCHAR szFileBuf[MAX_PATH];
-		*szFileBuf = 0;
-		GetDlgItemText(hwnd, IDE_FILENAME, szFileBuf, chDIMOF(szFileBuf));
+	STARTUPINFO si = {sizeof(si)};
 
-		STARTUPINFO si;
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-
-		// Create a new process with our current token
-		PROCESS_INFORMATION pi;
-		if (CreateProcessAsUser(g_hToken, NULL, szFileBuf, NULL, NULL, FALSE, 0,
-			NULL, NULL, &si, &pi)) {
-				CloseHandle(pi.hProcess);
-				CloseHandle(pi.hThread);
-		} else
-			RefreshStatus(TEXT("CreateProcessAsUser"), GetLastError());
-
-	} leave:;
-	} catch(...) {}
+	// Create a new process with our current token
+	PROCESS_INFORMATION pi;
+	if (CreateProcessAsUser(g_hToken, NULL, szFileBuf, NULL, NULL, FALSE, 0,
+		NULL, NULL, &si, &pi)) 
+	{
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	} else {
+		RefreshStatus(TEXT("CreateProcessAsUser"), GetLastError());
+	}
 }
 
 
@@ -800,7 +794,7 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		break;
 
 	case IDB_CREATEPROCESS:
-		Cmd_CreateProcess(hwnd);
+		Cmd_CreateProcessAsUser(hwnd);
 		break;
 
 	case IDB_ADDRESTRICTED:
