@@ -921,7 +921,7 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	TCHAR *pszRunAs = _T("");
 	if( _tcscmp(szUserName, _T("SYSTEM"))==0 )
 		pszRunAs = _T("(Run as SYSTEM)");
-	else if(IsRunAsAdmin())
+	else if(IsUserAnAdmin())
 		pszRunAs = _T("(RunAsAdmin)");
 	//
 	vaSetWindowText(hwnd, _T("TokenMaster v%s %s"), _T(EXE_VERSION), pszRunAs);

@@ -263,27 +263,3 @@ TCHAR* InterpretRights_Token(DWORD rights, void *userctx)
 
 	return pbuf; // need C++-delete
 }
-
-
-BOOL IsRunAsAdmin()
-{
-	// Code from CppUACSelfElevation.cpp
-
-	BOOL fIsRunAsAdmin = FALSE;
-	DWORD dwError = ERROR_SUCCESS;
-	PSID pAdministratorsGroup = NULL;
-
-	// Create the SID corresponding to the Administrators group.
-	BYTE adminSID[SECURITY_MAX_SID_SIZE] = {};
-	SID *psid = (SID*)adminSID; // debug
-	DWORD cbSize = sizeof(adminSID);
-	if (!CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, &adminSID, &cbSize))
-		return FALSE; // unlikely
-
-	// Determine whether the SID of administrators group is enabled in 
-	// the calling thread's token.
-	if (!CheckTokenMembership(NULL, psid, &fIsRunAsAdmin))
-		return FALSE;
-	else
-		return fIsRunAsAdmin;
-}

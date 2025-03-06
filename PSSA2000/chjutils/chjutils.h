@@ -67,9 +67,6 @@ TCHAR* InterpretRights_Generic(DWORD rights, void *userctx);
 TCHAR* InterpretRights_Token(DWORD rights, void *userctx);
 
 
-BOOL IsRunAsAdmin();
-
-
 //////////////////////////////////////////////////////////////////////////
 
 #include <itc/InterpretConst.h>

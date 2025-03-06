@@ -3,6 +3,7 @@
 #include "..\CmnHdr.h"           /* See Appendix A. */
 
 #include <WindowsX.h>
+#include <Shlobj.h> // for IsUserAnAdmin()
 #include <AclAPI.h>
 #include <AclUI.h>
 #include <ObjBase.h>
