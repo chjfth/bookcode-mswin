@@ -401,9 +401,8 @@ void Cmd_SetDACL(HWND hwnd)
 void Cmd_Browse(HWND hwnd) 
 {
 	// Get current filename text
-	TCHAR szFileBuf[MAX_PATH];
-	*szFileBuf = 0;
-	GetDlgItemText(hwnd, IDE_FILENAME, szFileBuf, chDIMOF(szFileBuf));
+	TCHAR szFileBuf[MAX_PATH] = {};
+	GetDlgItemText(hwnd, IDE_FILENAME, szFileBuf, ARRAYSIZE(szFileBuf));
 
 	// Use common dialog to fetch a filename
 	OPENFILENAME ofn;
@@ -412,11 +411,12 @@ void Cmd_Browse(HWND hwnd)
 	ofn.hwndOwner   = hwnd;
 	ofn.lpstrFilter = TEXT("Executables\000*.exe\000All Files\000*.*\000");
 	ofn.lpstrFile   = szFileBuf;
-	ofn.nMaxFile    = chDIMOF(szFileBuf);
+	ofn.nMaxFile    = ARRAYSIZE(szFileBuf);
 	ofn.lpstrTitle  = TEXT("Select a File Launchable by CreateProcessAsUser");
 	ofn.Flags       = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NONETWORKBUTTON
 		| OFN_PATHMUSTEXIST;
 	ofn.lpstrDefExt = TEXT("EXE");
+	
 	if (GetOpenFileName(&ofn))
 		SetDlgItemText(hwnd, IDE_FILENAME, szFileBuf);
 }
@@ -435,10 +435,13 @@ void Cmd_CreateProcessAsUser(HWND hwnd)
 	GetDlgItemText(hwnd, IDE_FILENAME, szFileBuf, chDIMOF(szFileBuf));
 
 	STARTUPINFO si = {sizeof(si)};
+	PROCESS_INFORMATION pi = {};
 
 	// Create a new process with our current token
-	PROCESS_INFORMATION pi;
-	if (CreateProcessAsUser(g_hToken, NULL, szFileBuf, NULL, NULL, FALSE, 0,
+	if (CreateProcessAsUser(g_hToken, NULL, szFileBuf, 
+		NULL, NULL, // process and thread secuattr
+		FALSE, // bInheritHandles
+		0,     // dwCreationFlags
 		NULL, NULL, &si, &pi)) 
 	{
 		CloseHandle(pi.hProcess);
