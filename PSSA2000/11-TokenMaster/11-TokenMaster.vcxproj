@@ -224,10 +224,11 @@
     <ClInclude Include="shareinc.h" />
     <ClInclude Include="DumpInfo.h" />
     <ClInclude Include="DaclPage.h" />
+    <ClInclude Include="..\..\share\vaDbg.h" />
     <ClInclude Include="..\chjutils\chjutils.h" />
     <ClInclude Include="..\chjutils\ch10-DumpSD.h" />
     <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h" />
-    <ClInclude Include="..\..\share\vaDbg.h" />
+    <ClInclude Include="..\..\__chjcxx\common-include\include\mswin\Combobox_EnableWideDrop.h" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->

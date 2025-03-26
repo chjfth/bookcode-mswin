@@ -47,6 +47,9 @@
     <ClInclude Include="exe_version.h">
       <Filter>chjutils</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\__chjcxx\common-include\include\mswin\Combobox_EnableWideDrop.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TokenMaster.rc" />

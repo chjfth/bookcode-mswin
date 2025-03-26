@@ -19,6 +19,9 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #define AUTOBUF_IMPL
 #include "..\ClassLib\AutoBuf.h"       // See Appendix B.
 
+#define Combobox_EnableWideDrop_IMPL
+#include <mswin/Combobox_EnableWideDrop.h>
+
 #include <vaDbg.h>
 
 HANDLE g_hSnapShot = NULL;
@@ -890,6 +893,7 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	chSETDLGICONS(hwnd, IDI_TOKENMASTER);
 
 	Dlg_EnableJULayout(hwnd);
+	Dlgbox_EnableComboboxWideDrop(hwnd);
 
 	// Store some window handles
 	g_hwndProcessCombo = GetDlgItem(hwnd, IDC_PROCESSES);
