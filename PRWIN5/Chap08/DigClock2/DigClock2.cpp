@@ -29,6 +29,11 @@ Since 2024.10:
 #include "iversion.h"
 #include "utils.h"
 
+#define Editbox_EnableKbdAdjustNumber_IMPL
+#define Editbox_EnableKbdAdjustNumber_DEBUG
+#define vaDBG vaDbgTs
+#include <mswin/Editbox_EnableKbdAdjustNumber.h>
+
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 void ShowHelp(HWND hwndParent)
@@ -109,8 +114,8 @@ bool SomeInit()
 
 	TCHAR szDbg[4] = {};
 	GetEnvironmentVariable(_T("DIGCLOCK_DBG"), szDbg, ARRAYSIZE(szDbg));
-	if(_tcscmp(szDbg, _T("1"))==0)
-		g_isDbg = 1;
+//	if(_tcscmp(szDbg, _T("1"))==0)
+//		g_isDbg = 1;
 	
 	MySaveSysDpiScaling();
 
@@ -738,7 +743,7 @@ BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
 
 	HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
-	Editbox_EnableUpDownKeyAdjustNumber(hEdit, 0, 59, true, true);
+	Editbox_EnableKbdAdjustNumber(hEdit, 0, 59, true, true);
 
 	// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
 	int textlen = GetWindowTextLength (hEdit);

@@ -28,9 +28,6 @@ extern"C"{
 	// Ref: Raymond Chen https://devblogs.microsoft.com/oldnewthing/20031107-00/?p=41923
 
 
-extern bool g_isDbg;
-void myDbg(const TCHAR *fmt, ...);
-
 const TCHAR *GetExeFilename();
 
 void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop);
@@ -47,12 +44,6 @@ void MoveWindow_byOffset(HWND hwnd, int offsetx, int offsety);
 const TCHAR* Seconds_to_HMS(int seconds);
 int HMS_to_Seconds(const TCHAR *szHMS);
 
-
-bool Editbox_EnableUpDownKeyAdjustNumber(HWND hEdit,
-	int min_val, int max_val, bool is_wrap_around, bool is_pad_0);
-
-bool Editbox_DisableUpDownKeyAdjustNumber(HWND hEdit);
-// -- optional, WM_NCDESTROY will call this automatically
 
 #ifdef __cplusplus
 } // extern"C"{
