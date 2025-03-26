@@ -39,7 +39,7 @@ Since 2024.10:
 void ShowHelp(HWND hwndParent)
 {
 	static TCHAR *s_help_fmt =
-		_T("DigClock2 by Jimm Chen. (version %d.%d)\r\n")
+		_T("DigClock2 by Jimm Chen. (version %d.%d.%d)\r\n")
 		_T("\r\n")
 		_T("This clock program works in wall-time mode or countdown mode.\r\n")
 		_T("Clock drawing code by DigClock from Charles Petzold [PRWIN5] Chap08.\r\n")
@@ -58,7 +58,7 @@ void ShowHelp(HWND hwndParent)
 		_T("Compiled on: ") _T(__DATE__) _T(", ") _T(__TIME__)
 		;
 	vaMsgBox(hwndParent, MB_OK|MB_ICONINFORMATION,_T("Help"), 
-		s_help_fmt, THISEXE_VMAJOR, THISEXE_VMINOR);
+		s_help_fmt, THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD);
 }
 
 #define MY_TIMER_INTERVAL_1000ms 1000 // request exactly 1 seconds per WM_TIMER callback
@@ -635,7 +635,7 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
 		g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
 
 	EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
-		g_seconds_remain>0 ? MF_ENABLED: MF_DISABLED);
+		g_seconds_remain>0 ? MF_ENABLED: MF_GRAYED);
 
 	CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
 		s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
