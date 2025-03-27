@@ -5,6 +5,7 @@
 #define IDR_MENU1                       101
 #define IDD_COUNTDOWN_CFG               102
 #define IDM_ALWAYS_ON_TOP               1000
+#define IDB_StartCountDown              1000
 #define IDM_RESET_SIZE                  1001
 #define IDM_MINIMIZE_WINDOW             1002
 #define IDM_COUNTDOWN_MODE              2000
@@ -23,7 +24,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

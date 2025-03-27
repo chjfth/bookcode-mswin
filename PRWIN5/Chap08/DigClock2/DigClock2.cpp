@@ -83,7 +83,7 @@ HWND g_hdlgCountdownCfg;
 
 POINT g_ptClickCountDown;
 
-SIZE g_init_clisize = {180, 60}; // Initial main-window client-area size
+SIZE g_init_clisize = {192, 60}; // Initial main-window client-area size
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -114,8 +114,6 @@ bool SomeInit()
 
 	TCHAR szDbg[4] = {};
 	GetEnvironmentVariable(_T("DIGCLOCK_DBG"), szDbg, ARRAYSIZE(szDbg));
-//	if(_tcscmp(szDbg, _T("1"))==0)
-//		g_isDbg = 1;
 	
 	MySaveSysDpiScaling();
 
@@ -210,7 +208,7 @@ int Get_NewColorIdx(int old, int shift)
 
 int Digit_ScaleDown(int value)
 {
-	// Chj: For Second value(not Hour, Minute value), we scale down the 
+	// Chj: For Second-value(not Hour, Minute value), we scale down the 
 	// digit display size to 75% to make the seconds value stands out.
 	return value * 3 /4;
 }
@@ -407,7 +405,13 @@ void Hide_CountdownCfg()
 	ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
 
 	HWND hwndMain = GetParent(g_hdlgCountdownCfg);
-	SetFocus(hwndMain); // so that user can use keyboard arraow to move hwndMain
+	SetFocus(hwndMain); // so that user can use keyboard arrow to move hwndMain
+}
+
+void do_CountdownDone(HWND hwnd)
+{
+	(void)hwnd;
+	SetDlgItemText(g_hdlgCountdownCfg, IDB_StartCountDown, _T("Start countdown"));
 }
 
 void DoTimer(HWND hwnd, int idtimer)
@@ -440,7 +444,11 @@ void DoTimer(HWND hwnd, int idtimer)
 			assert(g_seconds_remain>=0);
 
 			if(prev_remain>0 && g_seconds_remain==0)
+			{
 				MessageBeep(MB_OK); // time-up beep
+
+				do_CountdownDone(hwnd);
+			}
 		}
 		
 		InvalidateRect (hwnd, NULL, TRUE); // draw UI according to g_seconds_remain
@@ -661,6 +669,9 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	else if(cmdid==IDM_STOP_COUNTDOWN)
 	{
 		g_seconds_remain = 0;
+
+		do_CountdownDone(hwnd);
+
 		InvalidateRect(hwnd, NULL, TRUE);
 	}
 	else if(cmdid==IDM_ALWAYS_ON_TOP)
@@ -759,7 +770,7 @@ void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 {
 	HWND hwndMain = GetParent(hDlg);
 
-	if(idcmd==IDOK)
+	if(idcmd==IDB_StartCountDown)
 	{
 		TCHAR szHMS[20] = {};
 		GetDlgItemText(hDlg, IDC_EDIT1, szHMS, ARRAYSIZE(szHMS)-1);
@@ -778,6 +789,8 @@ void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 
 		GetCursorPos(&g_ptClickCountDown);
 		Hide_CountdownCfg();
+
+		SetDlgItemText(hDlg, IDB_StartCountDown, _T("Restart countdown"));
 
 		InvalidateRect(hwndMain, NULL, TRUE);			
 	}
