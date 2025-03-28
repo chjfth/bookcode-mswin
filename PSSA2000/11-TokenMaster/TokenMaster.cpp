@@ -442,7 +442,7 @@ void Cmd_CreateProcessAsUser(HWND hwnd)
 
 	// Create a new process with our current token
 	if (CreateProcessAsUser(g_hToken, NULL, szFileBuf, 
-		NULL, NULL, // process and thread secuattr
+		NULL, NULL, // process and thread secu-attr
 		FALSE, // bInheritHandles
 		0,     // dwCreationFlags
 		NULL, NULL, &si, &pi)) 
@@ -545,9 +545,9 @@ void Cmd_CreateRestrictedToken()
 	PLUID_AND_ATTRIBUTES pluidPrivAttribs     = NULL;
 	PSID_AND_ATTRIBUTES  psidToRestrictAttrib = NULL;
 
-	DWORD dwIndex;
-	DWORD dwDisableSize  = 0;
-	DWORD dwRestrictSize = 0;
+	DWORD dwIndex = 0;
+	DWORD DisableCount  = 0;
+	DWORD RestrictCount = 0;
 
 	PTSTR szStatus = TEXT("Restricted Token Created");
 
@@ -560,16 +560,16 @@ void Cmd_CreateRestrictedToken()
 			goto leave;
 		}
 
-		// How big of a structure do I allocate for restricted sids
-		dwRestrictSize = ListBox_GetCount(g_hwndRestrictedSids);
+		// How big of a structure do I allocate for restricted SIDs
+		RestrictCount = ListBox_GetCount(g_hwndRestrictedSids);
 		psidToRestrictAttrib = (PSID_AND_ATTRIBUTES) LocalAlloc(LPTR,
-			dwRestrictSize * sizeof(SID_AND_ATTRIBUTES));
+			RestrictCount * sizeof(SID_AND_ATTRIBUTES));
 		if (psidToRestrictAttrib == NULL) {
 			szStatus = TEXT("LocalAlloc");
 			goto leave;
 		}
 
-		ZeroMemory(psidToRestrictAttrib, dwRestrictSize
+		ZeroMemory(psidToRestrictAttrib, RestrictCount
 			* sizeof(SID_AND_ATTRIBUTES));
 
 		DWORD dwData;
@@ -582,7 +582,7 @@ void Cmd_CreateRestrictedToken()
 		SID_NAME_USE sidNameUse;
 
 		// For each sid, we find the sid and add it to our array
-		for (dwIndex = 0; dwIndex < dwRestrictSize; dwIndex++) {
+		for (dwIndex = 0; dwIndex < RestrictCount; dwIndex++) {
 
 			dwData = ListBox_GetText(g_hwndRestrictedSids, dwIndex, szBuffer);
 			if (dwData == LB_ERR) {
@@ -614,22 +614,22 @@ void Cmd_CreateRestrictedToken()
 			psidToRestrictAttrib[dwIndex].Sid = pSid;
 			psidToRestrictAttrib[dwIndex].Attributes = 0;
 		}
-		dwRestrictSize = dwIndex;
+		RestrictCount = dwIndex;
 
 		// How much memory do we need for our disabled SIDS?
-		dwDisableSize = ListBox_GetCount(g_hwndDisabledSids);
+		DisableCount = ListBox_GetCount(g_hwndDisabledSids);
 		psidToDisableAttrib = (PSID_AND_ATTRIBUTES)
-			LocalAlloc(LPTR, dwDisableSize * sizeof(SID_AND_ATTRIBUTES));     
+			LocalAlloc(LPTR, DisableCount * sizeof(SID_AND_ATTRIBUTES));     
 		if (psidToDisableAttrib == NULL) {
 
 			szStatus = TEXT("LocalAlloc");
 			goto leave;
 		}
 		ZeroMemory(psidToDisableAttrib,
-			dwDisableSize * sizeof(SID_AND_ATTRIBUTES));
+			DisableCount * sizeof(SID_AND_ATTRIBUTES));
 
-		DWORD dwEnd = dwDisableSize;
-		dwDisableSize = 0;
+		DWORD dwEnd = DisableCount;
+		DisableCount = 0;
 
 		// For each one, add it to our array
 		for (dwIndex = 0; dwIndex < dwEnd; dwIndex++) 
@@ -663,9 +663,9 @@ void Cmd_CreateRestrictedToken()
 						goto leave;
 				}
 
-				psidToDisableAttrib[dwDisableSize].Sid = pSid;
-				psidToDisableAttrib[dwDisableSize].Attributes = 0;
-				dwDisableSize++;
+				psidToDisableAttrib[DisableCount].Sid = pSid;
+				psidToDisableAttrib[DisableCount].Attributes = 0;
+				DisableCount++;
 			}
 		}
 
@@ -705,9 +705,9 @@ void Cmd_CreateRestrictedToken()
 		}
 
 		// Attempt to create restricted token with the structures we built
-		HANDLE hNewToken;
-		if (!CreateRestrictedToken(g_hToken, 0, dwDisableSize,
-			psidToDisableAttrib, dwPrivSize, pluidPrivAttribs, dwRestrictSize,
+		HANDLE hNewToken = NULL;
+		if (!CreateRestrictedToken(g_hToken, 0, DisableCount,
+			psidToDisableAttrib, dwPrivSize, pluidPrivAttribs, RestrictCount,
 			psidToRestrictAttrib, &hNewToken)) {
 				szStatus = TEXT("CreateRestrictedToken");
 				goto leave;
@@ -731,7 +731,7 @@ void Cmd_CreateRestrictedToken()
 
 	// We have to loop to remove all of those sids we allocated
 	if (psidToDisableAttrib != NULL) {
-		for (dwIndex = 0; dwIndex < dwDisableSize; dwIndex++)
+		for (dwIndex = 0; dwIndex < DisableCount; dwIndex++)
 			if (psidToDisableAttrib[dwIndex].Sid != NULL)
 				LocalFree(psidToDisableAttrib[dwIndex].Sid);
 		LocalFree(psidToDisableAttrib);
@@ -743,7 +743,7 @@ void Cmd_CreateRestrictedToken()
 
 	// More looping to free up sids we allocated
 	if (psidToRestrictAttrib != NULL) {
-		for (dwIndex = 0; dwIndex < dwRestrictSize; dwIndex++)
+		for (dwIndex = 0; dwIndex < RestrictCount; dwIndex++)
 			if (psidToRestrictAttrib[dwIndex].Sid != NULL)
 				LocalFree(psidToRestrictAttrib[dwIndex].Sid);
 		LocalFree(psidToRestrictAttrib);

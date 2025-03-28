@@ -513,15 +513,15 @@ BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken)
 
 	pbufToken->Print(DIVIDERL);
 	pbufToken->Print(fRestricted 
-		? TEXT("Token is Restricted\r\n")
-		: TEXT("Token is not Restricted\r\n"));
+		? TEXT("IsTokenRestricted() = TRUE\r\n")
+		: TEXT("IsTokenRestricted() = FALSE\r\n"));
 	pbufToken->Print(TEXT("Restricted SID Count:\t%lu\r\n"), ptgGroups->GroupCount);
 
 	pbufToken->Print(TEXT("Restricted SIDs\r\n"));
 
 	DWORD dwIndex = 0;
 	for (; dwIndex < ptgGroups->GroupCount; dwIndex++) {
-		pbufToken->Print(TEXT("  Sid #%d\r\n"), dwIndex);
+		pbufToken->Print(TEXT("Restricted-Sid #%d:\r\n"), dwIndex);
 		DumpSIDAttributes(ptgGroups->Groups[dwIndex].Attributes, pbufToken);
 		DumpSID(ptgGroups->Groups[dwIndex].Sid, pbufToken);
 		// pbufToken->Print(DIVIDERS);
