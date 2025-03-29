@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../chjutils/chjutils.h"
 #include "../chjutils/ch10-DumpSD.h"
 
 extern HWND g_hwndProcessCombo;
@@ -15,8 +16,6 @@ extern HWND g_hwndLogonTypes;
 extern HWND g_hwndLogonProviders;
 extern HWND g_hwndImpersonationLevels;
 extern HWND g_hwndTokenTypes;
-
-typedef DWORD WinError_t;
 
 BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled);
 
@@ -35,7 +34,7 @@ BOOL myGetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize);
 
 
 void RefreshStatus(PCTSTR szStatus, DWORD dwLastError);
-void vaPrintStatus(const TCHAR *fmt, ...);
+void vaRefreshStatus(const TCHAR *fmt, ...);
 
 PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass);
 

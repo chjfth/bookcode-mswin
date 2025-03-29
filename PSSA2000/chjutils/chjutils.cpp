@@ -12,8 +12,6 @@
 #include <assert.h>
 #include <wchar.h>
 
-#include <vaDbg.h>
-
 #define JAUTOBUF_IMPL
 #include "chjutils.h"
 
@@ -262,4 +260,36 @@ TCHAR* InterpretRights_Token(DWORD rights, void *userctx)
 	REMOVE_TRAILING_CRLF(pbuf);
 
 	return pbuf; // need C++-delete
+}
+
+
+WinError_t ab_GetSidFromAccountName( // ab: Jautobuf
+	const TCHAR *accname, // input
+	Jautobuf &abSid     // output
+	)
+{
+	// Hint: I will deal with the ultimate env-trick:
+	// Between two LookupAccountName() calls, old accname may be deleted an recreated,
+	// and it maps to a totally different SID. 
+	// So, I need to put LookupAccountName() in a loop, preparing for an ever increasing
+	// SID buffer requirement.
+
+	AutoTCHARs abDomname;
+	SID_NAME_USE sidNameUse = SidTypeInvalid;
+	DWORD winerr = 0;
+	BOOL succ = 0;
+
+	do 
+	{
+		SetLastError(0);
+		succ = LookupAccountName(NULL, accname,  
+			abSid, abSid,  abDomname, abDomname,  &sidNameUse);
+		winerr = GetLastError();
+	} while(winerr && Is_LessBuffer(winerr));
+
+	if(!succ && winerr!=ERROR_INSUFFICIENT_BUFFER) {
+		return winerr;
+	}
+
+	return winerr;
 }

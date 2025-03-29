@@ -4,14 +4,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 ******************************************************************************/
 
 #define PRINTBUF_IMPL
-
 #include "shareinc.h"
-#include "DaclPage.h"
-#include "TokenMaster-helper.h"
-#include "../chjutils/chjutils.h"
-#include "exe_version.h"
-
-#include "Resource.h"
 
 #define JULAYOUT_IMPL
 #include <mswin/JULayout2.h>
@@ -22,8 +15,14 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #define Combobox_EnableWideDrop_IMPL
 #include <mswin/Combobox_EnableWideDrop.h>
 
+#include "DaclPage.h"
+#include "TokenMaster-helper.h"
+#include "../chjutils/chjutils.h"
+#include "exe_version.h"
+
+#include "Resource.h"
+
 #include <process.h>
-#include <vaDbg.h>
 
 HANDLE g_hSnapShot = NULL;
 HANDLE g_hToken = NULL;
@@ -450,7 +449,7 @@ void Cmd_CreateProcessAsUser(HWND hwnd)
 	{
 		DWORD msec_start = TrueGetMillisec();
 
-		vaPrintStatus(_T("CreateProcessAsUser() success, child PID=%d."), pi.hProcess);
+		vaRefreshStatus(_T("CreateProcessAsUser() success, child PID=%d."), pi.hProcess);
 
 		// [2025-03-29] v1.4.1: Wait 1 second to see if the child process runs to end.
 		// If so, report child process's exit code.
@@ -465,7 +464,7 @@ void Cmd_CreateProcessAsUser(HWND hwnd)
 
 			DWORD msec_end = TrueGetMillisec();
 			int msec_used = msec_end - msec_start;
-			vaPrintStatus(
+			vaRefreshStatus(
 				_T("Child process creation success, but exits in less than %d milliseconds. ")
 				_T("Child process exit code is %d (0x%X).")
 				, msec_used, exitcode, exitcode);
@@ -567,213 +566,129 @@ void Cmd_SetOwnerGroup(HWND hwnd, BOOL fOwner)
 
 void Cmd_CreateRestrictedToken() 
 {
-	PSID_AND_ATTRIBUTES  psidToDisableAttrib  = NULL;
-	PLUID_AND_ATTRIBUTES pluidPrivAttribs     = NULL;
-	PSID_AND_ATTRIBUTES  psidToRestrictAttrib = NULL;
+	// No Token?  Gotta run...
+	if (g_hToken == NULL) {
+		RefreshStatus(_T("No Token."), 0);
+		return;
+	}
 
+	AutoTCHARs abText;
+	int textlen = 0;
+	BOOL succ = 0;
+	WinError_t winerr = 0;
+
+	// Prepare SIDs-to-restrict array.
+
+	DWORD RestrictCount = ListBox_GetCount(g_hwndRestrictedSids);
+	CecArray_SID_AND_ATTRIBUTES ceca_SidsToRestrict = new Cxx_SID_AND_ATTRIBUTES[RestrictCount];
+	
+	Jautobuf abSid;
 	DWORD dwIndex = 0;
-	DWORD DisableCount  = 0;
-	DWORD RestrictCount = 0;
 
-	PTSTR szStatus = TEXT("Restricted Token Created");
+	for(dwIndex=0; dwIndex<RestrictCount; dwIndex++)
+	{
+		textlen = ListBox_GetTextLen(g_hwndRestrictedSids, dwIndex);
+		if((int)abText.Size() < textlen+1)
+			abText = textlen+1;
 
-	try {{
+		textlen = ListBox_GetText(g_hwndRestrictedSids, dwIndex, abText);
 
-		// No Token?  Gotta run...
-		if (g_hToken == NULL) {
-			szStatus = TEXT("No Token");
-			SetLastError(0);
-			goto leave;
+		winerr = ab_GetSidFromAccountName(abText, abSid);
+		if(winerr) {
+			vaRefreshStatus(_T("(1)Unexpect error on LookupAccountName(\"%s\"), winerr=%s"), 
+				abText.Bufptr(), ITCSv(winerr, WinError));
+			return;
 		}
 
-		// How big of a structure do I allocate for restricted SIDs
-		RestrictCount = ListBox_GetCount(g_hwndRestrictedSids);
-		psidToRestrictAttrib = (PSID_AND_ATTRIBUTES) LocalAlloc(LPTR,
-			RestrictCount * sizeof(SID_AND_ATTRIBUTES));
-		if (psidToRestrictAttrib == NULL) {
-			szStatus = TEXT("LocalAlloc");
-			goto leave;
-		}
-
-		ZeroMemory(psidToRestrictAttrib, RestrictCount
-			* sizeof(SID_AND_ATTRIBUTES));
-
-		DWORD dwData;
-		DWORD dwSidSize;
-		DWORD dwDomainSize;
-		TCHAR szBuffer[1024];
-		TCHAR szDomain[1024];
-		PSID  pSid;
-
-		SID_NAME_USE sidNameUse;
-
-		// For each sid, we find the sid and add it to our array
-		for (dwIndex = 0; dwIndex < RestrictCount; dwIndex++) {
-
-			dwData = ListBox_GetText(g_hwndRestrictedSids, dwIndex, szBuffer);
-			if (dwData == LB_ERR) {
-				dwIndex--;
-				break;
-			}
-
-			dwSidSize = 0;
-			dwDomainSize = chDIMOF(szDomain);
-
-			// Size of SID?
-			LookupAccountName(NULL, szBuffer, NULL, &dwSidSize, szDomain,
-				&dwDomainSize, &sidNameUse);
-			pSid = LocalAlloc(LPTR, dwSidSize);
-			if (pSid == NULL) {
-
-				szStatus = TEXT("LocalAlloc");
-				goto leave;
-			}
-
-			// Get the SID
-			if (!LookupAccountName(NULL, szBuffer, pSid, &dwSidSize, szDomain,
-				&dwDomainSize, &sidNameUse)) {
-
-					szStatus = TEXT("LookupAccountName");
-					goto leave;
-			}
-
-			psidToRestrictAttrib[dwIndex].Sid = pSid;
-			psidToRestrictAttrib[dwIndex].Attributes = 0;
-		}
-		RestrictCount = dwIndex;
-
-		// How much memory do we need for our disabled SIDS?
-		DisableCount = ListBox_GetCount(g_hwndDisabledSids);
-		psidToDisableAttrib = (PSID_AND_ATTRIBUTES)
-			LocalAlloc(LPTR, DisableCount * sizeof(SID_AND_ATTRIBUTES));     
-		if (psidToDisableAttrib == NULL) {
-
-			szStatus = TEXT("LocalAlloc");
-			goto leave;
-		}
-		ZeroMemory(psidToDisableAttrib,
-			DisableCount * sizeof(SID_AND_ATTRIBUTES));
-
-		DWORD dwEnd = DisableCount;
-		DisableCount = 0;
-
-		// For each one, add it to our array
-		for (dwIndex = 0; dwIndex < dwEnd; dwIndex++) 
-		{
-			if (ListBox_GetSel(g_hwndDisabledSids, dwIndex)) {
-
-				dwData = ListBox_GetText(g_hwndDisabledSids, dwIndex, szBuffer);
-				if (dwData == LB_ERR) {
-
-					dwIndex--;
-					break;
-				}
-
-				dwSidSize = 0;
-				dwDomainSize = chDIMOF(szDomain);
-
-				// SID size?
-				LookupAccountName(NULL, szBuffer, NULL, &dwSidSize, szDomain,
-					&dwDomainSize, &sidNameUse);
-				pSid = LocalAlloc(LPTR, dwSidSize);
-				if (pSid == NULL) {
-
-					szStatus = TEXT("LocalAlloc");
-					goto leave;
-				}
-				// Get the SID
-				if (!LookupAccountName(NULL, szBuffer, pSid, &dwSidSize,
-					szDomain, &dwDomainSize, &sidNameUse)) {
-
-						szStatus = TEXT("LookupAccountName");
-						goto leave;
-				}
-
-				psidToDisableAttrib[DisableCount].Sid = pSid;
-				psidToDisableAttrib[DisableCount].Attributes = 0;
-				DisableCount++;
-			}
-		}
-
-		// Now we find out how much memory we need for our privileges
-		DWORD dwPrivSize = ListBox_GetCount(g_hwndDeletedPrivileges);
-		pluidPrivAttribs = (PLUID_AND_ATTRIBUTES) LocalAlloc(LPTR, dwPrivSize
-			* sizeof(LUID_AND_ATTRIBUTES));
-		if (pluidPrivAttribs == NULL) {
-			szStatus = TEXT("LocalAlloc");
-			goto leave;
-		}
-		ZeroMemory(pluidPrivAttribs, dwPrivSize * sizeof(LUID_AND_ATTRIBUTES));
-
-		// Add the privileges that are to be removed from the token to the list
-		dwEnd = dwPrivSize;
-		dwPrivSize = 0;
-		for (dwIndex = 0; dwIndex < dwEnd; dwIndex++) {
-
-			if (ListBox_GetSel(g_hwndDeletedPrivileges, dwIndex)) {
-
-				dwData = ListBox_GetText(g_hwndDeletedPrivileges, dwIndex, szBuffer);
-				if (dwData == LB_ERR) {
-					dwIndex--;
-					break;
-				}
-
-				LUID luid;
-				if (!LookupPrivilegeValue(NULL, szBuffer, &luid)) {
-					szStatus = TEXT("LookupPrivilegeValue");
-					goto leave;
-				}
-
-				pluidPrivAttribs[dwPrivSize].Luid = luid;
-				pluidPrivAttribs[dwPrivSize].Attributes = 0;
-				dwPrivSize++;
-			}
-		}
-
-		// Attempt to create restricted token with the structures we built
-		HANDLE hNewToken = NULL;
-		if (!CreateRestrictedToken(g_hToken, 0, DisableCount,
-			psidToDisableAttrib, dwPrivSize, pluidPrivAttribs, RestrictCount,
-			psidToRestrictAttrib, &hNewToken)) {
-				szStatus = TEXT("CreateRestrictedToken");
-				goto leave;
-		}
-
-		// Close out our old token
-		CloseHandle(g_hToken);
-
-		// This is our new token
-		g_hToken = hNewToken;
-
-		// Display it
-		guiDumpToken();
-
-		SetLastError(0);
-
-	} leave:;
-	} catch(...) {}
-
-	RefreshStatus(szStatus, GetLastError());
-
-	// We have to loop to remove all of those sids we allocated
-	if (psidToDisableAttrib != NULL) {
-		for (dwIndex = 0; dwIndex < DisableCount; dwIndex++)
-			if (psidToDisableAttrib[dwIndex].Sid != NULL)
-				LocalFree(psidToDisableAttrib[dwIndex].Sid);
-		LocalFree(psidToDisableAttrib);
+		ceca_SidsToRestrict[dwIndex].Sid = abSid.Bufptr();
+		abSid.Discard();
 	}
 
-	// The privileges we can just free
-	if (pluidPrivAttribs != NULL)
-		LocalFree(pluidPrivAttribs);
+	// Prepare SIDs-to-disable array.
 
-	// More looping to free up sids we allocated
-	if (psidToRestrictAttrib != NULL) {
-		for (dwIndex = 0; dwIndex < RestrictCount; dwIndex++)
-			if (psidToRestrictAttrib[dwIndex].Sid != NULL)
-				LocalFree(psidToRestrictAttrib[dwIndex].Sid);
-		LocalFree(psidToRestrictAttrib);
+	DWORD DisableSidCount = 0;
+	DWORD ListCount = ListBox_GetCount(g_hwndDisabledSids);
+	CecArray_SID_AND_ATTRIBUTES ceca_SidsToDisable = new Cxx_SID_AND_ATTRIBUTES[ListCount];
+
+	for(dwIndex=0; dwIndex<ListCount; dwIndex++)
+	{
+		if(! ListBox_GetSel(g_hwndDisabledSids, dwIndex))
+			continue; // this entry not selected by user, so skip
+
+		textlen = ListBox_GetTextLen(g_hwndDisabledSids, dwIndex);
+
+		if((int)abText.Size() < textlen+1)
+			abText = textlen+1;
+
+		textlen = ListBox_GetText(g_hwndDisabledSids, dwIndex, abText);
+
+		winerr = ab_GetSidFromAccountName(abText, abSid);
+		if(winerr) {
+			vaRefreshStatus(_T("(2)Unexpect error on LookupAccountName(\"%s\"), winerr=%s"), 
+				abText.Bufptr(), ITCSv(winerr, WinError));
+			return;
+		}
+
+		ceca_SidsToDisable[DisableSidCount].Sid = abSid.Bufptr();
+		abSid.Discard();
+
+		DisableSidCount++;
 	}
+
+	// Prepare WinPrivs-to-delete list
+
+	DWORD DelPrivCount = 0;
+	ListCount = ListBox_GetCount(g_hwndDeletedPrivileges);
+	CecArray_LUID_AND_ATTRIBUTES ceca_LUID_AND_ATTRIBUTES =	new LUID_AND_ATTRIBUTES[ListCount];
+	ZeroMemory((void*)ceca_LUID_AND_ATTRIBUTES, ListCount*sizeof(LUID_AND_ATTRIBUTES));
+
+	for(dwIndex=0; dwIndex<ListCount; dwIndex++)
+	{
+		if(! ListBox_GetSel(g_hwndDeletedPrivileges, dwIndex))
+			continue; // this entry not selected by user, so skip
+
+		if((int)abText.Size() < textlen+1)
+			abText = textlen+1;
+
+		textlen = ListBox_GetText(g_hwndDeletedPrivileges, dwIndex, abText);
+
+		LUID luid = {};
+		succ = LookupPrivilegeValue(NULL, abText, &luid);
+		if(!succ) {
+			vaRefreshStatus(_T("(3)Unexpect error on LookupPrivilegeValue(\"%s\"), winerr=%s"),
+				abText.Bufptr(), ITCS_WinError);
+			return;
+		}
+
+		ceca_LUID_AND_ATTRIBUTES[DelPrivCount].Luid = luid;
+		ceca_LUID_AND_ATTRIBUTES[DelPrivCount].Attributes = 0;
+		DelPrivCount++;
+	}
+
+	HANDLE hNewToken = NULL;
+	succ = CreateRestrictedToken(g_hToken, // old token as template
+		0, // flags
+		DisableSidCount, ceca_SidsToDisable,
+		DelPrivCount, ceca_LUID_AND_ATTRIBUTES,
+		RestrictCount, ceca_SidsToRestrict,
+		&hNewToken);
+	if(!succ)
+	{
+		winerr = GetLastError();
+		vaRefreshStatus(_T("CreateRestrictedToken() fail, winerr=%s"), ITCSv(winerr, WinError));
+		return;
+	}
+
+	vaRefreshStatus(_T("CreateRestrictedToken() success."));
+
+	// Close out our old token
+	CloseHandle(g_hToken);
+
+	// This is our new token
+	g_hToken = hNewToken;
+
+	// Display it
+	guiDumpToken();
 }
 
 static void try_OpenFile(const TCHAR *filepath)

@@ -417,7 +417,7 @@ void RefreshStatus(PCTSTR szStatus, DWORD dwLastError)
 	}
 }
 
-void vaPrintStatus(const TCHAR *fmt, ...)
+void vaRefreshStatus(const TCHAR *fmt, ...)
 {
 	TCHAR tbuf[2000] = {};
 	va_list args;

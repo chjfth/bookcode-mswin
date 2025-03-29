@@ -4,23 +4,29 @@
 #include <Ntsecapi.h> // for LSA_HANDLE
 #include <Lm.h> // for NetApiBufferFree 
 
+#include <vaDbg.h>
+
+typedef DWORD WinError_t;
+
+
 //////////////////////////////////////////////////////////////////////////
 
 
 #include <EnsureClnup_mswin.h>
 
-MakeCleanupPtrClass_winapi(Cec_LsaClose, NTSTATUS, LsaClose, LSA_HANDLE)
+MakeDelega_CleanupPtr_winapi(Cec_LsaClose, NTSTATUS, LsaClose, LSA_HANDLE)
 // -- for LsaOpenPolicy
 
-MakeCleanupPtrClass_winapi(Cec_LsaFreeMemory, NTSTATUS, LsaFreeMemory, PVOID)
+MakeDelega_CleanupPtr_winapi(Cec_LsaFreeMemory, NTSTATUS, LsaFreeMemory, PVOID)
 // -- for LsaLookupNames2
 
-MakeCleanupPtrClass_winapi(Cec_NetApiBufferFree, NET_API_STATUS, NetApiBufferFree, PVOID)
+MakeDelega_CleanupPtr_winapi(Cec_NetApiBufferFree, NET_API_STATUS, NetApiBufferFree, PVOID)
 // -- for NetLocalGroupEnum etc
 
 inline NTSTATUS _LsaFreeMemory(LSA_UNICODE_STRING *pus){ return LsaFreeMemory(pus); }
-MakeCleanupPtrClass(Cec_LsaFreeMemory_UNICODE_STRING, NTSTATUS, _LsaFreeMemory, LSA_UNICODE_STRING*)
+MakeDelega_CleanupPtr_winapi(Cec_LsaFreeMemory_UNICODE_STRING, NTSTATUS, _LsaFreeMemory, LSA_UNICODE_STRING*)
 // -- LsaEnumerateAccountRights() returns an LSA_UNICODE_STRING[] that needs freeing by LsaFreeMemory. 
+
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +71,32 @@ const TCHAR *app_WinErrStr(DWORD winerr); // same as above
 //
 TCHAR* InterpretRights_Generic(DWORD rights, void *userctx);
 TCHAR* InterpretRights_Token(DWORD rights, void *userctx);
+
+struct Cxx_SID_AND_ATTRIBUTES : public SID_AND_ATTRIBUTES
+{
+	Cxx_SID_AND_ATTRIBUTES(void *psid=nullptr)
+	{
+		Sid = psid;
+		Attributes = 0;
+
+//		vaDbgS(_T("Cxx_SID_AND_ATTRIBUTES ctor(%p)"), this);
+	}
+
+	~Cxx_SID_AND_ATTRIBUTES()
+	{
+		delete (char*)Sid;
+
+//		vaDbgS(_T("Cxx_SID_AND_ATTRIBUTES dtor(%p) Sid=%p"), this, Sid); // ok
+	}
+};
+
+MakeDelega_CleanupCxxPtr_en(Cxx_SID_AND_ATTRIBUTES, 
+	Cec_SID_AND_ATTRIBUTES, CecArray_SID_AND_ATTRIBUTES)
+
+MakeDelega_CleanupCxxPtr_en(LUID_AND_ATTRIBUTES, 
+	Cec_LUID_AND_ATTRIBUTES, CecArray_LUID_AND_ATTRIBUTES)
+
+WinError_t ab_GetSidFromAccountName(const TCHAR *accname, Jautobuf &abSid);
 
 
 //////////////////////////////////////////////////////////////////////////
