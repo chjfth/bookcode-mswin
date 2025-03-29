@@ -22,6 +22,7 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #define Combobox_EnableWideDrop_IMPL
 #include <mswin/Combobox_EnableWideDrop.h>
 
+#include <process.h>
 #include <vaDbg.h>
 
 HANDLE g_hSnapShot = NULL;
@@ -750,6 +751,77 @@ void Cmd_CreateRestrictedToken()
 	}
 }
 
+static void try_OpenFile(const TCHAR *filepath)
+{
+	HANDLE hfile = CreateFile(filepath, 
+		FILE_GENERIC_READ|FILE_GENERIC_WRITE,
+		FILE_SHARE_READ,
+		NULL, // secu-attr
+		OPEN_ALWAYS, // we want to open existing file
+		0,
+		NULL);
+	CEC_FILEHANDLE cec_hfile = hfile;
+	if(hfile==INVALID_HANDLE_VALUE)
+	{
+		vaDbgTs(_T("CreateFile(\"%s\",... OPEN_ALWAYS ...) fail with winerr=%s"), 
+			filepath, ITCS_WinError);
+		return;
+	}
+
+	vaDbgTs(_T("CreateFile(\"%s\",... OPEN_ALWAYS ...) success."), filepath);
+}
+
+static unsigned __stdcall _thread_TestToken(void *ctx) 
+{
+	BOOL succ = ImpersonateLoggedOnUser(g_hToken);
+	if(!succ) 
+	{
+		vaDbgTs(_T("ImpersonateLoggedOnUser(0x%X) fail with winerr=%s"), (UINT)g_hToken, ITCS_WinError);
+		return 0x44;
+	}
+
+	vaDbgTs(_T("ImpersonateLoggedOnUser(0x%X) success"), (UINT)g_hToken);
+
+	try_OpenFile(_T("D:\\_testPSSA2000\\fileA.txt"));
+	try_OpenFile(_T("D:\\_testPSSA2000\\fileB.txt"));
+	try_OpenFile(_T("D:\\_testPSSA2000\\fileC.txt"));
+
+	try_OpenFile(_T("D:\\_testPSSA2000\\only-grpBar.txt"));
+	try_OpenFile(_T("D:\\_testPSSA2000\\Users-and-grpBar.txt"));
+	try_OpenFile(_T("D:\\_testPSSA2000\\Users-deny-grpBar.txt"));
+
+	RevertToSelf();
+
+	return 0;
+}
+
+void Cmd_TestThreadToken() // [2025-03-29] Chj, since 1.4.0
+{
+	if (g_hToken == NULL) {
+		vaMsgBox(NULL, MB_OK|MB_ICONWARNING, NULL, _T("No Token yet, nothing to do"));
+		return;
+	}
+
+	HANDLE hThread = chBEGINTHREADEX(NULL, 0, 
+		_thread_TestToken, nullptr,
+		0, NULL);
+
+	if(!hThread) {
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, NULL,
+			_T("Creating thread fail, WinErr=%s."), ITCS_WinError);
+		return;
+	}
+
+	WaitForSingleObject(hThread, INFINITE);
+
+	CloseHandle(hThread);
+
+	vaMsgBox(NULL, MB_OK, NULL, 
+		_T("Cmd_TestThreadToken() done.\r\n")
+		_T("Use DbgView to see what has happened. ")
+		);
+}
+
 
 void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) 
 {
@@ -823,6 +895,10 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		Cmd_CreateRestrictedToken();
 		break;
 
+	case IDB_TestThreadToken:
+		Cmd_TestThreadToken();
+		break;
+
 	case IDB_LOGONUSER:
 		Cmd_LogonUser(hwnd);
 		break;
@@ -884,7 +960,8 @@ static void Dlg_EnableJULayout(HWND hdlg)
 	jul->AnchorControl(0,y85, x30,y100, IDL_DISABLEDSIDS);
 	//
 	jul->AnchorControls(x30,y70, x60,y100, IDS_ADDREMOVERESTRICTED, IDL_RESTRICTEDSIDS, -1);
-	jul->AnchorControls(x45,y100, x45,y100, IDB_ADDRESTRICTED, IDB_REMOVERESTRICTED, IDB_CREATERESTRICTEDTOKEN, -1);
+	jul->AnchorControls(x45,y100, x45,y100, IDB_ADDRESTRICTED, IDB_REMOVERESTRICTED, IDB_CREATERESTRICTEDTOKEN, 
+		IDB_TestThreadToken ,-1);
 }
 
 

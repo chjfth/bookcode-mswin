@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by TokenMaster.rc
 //
 #define IDD_DIALOG1                     101
@@ -58,8 +58,9 @@
 #define IDC_IMPERSONATIONLEVEL          1046
 #define IDC_TOKENTYPE                   1047
 #define IDB_NODEFAULT                   1048
-
-#define IDC_STATIC (-1)
+#define IDC_BUTTON1                     1049
+#define IDB_TestThreadToken             1049
+#define IDC_STATIC                      -1
 
 // Next default values for new objects
 // 
@@ -67,7 +68,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        107
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1049
+#define _APS_NEXT_CONTROL_VALUE         1050
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
