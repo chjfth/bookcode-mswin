@@ -58,7 +58,6 @@
 #define IDC_IMPERSONATIONLEVEL          1046
 #define IDC_TOKENTYPE                   1047
 #define IDB_NODEFAULT                   1048
-#define IDC_BUTTON1                     1049
 #define IDB_TestThreadToken             1049
 #define IDC_STATIC                      -1
 

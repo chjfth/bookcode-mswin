@@ -417,6 +417,18 @@ void RefreshStatus(PCTSTR szStatus, DWORD dwLastError)
 	}
 }
 
+void vaPrintStatus(const TCHAR *fmt, ...)
+{
+	TCHAR tbuf[2000] = {};
+	va_list args;
+	va_start(args, fmt);
+	
+	_vsntprintf_s(tbuf, _TRUNCATE, fmt, args);
+	RefreshStatus(tbuf, 0);
+	
+	va_end(args);
+}
+
 
 PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass) 
 {

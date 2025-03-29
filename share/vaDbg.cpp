@@ -30,12 +30,12 @@ inline unsigned __int64 get_qpc()
 		return li.QuadPart;
 }
 
-static DWORD MyGetMillisec()
+DWORD TrueGetMillisec()
 {
 	static __int64 s_qpf = get_qpf();
 
 	// We should use QueryPerformanceCounter(), 
-	// bcz GetTickCount only has 15.6 ms resolution.
+	// bcz GetTickCount() only has 15.6 ms resolution.
 	DWORD millisec = DWORD(get_qpc()*1000 / s_qpf);
 	return millisec;
 }
@@ -55,9 +55,9 @@ void vlDbgTs(const TCHAR *fmt, va_list args)
 	// A '\n' will be added automatically at end.
 
 	static int count = 0;
-	static DWORD s_prev_msec = MyGetMillisec();
+	static DWORD s_prev_msec = TrueGetMillisec();
 
-	DWORD now_msec = MyGetMillisec();
+	DWORD now_msec = TrueGetMillisec();
 
 	TCHAR buf[4000] = {0};
 

@@ -35,6 +35,7 @@ BOOL myGetUserSID(PSID psid, BOOL fAllowImpersonate, PDWORD pdwSize);
 
 
 void RefreshStatus(PCTSTR szStatus, DWORD dwLastError);
+void vaPrintStatus(const TCHAR *fmt, ...);
 
 PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass);
 

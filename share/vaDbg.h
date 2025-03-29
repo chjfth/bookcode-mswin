@@ -4,6 +4,8 @@
 #include <tchar.h>
 #include <stdarg.h>
 
+DWORD TrueGetMillisec(); // more accurate than GetTickCount();
+
 void vaDbgTs(const TCHAR *fmt, ...); // with seq+timestamp prefix
 void vlDbgTs(const TCHAR *fmt, va_list args);
 

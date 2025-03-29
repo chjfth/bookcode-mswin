@@ -448,9 +448,34 @@ void Cmd_CreateProcessAsUser(HWND hwnd)
 		0,     // dwCreationFlags
 		NULL, NULL, &si, &pi)) 
 	{
+		DWORD msec_start = TrueGetMillisec();
+
+		vaPrintStatus(_T("CreateProcessAsUser() success, child PID=%d."), pi.hProcess);
+
+		// [2025-03-29] v1.4.1: Wait 1 second to see if the child process runs to end.
+		// If so, report child process's exit code.
+		// If we pass a narrow-sense restricted-token to CreateProcessAsUser(), trying
+		// to spawn a C:\Windows\System\CMD.EXE process, we bump into this situation.
+
+		DWORD waitret = WaitForSingleObject(pi.hProcess, 1000);
+		if(waitret==WAIT_OBJECT_0)
+		{
+			DWORD exitcode = 0;
+			GetExitCodeProcess(pi.hProcess, &exitcode);
+
+			DWORD msec_end = TrueGetMillisec();
+			int msec_used = msec_end - msec_start;
+			vaPrintStatus(
+				_T("Child process creation success, but exits in less than %d milliseconds. ")
+				_T("Child process exit code is %d (0x%X).")
+				, msec_used, exitcode, exitcode);
+		}
+
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
-	} else {
+	} 
+	else 
+	{
 		RefreshStatus(TEXT("CreateProcessAsUser"), GetLastError());
 	}
 }
@@ -986,6 +1011,8 @@ BOOL Dlg_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	g_hwndLogonProviders = GetDlgItem(hwnd, IDC_LOGONPROVIDER);
 	g_hwndImpersonationLevels = GetDlgItem(hwnd, IDC_IMPERSONATIONLEVEL);
 	g_hwndTokenTypes = GetDlgItem(hwnd, IDC_TOKENTYPE);
+
+	SetDlgItemText(hwnd, IDE_FILENAME, _T("C:\\Windows\\System32\\cmd.exe"));
 
 	// Refresh the Process snapshot and combo boxes
 	RefreshSnapShot();
