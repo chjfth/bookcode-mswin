@@ -285,11 +285,10 @@ WinError_t ab_GetSidFromAccountName( // ab: Jautobuf
 		succ = LookupAccountName(NULL, accname,  
 			abSid, abSid,  abDomname, abDomname,  &sidNameUse);
 		winerr = GetLastError();
-	} while(winerr && Is_LessBuffer(winerr));
+	} while(!succ && Is_LessBuffer(winerr));
 
-	if(!succ && winerr!=ERROR_INSUFFICIENT_BUFFER) {
+	if(!succ)
 		return winerr;
-	}
-
-	return winerr;
+	else
+		return NOERROR;
 }

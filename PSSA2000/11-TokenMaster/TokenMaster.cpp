@@ -762,9 +762,16 @@ void Cmd_TestThreadToken() // [2025-03-29] Chj, since 1.4.0
 		);
 }
 
+void Cmd_chjtest(HWND hdlg)
+{
+	vaMsgBox(hdlg, MB_OK, NULL, 
+		_T("Cmd_chjtest() placeholder, Shift+click [~] to activate."));
+}
 
 void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify) 
 {
+
+	bool isShift = GetKeyState(VK_SHIFT)<0;
 
 	// Special handling for focus notifications
 	switch (codeNotify) {
@@ -836,7 +843,10 @@ void Dlg_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 		break;
 
 	case IDB_TestThreadToken:
-		Cmd_TestThreadToken();
+		if(!isShift)
+			Cmd_TestThreadToken();
+		else
+			Cmd_chjtest(hwnd);
 		break;
 
 	case IDB_LOGONUSER:
