@@ -436,7 +436,8 @@ PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass)
 
 	PVOID pvBuffer  = NULL;
 	PTSTR pszStatus = NULL;
-	DWORD dwStatus;
+	DWORD dwStatus = 0;
+	DWORD winerr = 0;
 
 	try {{
 
@@ -461,10 +462,25 @@ PVOID myAllocateTokenInfo(HANDLE hToken, TOKEN_INFORMATION_CLASS tokenClass)
 			}
 
 			// Try again
+			SetLastError(0); // due to WinXP bug
 			fSuccess = GetTokenInformation(hToken, tokenClass, pvBuffer, dwSize, &dwSize);
+			winerr = GetLastError();
+
+			if(!fSuccess && winerr==ERROR_BAD_LENGTH && dwSize==0)
+			{
+				// Fix a WinXP SP3 bug, who outputs [ERROR_BAD_LENGTH and dwSize=0]
+				// when querying TokenSessionId. Retrying with a large dwSize still reports 
+				// ERROR_BAD_LENGTH. So give up.
+				//
+				// Win7 has fixed it.
+				break;
+			}
 
 			// while it is failing on ERROR_INSUFFICIENT_BUFFER
-		} while (!fSuccess && (GetLastError() == ERROR_INSUFFICIENT_BUFFER));
+		} while (!fSuccess && (
+				winerr==ERROR_INSUFFICIENT_BUFFER 
+				|| winerr==ERROR_BAD_LENGTH // Win7 TokenElevation meets this
+				));
 
 		// If we failed for some other reason then back out
 		if (!fSuccess) {

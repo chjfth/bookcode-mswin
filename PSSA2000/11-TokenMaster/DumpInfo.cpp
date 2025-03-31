@@ -535,6 +535,103 @@ BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken)
 	return TRUE;
 }
 
+void DumpTokenOrigin(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	TOKEN_ORIGIN *pto = (TOKEN_ORIGIN*)myAllocateTokenInfo(hToken, TokenOrigin);
+	CEC_LocalFree cec_pto = pto;
+	if(!pto)
+	{
+		pbufToken->Print(_T("Get TokenOrigin fail, WinErr=%s\r\n"), ITCS_WinError);
+		return;
+	}
+
+	pbufToken->Print(_T("[TokenOrigin]  OriginatingLogonSession = 0x%X:%08X (=%I64u)\r\n"), 
+		pto->OriginatingLogonSession.HighPart, pto->OriginatingLogonSession.LowPart,
+		*(unsigned __int64*)&pto->OriginatingLogonSession);
+
+	pbufToken->Print(DIVIDERL);
+}
+
+static void DumpToken_report_error(const TCHAR *errname, CPrintBuf* pbufToken)
+{
+	DWORD winerr = GetLastError();
+	if(winerr==ERROR_INVALID_PARAMETER) {
+		pbufToken->Print(_T("[%s] not supported.\r\n"), errname);
+	} else {
+		pbufToken->Print(_T("[%s] fail, WinErr=%s\r\n"), errname, ITCSv(winerr, WinError));
+	}
+}
+
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant: do{ ... }while(0);
+
+#define DUMPTOKEN_RETURN_ON_ERROR(errname) do { \
+	if(!p) { \
+		DumpToken_report_error(_T(#errname), pbufToken);  \
+		return; \
+	} \
+}while(0)
+
+void DumpTokenSessionId(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	DWORD *p = (DWORD*)myAllocateTokenInfo(hToken, TokenSessionId);
+	CEC_LocalFree cec = p;
+	DUMPTOKEN_RETURN_ON_ERROR(TokenSessionId);
+
+	pbufToken->Print(_T("[TokenSessionId] = %u\r\n"), *p);
+
+	pbufToken->Print(DIVIDERL);
+}
+
+void DumpTokenElevation(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	TOKEN_ELEVATION *p = (TOKEN_ELEVATION*)myAllocateTokenInfo(hToken, TokenElevation);
+	CEC_LocalFree cec = p;
+	DUMPTOKEN_RETURN_ON_ERROR(TokenElevation);
+
+	pbufToken->Print(_T("[TokenElevation] TokenIsElevated = %s\r\n"), 
+		p->TokenIsElevated ? _T("TRUE") : _T("FALSE"));
+
+	pbufToken->Print(DIVIDERL);
+}
+
+void DumpTokenElevationType(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	TOKEN_ELEVATION_TYPE *p = 
+		(TOKEN_ELEVATION_TYPE *)myAllocateTokenInfo(hToken, TokenElevationType);
+	CEC_LocalFree cec = p;
+	DUMPTOKEN_RETURN_ON_ERROR(TokenElevationType);
+
+	pbufToken->Print(_T("[TokenElevationType] = %s\r\n"), ITCSv(*p, TokenElevationTypeXXX));
+
+	pbufToken->Print(DIVIDERL);
+}
+
+#if 0 // as template
+void DumpToken_xxx(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	DATE_TYPE *p =
+		(DATE_TYPE*)myAllocateTokenInfo(hToken, TokenXXX);
+	CEC_LocalFree cec = p;
+	DUMPTOKEN_RETURN_ON_ERROR(xxx);
+
+	pbufToken->Print(_T("[] = %s\r\n"), xxx);
+
+	pbufToken->Print(DIVIDERL);
+}
+#endif
+
+#pragma warning(pop)
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -542,6 +639,7 @@ BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken)
 void guiDumpToken() 
 {
 	CPrintBuf* pbufToken = NULL;
+	HANDLE hToken = g_hToken;
 
 	try {{
 
@@ -564,37 +662,45 @@ void guiDumpToken()
 			goto leave;
 
 		// Chj: Show token handle value.
-		pbufToken->Print(_T("Token handle value: 0x%X\r\n"), PtrToUint(g_hToken));
+		pbufToken->Print(_T("Token handle value: 0x%X\r\n"), PtrToUint(hToken));
 
 		// Display the token user
-		if (!DumpTokenUser(g_hToken, pbufToken))
+		if (!DumpTokenUser(hToken, pbufToken))
 			pbufToken->Print(TEXT("Unable to dump Token User\r\n"));
 
 		// Display the token groups
-		if (!DumpTokenGroups(g_hToken, pbufToken))
+		if (!DumpTokenGroups(hToken, pbufToken))
 			pbufToken->Print(TEXT("Unable to dump Token Groups\r\n"));
 
 		// Display the token privileges
-		DumpTokenPrivileges(g_hToken, pbufToken);
+		DumpTokenPrivileges(hToken, pbufToken);
 
 		// Display the token owner
-		DumpTokenOwner(g_hToken, pbufToken);
+		DumpTokenOwner(hToken, pbufToken);
 
 		// Display the token primary group
-		DumpTokenPrimaryGroup(g_hToken, pbufToken);
+		DumpTokenPrimaryGroup(hToken, pbufToken);
 
 		// Display the token default DACL
-		DumpTokenDefaultDacl(g_hToken, pbufToken);
+		DumpTokenDefaultDacl(hToken, pbufToken);
 
 		// Display the token source
-		DumpTokenSource(g_hToken, pbufToken);
+		DumpTokenSource(hToken, pbufToken);
 
 		// Display the token type
-		DumpTokenType(g_hToken, pbufToken);
+		DumpTokenType(hToken, pbufToken);
 
 		// Display the token restricted sids
-		if (!DumpTokenRestrictedSids(g_hToken, pbufToken))
+		if (!DumpTokenRestrictedSids(hToken, pbufToken))
 			pbufToken->Print(TEXT("Unable to dump Token Restricted Sids\r\n"));
+
+		DumpTokenSessionId(hToken, pbufToken);
+
+		DumpTokenOrigin(hToken, pbufToken);
+
+		DumpTokenElevation(hToken, pbufToken);
+		DumpTokenElevationType(hToken, pbufToken);
+
 
 	} leave:;
 	} catch(...) {}

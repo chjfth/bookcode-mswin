@@ -48,7 +48,8 @@ inline bool Is_LessBuffer(DWORD winerr)
 {
 	if( winerr==ERROR_INSUFFICIENT_BUFFER ||
 		winerr==ERROR_MORE_DATA ||
-		winerr==ERROR_BUFFER_OVERFLOW)
+		winerr==ERROR_BUFFER_OVERFLOW ||
+		winerr==ERROR_BAD_LENGTH )
 		return true;
 	else
 		return false;
