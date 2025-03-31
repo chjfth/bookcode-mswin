@@ -1,1 +1,1 @@
-#define EXE_VERSION "1.4.4"
+#define EXE_VERSION "1.4.5"

@@ -8,6 +8,8 @@
 
 #include "vaDbg.h"
 
+const int DBG_BUFCHARS = 16000;
+
 static int s_dbgcount = 0;
 
 inline unsigned __int64 get_qpf()
@@ -59,7 +61,7 @@ void vlDbgTs(const TCHAR *fmt, va_list args)
 
 	DWORD now_msec = TrueGetMillisec();
 
-	TCHAR buf[4000] = {0};
+	TCHAR buf[DBG_BUFCHARS] = {0};
 
 	// Print timestamp to show that time has elapsed for more than one second.
 	DWORD delta_msec = now_msec - s_prev_msec;
@@ -105,7 +107,7 @@ void vlDbgS(const TCHAR *fmt, va_list args)
 {
 	// This only has Sequential prefix.
 
-	TCHAR buf[1000] = {0};
+	TCHAR buf[DBG_BUFCHARS] = {0};
 
 	_sntprintf_s(buf, ARRAYSIZE(buf)-3, _TRUNCATE, TEXT("[%d] "), ++s_dbgcount); // prefix seq
 

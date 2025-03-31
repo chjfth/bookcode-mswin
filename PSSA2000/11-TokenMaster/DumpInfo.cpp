@@ -615,13 +615,39 @@ void DumpTokenElevationType(HANDLE hToken, CPrintBuf* pbufToken)
 	pbufToken->Print(DIVIDERL);
 }
 
+bool DumpTokenLinkedToken(HANDLE hToken, CPrintBuf* pbufToken, CPrintBuf* pbufLinked, int nRecurse)
+{
+	extern void text_DumpToken(HANDLE hToken, CPrintBuf *pbufToken, int nRecurse);
+
+	pbufToken->Print(DIVIDERL);
+
+	TOKEN_LINKED_TOKEN *p = 
+		(TOKEN_LINKED_TOKEN*)myAllocateTokenInfo(hToken, TokenLinkedToken);
+	CEC_LocalFree cec = p;
+	if(!p) {
+		// WinXP does not support this.
+		DumpToken_report_error(_T("TokenLinkedToken"), pbufToken);
+		return false;
+	}
+
+	pbufToken->Print(_T("[TokenLinkedToken] LinkedToken(handle) = 0x%X\r\n"), p->LinkedToken);
+	
+	if(nRecurse>0) // user wants recursive dump
+		text_DumpToken(p->LinkedToken, pbufLinked, nRecurse-1);
+
+	CloseHandle(p->LinkedToken);
+
+	pbufToken->Print(DIVIDERL);
+	return true;
+}
+
+
 #if 0 // as template
 void DumpToken_xxx(HANDLE hToken, CPrintBuf* pbufToken)
 {
 	pbufToken->Print(DIVIDERL);
 
-	DATE_TYPE *p =
-		(DATE_TYPE*)myAllocateTokenInfo(hToken, TokenXXX);
+	DATE_TYPE *p = (DATE_TYPE*)myAllocateTokenInfo(hToken, TokenXXX);
 	CEC_LocalFree cec = p;
 	DUMPTOKEN_RETURN_ON_ERROR(xxx);
 
@@ -635,6 +661,62 @@ void DumpToken_xxx(HANDLE hToken, CPrintBuf* pbufToken)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void text_DumpToken(HANDLE hToken, CPrintBuf *pbufToken, int nRecurseLinkedToken)
+{
+	// Chj: Show token handle value.
+	pbufToken->Print(_T("Token handle value: 0x%X\r\n"), PtrToUint(hToken));
+
+	// Display the token user
+	if (!DumpTokenUser(hToken, pbufToken))
+		pbufToken->Print(TEXT("Unable to dump Token User\r\n"));
+
+	// Display the token groups
+	if (!DumpTokenGroups(hToken, pbufToken))
+		pbufToken->Print(TEXT("Unable to dump Token Groups\r\n"));
+
+	// Display the token privileges
+	DumpTokenPrivileges(hToken, pbufToken);
+
+	// Display the token owner
+	DumpTokenOwner(hToken, pbufToken);
+
+	// Display the token primary group
+	DumpTokenPrimaryGroup(hToken, pbufToken);
+
+	// Display the token default DACL
+	DumpTokenDefaultDacl(hToken, pbufToken);
+
+	// Display the token source
+	DumpTokenSource(hToken, pbufToken);
+
+	// Display the token type
+	DumpTokenType(hToken, pbufToken);
+
+	// Display the token restricted sids
+	if (!DumpTokenRestrictedSids(hToken, pbufToken))
+		pbufToken->Print(TEXT("Unable to dump Token Restricted Sids\r\n"));
+
+	DumpTokenSessionId(hToken, pbufToken);
+
+	DumpTokenOrigin(hToken, pbufToken);
+
+	DumpTokenElevation(hToken, pbufToken);
+	DumpTokenElevationType(hToken, pbufToken);
+
+	if(nRecurseLinkedToken>0)
+	{
+		CPrintBuf bufLinked; // as output param to DumpTokenLinkedToken()
+		bufLinked.Print(_T("Linked-token dumping:\r\n"));
+		
+		bool isok = DumpTokenLinkedToken(hToken, pbufToken, &bufLinked, nRecurseLinkedToken);
+		if(isok)
+		{
+			// Print the result to debug channel:
+			pbufToken->Print(_T("Dumping linked-token to debug-channel.\r\n"));
+			vaDbgTs(_T("%s\r\n"), (PCTSTR)bufLinked);
+		}
+	}
+}
 
 void guiDumpToken() 
 {
@@ -661,46 +743,10 @@ void guiDumpToken()
 		if (pbufToken == NULL)
 			goto leave;
 
-		// Chj: Show token handle value.
-		pbufToken->Print(_T("Token handle value: 0x%X\r\n"), PtrToUint(hToken));
-
-		// Display the token user
-		if (!DumpTokenUser(hToken, pbufToken))
-			pbufToken->Print(TEXT("Unable to dump Token User\r\n"));
-
-		// Display the token groups
-		if (!DumpTokenGroups(hToken, pbufToken))
-			pbufToken->Print(TEXT("Unable to dump Token Groups\r\n"));
-
-		// Display the token privileges
-		DumpTokenPrivileges(hToken, pbufToken);
-
-		// Display the token owner
-		DumpTokenOwner(hToken, pbufToken);
-
-		// Display the token primary group
-		DumpTokenPrimaryGroup(hToken, pbufToken);
-
-		// Display the token default DACL
-		DumpTokenDefaultDacl(hToken, pbufToken);
-
-		// Display the token source
-		DumpTokenSource(hToken, pbufToken);
-
-		// Display the token type
-		DumpTokenType(hToken, pbufToken);
-
-		// Display the token restricted sids
-		if (!DumpTokenRestrictedSids(hToken, pbufToken))
-			pbufToken->Print(TEXT("Unable to dump Token Restricted Sids\r\n"));
-
-		DumpTokenSessionId(hToken, pbufToken);
-
-		DumpTokenOrigin(hToken, pbufToken);
-
-		DumpTokenElevation(hToken, pbufToken);
-		DumpTokenElevationType(hToken, pbufToken);
-
+		text_DumpToken(hToken, pbufToken, 1); 
+		// -- [2025-03-31] Chj: For an Admin-group user, if we pass nRecurseLinkedToken=2 or 
+		// more, we'll see that TokenLinkedToken will always succeed, returning Token-handles
+		// alternatingly referring to the filtered-token(non-Admin) and the full-token(Admin).
 
 	} leave:;
 	} catch(...) {}
