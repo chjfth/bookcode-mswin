@@ -582,7 +582,7 @@ void DumpTokenSessionId(HANDLE hToken, CPrintBuf* pbufToken)
 	CEC_LocalFree cec = p;
 	DUMPTOKEN_RETURN_ON_ERROR(TokenSessionId);
 
-	pbufToken->Print(_T("[TokenSessionId] = %u\r\n"), *p);
+	pbufToken->Print(_T("[TokenSessionId] = %u (TsSessionId)\r\n"), *p);
 
 	pbufToken->Print(DIVIDERL);
 }
