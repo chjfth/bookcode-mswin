@@ -87,35 +87,35 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 		switch (snuUse) {
 
 		case SidTypeUser:
-			pszUse = TEXT("User SID");
+			pszUse = TEXT("User SID (SidTypeUser)");
 			break;
 
 		case SidTypeGroup:
-			pszUse = TEXT("Group SID");
+			pszUse = TEXT("Group SID (SidTypeGroup)");
 			break;
 
 		case SidTypeDomain:
-			pszUse = TEXT("Domain SID");
+			pszUse = TEXT("Domain SID (SidTypeDomain)");
 			break;
 
 		case SidTypeAlias:
-			pszUse = TEXT("Alias SID");
+			pszUse = TEXT("Alias SID (SidTypeAlias)");
 			break;
 
 		case SidTypeWellKnownGroup:
-			pszUse = TEXT("Well-Known Group SID");
+			pszUse = TEXT("Well-Known Group SID (SidTypeWellKnownGroup)");
 			break;
 
 		case SidTypeDeletedAccount:
-			pszUse = TEXT("Deleted Account");
+			pszUse = TEXT("Deleted Account (SidTypeDeletedAccount)");
 			break;
 
 		case SidTypeInvalid:
-			pszUse = TEXT("Invalid SID");
+			pszUse = TEXT("Invalid SID (SidTypeInvalid)");
 			break;
 
 		case SidTypeLabel:
-			pszUse = TEXT("Integrity Level Label");
+			pszUse = TEXT("Integrity Level Label (SidTypeLabel)");
 			break;
 
 		default:
@@ -193,7 +193,7 @@ BOOL DumpTokenGroups(HANDLE hToken, CPrintBuf* pbufToken)
 	if (ptgGroups == NULL)
 		return FALSE;
 
-	pbufToken->Print(DIVIDERL TEXT("GROUP SIDs\r\n"));
+	pbufToken->Print(DIVIDERL TEXT("GROUP SIDs (TokenGroups)\r\n"));
 	pbufToken->Print(TEXT("Group Count:\t%lu"), ptgGroups->GroupCount);
 	pbufToken->Print(TEXT("\r\n") DIVIDERL);
 
@@ -221,7 +221,7 @@ void DumpTokenPrivileges(HANDLE hToken, CPrintBuf* pbufToken)
 	if (ptpPrivileges == NULL)
 		return;
 
-	pbufToken->Print(DIVIDERL TEXT("Privileges\r\n") DIVIDERL);
+	pbufToken->Print(DIVIDERL TEXT("Privileges (TokenPrivileges)\r\n") DIVIDERL);
 
 	DWORD dwIndex = 0;
 	for (; dwIndex < ptpPrivileges->PrivilegeCount; dwIndex++) 
@@ -261,7 +261,7 @@ void DumpTokenOwner(HANDLE hToken, CPrintBuf* pbufToken)
 	if (ptoOwner == NULL)
 		return;
 
-	pbufToken->Print(DIVIDERL TEXT("Token Owner\r\n") DIVIDERL);
+	pbufToken->Print(DIVIDERL TEXT("Token Owner (TokenOwner)\r\n") DIVIDERL);
 	
 	DumpSID(ptoOwner->Owner, pbufToken);
 }
@@ -278,7 +278,7 @@ void DumpTokenPrimaryGroup(HANDLE hToken, CPrintBuf* pbufToken)
 	if (ptgGroup == NULL)
 		return;
 
-	pbufToken->Print(DIVIDERL TEXT("Token Primary Group\r\n") DIVIDERL);
+	pbufToken->Print(DIVIDERL TEXT("Token Primary Group (TokenPrimaryGroup)\r\n") DIVIDERL);
 	
 	DumpSID(ptgGroup->PrimaryGroup, pbufToken);
 }
@@ -298,7 +298,7 @@ void DumpTokenDefaultDacl(HANDLE hToken, CPrintBuf* pbufToken)
 	if (ptdDacl == NULL)
 		return;
 
-	pbufToken->Print(DIVIDERL TEXT("Token Default DACL\r\n") DIVIDERL);
+	pbufToken->Print(DIVIDERL TEXT("Token Default DACL (TokenDefaultDacl)\r\n") DIVIDERL);
 
 	// Get ACL size information
 	ACL_SIZE_INFORMATION sizeInfo = {};
@@ -419,7 +419,7 @@ void DumpTokenSource(HANDLE hToken, CPrintBuf* pbufToken)
 
 	szName[TOKEN_SOURCE_LENGTH] = '\0';
 	
-	pbufToken->Print(DIVIDERL TEXT("Token Source: %s\r\n") DIVIDERL, szName);
+	pbufToken->Print(DIVIDERL TEXT("Token Source (TokenSource): %s\r\n") DIVIDERL, szName);
 	// -- [2025-02-26] Chj sees "User32"
 }
 
@@ -469,7 +469,7 @@ void DumpTokenType(HANDLE hToken, CPrintBuf* pbufToken)
 	if (pttType == NULL)
 		return;
 
-	pbufToken->Print(DIVIDERL TEXT("Token Type:  "));
+	pbufToken->Print(DIVIDERL TEXT("Token Type (TokenType):  "));
 
 	BOOL fImpersonation = FALSE;
 	switch (*pttType) {
@@ -496,7 +496,7 @@ BOOL DumpTokenUser(HANDLE hToken, CPrintBuf* pbufToken)
 	if (ptuUser == NULL)
 		return FALSE;
 
-	pbufToken->Print(DIVIDERL TEXT("USER SID\r\n") DIVIDERL TEXT("\r\n"));
+	pbufToken->Print(DIVIDERL TEXT("USER SID (TokenUser)\r\n") DIVIDERL TEXT("\r\n"));
 	DumpSID(ptuUser->User.Sid, pbufToken);
 
 	return TRUE;
