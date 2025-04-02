@@ -292,3 +292,26 @@ WinError_t ab_GetSidFromAccountName( // ab: Jautobuf
 	else
 		return NOERROR;
 }
+
+const TCHAR* format_wetime_as_localtime(LARGE_INTEGER twe, TCHAR output[], int osize)
+{
+	// Format Windows-epoch time into string, as local time
+
+	_sntprintf_s(output, osize, _TRUNCATE, _T("BAD time")); // assume bad time
+
+	SYSTEMTIME st = {};
+	FILETIME   ft = {};
+	FILETIME   locft = {};
+	ft.dwHighDateTime = twe.HighPart;
+	ft.dwLowDateTime  = twe.LowPart;
+	if (FileTimeToLocalFileTime(&ft, &locft) && FileTimeToSystemTime(&locft, &st)) 
+	{
+		_sntprintf_s(output, osize, _TRUNCATE, 
+			_T("%04u-%02u-%02u %02u:%02u:%02u"), 
+			st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+	}
+
+	return output;
+}
+
+

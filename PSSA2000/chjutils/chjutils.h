@@ -100,6 +100,9 @@ MakeDelega_CleanupCxxPtr_en(LUID_AND_ATTRIBUTES,
 WinError_t ab_GetSidFromAccountName(const TCHAR *accname, Jautobuf &abSid);
 
 
+const TCHAR* format_wetime_as_localtime(LARGE_INTEGER twe, TCHAR output[], int osize);
+
+
 //////////////////////////////////////////////////////////////////////////
 
 #include <itc/InterpretConst.h>

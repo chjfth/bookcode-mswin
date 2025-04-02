@@ -9,6 +9,7 @@
 #include <ObjBase.h>
 #include <ObjSel.h>
 #include <TlHelp32.h>
+#include <intsafe.h>
 
 #include "..\ClassLib\PrintBuf.h"      // See Appendix B.
 

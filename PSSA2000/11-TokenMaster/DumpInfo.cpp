@@ -671,6 +671,40 @@ void DumpTokenLogonSid(HANDLE hToken, CPrintBuf* pbufToken)
 	pbufToken->Print(DIVIDERL);
 }
 
+void DumpTokenStatistics(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	TCHAR tbuf[200] = {};
+
+	TOKEN_STATISTICS  *p = 
+		(TOKEN_STATISTICS *)myAllocateTokenInfo(hToken, TokenStatistics);
+	CEC_LocalFree cec = p;
+	DUMPTOKEN_RETURN_ON_ERROR(TokenStatistics);
+
+	pbufToken->Print(_T("[TokenStatistics]\r\n"));
+	pbufToken->Print(_T("    .TokenId = %I64X\r\n"), *(UINT64*)&p->TokenId);
+	pbufToken->Print(_T("    .AuthenticationId(LogonSessid) = 0x%X:%08X\r\n"), 
+		p->AuthenticationId.HighPart, p->AuthenticationId.LowPart);
+
+	pbufToken->Print(_T("    .ExpirationTime: %s\r\n"),
+		p->ExpirationTime.QuadPart==INT64_MAX 
+			? _T("(No expire)") 
+			: format_wetime_as_localtime(p->ExpirationTime, tbuf, ARRAYSIZE(tbuf))
+		);
+
+	pbufToken->Print(_T("    .TokenType = %s\r\n"), ITCSv(p->TokenType, itc_TOKEN_TYPE));
+	pbufToken->Print(_T("    .ImpersonationLevel = %s\r\n"), ITCSv(p->ImpersonationLevel, itc_SECURITY_IMPERSONATION_LEVEL));
+
+	pbufToken->Print(_T("    .DynamicCharged   = %d bytes\r\n"), p->DynamicCharged);
+	pbufToken->Print(_T("    .DynamicAvailable = %d bytes\r\n"), p->DynamicAvailable);
+	pbufToken->Print(_T("    .GroupCount = %d\r\n"), p->GroupCount);
+	pbufToken->Print(_T("    .PrivilegeCount = %d\r\n"), p->PrivilegeCount);
+	pbufToken->Print(_T("    .ModifiedId = %I64u\r\n"), *(UINT64*)&p->ModifiedId);
+
+	pbufToken->Print(DIVIDERL);
+}
+
 
 bool DumpTokenLinkedToken(HANDLE hToken, CPrintBuf* pbufToken, CPrintBuf* pbufLinked, int nRecurse)
 {
@@ -763,6 +797,8 @@ void text_DumpToken(HANDLE hToken, CPrintBuf *pbufToken, int nRecurseLinkedToken
 	DumpTokenIntegrityLevel(hToken, pbufToken);
 
 	DumpTokenLogonSid(hToken, pbufToken);
+
+	DumpTokenStatistics(hToken, pbufToken);
 
 	if(nRecurseLinkedToken>0)
 	{
