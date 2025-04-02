@@ -3,17 +3,14 @@
 #include <vaDbg.h>
 #include "chjutils.h"
 
-// void functionbody_NeedDebugInfo()
-// {
-// 	SECURITY_DESCRIPTOR sd = {};
-// 	SID sid = {};
-// }
-
 
 TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen)
 {
-	// Convert an SID to text Representation, like:
-	// todo: add example 
+	// Convert an SID to text Representation.
+	// Input:
+	//	binary-form S-1-16-8192
+	// Output the string:
+	//	S-1-16-8192 ( "Mandatory Label\Medium Mandatory Level" )
 
 	if(!pvSid)
 	{

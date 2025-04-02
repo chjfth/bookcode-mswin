@@ -615,6 +615,29 @@ void DumpTokenElevationType(HANDLE hToken, CPrintBuf* pbufToken)
 	pbufToken->Print(DIVIDERL);
 }
 
+void DumpTokenIntegrityLevel(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	TOKEN_MANDATORY_LABEL *p = 
+		(TOKEN_MANDATORY_LABEL*)myAllocateTokenInfo(hToken, TokenIntegrityLevel);
+	CEC_LocalFree cec = p;
+	DUMPTOKEN_RETURN_ON_ERROR(TokenIntegrityLevel);
+
+	TCHAR *strSid = NULL;
+	ConvertSidToStringSid(p->Label.Sid, &strSid);
+	CEC_LocalFree cec_strSid = strSid;
+
+	TCHAR accname[200] = {};
+	SID2Repr(p->Label.Sid, accname, ARRAYSIZE(accname));
+
+	pbufToken->Print(_T("[TokenIntegrityLevel] %s\r\n"), accname);
+	pbufToken->Print(_T("    SID.Attributes = 0x%X %s\r\n"), 
+		p->Label.Attributes, ITCSv(p->Label.Attributes, SE_GROUP_xxx));
+
+	pbufToken->Print(DIVIDERL);
+}
+
 bool DumpTokenLinkedToken(HANDLE hToken, CPrintBuf* pbufToken, CPrintBuf* pbufLinked, int nRecurse)
 {
 	extern void text_DumpToken(HANDLE hToken, CPrintBuf *pbufToken, int nRecurse);
@@ -702,6 +725,8 @@ void text_DumpToken(HANDLE hToken, CPrintBuf *pbufToken, int nRecurseLinkedToken
 
 	DumpTokenElevation(hToken, pbufToken);
 	DumpTokenElevationType(hToken, pbufToken);
+
+	DumpTokenIntegrityLevel(hToken, pbufToken);
 
 	if(nRecurseLinkedToken>0)
 	{
