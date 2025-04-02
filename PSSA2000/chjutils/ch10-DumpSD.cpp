@@ -56,7 +56,7 @@ TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen)
 	{
 		DWORD winerr = GetLastError();
 		assert(!succ && winerr==ERROR_NONE_MAPPED);
-		_sntprintf_s(buf, buflen, _TRUNCATE, _T("( no mapped name )"));
+		_sntprintf_s(buf, buflen, _TRUNCATE, _T("%s ( no mapped name )"), pszSid);
 	}
 
 	LocalFree(pszSid);

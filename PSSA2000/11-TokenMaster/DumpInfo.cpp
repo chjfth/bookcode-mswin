@@ -628,15 +628,49 @@ void DumpTokenIntegrityLevel(HANDLE hToken, CPrintBuf* pbufToken)
 	ConvertSidToStringSid(p->Label.Sid, &strSid);
 	CEC_LocalFree cec_strSid = strSid;
 
-	TCHAR accname[200] = {};
-	SID2Repr(p->Label.Sid, accname, ARRAYSIZE(accname));
+	TCHAR sidrepr[200] = {};
+	SID2Repr(p->Label.Sid, sidrepr, ARRAYSIZE(sidrepr));
 
-	pbufToken->Print(_T("[TokenIntegrityLevel] %s\r\n"), accname);
+	pbufToken->Print(_T("[TokenIntegrityLevel] %s\r\n"), sidrepr);
 	pbufToken->Print(_T("    SID.Attributes = 0x%X %s\r\n"), 
 		p->Label.Attributes, ITCSv(p->Label.Attributes, SE_GROUP_xxx));
 
 	pbufToken->Print(DIVIDERL);
 }
+
+void DumpTokenLogonSid(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	TOKEN_GROUPS *p = (TOKEN_GROUPS*)myAllocateTokenInfo(hToken, TokenLogonSid);
+	CEC_LocalFree cec = p;
+	DUMPTOKEN_RETURN_ON_ERROR(TokenLogonSid);
+
+	pbufToken->Print(_T("[TokenLogonSid] GroupCount = %d\r\n"), p->GroupCount);
+
+	for(DWORD i=0; i<p->GroupCount; i++)
+	{
+		SID_AND_ATTRIBUTES &saa = p->Groups[i];
+
+		TCHAR sidrepr[200] = {};
+		SID2Repr(saa.Sid, sidrepr, ARRAYSIZE(sidrepr));
+		pbufToken->Print(_T("    #%d.Sid = %s\r\n"), i, sidrepr);
+		pbufToken->Print(_T("    #%d.Attributes = 0x%X %s\r\n"), i, 
+			saa.Attributes, ITCSv(saa.Attributes, SE_GROUP_xxx));
+	}
+
+/*	On Win10.22H2, typically 1 group is output:
+	[TokenLogonSid] GroupCount = 1
+		#0.Sid = S-1-5-5-0-673378 ( "NT AUTHORITY\LogonSessionId_0_673378" )
+		#0.Attributes = 0xC0000007 
+			SE_GROUP_MANDATORY(0x01)|
+			SE_GROUP_ENABLED_BY_DEFAULT(0x02)|
+			SE_GROUP_ENABLED(0x04)|
+			SE_GROUP_LOGON_ID(0xC0000000)
+*/
+	pbufToken->Print(DIVIDERL);
+}
+
 
 bool DumpTokenLinkedToken(HANDLE hToken, CPrintBuf* pbufToken, CPrintBuf* pbufLinked, int nRecurse)
 {
@@ -727,6 +761,8 @@ void text_DumpToken(HANDLE hToken, CPrintBuf *pbufToken, int nRecurseLinkedToken
 	DumpTokenElevationType(hToken, pbufToken);
 
 	DumpTokenIntegrityLevel(hToken, pbufToken);
+
+	DumpTokenLogonSid(hToken, pbufToken);
 
 	if(nRecurseLinkedToken>0)
 	{
