@@ -2,6 +2,8 @@
 #include "TokenMaster-helper.h"
 #include "../chjutils/chjutils.h"
 
+#include <mswin/VC2010_future.h>
+
 #if 0
 // [2025-02-26] Chj: I'll use stock ConvertSidToStringSid() instead.
 BOOL GetTextualSid(PSID pSid, PTSTR TextualSid, PDWORD pdwBufferLen) 
@@ -85,7 +87,7 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 	// What is the SID type
 	if (LookupAccountSid(NULL, psid, szName, &dwSize, szDomName, &dwDomSize, &snuUse)) 
 	{
-		switch (snuUse) {
+		switch ((int)snuUse) {
 
 		case SidTypeUser:
 			pszUse = TEXT("User SID (SidTypeUser)");
@@ -117,6 +119,13 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 
 		case SidTypeLabel:
 			pszUse = TEXT("Integrity Level Label (SidTypeLabel)");
+			break;
+
+		case SidTypeLogonSession: 
+			// For LoginVSid like S-1-5-5-0-448978 ,
+			// Win7's LookupAccountSid() will fail.
+			// Win10's LookupAccountSid() will success and report SidTypeLogonSession.
+			pszUse = TEXT("(SidTypeLogonSession)");
 			break;
 
 		default:
