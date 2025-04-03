@@ -75,6 +75,7 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 	SID *psid = (SID*)_psid;
 
 	SID_NAME_USE snuUse = SidTypeInvalid; // neg-init
+	TCHAR sz_SidUse[40] = {};
 	PTSTR pszUse = NULL;
 	TCHAR szName[255]    = {};
 	DWORD dwSize         = ARRAYSIZE(szName);
@@ -119,19 +120,22 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 			break;
 
 		default:
-			pszUse = TEXT("Unknown SID");
+			_sntprintf_s(sz_SidUse, _TRUNCATE, TEXT("Unknown SID (%d)"), snuUse);
+			pszUse = sz_SidUse;
 			break;
 		}
 
 	} else {
 
 		// We couldn't look it up, maybe it is the logon SID.
-		// Chjmemo: sth like: S-1-5-5-0-448978
+		// Chjmemo: sth like: 
+		//	S-1-5-5-0-448978
+		//	S-1-5-5-0-213111592
 
 		PSID_IDENTIFIER_AUTHORITY psia = GetSidIdentifierAuthority(psid);
 		DWORD dwFirstSub = *GetSidSubAuthority(psid, 0);
-		if (dwFirstSub == 5 && psia->Value[6] == 5)
-			pszUse = TEXT("(Logon SID)");
+		if (psia->Value[5] == 5 && dwFirstSub == 5)
+			pszUse = TEXT("(Logon SID) // Chj: LogonVSid");
 		else
 			pszUse = TEXT("");
 	}
