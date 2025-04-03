@@ -716,11 +716,11 @@ static unsigned __stdcall _thread_TestToken(void *ctx)
 	BOOL succ = ImpersonateLoggedOnUser(g_hToken);
 	if(!succ) 
 	{
-		vaDbgTs(_T("ImpersonateLoggedOnUser(0x%X) fail with winerr=%s"), (UINT)g_hToken, ITCS_WinError);
+		vaDbgTs(_T("ImpersonateLoggedOnUser(0x%X) fail with winerr=%s"), HandleToUlong(g_hToken), ITCS_WinError);
 		return 0x44;
 	}
 
-	vaDbgTs(_T("ImpersonateLoggedOnUser(0x%X) success"), (UINT)g_hToken);
+	vaDbgTs(_T("ImpersonateLoggedOnUser(0x%X) success"), HandleToULong(g_hToken));
 
 	try_OpenFile(_T("D:\\_testPSSA2000\\fileA.txt"));
 	try_OpenFile(_T("D:\\_testPSSA2000\\fileB.txt"));
