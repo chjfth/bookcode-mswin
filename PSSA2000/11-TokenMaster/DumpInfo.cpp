@@ -159,11 +159,9 @@ void DumpSID(PSID _psid, CPrintBuf* pbufToken)
 
 	pbufToken->Print(TEXT("Use:\t\t%s\r\n"), pszUse);
 
-	pbufToken->Print(TEXT("\r\nName:\t\t\"%s\"\r\n"), szName);
+	pbufToken->Print(TEXT("Name:\t\t\"%s\"\r\n"), szName);
 
-	pbufToken->Print(TEXT("\r\nDomain Name:\t\"%s\"\r\n"), szDomName);
-
-	pbufToken->Print(TEXT("\r\n"));
+	pbufToken->Print(TEXT("Domain Name:\t\"%s\"\r\n"), szDomName);
 }
 
 void DumpSIDAttributes(DWORD dwAttrib, CPrintBuf* pbufToken) 
@@ -509,9 +507,10 @@ BOOL DumpTokenUser(HANDLE hToken, CPrintBuf* pbufToken)
 	if (ptuUser == NULL)
 		return FALSE;
 
-	pbufToken->Print(DIVIDERL TEXT("USER SID (TokenUser)\r\n") DIVIDERL TEXT("\r\n"));
+	pbufToken->Print(DIVIDERL TEXT("USER SID (TokenUser)\r\n") DIVIDERL);
 	DumpSID(ptuUser->User.Sid, pbufToken);
 
+	pbufToken->Print(TEXT("\r\n"));
 	return TRUE;
 }
 
@@ -645,7 +644,7 @@ void DumpTokenIntegrityLevel(HANDLE hToken, CPrintBuf* pbufToken)
 	SID2Repr(p->Label.Sid, sidrepr, ARRAYSIZE(sidrepr));
 
 	pbufToken->Print(_T("[TokenIntegrityLevel] %s\r\n"), sidrepr);
-	pbufToken->Print(_T("    SID.Attributes = 0x%X %s\r\n"), 
+	pbufToken->Print(_T("    SID.Attributes = 0x%X , %s\r\n"), 
 		p->Label.Attributes, ITCSv(p->Label.Attributes, SE_GROUP_xxx));
 
 	pbufToken->Print(DIVIDERL);
