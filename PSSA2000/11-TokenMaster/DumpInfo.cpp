@@ -533,9 +533,13 @@ BOOL DumpTokenRestrictedSids(HANDLE hToken, CPrintBuf* pbufToken)
 
 	DWORD dwIndex = 0;
 	for (; dwIndex < ptgGroups->GroupCount; dwIndex++) {
+
 		pbufToken->Print(TEXT("Restricted-Sid #%d:\r\n"), dwIndex);
-		DumpSIDAttributes(ptgGroups->Groups[dwIndex].Attributes, pbufToken);
+
 		DumpSID(ptgGroups->Groups[dwIndex].Sid, pbufToken);
+
+		DumpSIDAttributes(ptgGroups->Groups[dwIndex].Attributes, pbufToken);
+
 		// pbufToken->Print(DIVIDERS);
 	}
 
