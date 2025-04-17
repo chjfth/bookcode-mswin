@@ -715,7 +715,7 @@ void DumpTokenStatistics(HANDLE hToken, CPrintBuf* pbufToken)
 	DUMPTOKEN_RETURN_ON_ERROR(TokenStatistics);
 
 	pbufToken->Print(_T("[TokenStatistics]\r\n"));
-	pbufToken->Print(_T("    .TokenId = %I64X\r\n"), *(UINT64*)&p->TokenId);
+	pbufToken->Print(_T("    .TokenId = 0x%I64X\r\n"), *(UINT64*)&p->TokenId);
 	pbufToken->Print(_T("    .AuthenticationId(LogonSessid) = 0x%X:%08X\r\n"), 
 		p->AuthenticationId.HighPart, p->AuthenticationId.LowPart);
 
