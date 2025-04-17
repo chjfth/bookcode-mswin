@@ -654,6 +654,22 @@ void DumpTokenIntegrityLevel(HANDLE hToken, CPrintBuf* pbufToken)
 	pbufToken->Print(DIVIDERL);
 }
 
+void DumpTokenMandatoryPolicy(HANDLE hToken, CPrintBuf* pbufToken)
+{
+	pbufToken->Print(DIVIDERL);
+
+	TOKEN_MANDATORY_POLICY *p = 
+		(TOKEN_MANDATORY_POLICY *)myAllocateTokenInfo(hToken, TokenMandatoryPolicy);
+	CEC_LocalFree cec = p;
+	DUMPTOKEN_RETURN_ON_ERROR(TokenMandatoryPolicy);
+
+	pbufToken->Print(_T("[TokenMandatoryPolicy] = %s\r\n"), 
+		ITCSv(p->Policy, TOKEN_MANDATORY_POLICY_xxx));
+
+	pbufToken->Print(DIVIDERL);
+
+}
+
 void DumpTokenLogonSid(HANDLE hToken, CPrintBuf* pbufToken)
 {
 	pbufToken->Print(DIVIDERL);
@@ -811,6 +827,7 @@ void text_DumpToken(HANDLE hToken, CPrintBuf *pbufToken, int nRecurseLinkedToken
 	DumpTokenElevationType(hToken, pbufToken);
 
 	DumpTokenIntegrityLevel(hToken, pbufToken);
+	DumpTokenMandatoryPolicy(hToken, pbufToken);
 
 	DumpTokenLogonSid(hToken, pbufToken);
 
