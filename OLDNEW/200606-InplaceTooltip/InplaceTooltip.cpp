@@ -46,8 +46,10 @@ OnSize(HWND hwnd, UINT state, int cx, int cy)
 BOOL
 OnCreate(HWND hwnd, LPCREATESTRUCT lpcs)
 {
-	g_hwndTT = CreateWindowEx(WS_EX_TRANSPARENT, TOOLTIPS_CLASS, NULL,
-		TTS_NOPREFIX,
+	g_hwndTT = CreateWindowEx(WS_EX_TRANSPARENT, 
+		TOOLTIPS_CLASS, 
+		NULL, // window title
+		TTS_NOPREFIX | TTS_NOANIMATE,
 		0, 0, 0, 0,
 		hwnd, NULL, g_hinst, NULL);
 	if (!g_hwndTT)
@@ -213,8 +215,8 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 	if (SUCCEEDED(CoInitialize(NULL))) /* In case we use COM */
 	{
 		hwnd = CreateWindow(
-			TEXT("InplaceTooltip"),                /* Class Name */
-			TEXT("InplaceTooltip"),                /* Title */
+			TEXT("InplaceTooltip"),         /* Class Name */
+			TEXT("Raymond Inplace-Tooltip"), /* Title */
 			WS_OVERLAPPEDWINDOW,            /* Style */
 			CW_USEDEFAULT, CW_USEDEFAULT,   /* Position */
 			400, 200,                       /* Size */
@@ -222,6 +224,7 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 			NULL,                           /* No menu */
 			hinst,                          /* Instance */
 			0);                             /* No special parameters */
+		assert(hwnd);
 
 		ShowWindow(hwnd, nShowCmd);
 
