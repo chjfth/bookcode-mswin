@@ -5,6 +5,9 @@
 #include <commctrl.h>
 #include <shlwapi.h>
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
+
 HINSTANCE g_hinst;          /* This application's HINSTANCE */
 HWND g_hwndChild;           /* Optional child window */
 
@@ -123,6 +126,8 @@ InitApp(void)
 int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 				   LPSTR lpCmdLine, int nShowCmd)
 {
+	InitCommonControls(); // WinXP requires this, to work with Visual-style manifest
+
 	MSG msg;
 	HWND hwnd;
 	g_hinst = hinst;
@@ -130,7 +135,8 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 	if (!InitApp()) 
 		return 0;
 
-	if (SUCCEEDED(CoInitialize(NULL))) {/* In case we use COM */
+	if (SUCCEEDED(CoInitialize(NULL))) /* In case we use COM */
+	{
 		hwnd = CreateWindow(
 			TEXT("Scratch"),                /* Class Name */
 			TEXT("Scratch"),                /* Title */
