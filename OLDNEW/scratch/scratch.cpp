@@ -1,4 +1,5 @@
 #define STRICT
+#include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <ole2.h>
@@ -13,6 +14,7 @@ that this function contains specific content for this specific project.
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
+const TCHAR *MAINWND_CLASSNAME = _T("Scratch");
 
 HINSTANCE g_hinst;          /* This application's HINSTANCE */
 HWND g_hwndChild;           /* Optional child window */
@@ -113,7 +115,7 @@ BOOL InitApp(void)
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = TEXT("Scratch");
+	wc.lpszClassName = MAINWND_CLASSNAME;
 	
 	if (!RegisterClass(&wc)) 
 		return FALSE;
@@ -137,8 +139,8 @@ int WINAPI WinMain(HINSTANCE hinst, HINSTANCE hinstPrev,
 	if (SUCCEEDED(CoInitialize(NULL))) /* In case we use COM */
 	{
 		hwnd = CreateWindow(
-			TEXT("Scratch"),                /* Class Name */
-			TEXT("Scratch"),                /* Title */
+			MAINWND_CLASSNAME,              /* Class Name */
+			TEXT("Scratch program"),        /* Title */
 			WS_OVERLAPPEDWINDOW,            /* Style */
 			CW_USEDEFAULT, CW_USEDEFAULT,   /* Position */
 			500, 400,                       /* Size */
