@@ -43,10 +43,10 @@ myItemHitTest(int x, int y)
 }
 
 void
-myUpdateTooltip(int x, int y)
+myUpdateTooltip(int mousex, int mousey)
 {
 	int iItemOld = g_iItemTip;
-	g_iItemTip = myItemHitTest(x, y);
+	g_iItemTip = myItemHitTest(mousex, mousey);
 
 	if (iItemOld != g_iItemTip) {
 		SendMessage(g_hwndTT, TTM_POP, 0, 0); // hide the tooltip
@@ -75,7 +75,8 @@ OnSize(HWND hwnd, UINT state, int cx, int cy)
  *      Applications will typically override this and maybe even
  *      create a child window.
  */
-BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpcs)
+BOOL 
+OnCreate(HWND hwnd, LPCREATESTRUCT lpcs)
 {
 	g_hwndTT = CreateWindowEx(WS_EX_TRANSPARENT, TOOLTIPS_CLASS, NULL,
 		TTS_NOPREFIX,
@@ -118,7 +119,8 @@ PaintContent(HWND hwnd, PAINTSTRUCT *pps)
 	{
 		RECT rc = {};
 		myGetItemRect(iItem, &rc);
-		COLORREF clr = RGB((iItem & 1) ? 0x7F : 0,
+		COLORREF clr = RGB(
+			(iItem & 1) ? 0x7F : 0,
 			(iItem & 2) ? 0x7F : 0,
 			(iItem & 4) ? 0x7F : 0);
 	
@@ -126,6 +128,7 @@ PaintContent(HWND hwnd, PAINTSTRUCT *pps)
 			clr *= 2;
 		
 		SetBkColor(pps->hdc, clr);
+
 		ExtTextOut(pps->hdc, rc.left, rc.top,
 			ETO_OPAQUE, &rc, TEXT(""), 0, NULL);
 	}
