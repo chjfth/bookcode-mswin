@@ -5,6 +5,12 @@
 #include <commctrl.h>
 #include <shlwapi.h>
 
+/*
+[2025-05-24] Chj coding hint: If I add/change a function in concrete project, 
+I will leave that function's return type on its dedicated line, so to imply
+that this function contains specific content for this specific project.
+*/
+
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 
@@ -15,8 +21,7 @@ HWND g_hwndChild;           /* Optional child window */
  *  OnSize
  *      If we have an inner child, resize it to fit.
  */
-void
-OnSize(HWND hwnd, UINT state, int cx, int cy)
+void OnSize(HWND hwnd, UINT state, int cx, int cy)
 {
 	if (g_hwndChild) {
 		MoveWindow(g_hwndChild, 0, 0, cx, cy, TRUE);
@@ -28,8 +33,7 @@ OnSize(HWND hwnd, UINT state, int cx, int cy)
  *      Applications will typically override this and maybe even
  *      create a child window.
  */
-BOOL
-OnCreate(HWND hwnd, LPCREATESTRUCT lpcs)
+BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpcs)
 {
 	return TRUE;
 }
@@ -39,8 +43,7 @@ OnCreate(HWND hwnd, LPCREATESTRUCT lpcs)
  *      Post a quit message because our application is over when the
  *      user closes this window.
  */
-void
-OnDestroy(HWND hwnd)
+void OnDestroy(HWND hwnd)
 {
 	PostQuitMessage(0);
 }
@@ -49,8 +52,7 @@ OnDestroy(HWND hwnd)
  *  PaintContent
  *      Interesting things will be painted here eventually.
  */
-void
-PaintContent(HWND hwnd, PAINTSTRUCT *pps)
+void PaintContent(HWND hwnd, PAINTSTRUCT *pps)
 {
 }
 
@@ -58,8 +60,7 @@ PaintContent(HWND hwnd, PAINTSTRUCT *pps)
  *  OnPaint
  *      Paint the content as part of the paint cycle.
  */
-void
-OnPaint(HWND hwnd)
+void OnPaint(HWND hwnd)
 {
 	PAINTSTRUCT ps;
 	BeginPaint(hwnd, &ps);
@@ -71,8 +72,7 @@ OnPaint(HWND hwnd)
  *  OnPrintClient
  *      Paint the content as requested by USER.
  */
-void
-OnPrintClient(HWND hwnd, HDC hdc)
+void OnPrintClient(HWND hwnd, HDC hdc)
 {
 	PAINTSTRUCT ps;
 	ps.hdc = hdc;
@@ -83,7 +83,7 @@ OnPrintClient(HWND hwnd, HDC hdc)
 /*
  *  Window procedure
  */
-LRESULT CALLBACK
+LRESULT CALLBACK 
 WndProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uiMsg) 
@@ -101,8 +101,7 @@ WndProc(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, uiMsg, wParam, lParam);
 }
 
-BOOL
-InitApp(void)
+BOOL InitApp(void)
 {
 	WNDCLASS wc;
 	wc.style = 0;
