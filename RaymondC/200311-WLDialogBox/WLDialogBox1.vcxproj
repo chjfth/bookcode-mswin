@@ -41,8 +41,8 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20250524-0000-0000-0000-220356000001}</ProjectGuid>
-    <ProjectName>WLDialogBox</ProjectName>
-     <TargetName>WLDialogBox</TargetName>
+    <ProjectName>WLDialogBox1</ProjectName>
+     <TargetName>WLDialogBox1</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
@@ -166,10 +166,10 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="WLDialogBox.cpp" />
+    <ClCompile Include="WLDialogBox1.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="WLDialogBox.rc" />
+    <ResourceCompile Include="WLDialogBox1.rc" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->

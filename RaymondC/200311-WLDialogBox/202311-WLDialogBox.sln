@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WLDialogBox", "WLDialogBox.vcxproj", "{20250524-0000-0000-0000-220356000001}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WLDialogBox", "WLDialogBox1.vcxproj", "{20250524-0000-0000-0000-220356000001}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WLDialogBox2", "WLDialogBox2.vcxproj", "{20250525-0000-0000-0000-092622000001}"
 EndProject
