@@ -205,7 +205,15 @@ OnTooltipCustomDraw(HWND hwnd, NMHDR *pnm)
 
 	if (pcd->nmcd.dwDrawStage == CDDS_PREPAINT) 
 	{
-		SelectFont(pcd->nmcd.hdc, g_hfTT);
+		SetTextColor(pcd->nmcd.hdc, RGB(255,0,0)); // Chj: yes, I see font stroke in RED
+
+		// [2025-05-25] Raymond way, no effect on WinXP+
+		// SelectFont(pcd->nmcd.hdc, g_hfTT); 
+		
+		// [2025-05-25] Chj finds SetWindowFont() working on WinXP.
+		// But, still buggy on Win7+, due to tooltip width remains at old value.
+		SetWindowFont(pnm->hwndFrom, g_hfTT, FALSE);
+
 		return CDRF_NEWFONT;
 	}
 	return 0;
