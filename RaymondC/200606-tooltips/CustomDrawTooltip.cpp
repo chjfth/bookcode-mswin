@@ -118,6 +118,8 @@ OnCreate(HWND hwnd, LPCREATESTRUCT lpcs)
 	// Make the tooltip appear immediately (10ms), instead of delaying 500ms.
 	SendMessage(g_hwndTT, TTM_SETDELAYTIME, TTDT_INITIAL, 10);
 
+	vaDbgTs(_T("Tooltip-window created. HWND=0x%X"), g_hwndTT);
+
 	return TRUE;
 }
 
