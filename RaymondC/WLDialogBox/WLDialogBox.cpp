@@ -20,6 +20,8 @@ public:
 	virtual LRESULT WLDlgProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		return DefDlgProcEx(hdlg, uMsg, wParam, lParam, &m_fRecursing);
+		// -- Important: DefDlgProcEx() macro sets m_fRecursing=TRUE, and this TRUE
+		//    is later checked by CheckDefDlgRecursion().
 	}
 
 	INT_PTR DoModal(HINSTANCE hinst, LPCTSTR pszTemplate,
