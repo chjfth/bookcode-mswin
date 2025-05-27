@@ -20,6 +20,8 @@ using namespace itc;
 // Using custom-draw in tooltips to adjust the font
 // https://devblogs.microsoft.com/oldnewthing/20060627-22/?p=30723
 // Key function: OnTooltipCustomDraw()
+// But, Raymond's original code looks buggy, In OnTooltipCustomDraw(),
+// SelectFont() cannot change the font, only SetWindowFont() can, but partially.
 
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -213,7 +215,7 @@ OnTooltipCustomDraw(HWND hwnd, NMHDR *pnm)
 		// SelectFont(pcd->nmcd.hdc, g_hfTT); 
 		
 		// [2025-05-25] Chj finds SetWindowFont() working on WinXP.
-		// But, still buggy on Win7+, due to tooltip width remains at old value.
+		// But, still buggy on Win7+, due to tooltip *width* remains at old value.
 		SetWindowFont(pnm->hwndFrom, g_hfTT, FALSE);
 
 		return CDRF_NEWFONT;

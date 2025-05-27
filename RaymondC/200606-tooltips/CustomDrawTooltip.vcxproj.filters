@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="CustomDrawTooltip.cpp" />
+    <ClCompile Include="..\..\__WinConst\mswin\WinUser.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\mswin\WinNT.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\mswin\CommCtrl.itc.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\share\vaDbg.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp">
+      <Filter>chjutils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="chjutils">
+      <UniqueIdentifier>{c4baf56f-841f-43c3-b92a-4af34f39e671}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\__WinConst\mswin\WinUser.itc.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\share\vaDbg.h">
+      <Filter>chjutils</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
