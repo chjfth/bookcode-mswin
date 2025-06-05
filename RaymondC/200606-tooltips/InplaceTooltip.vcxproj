@@ -41,8 +41,8 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20250521-0000-0000-0000-121808000001}</ProjectGuid>
-    <ProjectName>InplaceTooltip</ProjectName>
-     <TargetName>InplaceTooltip</TargetName>
+    <ProjectName>01-InplaceTooltip</ProjectName>
+     <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   

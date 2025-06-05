@@ -41,8 +41,8 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20250525-0000-0000-0000-102147000001}</ProjectGuid>
-    <ProjectName>DynamicTextTooltip</ProjectName>
-     <TargetName>DynamicTextTooltip</TargetName>
+    <ProjectName>02b-DynamicTextTooltip</ProjectName>
+     <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   
