@@ -20,9 +20,10 @@
 
 #include "resource.h"
 
+#include <mswin/JULayout2.h>
+
 #include "..\..\include\property.h"
 #include "..\..\include\listview.h"
-#include "..\..\include\JULayout2.h"
 
 #include "DevCaps.h"
 

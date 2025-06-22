@@ -15,7 +15,7 @@
 
 #include <commctrl.h>
 
-#include "JULayout2.h"
+#include <mswin/JULayout2.h>
 
 #include "dialog.h"
 

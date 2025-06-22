@@ -13,7 +13,7 @@
 
 #define STRICT
 #define NOCRYPT
-#define _WIN32_WINNT 0x0500
+//#define _WIN32_WINNT 0x0500 // CxxWindowSubclass's DefSubclassProc needs at least 0x0501
 #define WINVER       0x0500
 
 #include <windows.h>
@@ -23,9 +23,10 @@
 
 #include "resource.h"
 
+#include <mswin\JULayout2.h>
+
 #include "..\..\include\property.h"
 #include "..\..\include\listview.h"
-#include "..\..\include\JULayout2.h"
 
 #include "DCAttr.h"
 

@@ -75,6 +75,7 @@
     <ClCompile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..;..\..\..\__chjcxx\common-include\include;..\..\..\__chjcxx\common-include\include\ps_mswin;..\..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
