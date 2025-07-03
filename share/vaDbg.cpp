@@ -115,9 +115,6 @@ void vlDbgS(const TCHAR *fmt, va_list args)
 
 	_vsntprintf_s(buf+prefixlen, ARRAYSIZE(buf)-3-prefixlen, _TRUNCATE, fmt, args);
 
-	prefixlen = (int)_tcslen(buf);
-	_tcsncpy_s(buf+prefixlen, 2, TEXT("\r\n"), _TRUNCATE); // add trailing \r\n
-
 	// add trailing \n
 	int slen = (int)_tcslen(buf);
 	if(slen==ARRAYSIZE(buf)-1)
