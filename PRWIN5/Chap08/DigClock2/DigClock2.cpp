@@ -29,9 +29,10 @@ Since 2024.10:
 #include "iversion.h"
 #include "utils.h"
 
+#include <CHHI_vaDBG_is_vaDbgTs.h>
+
 #define Editbox_EnableKbdAdjustNumber_IMPL
 #define Editbox_EnableKbdAdjustNumber_DEBUG
-#define vaDBG vaDbgTs
 #include <mswin/Editbox_EnableKbdAdjustNumber.h>
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
