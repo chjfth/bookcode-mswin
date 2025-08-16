@@ -21,7 +21,7 @@ This program requires Windows Vista+.
 #include <tchar.h>
 #include <StrSafe.h> 
 
-#include "..\..\share\dlptr_winapi.h"
+#include <mswin/dlptr_winapi.h>
 
 #pragma comment (lib,"shlwapi.lib")
 #pragma comment (lib,"shell32.lib")

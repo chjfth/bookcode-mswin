@@ -14,8 +14,8 @@ Notices: Copyright (c) 2008 Jeffrey Richter & Christophe Nasarre
 
 #include <StrSafe.h>
 
-#define JULAYOUT_IMPL
-#include "JULayout2.h"
+#define JULayout2_IMPL
+#include <mswin/JULayout2.h>
 
 
 #pragma comment (lib, "psapi.lib")  
