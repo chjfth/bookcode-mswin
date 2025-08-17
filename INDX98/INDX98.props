@@ -29,6 +29,8 @@
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] Since you are using VC2010 and/or Win7SDK, you need extra DirectX SDK to provide ddraw.lib etc.'" Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathDdrawLib)', so EXE linking will fail." Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] Suggested: DirectX SDK June 2007 version." Importance="high" />
+    
+    <Message Condition="'$(IsUsingVc2010)'=='true' and '$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk2007) ." Importance="high" />
   </Target>
 
 </Project>
