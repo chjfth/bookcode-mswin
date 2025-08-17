@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- For VC2010 (v100), we need DirectX SDK June 2007 to have ddraw.lib etc. -->
-  <PropertyGroup Condition="'$(PlatformToolset)'=='v100'">
-    <LibraryPath Condition="'$(Platform)'=='x64'"  >d:\DXSDK-Jun-2007\Lib\x64;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Platform)'=='Win32'">d:\DXSDK-Jun-2007\Lib\x86;$(LibraryPath)</LibraryPath>
+  <!-- 
+  	For VC2010 (v100), we need DirectX SDK June 2007 to have ddraw.lib etc. 
+  	User should have:
+  		d:\DXSDK-for-INDX98\Lib\x86\ddraw.lib
+  		d:\DXSDK-for-INDX98\Lib\x64\ddraw.lib
+  -->
+  
+  <PropertyGroup>
+    <dirDxsdk2007>d:\DXSDK-for-INDX98</dirDxsdk2007>
+    <IsUsingVc2010 Condition="'$(PlatformToolset)'=='v100'">true</IsUsingVc2010>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(IsUsingVc2010)'=='true'">
+    <LibraryPath>$(dirDxsdk2007)\Lib\$(PlatformX);$(LibraryPath)</LibraryPath>
+    <PathDdrawLib>$(dirDxsdk2007)\Lib\$(PlatformX)\ddraw.lib</PathDdrawLib>
+    <NeedDxsdkAlert Condition="'$(IsUsingVc2010)'=='true' and !exists('$(PathDdrawLib)')">true</NeedDxsdkAlert>
   </PropertyGroup>
 
   <ItemDefinitionGroup>
@@ -12,5 +24,11 @@
       <AdditionalDependencies>ddraw.lib;;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+
+  <Target Name="VC2010_DXSDK_ChjAlert" BeforeTargets="PrepareForBuild">
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] Since you are using VC2010 and/or Win7SDK, you need extra DirectX SDK to provide ddraw.lib etc.'" Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathDdrawLib)', so EXE linking will fail." Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] Suggested: DirectX SDK June 2007 version." Importance="high" />
+  </Target>
 
 </Project>

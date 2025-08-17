@@ -71,6 +71,12 @@
     </ProjectConfiguration>
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- Define PlatformX var, using 'x86' instead of 'Win32'. The 'X' refers to the X in x86 & x64. -->
+    <PlatformX>$(Platform)</PlatformX>
+    <PlatformX Condition="'$(Platform)'=='Win32'">x86</PlatformX>
+  </PropertyGroup>
+
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
