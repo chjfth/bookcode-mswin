@@ -31,8 +31,7 @@ BOOL Fail( HWND hwnd, char *szMsg )
 }
 
 BOOL WINAPI EnumDDrawDevice( GUID FAR *lpGUID,           
-	LPSTR lpDriverDescription,  
-	LPSTR lpDriverName,         
+	LPSTR lpDriverDescription,  LPSTR lpDriverName,         
 	LPVOID lpContext )
 {
 	LONG    iIndex;
@@ -55,7 +54,8 @@ BOOL WINAPI EnumDDrawDevice( GUID FAR *lpGUID,
 		else
 		{
 			lpDevice = ( LPGUID )malloc( sizeof( GUID ) );
-			if ( !lpDevice ) return FALSE;
+			if ( !lpDevice ) 
+				return FALSE;
 			memcpy( lpDevice, lpGUID, sizeof( GUID ) );
 		}
 
@@ -114,15 +114,15 @@ static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	LPDDSURFACEDESC     lpDesc = NULL;
 	LPGUID              lpDevice = NULL;
 
-	switch ( LOWORD( wParam ) )
+	switch ( GET_WM_COMMAND_ID(wParam, lParam) )
 	{{
 	case IDC_CREATE:
 		// Get the unique id for the selected device. If it's
 		// the primary device, the id will be NULL.
 		iIndex = (int)SendDlgItemMessage( hWnd, IDC_DEVICE, CB_GETCURSEL, 0, 0L );
 			 
-		lpDevice = ( LPGUID )SendDlgItemMessage( hWnd, IDC_DEVICE, 
-									CB_GETITEMDATA, iIndex, 0 );
+		lpDevice = (LPGUID)SendDlgItemMessage(hWnd, IDC_DEVICE, CB_GETITEMDATA, iIndex, 0);
+		
 		// Create the DirectDraw object.
 		if ( FAILED( DirectDrawCreate( lpDevice, &lpDD, NULL ) ) )
 		{
@@ -130,8 +130,7 @@ static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		}
 
 		// Query the appropriate interface.
-		if ( FAILED( lpDD->QueryInterface( IID_IDirectDraw2, 
-											( LPVOID * )&lpDD2 ) ) )
+		if ( FAILED( lpDD->QueryInterface( IID_IDirectDraw2, (LPVOID*)&lpDD2 ) ) )
 		{
 			return Fail( hWnd, "Couldn't query the interface.\n" );
 		}
@@ -215,7 +214,7 @@ static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-LRESULT CALLBACK DlgModeProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgModeProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LPVOID              lpHeap = NULL;
 	LPDELETEITEMSTRUCT  lpdis = NULL;
@@ -260,51 +259,21 @@ LRESULT CALLBACK DlgModeProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	return FALSE; 
 }
 
-
-/*
- * WindowProc
- *
- * Messages for our window are handled here
- */
-LRESULT CALLBACK WindowProc( HWND hwnd, unsigned uMsg, WPARAM wParam, LPARAM lParam )
-{
-	switch ( uMsg )
-	{
-		case WM_PAINT:
-			PAINTSTRUCT     ps;
-
-			BeginPaint( hwnd, &ps );
-			EndPaint( hwnd, &ps );
-			break;
-
-		case WM_DESTROY:
-			PostQuitMessage( 0 );
-			break;
-
-		default:
-			return DefWindowProc( hwnd, uMsg, wParam, lParam );
-	}
-	return 0L;
-}
-
 static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 {
 	hInst = hInstance;
-
 	return TRUE; 
 }
 
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 					LPSTR lpCmdLine, int nCmdShow)
 {
-	INT_PTR rc = 0;
-
 	if ( !doInit( hInstance, nCmdShow ) )
 	{
 		return FALSE;
 	}
 
-	rc = DialogBox( hInst, MAKEINTRESOURCE( IDD_MAIN ), NULL, ( DLGPROC )DlgModeProc );
+	INT_PTR rc = DialogBox(hInst, MAKEINTRESOURCE( IDD_MAIN ), NULL, DlgModeProc);
 
 	return 0;
 }
