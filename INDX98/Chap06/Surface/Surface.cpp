@@ -9,24 +9,20 @@
 LPDIRECTDRAW            lpDD;           // DirectDraw object
 LPDIRECTDRAWSURFACE     lpDDSPrimary;   // DirectDraw primary surface
 
-BOOL LoadImage( LPDIRECTDRAWSURFACE lpDDS, LPSTR szImage )
+BOOL myLoadImage( LPDIRECTDRAWSURFACE lpDDS, LPSTR szImage )
 {
-	HBITMAP         hbm;
+	HBITMAP         hbm      = NULL;
 	HDC             hdcImage = NULL;
 	HDC             hdcSurf  = NULL;
 	BOOL            bReturn  = FALSE;
-	DDSURFACEDESC   ddsd;
-
-	ZeroMemory( &ddsd, sizeof( ddsd ) );
-	ddsd.dwSize = sizeof( ddsd );
+	DDSURFACEDESC   ddsd = {sizeof(ddsd)};
 
 	if ( FAILED( lpDDS->GetSurfaceDesc( &ddsd ) ) )
 	{
 		goto Exit;
 	}
 
-	// If the pixel format isn't some flavor of RGB, 
-	// we can't handle it.
+	// If the pixel format isn't some flavor of RGB, we can't handle it.
 	if ( ( ddsd.ddpfPixelFormat.dwFlags != DDPF_RGB ) ||
 		( ddsd.ddpfPixelFormat.dwRGBBitCount < 16 ) )
 
@@ -200,7 +196,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 		return Fail( hwnd, "Couldn't create primary surface.\n" );
 	}
 
-	if ( !LoadImage( lpDDSPrimary, "lake.bmp" ) ) 
+	if ( !myLoadImage( lpDDSPrimary, "lake.bmp" ) ) 
 	{
 		return Fail( hwnd, "Couldn't load the image.\n" );
 	}
@@ -211,7 +207,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine, int nCmdShow )
 {
-	MSG         msg;
+	MSG msg = {};
 
 	lpCmdLine = lpCmdLine;
 	hPrevInstance = hPrevInstance;
