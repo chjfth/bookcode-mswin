@@ -9,6 +9,9 @@
 
 #include "resource.h"
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
+
 LPDIRECTDRAW            lpDD = NULL;           // DirectDraw object.
 LPDIRECTDRAW2           lpDD2 = NULL;          // DirectDraw2 object.
 HINSTANCE               hInst;
@@ -36,7 +39,7 @@ BOOL WINAPI EnumDDrawDevice( GUID FAR *lpGUID,
 {
 	LONG    iIndex;
 	HWND    hWnd = ( HWND )lpContext;
-	LPVOID  lpDevice = NULL;
+	LPVOID  lpDevice = NULL; // Chj: Better var naming? This refers to a DirectDraw object GUID.
 
 	iIndex = ComboBox_AddString(hWnd, lpDriverDescription);
 
@@ -59,32 +62,30 @@ BOOL WINAPI EnumDDrawDevice( GUID FAR *lpGUID,
 			memcpy( lpDevice, lpGUID, sizeof( GUID ) );
 		}
 
-		SendMessage( hWnd, CB_SETITEMDATA, iIndex, 
-			( LPARAM )lpDevice );
+		ComboBox_SetItemData(hWnd, iIndex, lpDevice);
 	}
 	else 
 	{
-		return DDENUMRET_CANCEL;
+		return DDENUMRET_CANCEL; // =0
 	}
 
-	return DDENUMRET_OK;
+	return DDENUMRET_OK; // =1
 }
 
-BOOL WINAPI EnumDisplayModes( LPDDSURFACEDESC lpDDSurfaceDesc,  
-	LPVOID lpContext )
+BOOL WINAPI EnumDisplayModes( LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext )
 {
 	LONG    iIndex;
-	char    buff[256];
-	HWND    hWnd = ( HWND )lpContext;
+	char    buff[256] = {};
+	HWND    hwndListbox = ( HWND )lpContext;
 	LPVOID  lpDesc = NULL;
 
-	wsprintf( buff, "%dx%dx%dx%d", 
+	_snprintf_s( buff, _TRUNCATE, "%dx%dx%dx%d", 
 		lpDDSurfaceDesc->dwWidth,
 		lpDDSurfaceDesc->dwHeight,
 		lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount,
 		lpDDSurfaceDesc->dwRefreshRate );
 
-	iIndex = ListBox_AddString(hWnd, buff);
+	iIndex = ListBox_AddString(hwndListbox, buff);
 
 	// If it got added to the list box, create a copy of the
 	// surface description and store a pointer to it in the
@@ -93,19 +94,19 @@ BOOL WINAPI EnumDisplayModes( LPDDSURFACEDESC lpDDSurfaceDesc,
 	if ( iIndex != LB_ERR )
 	{
 		lpDesc = ( LPDDSURFACEDESC )malloc( sizeof( DDSURFACEDESC ) );
-		if ( !lpDesc ) return FALSE;
+		if ( !lpDesc ) 
+			return FALSE;
 
 		memcpy( lpDesc, lpDDSurfaceDesc, sizeof( DDSURFACEDESC ) );
 
-		SendMessage( hWnd, LB_SETITEMDATA, iIndex, 
-			( LPARAM )lpDesc );
+		ListBox_SetItemData( hwndListbox, iIndex, lpDesc );
 	}
 	else 
 	{
-		return DDENUMRET_CANCEL;
+		return DDENUMRET_CANCEL; // =0
 	}
 
-	return DDENUMRET_OK;
+	return DDENUMRET_OK; // =1
 }
 
 static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -113,15 +114,18 @@ static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int                 iIndex = 0;
 	LPDDSURFACEDESC     lpDesc = NULL;
 	LPGUID              lpDevice = NULL;
+	HWND hCombobox = NULL;
 
 	switch ( GET_WM_COMMAND_ID(wParam, lParam) )
 	{{
 	case IDC_CREATE:
 		// Get the unique id for the selected device. If it's
 		// the primary device, the id will be NULL.
-		iIndex = (int)SendDlgItemMessage( hWnd, IDC_DEVICE, CB_GETCURSEL, 0, 0L );
+
+		hCombobox = GetDlgItem(hWnd, IDC_DEVICE);
+		iIndex = ComboBox_GetCurSel(hCombobox);
 			 
-		lpDevice = (LPGUID)SendDlgItemMessage(hWnd, IDC_DEVICE, CB_GETITEMDATA, iIndex, 0);
+		lpDevice = (LPGUID)ComboBox_GetItemData(hCombobox, iIndex);
 		
 		// Create the DirectDraw object.
 		if ( FAILED( DirectDrawCreate( lpDevice, &lpDD, NULL ) ) )
@@ -218,6 +222,7 @@ INT_PTR CALLBACK DlgModeProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 {
 	LPVOID              lpHeap = NULL;
 	LPDELETEITEMSTRUCT  lpdis = NULL;
+	HWND hCombobox = NULL;
 
 	switch ( message )
 	{
@@ -230,20 +235,21 @@ INT_PTR CALLBACK DlgModeProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				return FALSE;
 			}
 
-			SendDlgItemMessage( hWnd, IDC_DEVICE, 
-								CB_SETCURSEL, 0, 0L );
-
+			hCombobox = GetDlgItem(hWnd, IDC_DEVICE);
+			ComboBox_SetCurSel(hCombobox, 0);
 			return TRUE;
 
 		case WM_COMMAND:
 			return do_WM_COMMAND(hWnd, wParam, lParam);
 			break;
 
-	   case WM_DELETEITEM:
-			// A clean way to free the memory allocated
-			// when the list and combo boxes are filled.
-			// Don't use this technique on NT -- the
-			// message isn't sent.
+		case WM_DELETEITEM:
+			// A clean way to free the memory allocated when the listbox and comboboxes are filled.
+			// Don't use this technique on NT -- the message isn't sent.
+			//
+			// [2025-08-17] Chj: Yes, I do not see this message on Win7. 
+			// So we get mem-leak on WinNT+ !
+			//
 			lpdis = ( LPDELETEITEMSTRUCT )lParam;
 			lpHeap = ( LPVOID )lpdis->itemData;
 			if ( lpHeap ) 
