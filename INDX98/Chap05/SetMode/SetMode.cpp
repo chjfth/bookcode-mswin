@@ -39,8 +39,7 @@ BOOL WINAPI EnumDDrawDevice( GUID FAR *lpGUID,
     HWND    hWnd = ( HWND )lpContext;
     LPVOID  lpDevice = NULL;
 
-    iIndex = SendMessage( hWnd, CB_ADDSTRING, 0, 
-                          ( LPARAM )lpDriverDescription );
+	iIndex = ComboBox_AddString(hWnd, lpDriverDescription);
 
     // If it got added to the list box, create a copy of the GUID
     // and store a pointer to it in the list box.
@@ -85,8 +84,7 @@ BOOL WINAPI EnumDisplayModes( LPDDSURFACEDESC lpDDSurfaceDesc,
               lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount,
               lpDDSurfaceDesc->dwRefreshRate );
 
-    iIndex = SendMessage( hWnd, LB_ADDSTRING, 0, 
-                          ( LONG )( LPSTR )buff );
+	iIndex = ListBox_AddString(hWnd, buff);
 
     // If it got added to the list box, create a copy of the
     // surface description and store a pointer to it in the
@@ -140,10 +138,9 @@ LRESULT CALLBACK DlgModeProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 case IDC_CREATE:
                     // Get the unique id for the selected device. If it's
                     // the primary device, the id will be NULL.
-                    iIndex = SendDlgItemMessage( hWnd, IDC_DEVICE, 
-                                                 CB_GETCURSEL, 0, 0L );
-                    lpDevice = ( LPGUID )SendDlgItemMessage( 
-                                             hWnd, IDC_DEVICE, 
+                    iIndex = (int)SendDlgItemMessage( hWnd, IDC_DEVICE, CB_GETCURSEL, 0, 0L );
+             
+					lpDevice = ( LPGUID )SendDlgItemMessage( hWnd, IDC_DEVICE, 
                                              CB_GETITEMDATA, iIndex, 0 );
                     // Create the DirectDraw object.
                     if ( FAILED( DirectDrawCreate( lpDevice, &lpDD, NULL ) ) )
@@ -214,8 +211,7 @@ LRESULT CALLBACK DlgModeProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
                 case IDC_SET:
                     // Get the surface description referenced in the list box.
-                    iIndex = SendDlgItemMessage( hWnd, IDC_MODES, 
-                                                 LB_GETCURSEL, 0, 0L );
+                    iIndex = (int)SendDlgItemMessage( hWnd, IDC_MODES, LB_GETCURSEL, 0, 0L );
                     lpDesc = ( LPDDSURFACEDESC )SendDlgItemMessage( 
                                                     hWnd, IDC_MODES, 
                                                     LB_GETITEMDATA, iIndex, 0 );
@@ -294,7 +290,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPSTR lpCmdLine, int nCmdShow)
 {
-    BOOL rc;
+    INT_PTR rc = 0;
 
     if ( !doInit( hInstance, nCmdShow ) )
     {
