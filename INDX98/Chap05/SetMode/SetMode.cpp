@@ -12,7 +12,6 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 
-LPDIRECTDRAW            lpDD = NULL;           // DirectDraw object.
 LPDIRECTDRAW2           lpDD2 = NULL;          // DirectDraw2 object.
 HINSTANCE               hInst;
 
@@ -114,7 +113,8 @@ static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int                 iIndex = 0;
 	LPDDSURFACEDESC     lpDesc = NULL;
 	LPGUID              lpDevice = NULL;
-	HWND hCombobox = NULL;
+	HWND                hCombobox = NULL;
+	LPDIRECTDRAW        lpDD = NULL;
 
 	switch ( GET_WM_COMMAND_ID(wParam, lParam) )
 	{{
