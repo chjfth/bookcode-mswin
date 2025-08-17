@@ -108,11 +108,115 @@ BOOL WINAPI EnumDisplayModes( LPDDSURFACEDESC lpDDSurfaceDesc,
 	return DDENUMRET_OK;
 }
 
-LRESULT CALLBACK DlgModeProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	int                 iIndex;
+	int                 iIndex = 0;
 	LPDDSURFACEDESC     lpDesc = NULL;
 	LPGUID              lpDevice = NULL;
+
+	switch ( LOWORD( wParam ) )
+	{{
+	case IDC_CREATE:
+		// Get the unique id for the selected device. If it's
+		// the primary device, the id will be NULL.
+		iIndex = (int)SendDlgItemMessage( hWnd, IDC_DEVICE, CB_GETCURSEL, 0, 0L );
+			 
+		lpDevice = ( LPGUID )SendDlgItemMessage( hWnd, IDC_DEVICE, 
+									CB_GETITEMDATA, iIndex, 0 );
+		// Create the DirectDraw object.
+		if ( FAILED( DirectDrawCreate( lpDevice, &lpDD, NULL ) ) )
+		{
+			return Fail( hWnd, "Couldn't create DirectDraw object.\n" );
+		}
+
+		// Query the appropriate interface.
+		if ( FAILED( lpDD->QueryInterface( IID_IDirectDraw2, 
+											( LPVOID * )&lpDD2 ) ) )
+		{
+			return Fail( hWnd, "Couldn't query the interface.\n" );
+		}
+
+		// Release the interface we don't need.
+		lpDD->Release();
+
+		/* 
+					
+		// This code can be used to create the DirectDraw
+		// object using CoCreateInstance instead of
+		// DirectDrawCreate.
+					
+		CoInitialize( NULL );
+
+		if ( FAILED( CoCreateInstance( CLSID_DirectDraw,
+				NULL, CLSCTX_ALL, IID_IDirectDraw2,
+				( LPVOID* ) &lpDD2 ) ) )
+		{
+			return Fail( hWnd, "Couldn't create DirectDraw object.\n" );
+		}
+
+		if ( FAILED( lpDD2->Initialize( lpDevice ) ) )
+		{
+			return Fail( hWnd, "Couldn't initialize DirectDraw.\n" );
+		}
+
+		CoUninitialize();
+
+		*/
+
+		// Set the cooperative level. Give us the
+		// ability to change the bit depth, and don't
+		// fiddle with our window.
+		if ( FAILED( lpDD2->SetCooperativeLevel( hWnd,
+						DDSCL_FULLSCREEN |
+						DDSCL_EXCLUSIVE |
+						DDSCL_NOWINDOWCHANGES ) ) )
+		{
+			return Fail( hWnd, "Couldn't set cooperative level.\n" );
+		}
+
+		// Enumerate the available modes.
+		if ( FAILED( lpDD2->EnumDisplayModes( 0, NULL,
+						( LPVOID )GetDlgItem( hWnd, IDC_MODES ),
+						( LPDDENUMMODESCALLBACK )EnumDisplayModes ) ) )
+		{
+			return Fail( hWnd, "Couldn't enumerate modes.\n" );
+		}
+ 
+		SendDlgItemMessage( hWnd, IDC_MODES, 
+							LB_SETCURSEL, 0, 0L );
+
+		EnableWindow( GetDlgItem( hWnd,IDC_CREATE ), FALSE );
+		EnableWindow( GetDlgItem( hWnd,IDC_SET ), TRUE );
+
+		break;
+
+	case IDC_SET:
+		// Get the surface description referenced in the list box.
+		iIndex = (int)SendDlgItemMessage( hWnd, IDC_MODES, LB_GETCURSEL, 0, 0L );
+		lpDesc = ( LPDDSURFACEDESC )SendDlgItemMessage( 
+										hWnd, IDC_MODES, 
+										LB_GETITEMDATA, iIndex, 0 );
+
+		// Set the new display mode.
+		if ( FAILED( lpDD2->SetDisplayMode( lpDesc->dwWidth, 
+								lpDesc->dwHeight,       
+								lpDesc->ddpfPixelFormat.dwRGBBitCount,
+								lpDesc->dwRefreshRate, 0 ) ) )
+		{
+			return Fail( hWnd, "Couldn't set the mode.\n");
+		}
+		break;
+
+	case IDCANCEL:
+		EndDialog( hWnd, FALSE );
+		return TRUE;
+	}}
+
+	return 0;
+}
+
+LRESULT CALLBACK DlgModeProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
 	LPVOID              lpHeap = NULL;
 	LPDELETEITEMSTRUCT  lpdis = NULL;
 
@@ -133,103 +237,7 @@ LRESULT CALLBACK DlgModeProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			return TRUE;
 
 		case WM_COMMAND:
-			switch ( LOWORD( wParam ) )
-			{
-				case IDC_CREATE:
-					// Get the unique id for the selected device. If it's
-					// the primary device, the id will be NULL.
-					iIndex = (int)SendDlgItemMessage( hWnd, IDC_DEVICE, CB_GETCURSEL, 0, 0L );
-			 
-					lpDevice = ( LPGUID )SendDlgItemMessage( hWnd, IDC_DEVICE, 
-											 CB_GETITEMDATA, iIndex, 0 );
-					// Create the DirectDraw object.
-					if ( FAILED( DirectDrawCreate( lpDevice, &lpDD, NULL ) ) )
-					{
-						return Fail( hWnd, "Couldn't create DirectDraw object.\n" );
-					}
-
-					// Query the appropriate interface.
-					if ( FAILED( lpDD->QueryInterface( IID_IDirectDraw2, 
-													   ( LPVOID * )&lpDD2 ) ) )
-					{
-						return Fail( hWnd, "Couldn't query the interface.\n" );
-					}
-
-					// Release the interface we don't need.
-					lpDD->Release();
-
-					/* 
-					
-					// This code can be used to create the DirectDraw
-					// object using CoCreateInstance instead of
-					// DirectDrawCreate.
-					
-					CoInitialize( NULL );
-
-					if ( FAILED( CoCreateInstance( CLSID_DirectDraw,
-						 NULL, CLSCTX_ALL, IID_IDirectDraw2,
-						 ( LPVOID* ) &lpDD2 ) ) )
-					{
-						return Fail( hWnd, "Couldn't create DirectDraw object.\n" );
-					}
-
-					if ( FAILED( lpDD2->Initialize( lpDevice ) ) )
-					{
-						return Fail( hWnd, "Couldn't initialize DirectDraw.\n" );
-					}
-
-					CoUninitialize();
-
-					*/
-
-					// Set the cooperative level. Give us the
-					// ability to change the bit depth, and don't
-					// fiddle with our window.
-					if ( FAILED( lpDD2->SetCooperativeLevel( hWnd,
-								 DDSCL_FULLSCREEN |
-								 DDSCL_EXCLUSIVE |
-								 DDSCL_NOWINDOWCHANGES ) ) )
-					{
-						return Fail( hWnd, "Couldn't set cooperative level.\n" );
-					}
-
-					// Enumerate the available modes.
-					if ( FAILED( lpDD2->EnumDisplayModes( 0, NULL,
-								 ( LPVOID )GetDlgItem( hWnd, IDC_MODES ),
-								 ( LPDDENUMMODESCALLBACK )EnumDisplayModes ) ) )
-					{
-						return Fail( hWnd, "Couldn't enumerate modes.\n" );
-					}
- 
-					SendDlgItemMessage( hWnd, IDC_MODES, 
-										LB_SETCURSEL, 0, 0L );
-
-					EnableWindow( GetDlgItem( hWnd,IDC_CREATE ), FALSE );
-					EnableWindow( GetDlgItem( hWnd,IDC_SET ), TRUE );
-
-					break;
-
-				case IDC_SET:
-					// Get the surface description referenced in the list box.
-					iIndex = (int)SendDlgItemMessage( hWnd, IDC_MODES, LB_GETCURSEL, 0, 0L );
-					lpDesc = ( LPDDSURFACEDESC )SendDlgItemMessage( 
-													hWnd, IDC_MODES, 
-													LB_GETITEMDATA, iIndex, 0 );
-
-					// Set the new display mode.
-					if ( FAILED( lpDD2->SetDisplayMode( lpDesc->dwWidth, 
-										  lpDesc->dwHeight,       
-										  lpDesc->ddpfPixelFormat.dwRGBBitCount,
-										  lpDesc->dwRefreshRate, 0 ) ) )
-					{
-						return Fail( hWnd, "Couldn't set the mode.\n");
-					}
-					break;
-
-				case IDCANCEL:
-					EndDialog( hWnd, FALSE );
-					return TRUE;
-			}
+			return do_WM_COMMAND(hWnd, wParam, lParam);
 			break;
 
 	   case WM_DELETEITEM:
@@ -247,7 +255,6 @@ LRESULT CALLBACK DlgModeProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 		case WM_DESTROY:
 			break;
-
 	}
 
 	return FALSE; 
