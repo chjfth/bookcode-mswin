@@ -274,6 +274,10 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 					LPSTR lpCmdLine, int nCmdShow)
 {
+	int testerr = DDERR_INVALIDCAPS; // =0x88760064
+	testerr = DDERR_GENERIC; // =0x80004005
+	testerr = DDERR_INVALIDPARAMS; // =0x80070057 (from Win32 ERROR_INVALID_PARAMETER)
+
 	if ( !doInit( hInstance, nCmdShow ) )
 	{
 		return FALSE;
