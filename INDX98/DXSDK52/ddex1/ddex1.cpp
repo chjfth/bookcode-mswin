@@ -55,11 +55,11 @@ char szBackMsg[] = "Back buffer (F12 to quit)";
 long FAR PASCAL WindowProc( HWND hWnd, UINT message, 
 	WPARAM wParam, LPARAM lParam )
 {
-	PAINTSTRUCT ps;
-	RECT        rc;
-	SIZE        size;
+	PAINTSTRUCT ps = {};
+	RECT        rc = {};
+	SIZE        size = {};
 	static BYTE phase = 0;
-	HDC         hdc;
+	HDC         hdc = NULL;
 
 	switch( message )
 	{
@@ -97,8 +97,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,
 
 			while( 1 )
 			{
-				HRESULT ddrval;
-				ddrval = lpDDSPrimary->Flip( NULL, 0 );
+				HRESULT ddrval = lpDDSPrimary->Flip( NULL, 0 );
 				if( ddrval == DD_OK )
 				{
 					break;
@@ -158,13 +157,13 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,
  */
 static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 {
-    HWND                hwnd;
-    WNDCLASS            wc;
-    DDSURFACEDESC       ddsd;
-    DDSCAPS             ddscaps;
-    HRESULT             ddrval;
-    HDC                 hdc;
-    char                buf[256];
+    HWND                hwnd = NULL;
+	WNDCLASS            wc = {};
+	DDSURFACEDESC       ddsd = {sizeof(ddsd)};
+	DDSCAPS             ddscaps = {};
+    HRESULT             ddrval = 0;
+    HDC                 hdc = NULL;
+	char                buf[256] = {};
 
     /*
      * set up and register window class
@@ -222,24 +221,24 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 				// Create the primary surface with 1 back buffer
 				ddsd.dwSize = sizeof( ddsd );
 				ddsd.dwFlags = DDSD_CAPS | DDSD_BACKBUFFERCOUNT;
-				ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE |
-							  DDSCAPS_FLIP | 
-							  DDSCAPS_COMPLEX;
+				ddsd.ddsCaps.dwCaps = 
+						DDSCAPS_PRIMARYSURFACE |
+						DDSCAPS_FLIP | 
+						DDSCAPS_COMPLEX;
 				ddsd.dwBackBufferCount = 1;
 				ddrval = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
 				if( ddrval == DD_OK )
 				{
 					// Get a pointer to the back buffer
 					ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
-					ddrval = lpDDSPrimary->GetAttachedSurface(&ddscaps, 
-									  &lpDDSBack);
+					ddrval = lpDDSPrimary->GetAttachedSurface(&ddscaps, &lpDDSBack);
 					if( ddrval == DD_OK )
 					{
 						// draw some text.
 						if (lpDDSPrimary->GetDC(&hdc) == DD_OK)
 						{
-							SetBkColor( hdc, RGB( 0, 0, 255 ) );
-							SetTextColor( hdc, RGB( 255, 255, 0 ) );
+							SetBkColor( hdc, RGB( 0, 0, 255 ) );  // blue bkgnd
+							SetTextColor( hdc, RGB( 255, 255, 0 ) ); // yellow text
 							TextOut( hdc, 0, 0, szFrontMsg, lstrlen(szFrontMsg) );
 							lpDDSPrimary->ReleaseDC(hdc);
 						}
@@ -263,7 +262,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 		}
     }
 
-    wsprintf(buf, "Direct Draw Init Failed (%08lx)\n", ddrval );
+    wsprintf(buf, "Direct Draw Init Failed (0x%08X)\n", ddrval );
     MessageBox( hwnd, buf, "ERROR", MB_OK );
     finiObjects();
     DestroyWindow( hwnd );
