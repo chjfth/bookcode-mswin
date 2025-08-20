@@ -52,7 +52,7 @@ char szMsg[] = "Page Flipping Test: Press F12 to exit";
 char szFrontMsg[] = "Front buffer (F12 to quit)";
 char szBackMsg[] = "Back buffer (F12 to quit)";
 
-long FAR PASCAL WindowProc( HWND hWnd, UINT message, 
+LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message, 
 	WPARAM wParam, LPARAM lParam )
 {
 	PAINTSTRUCT ps = {};
@@ -64,7 +64,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,
 	switch( message )
 	{
 	case WM_ACTIVATEAPP:
-		bActive = wParam;
+		bActive = (BOOL)wParam;
 		break;
 
 	case WM_CREATE:
@@ -78,8 +78,11 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,
 		// Flip surfaces
 		if( bActive )
 		{
-			if (lpDDSBack->GetDC(&hdc) == DD_OK)
+			if(lpDDSBack->GetDC(&hdc) == DD_OK)
 			{
+				// [2025-08-19]Chj: This redraw recovers our painting after our program
+				// is sent to background(by user Alt+Tab) then sent to foreground again.
+
 				SetBkColor( hdc, RGB( 0, 0, 255 ) );
 				SetTextColor( hdc, RGB( 255, 255, 0 ) );
 				if( phase )
@@ -114,6 +117,7 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message,
 				
 				if( ddrval != DDERR_WASSTILLDRAWING )
 				{
+					// todo: Add vaDBG
 					break;
 				}
 			}
@@ -292,6 +296,6 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		DispatchMessage(&msg);
 	}
 
-	return msg.wParam;
+	return (int)msg.wParam;
 
 } /* WinMain */
