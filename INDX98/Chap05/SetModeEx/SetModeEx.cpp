@@ -125,12 +125,12 @@ void MainDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 	LPDDSURFACEDESC     lpDesc = NULL;
 	LPGUID              lpDevice = NULL;
 	HWND                hCombobox = NULL;
-	LPDIRECTDRAW        lpDD = NULL;
 	HRESULT             hret = 0;
 
 	switch ( id )
 	{{
 	case IDC_CREATE:
+	{
 		// Get the unique id for the selected device. If it's
 		// the primary device, the id will be NULL.
 
@@ -139,6 +139,9 @@ void MainDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 			 
 		lpDevice = (LPGUID)ComboBox_GetItemData(hCombobox, iIndex);
 		
+#if 1
+		LPDIRECTDRAW        lpDD = NULL;
+
 		// Create the DirectDraw object.
 		if ( FAILED( DirectDrawCreate( lpDevice, &lpDD, NULL ) ) )
 		{
@@ -157,37 +160,43 @@ void MainDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 		// Release the interface we don't need.
 		lpDD->Release();
 
-		/* 
-					
+#else
+			
 		// This code can be used to create the DirectDraw
-		// object using CoCreateInstance instead of
-		// DirectDrawCreate.
+		// object using CoCreateInstance() instead of DirectDrawCreate().
 					
-		CoInitialize( NULL );
+		hret = CoInitialize( NULL );
 
-		if ( FAILED( CoCreateInstance( CLSID_DirectDraw,
-				NULL, CLSCTX_ALL, IID_IDirectDraw2,
-				( LPVOID* ) &lpDD2 ) ) )
+		hret = CoCreateInstance( CLSID_DirectDraw,
+			NULL, CLSCTX_ALL, IID_IDirectDraw2,
+			( LPVOID* ) &m_lpDD2 );
+
+		if ( FAILED(hret) )
 		{
-			return Fail( hWnd, "Couldn't create DirectDraw object.\n" );
+			// return Fail( hWnd, "Couldn't create DirectDraw object.\n" ); todo
+			return;
 		}
 
-		if ( FAILED( lpDD2->Initialize( lpDevice ) ) )
+		hret = m_lpDD2->Initialize( lpDevice );
+		if ( FAILED(hret) )
 		{
-			return Fail( hWnd, "Couldn't initialize DirectDraw.\n" );
+			// return Fail( hWnd, "Couldn't initialize DirectDraw.\n" ); todo
+			return;
 		}
 
 		CoUninitialize();
 
-		*/
+#endif
 
 		// Set the cooperative level. Give us the
 		// ability to change the bit depth, and don't
 		// fiddle with our window.
-		if ( FAILED( m_lpDD2->SetCooperativeLevel( hdlg,
+		hret = m_lpDD2->SetCooperativeLevel(hdlg,
 						DDSCL_FULLSCREEN |
 						DDSCL_EXCLUSIVE |
-						DDSCL_NOWINDOWCHANGES ) ) )
+						DDSCL_NOWINDOWCHANGES
+						);
+		if( FAILED(hret) )
 		{
 			// return Fail( hWnd, "Couldn't set cooperative level.\n" ); // todo vaDbg
 			m_lpDD2->Release();
@@ -214,6 +223,7 @@ void MainDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 		EnableWindow( GetDlgItem( hdlg,IDC_SET ), TRUE );
 
 		return;
+	}
 
 	case IDC_SET:
 		// Get the surface description referenced in the list box.
