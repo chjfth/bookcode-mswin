@@ -6,41 +6,49 @@
 #include <windowsx.h>
 #include <stdio.h>
 #include <ddraw.h>
-
 #include "resource.h"
+
+#include <mswin/utils_wingui.h>
+
+#define JULayout2_IMPL
+#include <mswin/JULayout2.h>
+
+//#include <vaDbg.h>
+#include "CxxDialog.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 
-LPDIRECTDRAW2           lpDD2 = NULL;          // DirectDraw2 object.
-HINSTANCE               hInst;
-
-static void ReleaseObjects( void )
+class MainDialog : public CxxDialog
 {
-	if ( lpDD2 != NULL )
-	{
-		lpDD2->Release();
-		lpDD2 = NULL;
-	}
+public:
+	MainDialog();
+
+	virtual INT_PTR DialogProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+public:
+	void OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify);
+	BOOL OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam);
+
+private:
+	LPDIRECTDRAW2 m_lpDD2; // todo: make it a Cec
+};
+
+MainDialog::MainDialog()
+{
+	m_lpDD2 = NULL;
 }
 
-BOOL Fail( HWND hwnd, char *szMsg )
-{
-	ReleaseObjects();
-	OutputDebugString( szMsg );
-	EndDialog( hwnd, FALSE );
-	return FALSE;
-}
-
-BOOL WINAPI PROC_EnumDDrawDeviceEx( GUID FAR *lpGUID,           
+static BOOL WINAPI 
+PROC_EnumDDrawDeviceEx( GUID FAR *lpGUID,           
 	LPSTR lpDriverDescription,  LPSTR lpDriverName,         
 	LPVOID lpContext, HMONITOR hMonitor )
 {
 	LONG    iIndex;
-	HWND    hWnd = ( HWND )lpContext;
+	HWND    hdlg = ( HWND )lpContext;
 	LPVOID  lpDevice = NULL; // Chj: Better var naming? This refers to a DirectDraw object GUID.
 
-	iIndex = ComboBox_AddString(hWnd, lpDriverDescription);
+	iIndex = ComboBox_AddString(hdlg, lpDriverDescription);
 
 	// If it got added to the list box, create a copy of the GUID
 	// and store a pointer to it in the list box.
@@ -61,7 +69,7 @@ BOOL WINAPI PROC_EnumDDrawDeviceEx( GUID FAR *lpGUID,
 			memcpy( lpDevice, lpGUID, sizeof( GUID ) );
 		}
 
-		ComboBox_SetItemData(hWnd, iIndex, lpDevice);
+		ComboBox_SetItemData(hdlg, iIndex, lpDevice);
 	}
 	else 
 	{
@@ -71,7 +79,9 @@ BOOL WINAPI PROC_EnumDDrawDeviceEx( GUID FAR *lpGUID,
 	return DDENUMRET_OK; // =1
 }
 
-BOOL WINAPI EnumDisplayModes( LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext )
+
+static HRESULT WINAPI 
+PROC_EnumDisplayModes( LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext )
 {
 	LONG    iIndex;
 	char    buff[256] = {};
@@ -108,21 +118,23 @@ BOOL WINAPI EnumDisplayModes( LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext 
 	return DDENUMRET_OK; // =1
 }
 
-static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
+
+void MainDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify) 
 {
 	int                 iIndex = 0;
 	LPDDSURFACEDESC     lpDesc = NULL;
 	LPGUID              lpDevice = NULL;
 	HWND                hCombobox = NULL;
 	LPDIRECTDRAW        lpDD = NULL;
+	HRESULT             hret = 0;
 
-	switch ( GET_WM_COMMAND_ID(wParam, lParam) )
+	switch ( id )
 	{{
 	case IDC_CREATE:
 		// Get the unique id for the selected device. If it's
 		// the primary device, the id will be NULL.
 
-		hCombobox = GetDlgItem(hWnd, IDC_DEVICE);
+		hCombobox = GetDlgItem(hdlg, IDC_DEVICE);
 		iIndex = ComboBox_GetCurSel(hCombobox);
 			 
 		lpDevice = (LPGUID)ComboBox_GetItemData(hCombobox, iIndex);
@@ -130,13 +142,16 @@ static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		// Create the DirectDraw object.
 		if ( FAILED( DirectDrawCreate( lpDevice, &lpDD, NULL ) ) )
 		{
-			return Fail( hWnd, "Couldn't create DirectDraw object.\n" );
+			// return Fail( hdlg, "Couldn't create DirectDraw object.\n" ); todo
+			return;
 		}
 
 		// Query the appropriate interface.
-		if ( FAILED( lpDD->QueryInterface( IID_IDirectDraw2, (LPVOID*)&lpDD2 ) ) )
+		if ( FAILED( lpDD->QueryInterface( IID_IDirectDraw2, (LPVOID*)&m_lpDD2 ) ) )
 		{
-			return Fail( hWnd, "Couldn't query the interface.\n" );
+			assert(!m_lpDD2);
+			// return Fail( hdlg, "Couldn't query the interface.\n" ); todo
+			return;
 		}
 
 		// Release the interface we don't need.
@@ -169,124 +184,150 @@ static LRESULT do_WM_COMMAND(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		// Set the cooperative level. Give us the
 		// ability to change the bit depth, and don't
 		// fiddle with our window.
-		if ( FAILED( lpDD2->SetCooperativeLevel( hWnd,
+		if ( FAILED( m_lpDD2->SetCooperativeLevel( hdlg,
 						DDSCL_FULLSCREEN |
 						DDSCL_EXCLUSIVE |
 						DDSCL_NOWINDOWCHANGES ) ) )
 		{
-			return Fail( hWnd, "Couldn't set cooperative level.\n" );
+			// return Fail( hWnd, "Couldn't set cooperative level.\n" ); // todo vaDbg
+			m_lpDD2->Release();
+			m_lpDD2 = NULL;
+			return;
 		}
 
 		// Enumerate the available modes.
-		if ( FAILED( lpDD2->EnumDisplayModes( 0, NULL,
-						( LPVOID )GetDlgItem( hWnd, IDC_MODES ),
-						( LPDDENUMMODESCALLBACK )EnumDisplayModes ) ) )
+		hret = m_lpDD2->EnumDisplayModes( 0, NULL,
+			GetDlgItem( hdlg, IDC_MODES ),
+			PROC_EnumDisplayModes);
+		if ( FAILED(hret) )
 		{
-			return Fail( hWnd, "Couldn't enumerate modes.\n" );
+			// return Fail( hWnd, "Couldn't enumerate modes.\n" ); // todo vaDbg
+			m_lpDD2->Release();
+			m_lpDD2 = NULL;
+			return;
 		}
  
-		SendDlgItemMessage( hWnd, IDC_MODES, 
+		SendDlgItemMessage( hdlg, IDC_MODES, 
 							LB_SETCURSEL, 0, 0L );
 
-		EnableWindow( GetDlgItem( hWnd,IDC_CREATE ), FALSE );
-		EnableWindow( GetDlgItem( hWnd,IDC_SET ), TRUE );
+		EnableWindow( GetDlgItem( hdlg,IDC_CREATE ), FALSE );
+		EnableWindow( GetDlgItem( hdlg,IDC_SET ), TRUE );
 
-		break;
+		return;
 
 	case IDC_SET:
 		// Get the surface description referenced in the list box.
-		iIndex = (int)SendDlgItemMessage( hWnd, IDC_MODES, LB_GETCURSEL, 0, 0L );
+		iIndex = (int)SendDlgItemMessage( hdlg, IDC_MODES, LB_GETCURSEL, 0, 0L );
 		lpDesc = ( LPDDSURFACEDESC )SendDlgItemMessage( 
-										hWnd, IDC_MODES, 
+										hdlg, IDC_MODES, 
 										LB_GETITEMDATA, iIndex, 0 );
 
 		// Set the new display mode.
-		if ( FAILED( lpDD2->SetDisplayMode( lpDesc->dwWidth, 
+		if ( FAILED( m_lpDD2->SetDisplayMode( lpDesc->dwWidth, 
 								lpDesc->dwHeight,       
 								lpDesc->ddpfPixelFormat.dwRGBBitCount,
 								lpDesc->dwRefreshRate, 0 ) ) )
 		{
-			return Fail( hWnd, "Couldn't set the mode.\n");
+			// return Fail( hWnd, "Couldn't set the mode.\n"); // todo vaDbg
+			// leave m_lpDD2 intact.
+			return;
 		}
-		break;
+		
+		return;
+
+	case IDOK:
+		return;
 
 	case IDCANCEL:
-		EndDialog( hWnd, FALSE );
-		return TRUE;
+		EndDialog( hdlg, FALSE );
+		return;
 	}}
-
-	return 0;
 }
 
-INT_PTR CALLBACK DlgModeProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static void Dlg_EnableJULayout(HWND hdlg)
 {
-	LPVOID              lpHeap = NULL;
-	LPDELETEITEMSTRUCT  lpdis = NULL;
-	HWND hCombobox = NULL;
-	HRESULT hre = 0;
+	JULayout *jul = JULayout::EnableJULayout(hdlg);
 
-	switch ( message )
+// 	jul->AnchorControl(0,0, 100,0, IDC_LABEL1);
+// 	jul->AnchorControl(0,0, 100,100, IDC_EDIT_LOGMSG);
+// 	jul->AnchorControl(50,100, 50,100, IDC_BUTTON1);
+
+	// If you add more controls(IDC_xxx) to the dialog, adjust them here.
+}
+
+BOOL MainDialog::OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam) 
+{
+	SNDMSG(hdlg, WM_SETICON, TRUE, (LPARAM)LoadIcon(GetWindowInstance(hdlg), MAKEINTRESOURCE(1)));
+
+// 	vaSetDlgItemText(hdlg, IDC_LABEL1, _T("version: %d.%d.%d"), 
+// 		DialogAsMainUICxx_VMAJOR, DialogAsMainUICxx_VMINOR, DialogAsMainUICxx_VPATCH);
+// 
+// 	SetDlgItemText(hdlg, IDC_EDIT_LOGMSG, m_mystr);
+
+	Dlg_EnableJULayout(hdlg);
+
+	// Enumerate all DirectDraw devices.
+	HRESULT hret = DirectDrawEnumerateEx( PROC_EnumDDrawDeviceEx,  
+		( LPVOID )GetDlgItem( hdlg, IDC_DEVICE ),
+		DDENUM_ATTACHEDSECONDARYDEVICES);
+
+	if(FAILED(hret))
 	{
-		case WM_INITDIALOG:
-			hre = DirectDrawEnumerateEx( PROC_EnumDDrawDeviceEx,  
-				( LPVOID )GetDlgItem( hWnd, IDC_DEVICE ),
-				DDENUM_ATTACHEDSECONDARYDEVICES);
-			// Enumerate the DirectDraw devices.
-			if ( FAILED(hre) )
-			{
-				OutputDebugString( "Couldn't enumerate devices.\n" );
-				return FALSE;
-			}
-
-			hCombobox = GetDlgItem(hWnd, IDC_DEVICE);
-			ComboBox_SetCurSel(hCombobox, 0);
-			return TRUE;
-
-		case WM_COMMAND:
-			return do_WM_COMMAND(hWnd, wParam, lParam);
-			break;
-
-		case WM_DELETEITEM:
-			// A clean way to free the memory allocated when the listbox and comboboxes are filled.
-			// Don't use this technique on NT -- the message isn't sent.
-			//
-			// [2025-08-17] Chj: Yes, I do not see this message on Win7. 
-			// So we get mem-leak on WinNT+ !
-			//
-			lpdis = ( LPDELETEITEMSTRUCT )lParam;
-			lpHeap = ( LPVOID )lpdis->itemData;
-			if ( lpHeap ) 
-			{
-				free( lpHeap );
-			}
-			return TRUE;
-
-		case WM_DESTROY:
-			break;
-	}
-
-	return FALSE; 
-}
-
-static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
-{
-	hInst = hInstance;
-	return TRUE; 
-}
-
-int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-					LPSTR lpCmdLine, int nCmdShow)
-{
-	int testerr = DDERR_INVALIDCAPS; // =0x88760064
-	testerr = DDERR_GENERIC; // =0x80004005
-	testerr = DDERR_INVALIDPARAMS; // =0x80070057 (from Win32 ERROR_INVALID_PARAMETER)
-
-	if ( !doInit( hInstance, nCmdShow ) )
-	{
+//		vaDbgTs("DirectDrawEnumerateEx() fail! hret=0x%08X.", hret); // todo
 		return FALSE;
 	}
 
-	INT_PTR rc = DialogBox(hInst, MAKEINTRESOURCE( IDD_MAIN ), NULL, DlgModeProc);
+	HWND hCombobox = GetDlgItem(hdlg, IDC_DEVICE);
+	ComboBox_SetCurSel(hCombobox, 0); 
+
+	SetFocus(GetDlgItem(hdlg, IDC_CREATE));
+	return FALSE; // FALSE to let Dlg-manager respect our SetFocus().
+}
+
+INT_PTR MainDialog::DialogProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPARAM lParam) 
+{
+	switch (uMsg) 
+	{
+		HANDLE_dlgMSG(hdlg, WM_INITDIALOG,    OnInitDialog);
+		HANDLE_dlgMSG(hdlg, WM_COMMAND,       OnCommand);
+	}
+	return FALSE;
+}
+
+
+int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR szParams, int) 
+{
+	InitCommonControls(); // WinXP requires this, to work with Visual-style manifest
+
+//	const TCHAR *szfullcmdline = GetCommandLine();
+//	vaDbgTs(_T("GetCommandLine() = %s"), szfullcmdline);
+
+	MainDialog dlg;
+	dlg.DialogBoxParam(hinstExe, MAKEINTRESOURCE(IDD_MAIN), NULL);
 
 	return 0;
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+/*
+static void ReleaseObjects( void )
+{
+	if ( lpDD2 != NULL )
+	{
+		lpDD2->Release();
+		lpDD2 = NULL;
+	}
+}
+
+BOOL Fail( HWND hwnd, char *szMsg )
+{
+	ReleaseObjects();
+	OutputDebugString( szMsg );
+	EndDialog( hwnd, FALSE );
+	return FALSE;
+}
+*/
+
