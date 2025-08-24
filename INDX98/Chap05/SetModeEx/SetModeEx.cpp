@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
-// You must include this define to use QueryInterface
+
+// You must include this define to use QueryInterface(IID_IDirectDraw2)
 #define INITGUID
 
 #include <windows.h>
