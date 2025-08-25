@@ -153,11 +153,11 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                     // Blit our sprites without color keys.
                     lpDDSPrimary->BltFast( 300, 200, lpDDSOffOne, NULL,
                                            DDBLTFAST_WAIT | 
-										   DDBLTFAST_SRCCOLORKEY );
+										   DDBLTFAST_NOCOLORKEY );
 
                     lpDDSPrimary->BltFast( 350, 250, lpDDSOffTwo, NULL,
                                            DDBLTFAST_WAIT |
-										   DDBLTFAST_SRCCOLORKEY );
+										   DDBLTFAST_NOCOLORKEY );
                     break;
 
                 case VK_F2:
