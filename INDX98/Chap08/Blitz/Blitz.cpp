@@ -178,7 +178,7 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
 					break;
 
                 case VK_F3:
-                    if ( ~DestKey ) 
+                    if ( !DestKey ) 
 					{
                         OutputDebugString( 
                             "No destination color keying...\n" );
@@ -348,7 +348,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 	{
         return Fail( hwnd, "Couldn't get caps.\n" );
     }
-    if ( ddcaps.dwCKeyCaps | DDCKEYCAPS_DESTBLT ) 
+    if ( ddcaps.dwCKeyCaps & DDCKEYCAPS_DESTBLT ) 
 	{
         DestKey = TRUE;
     }
