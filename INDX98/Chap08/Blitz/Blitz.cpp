@@ -16,7 +16,7 @@ DWORD                   dwGreen;            // Pure green
 DWORD                   dwBlue;             // Pure blue
 
 
-BOOL LoadImage( LPDIRECTDRAWSURFACE lpDDS, LPSTR szImage )
+BOOL myLoadImage( LPDIRECTDRAWSURFACE lpDDS, LPSTR szImage )
 {
     HBITMAP         hbm;
     HDC             hdcImage= NULL;
@@ -403,17 +403,17 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 	}
 
     // Load our images.
-    if ( !LoadImage( lpDDSOffOne, "redcirq.bmp" ) ) 
+    if ( !myLoadImage( lpDDSOffOne, "redcirq.bmp" ) ) 
 	{
         return Fail( hwnd, "Couldn't load offscreen one.\n" );
     }
 
-    if ( !LoadImage( lpDDSOffTwo, "bluesq.bmp" ) ) 
+    if ( !myLoadImage( lpDDSOffTwo, "bluesq.bmp" ) ) 
 	{
         return Fail( hwnd, "Couldn't load offscreen two.\n" );
     }
 
-    if ( !LoadImage( lpDDSOffThree, "lake.bmp" ) ) 
+    if ( !myLoadImage( lpDDSOffThree, "lake.bmp" ) ) 
 	{
         return Fail( hwnd, "Couldn't load offscreen three.\n" );
     }
