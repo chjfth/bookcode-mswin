@@ -175,6 +175,8 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                     lpDDSPrimary->BltFast( 350, 250, lpDDSOffTwo, NULL,
                                            DDBLTFAST_WAIT |
                                            DDBLTFAST_SRCCOLORKEY );
+					break;
+
                 case VK_F3:
                     if ( ~DestKey ) 
 					{
