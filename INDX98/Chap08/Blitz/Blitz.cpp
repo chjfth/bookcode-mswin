@@ -123,7 +123,7 @@ BOOL Fail( HWND hwnd,  char *szMsg )
     return FALSE;
 }
 
-long FAR PASCAL WindowProc( HWND hWnd, UINT message, 
+LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message, 
                             WPARAM wParam, LPARAM lParam )
 {
     DDBLTFX     ddbltfx;    // For blit effects.
@@ -440,5 +440,5 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         DispatchMessage( &msg );
     }
 
-    return msg.wParam;
+    return (int)msg.wParam;
 }
