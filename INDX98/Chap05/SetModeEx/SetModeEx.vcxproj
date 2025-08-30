@@ -208,7 +208,6 @@
    -->
   <ItemGroup>
     <ClCompile Include="SetModeEx.cpp" />
-    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SetModeEx.rc" />
@@ -219,7 +218,6 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="CxxDialog.h" />
-    <ClInclude Include="..\..\..\share\vaDbg.h" />
   </ItemGroup>
   
   <!-- Import shared project properties used by this book. -->

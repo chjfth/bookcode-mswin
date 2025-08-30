@@ -9,6 +9,10 @@
 #include <ddraw.h>
 #include "resource.h"
 
+#define utils_env_IMPL
+#include <mswin/utils_env.h>
+
+#define utils_wingui_IMPL
 #include <mswin/utils_wingui.h>
 
 #define JULayout2_IMPL
@@ -16,6 +20,8 @@
 
 //#include <vaDbg.h>
 #include "CxxDialog.h"
+
+#define ExeVersion "0.1"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -270,10 +276,7 @@ BOOL MainDialog::OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam)
 {
 	SNDMSG(hdlg, WM_SETICON, TRUE, (LPARAM)LoadIcon(GetWindowInstance(hdlg), MAKEINTRESOURCE(1)));
 
-// 	vaSetDlgItemText(hdlg, IDC_LABEL1, _T("version: %d.%d.%d"), 
-// 		DialogAsMainUICxx_VMAJOR, DialogAsMainUICxx_VMINOR, DialogAsMainUICxx_VPATCH);
-// 
-// 	SetDlgItemText(hdlg, IDC_EDIT_LOGMSG, m_mystr);
+ 	vaSetWindowText(hdlg, _T("SetModeEx v%s (%s)"), _T(ExeVersion), env_GetCpuArch());
 
 	Dlg_EnableJULayout(hdlg);
 
@@ -341,4 +344,3 @@ BOOL Fail( HWND hwnd, char *szMsg )
 	return FALSE;
 }
 */
-
