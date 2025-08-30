@@ -126,9 +126,10 @@ BOOL Fail( HWND hwnd,  char *szMsg )
 LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message, 
                             WPARAM wParam, LPARAM lParam )
 {
-    DDBLTFX     ddbltfx;    // For blit effects.
-    DDCOLORKEY  ddckey;     // For SetColorKey.
-    RECT        rcRect;     // For shrinking.
+	DDBLTFX     ddbltfx = {sizeof(DDBLTFX)};    // For blit effects.
+	DDCOLORKEY  ddckey = {0, 0};                // For SetColorKey.
+	RECT        rcRect = {};   // For shrinking.
+	HRESULT hret = 0;
 
     switch ( message )
     {
@@ -147,15 +148,15 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                     OutputDebugString( "No color keying...\n" );
 
                     // Blit the background with stretching.
-                    lpDDSPrimary->Blt( NULL, lpDDSOffThree, NULL,
+                    hret = lpDDSPrimary->Blt( NULL, lpDDSOffThree, NULL,
                                        DDBLT_WAIT, NULL );
 
                     // Blit our sprites without color keys.
-                    lpDDSPrimary->BltFast( 300, 200, lpDDSOffOne, NULL,
+                    hret = lpDDSPrimary->BltFast( 300, 200, lpDDSOffOne, NULL,
                                            DDBLTFAST_WAIT | 
 										   DDBLTFAST_NOCOLORKEY );
 
-                    lpDDSPrimary->BltFast( 350, 250, lpDDSOffTwo, NULL,
+                    hret = lpDDSPrimary->BltFast( 350, 250, lpDDSOffTwo, NULL,
                                            DDBLTFAST_WAIT |
 										   DDBLTFAST_NOCOLORKEY );
                     break;
@@ -164,15 +165,15 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                     OutputDebugString( "Source color keying...\n" );
 
                     // Blit the background with stretching.
-                    lpDDSPrimary->Blt( NULL, lpDDSOffThree, NULL,
+                    hret = lpDDSPrimary->Blt( NULL, lpDDSOffThree, NULL,
                                        DDBLT_WAIT, NULL );
 
                     // Blit our sprites with source color keys.
-                    lpDDSPrimary->BltFast( 300, 200, lpDDSOffOne, NULL,
+                    hret = lpDDSPrimary->BltFast( 300, 200, lpDDSOffOne, NULL,
                                            DDBLTFAST_WAIT | 
                                            DDBLTFAST_SRCCOLORKEY );
 
-                    lpDDSPrimary->BltFast( 350, 250, lpDDSOffTwo, NULL,
+                    hret = lpDDSPrimary->BltFast( 350, 250, lpDDSOffTwo, NULL,
                                            DDBLTFAST_WAIT |
                                            DDBLTFAST_SRCCOLORKEY );
 					break;
@@ -191,8 +192,7 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                     ddckey.dwColorSpaceLowValue = dwGreen;
                     ddckey.dwColorSpaceHighValue = dwGreen;
 
-                    lpDDSPrimary->SetColorKey( DDCKEY_DESTBLT, 
-                                               &ddckey );
+                    hret = lpDDSPrimary->SetColorKey( DDCKEY_DESTBLT, &ddckey );
 
                     // Use a color fill blit to fill the primary surface with
                     // the color key.
@@ -201,20 +201,20 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                     
                     ddbltfx.dwFillColor = dwGreen; 
 
-                    lpDDSPrimary->Blt( NULL, NULL, NULL,
+                    hret = lpDDSPrimary->Blt( NULL, NULL, NULL,
                                        DDBLT_COLORFILL |
                                        DDBLT_WAIT, &ddbltfx );
                     
                     // Now blit everything in reverse order.
-                    lpDDSPrimary->BltFast( 350, 250, lpDDSOffTwo, NULL,
+                    hret = lpDDSPrimary->BltFast( 350, 250, lpDDSOffTwo, NULL,
                                            DDBLTFAST_WAIT |
                                            DDBLTFAST_DESTCOLORKEY );
 
-                    lpDDSPrimary->BltFast( 300, 200, lpDDSOffOne, NULL,
+                    hret = lpDDSPrimary->BltFast( 300, 200, lpDDSOffOne, NULL,
                                            DDBLTFAST_WAIT | 
                                            DDBLTFAST_DESTCOLORKEY );
 
-                    lpDDSPrimary->Blt( NULL, lpDDSOffThree, NULL,
+                    hret = lpDDSPrimary->Blt( NULL, lpDDSOffThree, NULL,
                                        DDBLT_WAIT | DDBLT_KEYDEST,
                                        NULL );
                     break;
@@ -228,9 +228,9 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                     // Fill the surface with blue.
                     ddbltfx.dwFillColor = dwBlue; 
 
-                    lpDDSPrimary->Blt( NULL, NULL, NULL,
-                                       DDBLT_COLORFILL |
-                                       DDBLT_WAIT, &ddbltfx );
+                    hret = lpDDSPrimary->Blt( NULL, NULL, NULL,
+                                       DDBLT_COLORFILL | DDBLT_WAIT, 
+									   &ddbltfx );
                     break;
 
                 case VK_F5:
@@ -243,7 +243,7 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                                      DDBLTFX_MIRRORUPDOWN;
 
                     // Mirror the lake on both axis.
-                    lpDDSPrimary->Blt( NULL, lpDDSOffThree, NULL,
+                    hret = lpDDSPrimary->Blt( NULL, lpDDSOffThree, NULL,
                                        DDBLT_DDFX |DDBLT_WAIT, 
                                        &ddbltfx );
                     break;
@@ -257,7 +257,7 @@ LRESULT FAR PASCAL WindowProc( HWND hWnd, UINT message,
                     rcRect.bottom = 100; 
 
                     // Blit the lake with shrinking.
-                    lpDDSPrimary->Blt( &rcRect, lpDDSOffThree, NULL,
+                    hret = lpDDSPrimary->Blt( &rcRect, lpDDSOffThree, NULL,
                                        DDBLT_WAIT, NULL );
                     break;
 			}
