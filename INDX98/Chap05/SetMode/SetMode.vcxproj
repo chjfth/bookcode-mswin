@@ -81,7 +81,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20250817-0000-0000-0000-144840000001}</ProjectGuid>
-    <ProjectName>SetMode</ProjectName>
+    <ProjectName>05-SetMode</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
