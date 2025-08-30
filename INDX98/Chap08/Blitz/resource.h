@@ -2,11 +2,6 @@
 // Microsoft Developer Studio generated include file.
 // Used by Blitz.rc
 //
-#define IDC_SET                         3
-#define IDD_MAIN                        101
-#define IDC_MODES                       1001
-#define IDC_CREATE                      1003
-#define IDC_DEVICE                      1005
 #define IDC_STATIC -1
 
 // Next default values for new objects
