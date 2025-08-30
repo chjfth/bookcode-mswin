@@ -51,13 +51,13 @@ BOOL Fail( HWND hwnd,  char *szMsg )
     return FALSE;
 }
 
-long FAR PASCAL WindowProc( HWND hWnd, UINT message, 
+LRESULT WINAPI WindowProc( HWND hWnd, UINT message, 
                             WPARAM wParam, LPARAM lParam )
 {
     switch ( message )
     {
         case WM_ACTIVATEAPP:
-            bActive = wParam;
+            bActive = (BOOL)wParam;
             break;
 
         case WM_SETCURSOR:
@@ -281,7 +281,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         {
             if ( !GetMessage( &msg, NULL, 0, 0 ) )
             {
-                return msg.wParam;
+                return (int)msg.wParam;
             }
             TranslateMessage( &msg );
             DispatchMessage( &msg );
