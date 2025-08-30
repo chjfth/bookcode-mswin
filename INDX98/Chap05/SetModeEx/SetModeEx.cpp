@@ -21,7 +21,7 @@
 //#include <vaDbg.h>
 #include "CxxDialog.h"
 
-#define ExeVersion "0.1"
+#define ExeVersion "0.2"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -36,6 +36,15 @@ public:
 public:
 	void OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify);
 	BOOL OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam);
+
+private:
+	void ReleaseDD()
+	{
+		if(m_lpDD2) {
+			m_lpDD2->Release();
+			m_lpDD2 = NULL;
+		}
+	}
 
 private:
 	LPDIRECTDRAW2 m_lpDD2; // todo: make it a Cec
@@ -256,6 +265,7 @@ void MainDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 		return;
 
 	case IDCANCEL:
+		ReleaseDD();
 		EndDialog( hdlg, FALSE );
 		return;
 	}}
