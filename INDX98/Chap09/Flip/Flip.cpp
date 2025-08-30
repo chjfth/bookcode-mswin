@@ -92,6 +92,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     WNDCLASS            wc;
     DDSURFACEDESC       ddsd;       // Surface description structure.
     DDSCAPS             ddscaps;    // Surface capabilities structure.
+	HRESULT hret = 0;
 
     /*
      * set up and register window class
@@ -146,7 +147,8 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     }
 
     // Set the display mode to 640 by 480 palettized.
-    if ( FAILED( lpDD->SetDisplayMode( 640, 480, 8 ) ) )
+	hret = lpDD->SetDisplayMode( 640, 480, 8 );
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't set display mode." );
     }
@@ -161,15 +163,16 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
                             DDSCAPS_VIDEOMEMORY ;
     ddsd.dwBackBufferCount = BUFFERS;
   
-    if ( FAILED( lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL ) ) )
+	hret = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't create primary surface." );
     }
 
     // Get a pointer to the back buffer.
     ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
-    if ( FAILED( lpDDSPrimary->GetAttachedSurface( &ddscaps, 
-		                                           &lpDDSBack ) ) )
+	hret = lpDDSPrimary->GetAttachedSurface( &ddscaps, &lpDDSBack );
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't find the back buffer.\n" );
     }
