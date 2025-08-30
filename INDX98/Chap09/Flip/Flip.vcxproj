@@ -81,7 +81,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20250830-0000-0000-0000-095938000001}</ProjectGuid>
-    <ProjectName>08b-Flip</ProjectName>
+    <ProjectName>09b-Flip</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>

@@ -22,7 +22,7 @@ DWORD                   dwFrameCount = 0;   // Frames displayed.
 LONG                    position = 0;   // Current position of "sprite".
 
 // BUFFERS sets the number of back buffers and should be at least 1 and not
-// greater than can be accomodated by your display card's memory.
+// greater than can be accommodated by your display card's memory.
 #define BUFFERS     1
 // Simulate a more complex rendering cycle by increasing the value of SPRITES.
 #define SPRITES     100
@@ -243,7 +243,7 @@ BOOL UpdateFrame( HWND hwnd )
     }
     else
     {
-        sprintf( str, "%d", dwFrames );
+        _snprintf( str, _TRUNCATE, "Flip Framerate: %d", dwFrames );
         SetBkColor( hdc, RGB( 0, 0, 0 ) );
         SetTextColor( hdc, RGB( 255, 255, 255 ) );
         SetTextAlign( hdc, TA_CENTER );

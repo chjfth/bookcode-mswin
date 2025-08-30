@@ -222,7 +222,7 @@ BOOL UpdateFrame( HWND hwnd )
         return Fail( hwnd, "Couldn't get DC." );
     }
 
-    sprintf( str, "%d", dwFrames );
+    _snprintf( str, _TRUNCATE, "NoFlip Framerate: %d", dwFrames );
     SetBkColor( hdc, RGB( 0, 0, 0 ) );
     SetTextColor( hdc, RGB( 255, 255, 255 ) );
     SetTextAlign( hdc, TA_CENTER );
