@@ -21,7 +21,7 @@
 //#include <vaDbg.h>
 #include "CxxDialog.h"
 
-#define ExeVersion "0.2"
+#define ExeVersion "0.3"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -203,15 +203,6 @@ void MainDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 		CoUninitialize();
 
 #endif
-
-		// Set the cooperative level. Give us the
-		// ability to change the bit depth, and don't
-		// fiddle with our window.
-		hret = m_lpDD2->SetCooperativeLevel(hdlg,
-						DDSCL_FULLSCREEN |
-						DDSCL_EXCLUSIVE |
-						DDSCL_NOWINDOWCHANGES
-						);
 		if( FAILED(hret) )
 		{
 			// return Fail( hWnd, "Couldn't set cooperative level.\n" ); // todo vaDbg
@@ -247,6 +238,15 @@ void MainDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 		lpDesc = ( LPDDSURFACEDESC )SendDlgItemMessage( 
 										hdlg, IDC_MODES, 
 										LB_GETITEMDATA, iIndex, 0 );
+
+		// Set the cooperative level. Give us the
+		// ability to change the bit depth, and don't
+		// fiddle with our window.
+		hret = m_lpDD2->SetCooperativeLevel(hdlg,
+			DDSCL_FULLSCREEN |
+			DDSCL_EXCLUSIVE |
+			DDSCL_NOWINDOWCHANGES
+			);
 
 		// Set the new display mode.
 		if ( FAILED( m_lpDD2->SetDisplayMode( lpDesc->dwWidth, 
