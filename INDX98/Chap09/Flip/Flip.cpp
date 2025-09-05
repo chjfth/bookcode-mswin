@@ -2,13 +2,15 @@
 #define TITLE "Page Flipping yes"
 
 #define WIN32_LEAN_AND_MEAN
+#include <stdio.h>
 #include <windows.h>
 #include <windowsx.h>
-#include <stdio.h>
 #include <ddraw.h>
 #include <mmsystem.h>
-
 #pragma comment(lib, "winmm.lib") // for timeGetTime()
+
+#define utils_env_IMPL
+#include <mswin/utils_env.h>
 
 LPDIRECTDRAW            lpDD;           // DirectDraw object
 LPDIRECTDRAWSURFACE     lpDDSPrimary;   // DirectDraw primary surface
@@ -24,8 +26,11 @@ LONG                    position = 0;   // Current position of "sprite".
 // BUFFERS sets the number of back buffers and should be at least 1 and not
 // greater than can be accommodated by your display card's memory.
 #define BUFFERS     1
+int g_backbuffers = BUFFERS;
+
 // Simulate a more complex rendering cycle by increasing the value of SPRITES.
 #define SPRITES     100
+int g_sprites = SPRITES; //[2025-09-05] Chj: can be configured via exe parameter
 
 static void ReleaseObjects( void )
 {
@@ -161,7 +166,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
                             DDSCAPS_FLIP | 
                             DDSCAPS_COMPLEX |
                             DDSCAPS_VIDEOMEMORY ;
-    ddsd.dwBackBufferCount = BUFFERS;
+    ddsd.dwBackBufferCount = g_backbuffers;
   
 	hret = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
     if ( FAILED(hret) )
@@ -230,7 +235,7 @@ BOOL UpdateFrame( HWND hwnd )
     dest.right = dest.left + 100;
     dest.bottom = 290;
 
-    for ( i = 0; i < SPRITES; i++ ) 
+    for ( i = 0; i < g_sprites; i++ ) 
 	{
         if ( FAILED( lpDDSBack->Blt( &dest, NULL, NULL,
                         DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx ) ) )
@@ -246,7 +251,8 @@ BOOL UpdateFrame( HWND hwnd )
     }
     else
     {
-        _snprintf( str, _TRUNCATE, "Flip Framerate: %d", dwFrames );
+        _snprintf( str, _TRUNCATE, "Sprites=%d, backbuffers=%d, Flip Framerate: %d", 
+			g_sprites, g_backbuffers, dwFrames );
         SetBkColor( hdc, RGB( 0, 0, 0 ) );
         SetTextColor( hdc, RGB( 255, 255, 255 ) );
         SetTextAlign( hdc, TA_CENTER );
@@ -271,6 +277,36 @@ BOOL UpdateFrame( HWND hwnd )
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPSTR lpCmdLine, int nCmdShow)
 {
+/*
+	[2025-09-05] Chj: Add parameter support.
+	
+	Flip.exe 5000 
+		sprites=5000 , backbuffers=1
+
+	Flip.exe 5000 2
+		sprites=5000 , backbuffers=2
+*/
+	int nArgc = __argc;
+#ifdef UNICODE
+	PCTSTR* ppArgv = (PCTSTR*) CommandLineToArgvW(GetCommandLine(), &nArgc);
+#else
+	PCTSTR* ppArgv = (PCTSTR*) __argv;
+#endif
+	
+	if(nArgc>1)
+	{
+		int sprites = _ttoi(ppArgv[1]);
+		if(sprites>0)
+			g_sprites = sprites;
+	}
+
+	if(nArgc>2)
+	{
+		int backbuffers = _ttoi(ppArgv[2]);
+		if(backbuffers>0)
+			g_backbuffers = backbuffers;
+	}
+
     MSG         msg;
 
     if ( !doInit( hInstance, nCmdShow ) )
