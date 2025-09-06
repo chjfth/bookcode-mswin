@@ -71,7 +71,7 @@ LRESULT WINAPI WindowProc( HWND hWnd, UINT message,
 
                 // One way to prevent tearing, sparkling, flashing,
                 // and other nasty side effects of changing the palette
-                // indescriminately.  Uncomment this line to see it work.
+                // indiscriminately.  Uncomment this line to see it work.
 
                 // lpDD->WaitForVerticalBlank( DDWAITVB_BLOCKBEGIN, NULL );
 
@@ -98,7 +98,7 @@ LRESULT WINAPI WindowProc( HWND hWnd, UINT message,
         }
 
     return DefWindowProc( hWnd, message, wParam, lParam );
-} /* WindowProc */
+}
 
 /*
  * doInit - Create the window, initialize data, etc.
@@ -110,11 +110,10 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     DDSURFACEDESC       ddsd;
     PALETTEENTRY        ape[256];
     int                 i;
-    DDBLTFX     ddbltfx;
+	DDBLTFX     ddbltfx = {sizeof(DDBLTFX)};
+	HRESULT hret = 0;
 
-    /*
-     * set up and register window class
-     */
+    // set up and register window class
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = WindowProc;
     wc.cbClsExtra = 0;
@@ -127,9 +126,7 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     wc.lpszClassName = NAME;
     RegisterClass( &wc );
     
-    /*
-     * create a window
-     */
+    // create a window
     hwnd = CreateWindowEx(
         WS_EX_TOPMOST,
         NAME,
@@ -151,24 +148,26 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     ShowWindow( hwnd, nCmdShow );
     UpdateWindow( hwnd );
 
-    /*
-     * create the DirectDraw object
-     */
-    if ( FAILED( DirectDrawCreate( NULL, &lpDD, NULL ) ) )
+    // create the DirectDraw object
+	hret = DirectDrawCreate( NULL, &lpDD, NULL );
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't create DirectDraw object.\n" );
     }
 
     // Get exclusive mode.
-    if ( FAILED( lpDD->SetCooperativeLevel( hwnd,
-                    DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN ) ) )
+	hret = lpDD->SetCooperativeLevel( hwnd,	
+		DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN 
+		);
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't set cooperative level.\n" );
     }
 
 
     // Set display mode to 640x480x8 palettized.
-    if ( FAILED( lpDD->SetDisplayMode( 640, 480, 8 ) ) )
+	hret = lpDD->SetDisplayMode( 640, 480, 8 );
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't set display mode.\n" );
     }
@@ -178,7 +177,8 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     ddsd.dwFlags = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
     
-    if ( FAILED( lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL ) ) )
+	hret = lpDD->CreateSurface( &ddsd, &lpDDSPrimary, NULL );
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't create primary surface.\n" );
     }
@@ -194,13 +194,15 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
         ape[i].peFlags = ( BYTE )0;
     }
 
-    if ( FAILED( lpDD->CreatePalette( DDPCAPS_8BIT, 
-                    ape, &lpDDPal, NULL ) ) )
+	hret = lpDD->CreatePalette( DDPCAPS_8BIT, 
+		ape, &lpDDPal, NULL );
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't create palette.\n" );
     }
 
-    if ( FAILED( lpDDSPrimary->SetPalette( lpDDPal ) ) )
+	hret = lpDDSPrimary->SetPalette( lpDDPal );
+    if ( FAILED(hret) )
 	{
         return Fail( hwnd, "Couldn't set palette.\n" );
     }
@@ -215,14 +217,15 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
     // to a palette index rather than an RGB value.
     ddbltfx.dwFillColor = 1;
 
-    if ( FAILED( lpDDSPrimary->Blt(
-                                NULL,   // dest rect
-                                NULL,   // src surface
-                                NULL,   // src rect
-                                DDBLT_COLORFILL | DDBLT_WAIT,
-                                &ddbltfx ) ) )
+	hret = lpDDSPrimary->Blt(
+		NULL,   // dest rect
+		NULL,   // src surface
+		NULL,   // src rect
+		DDBLT_COLORFILL | DDBLT_WAIT,
+		&ddbltfx );
+    if( FAILED(hret) )
 	{
-        return Fail( hwnd, "Coudln't fill surface.\n" );
+        return Fail( hwnd, "Couldn't fill surface.\n" );
     }
 
     // Create a timer to drive animation.
