@@ -213,6 +213,7 @@
     <ResourceCompile Include="Overlay.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="xrules.bmp" />
     <None Include="Overlay.ico" />
   </ItemGroup>
   <ItemGroup>

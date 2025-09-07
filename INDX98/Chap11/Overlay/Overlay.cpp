@@ -39,16 +39,13 @@ DWORD AlignUp( DWORD dwNumber, DWORD dwAlignment )
 	return dwResult;
 }
 
-BOOL LoadImage( LPDIRECTDRAWSURFACE lpDDS, LPSTR szImage )
+BOOL myLoadImage( LPDIRECTDRAWSURFACE lpDDS, LPSTR szImage )
 {
 	HBITMAP         hbm;
 	HDC             hdcImage = NULL;
 	HDC             hdcSurf  = NULL;
 	BOOL            bReturn  = FALSE;
-	DDSURFACEDESC   ddsd;
-
-	ZeroMemory( &ddsd, sizeof( ddsd ) );
-	ddsd.dwSize = sizeof( ddsd );
+	DDSURFACEDESC   ddsd = {sizeof(ddsd)};
 
 	if ( FAILED( lpDDS->GetSurfaceDesc( &ddsd ) ) )
 	{
@@ -58,7 +55,6 @@ BOOL LoadImage( LPDIRECTDRAWSURFACE lpDDS, LPSTR szImage )
 	// If the pixel format isn't some flavor of RGB, we can't handle it.
 	if ( ( ddsd.ddpfPixelFormat.dwFlags != DDPF_RGB ) ||
 		( ddsd.ddpfPixelFormat.dwRGBBitCount < 16 ) )
-
 	{
 		OutputDebugString( "Non-palettized RGB mode required.\n" );
 		goto Exit;        
@@ -195,8 +191,7 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
 
-		ddsd.dwFlags= DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH |
-			DDSD_PIXELFORMAT;
+		ddsd.dwFlags= DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
 
 		ddsd.dwHeight = 64; 
 		ddsd.dwWidth = 64;
@@ -214,13 +209,12 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		if ( FAILED( lpDD->CreateSurface( &ddsd, &lpDDSOverlay, NULL ) ) )
 		{
 			// The first try failed, try again with RGB 565.
-			OutputDebugString( "Overlay format RGB555 failed.\n" );
+			OutputDebugString( "Overlay format RGB555 failed, will try RGB565.\n" );
 			ddsd.ddpfPixelFormat.dwRBitMask = 0xF800;
 			ddsd.ddpfPixelFormat.dwGBitMask = 0x07E0;
 			ddsd.ddpfPixelFormat.dwBBitMask = 0x001F;
 
-			if ( FAILED( lpDD->CreateSurface( &ddsd, &lpDDSOverlay,
-				NULL ) ) )
+			if ( FAILED( lpDD->CreateSurface( &ddsd, &lpDDSOverlay, NULL ) ) )
 			{
 				return Fail( hwnd, 
 					"Couldn't create overlay surface.\n" );
@@ -233,11 +227,9 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		if ( ddcaps.dwCKeyCaps & DDCKEYCAPS_SRCOVERLAY ) 
 		{
-			ddckey.dwColorSpaceLowValue = 
-				ddsd.ddpfPixelFormat.dwGBitMask;
+			ddckey.dwColorSpaceLowValue = ddsd.ddpfPixelFormat.dwGBitMask;
 
-			ddckey.dwColorSpaceHighValue = 
-				ddsd.ddpfPixelFormat.dwGBitMask;
+			ddckey.dwColorSpaceHighValue = ddsd.ddpfPixelFormat.dwGBitMask;
 
 			lpDDSOverlay->SetColorKey( DDCKEY_SRCOVERLAY, &ddckey );
 
@@ -248,7 +240,7 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		// Our bitmap is 64 pixels wide, which will satisfy
 		// the common alignment requirements of 4 and 8 pixels.
 
-		LoadImage( lpDDSOverlay, "xrules.bmp" );
+		myLoadImage( lpDDSOverlay, "xrules.bmp" );
 
 		// Prepare the overlay for display by setting the source
 		// and destination rectangles. This is the tricky part.
