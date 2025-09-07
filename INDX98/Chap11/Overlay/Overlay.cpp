@@ -168,8 +168,7 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		}
 
 		// Check to make sure that an overlay is available for use.
-		if ( ddcaps.dwCurrVisibleOverlays == 
-			ddcaps.dwMaxVisibleOverlays ) 
+		if ( ddcaps.dwCurrVisibleOverlays == ddcaps.dwMaxVisibleOverlays )
 		{
 			return Fail( hwnd, "No overlays available.\n" );
 		}
@@ -278,15 +277,13 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		// no stretching. We'd like 4x if we can get it. A value of 0
 		// for dwMaxOverlayStretch indicates no maximum limit.
 
-		if ( ( ddcaps.dwMinOverlayStretch <= 4000 ) &&
-			( ( ddcaps.dwMaxOverlayStretch >= 4000 ) ||
-			ddcaps.dwMaxOverlayStretch == 0 ) )
+		if ( ddcaps.dwMinOverlayStretch <= 4000 &&
+			(ddcaps.dwMaxOverlayStretch >= 4000 || ddcaps.dwMaxOverlayStretch == 0) )
 		{
 			// Add 999 to compensate for integer truncation.
 			rDest.right = ( ( rSrc.right * 4000 + 999 ) / 1000 );
 		}
-		else
-			// Take the minimum allowable if we can't get 4000.
+		else // Take the minimum allowable if we can't get 4000.
 		{
 			// Add 999 to compensate for integer truncation.
 			rDest.right = 
