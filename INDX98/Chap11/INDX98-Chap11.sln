@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10-Overlay", "Overlay\Overlay.vcxproj", "{20250907-0000-0000-0000-180052000001}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "11-Overlay", "Overlay\Overlay.vcxproj", "{20250907-0000-0000-0000-180052000001}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10-mosquito", "..\DXSDK52\mosquito\mosquito.vcxproj", "{20250907-0000-0000-0000-190901000001}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,22 @@ Global
 		{20250907-0000-0000-0000-180052000001}.Release|Win32.Build.0 = Release|Win32
 		{20250907-0000-0000-0000-180052000001}.Release|x64.ActiveCfg = Release|x64
 		{20250907-0000-0000-0000-180052000001}.Release|x64.Build.0 = Release|x64
+		{20250907-0000-0000-0000-190901000001}.Debug ANSI|Win32.ActiveCfg = Debug ANSI|Win32
+		{20250907-0000-0000-0000-190901000001}.Debug ANSI|Win32.Build.0 = Debug ANSI|Win32
+		{20250907-0000-0000-0000-190901000001}.Debug ANSI|x64.ActiveCfg = Debug ANSI|x64
+		{20250907-0000-0000-0000-190901000001}.Debug ANSI|x64.Build.0 = Debug ANSI|x64
+		{20250907-0000-0000-0000-190901000001}.Debug|Win32.ActiveCfg = Debug|Win32
+		{20250907-0000-0000-0000-190901000001}.Debug|Win32.Build.0 = Debug|Win32
+		{20250907-0000-0000-0000-190901000001}.Debug|x64.ActiveCfg = Debug|x64
+		{20250907-0000-0000-0000-190901000001}.Debug|x64.Build.0 = Debug|x64
+		{20250907-0000-0000-0000-190901000001}.Release ANSI|Win32.ActiveCfg = Release ANSI|Win32
+		{20250907-0000-0000-0000-190901000001}.Release ANSI|Win32.Build.0 = Release ANSI|Win32
+		{20250907-0000-0000-0000-190901000001}.Release ANSI|x64.ActiveCfg = Release ANSI|x64
+		{20250907-0000-0000-0000-190901000001}.Release ANSI|x64.Build.0 = Release ANSI|x64
+		{20250907-0000-0000-0000-190901000001}.Release|Win32.ActiveCfg = Release|Win32
+		{20250907-0000-0000-0000-190901000001}.Release|Win32.Build.0 = Release|Win32
+		{20250907-0000-0000-0000-190901000001}.Release|x64.ActiveCfg = Release|x64
+		{20250907-0000-0000-0000-190901000001}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
