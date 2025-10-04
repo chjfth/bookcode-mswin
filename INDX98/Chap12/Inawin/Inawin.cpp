@@ -333,6 +333,7 @@ BOOL UpdateFrame( HWND hwnd )
 {
 	RECT                rcFrame;
 	DWORD               dwTickCount;
+	HRESULT hret = 0;
 
 	// Check to see if it's time to update the frame.
 	dwTickCount = GetTickCount();
@@ -340,6 +341,7 @@ BOOL UpdateFrame( HWND hwnd )
 	{
 		return TRUE;
 	}
+
 	dwLastTickCount = dwTickCount;
 
 	// Update the sprite image with the current frame.
@@ -361,15 +363,16 @@ BOOL UpdateFrame( HWND hwnd )
 	// Update the window with the new sprite frame. Notice that the
 	// destination rectangle is our client rectangle, not the
 	// entire primary surface.
-	if ( FAILED( lpDDSPrimary->Blt( &rcWindow, lpDDSDonut, &rcFrame,
-		DDBLT_WAIT, NULL ) ) )
+	hret = lpDDSPrimary->Blt(&rcWindow, lpDDSDonut, &rcFrame, DDBLT_WAIT, NULL);
+	if ( FAILED(hret) )
 	{
 		return Fail( hwnd, "Couldn't Blt sprite.\n" );
 	}
 
 	// Advance the frame for next time.
 	dwFrame++;
-	if ( dwFrame > 29 ) dwFrame = 0;
+	if ( dwFrame > 29 ) 
+		dwFrame = 0;
 
 	return TRUE;
 }

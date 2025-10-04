@@ -81,7 +81,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20251004-0000-0000-0000-202400000001}</ProjectGuid>
-    <ProjectName>10-Inawin</ProjectName>
+    <ProjectName>12-Inawin</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
