@@ -2,6 +2,7 @@
 #define TITLE "Inawin"
 
 #define WIN32_LEAN_AND_MEAN
+#include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <ddraw.h>
@@ -22,8 +23,8 @@ DWORD                   dwLastTickCount;    // Last frame time.
 
 #define DELAY 15                            // Frame delay.
 
-// Uncomment the next line to turn off clipping.
-// #define NOCLIPPER
+// Chj: Write cmdline parameter "1" to set g_NOCLIPPER=true .
+bool g_NOCLIPPER = false;
 
 static void ReleaseObjects( void )
 {
@@ -187,14 +188,14 @@ BOOL InitDDraw( HWND hwnd )
 	// will use it. If this step is skipped by defining NOCLIPPER, you
 	// can observe the effects of rendering without clipping. Other
 	// windows partially obscuring Inawin's will be overwritten.
-#ifndef NOCLIPPER
 
-	if ( FAILED( lpDDSPrimary->SetClipper( lpDDClipper ) ) )
+	if(g_NOCLIPPER==false)
 	{
-		return Fail( hwnd, "Couldn't set the clipper.\n" );
+		if ( FAILED( lpDDSPrimary->SetClipper( lpDDClipper ) ) )
+		{
+			return Fail( hwnd, "Couldn't set the clipper.\n" );
+		}
 	}
-
-#endif
 
 	lpDDClipper->Release();
 
@@ -380,6 +381,17 @@ BOOL UpdateFrame( HWND hwnd )
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine, int nCmdShow)
 {
+	//[2025-10-04] Chj: Add parameter "1" to set g_NOCLIPPER=1.
+
+	int nArgc = __argc;
+#ifdef UNICODE
+	PCTSTR* ppArgv = (PCTSTR*) CommandLineToArgvW(GetCommandLine(), &nArgc);
+#else
+	PCTSTR* ppArgv = (PCTSTR*) __argv;
+#endif
+	if(nArgc>1 && _ttoi(ppArgv[1])==1)
+		g_NOCLIPPER = true;
+
 	MSG         msg;
 
 	if ( !doInit( hInstance, nCmdShow ) )
