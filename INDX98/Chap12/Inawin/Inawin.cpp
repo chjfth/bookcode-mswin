@@ -287,7 +287,7 @@ BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 		TITLE,
 		WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX,
 		CW_USEDEFAULT,
-		SW_SHOW,
+		CW_USEDEFAULT,
 		0,
 		0,
 		NULL,
@@ -314,8 +314,8 @@ BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 
 	// Adjust the window to the new size.
 	MoveWindow( hwnd, 
-		CW_USEDEFAULT, 
-		CW_USEDEFAULT, 
+		0, 
+		0, 
 		rc1.right - rc1.left, 
 		rc1.bottom - rc1.top, 
 		FALSE );
