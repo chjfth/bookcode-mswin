@@ -214,7 +214,7 @@ BOOL InitDDraw( HWND hwnd )
 
 		if ( FAILED( lpDDSPrimary->SetPalette( lpDDPalette ) ) )
 		{
-			return Fail( hwnd, "Couldnt' get and/or set the palette.\n" );
+			return Fail( hwnd, "Couldn't get and/or set the palette.\n" );
 		}
 	}
 
@@ -223,7 +223,7 @@ BOOL InitDDraw( HWND hwnd )
 
 	if ( lpDDSDonut == NULL )
 	{
-		return Fail( hwnd, "Could load the donut.\n" );
+		return Fail( hwnd, "Couldn't load the donut.\n" );
 	}
 
 	return TRUE;
