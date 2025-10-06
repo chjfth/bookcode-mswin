@@ -233,7 +233,8 @@ BOOL DDInit( void )
 										640, 480 );
 	}
 
-	if ( g_hwnd == NULL ) return FALSE;
+	if ( g_hwnd == NULL ) 
+		return FALSE;
 
 	if FAILED( DDStartup( &lpDD, NULL, g_hwnd, g_bFullScreen ) )
 	{

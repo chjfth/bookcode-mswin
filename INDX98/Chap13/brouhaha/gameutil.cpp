@@ -293,12 +293,9 @@ BOOL CreatePalette( LPDIRECTDRAW lpDD,
 
 BOOL LoadGameArt( DWORD dwFlags, LPDDPIXELFORMAT lpddpfFormat ) 
 {
-    DDCOLORKEY  ddck;
-    DDPIXELFORMAT ddpf;
+	DDPIXELFORMAT ddpf = {sizeof(DDPIXELFORMAT)};
 
-    ddpf.dwSize = sizeof( DDPIXELFORMAT );
-
-    lpDDSPrimary->GetPixelFormat( &ddpf );
+	lpDDSPrimary->GetPixelFormat( &ddpf );
 
     if ( ddpf.dwFlags & DDPF_PALETTEINDEXED8 )
     {
@@ -320,6 +317,7 @@ BOOL LoadGameArt( DWORD dwFlags, LPDDPIXELFORMAT lpddpfFormat )
     }
 
     // set a transparent color key using black
+	DDCOLORKEY  ddck = {};
     ddck.dwColorSpaceLowValue = 0x00;
     ddck.dwColorSpaceHighValue = 0x00;
 
@@ -353,8 +351,8 @@ BOOL LoadGameArt( DWORD dwFlags, LPDDPIXELFORMAT lpddpfFormat )
 
 HRESULT UpdateFrame( BOOL bActive )
 {
-    char str[255];
-    DWORD time, time2;
+	char str[255] = {};
+    DWORD time = 0, time2 = 0;
     HRESULT ddrval = DD_FALSE;
 
     // Update everyone's position
@@ -403,16 +401,12 @@ HRESULT UpdateFrame( BOOL bActive )
     return TRUE;
 }
 
-LPNODE CreateShip( double x, double y, double dx, 
-						double dy, int offset, int frame )
+LPNODE CreateShip( double x, double y, 
+				double dx, double dy, int offset, int frame )
 {
-    LPNODE ship;
-
-    ship = (LPNODE) malloc( sizeof(NODE) );
+    LPNODE ship = (LPNODE) malloc( sizeof(NODE) );
+	assert(ship);
     
-    if ( ship == NULL )
-        return ship;
-
     ship->frame = frame;
     ship->offset = offset;
     ship->timeupdate = timeGetTime();
@@ -528,8 +522,7 @@ void UpdateShip( LPNODE ship )
     dwTime = timeGetTime();
 	dwDelta = dwTime - ship->timeupdate;
 
-    FrameRatio = float ( dwDelta ) / 
-                            float ( FRAME_RATE );
+    FrameRatio = float(dwDelta) / float(FRAME_RATE);
 
     ship->timeupdate = dwTime;
 

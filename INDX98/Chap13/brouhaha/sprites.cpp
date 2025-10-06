@@ -36,13 +36,15 @@ void UpdateStates( void )
 	// Go through each node in the list,
 	// invoking its state function.
 
-    LPNODE next_node = (LPNODE) NULL;
+    LPNODE next_node = NULL;
     LPNODE thenode;
 
     for ( thenode=g_bottom_node; thenode!=(LPNODE)NULL; thenode=next_node )
     {
         next_node = thenode->next;
-        if ( thenode->state ) thenode->state( thenode );
+        
+		if ( thenode->state ) 
+			thenode->state( thenode );
     }
 
 }
@@ -52,10 +54,17 @@ BOOL CheckHit( LPNODE ship, LPNODE shot )
 	// Make a crude check to see if a ship is
 	// occupying the same place as a shot
 
-	if ( shot->posx < ship->posx ) return FALSE;
-	if ( shot->posy < ship->posy ) return FALSE;
-	if ( shot->posx > (ship->posx + 32.0) ) return FALSE;
-	if ( shot->posy > (ship->posy + 32.0) ) return FALSE;
+	if ( shot->posx < ship->posx ) 
+		return FALSE;
+	
+	if ( shot->posy < ship->posy ) 
+		return FALSE;
+	
+	if ( shot->posx > (ship->posx + 32.0) ) 
+		return FALSE;
+	
+	if ( shot->posy > (ship->posy + 32.0) ) 
+		return FALSE;
 
 	return TRUE;
 }
@@ -65,7 +74,7 @@ BOOL CheckForHits( LPNODE ship )
 	// Go through all the nodes checking shot nodes for
 	// collisions with the passed ship.
 
-    LPNODE next_node = (LPNODE) NULL;
+    LPNODE next_node = NULL;
     LPNODE thenode;
 
     for ( thenode=g_bottom_node; thenode!=(LPNODE)NULL; thenode=next_node )
@@ -101,7 +110,6 @@ HRESULT DrawSprites(
     HRESULT ddrval;
 
     if ( bDrawOrder )
-
     // start at the bottom of the list and work up -- items added most
     // recently will be drawn first
     {
@@ -109,7 +117,8 @@ HRESULT DrawSprites(
         {
             next_node = thenode->prev;
             ddrval = DrawSprite( thenode, lpDDSSurface );
-            if FAILED( ddrval ) return ddrval;
+            if FAILED( ddrval ) 
+				return ddrval;
         }
     }
     else
@@ -120,7 +129,8 @@ HRESULT DrawSprites(
         {
             next_node = thenode->next;
             ddrval = DrawSprite( thenode, lpDDSSurface );
-            if FAILED( ddrval ) return ddrval;
+            if FAILED( ddrval ) 
+				return ddrval;
         }
     }
 

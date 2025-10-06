@@ -5,11 +5,9 @@
 #include "brouhaha.h"
 
 HRESULT DDStartup( LPDIRECTDRAW* lplpDD, GUID FAR* lpGUID,
-                        HWND hwnd, BOOL bFullScreen )
+                   HWND hwnd, BOOL bFullScreen )
 {
-    HRESULT ddrval;
-
-    ddrval = DirectDrawCreate( lpGUID, lplpDD, NULL );
+    HRESULT ddrval = DirectDrawCreate( lpGUID, lplpDD, NULL );
     if FAILED( ddrval ) 
     {
         return ddrval;
@@ -44,8 +42,8 @@ HRESULT DDStartup( LPDIRECTDRAW* lplpDD, GUID FAR* lpGUID,
     else
     {
         // otherwise, set normal mode for use in a window
-        ddrval = (*lplpDD)->SetCooperativeLevel( hwnd,
-                            DDSCL_NORMAL );
+        ddrval = (*lplpDD)->SetCooperativeLevel( hwnd, DDSCL_NORMAL );
+
         OutputDebugString( "DDStartup: Setting windowed mode...\n" );
     }
     return ddrval;
@@ -53,8 +51,8 @@ HRESULT DDStartup( LPDIRECTDRAW* lplpDD, GUID FAR* lpGUID,
 
 
 HRESULT DDFullConfigure( LPDIRECTDRAW lpDD, 
-                            LPDIRECTDRAWSURFACE* lplpDDSPrimary,
-                            LPDIRECTDRAWSURFACE* lplpDDSBack )
+                        LPDIRECTDRAWSURFACE* lplpDDSPrimary,
+                        LPDIRECTDRAWSURFACE* lplpDDSBack )
 {
     // Attempt flipping surface with 2 back buffers
     if FAILED ( DDCreateFlipper( lpDD, lplpDDSPrimary, lplpDDSBack, 2 ) )
@@ -113,13 +111,10 @@ HRESULT DDCreateFlipper( LPDIRECTDRAW lpDD,
                             LPDIRECTDRAWSURFACE* lplpDDSBack,
                             DWORD dwBufferCount )
 {
-    DDSURFACEDESC	ddsd;
-    DDSCAPS			ddscaps;
-    HRESULT			ddrval;
+    HRESULT			ddrval = 0;
 
-    ddsd.dwSize = sizeof( ddsd );
-    
     // Create the primary surface with  back buffers
+	DDSURFACEDESC	ddsd = {sizeof(ddsd)};
     ddsd.dwFlags = DDSD_CAPS | DDSD_BACKBUFFERCOUNT;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE |
                               DDSCAPS_FLIP |
@@ -130,10 +125,11 @@ HRESULT DDCreateFlipper( LPDIRECTDRAW lpDD,
 	ddsd.dwHeight = 480;
 
     ddrval = lpDD->CreateSurface( &ddsd, lplpDDSPrimary, NULL );
-    if FAILED( ddrval ) return ddrval;
+    if FAILED( ddrval ) 
+		return ddrval;
         
     // Get a pointer to the back buffer
-    ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
+	DDSCAPS ddscaps = {DDSCAPS_BACKBUFFER};
     ddrval = (*lplpDDSPrimary)->GetAttachedSurface( &ddscaps, lplpDDSBack );
 
     return ddrval;
@@ -144,18 +140,15 @@ HRESULT DDCreateOverFlipper( LPDIRECTDRAW lpDD,
 								LPDIRECTDRAWSURFACE* lplpDDSBack,
 								DWORD dwBufferCount )
 {
-    DDSURFACEDESC	ddsd;
-    DDSCAPS			ddscaps;
-    HRESULT			ddrval;
-
-    ddsd.dwSize = sizeof( ddsd );
+    HRESULT			ddrval = 0;
 
 	// We're only going to try one format in Brouhaha. The Overlay
 	// sample tries two, and the SDK's Mosquito tries YUV formats
 	// as well.
 
 	// Set up the surface format, 16 bit RGB 565
-    ddsd.ddpfPixelFormat.dwFlags = DDPF_RGB;
+	DDSURFACEDESC ddsd = {sizeof(ddsd)};
+	ddsd.ddpfPixelFormat.dwFlags = DDPF_RGB;
     ddsd.ddpfPixelFormat.dwFourCC = 0;
     ddsd.ddpfPixelFormat.dwRGBBitCount = 16;
     ddsd.ddpfPixelFormat.dwRBitMask = 0x7C00;
@@ -175,10 +168,11 @@ HRESULT DDCreateOverFlipper( LPDIRECTDRAW lpDD,
 	ddsd.dwHeight = 480;
 
     ddrval = lpDD->CreateSurface( &ddsd, lplpDDSOverlay, NULL );
-    if FAILED( ddrval ) return ddrval;
+    if FAILED( ddrval ) 
+		return ddrval;
         
     // Get a pointer to the back buffer
-    ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
+	DDSCAPS ddscaps = {DDSCAPS_BACKBUFFER};
     ddrval = (*lplpDDSOverlay)->GetAttachedSurface( &ddscaps, lplpDDSBack );
 
     return ddrval;
@@ -189,13 +183,12 @@ HRESULT DDCreateOverlay( LPDIRECTDRAW lpDD,
 							LPDIRECTDRAWSURFACE* lplpDDSOverlay,
                             LPDIRECTDRAWSURFACE* lplpDDSBack )
 {
-    DDSURFACEDESC	ddsd;
-    HRESULT			ddrval;
+    HRESULT			ddrval = 0;
 
 	// We will need a primary surface to display the overlay on
 
-    ddsd.dwSize = sizeof( ddsd );
-    // Create the primary surface
+	// Create the primary surface
+	DDSURFACEDESC ddsd = {sizeof( ddsd )};
     ddsd.dwFlags = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
     ddrval = lpDD->CreateSurface( &ddsd, lplpDDSPrimary, NULL );
@@ -218,14 +211,13 @@ HRESULT DDCreateOverlay( LPDIRECTDRAW lpDD,
 }
 
 HRESULT DDCreateFakeFlipper( LPDIRECTDRAW lpDD,
-                                LPDIRECTDRAWSURFACE* lplpDDSPrimary,
-                                LPDIRECTDRAWSURFACE* lplpDDSBack )
+                             LPDIRECTDRAWSURFACE* lplpDDSPrimary,
+                             LPDIRECTDRAWSURFACE* lplpDDSBack )
 {
-    DDSURFACEDESC	ddsd;
-    HRESULT			ddrval;
+    HRESULT			ddrval = 0;
 
-    ddsd.dwSize = sizeof( ddsd );
     // Create the primary surface
+	DDSURFACEDESC ddsd = {sizeof( ddsd )};
     ddsd.dwFlags = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
     ddrval = lpDD->CreateSurface( &ddsd, lplpDDSPrimary, NULL );
@@ -254,27 +246,30 @@ HRESULT DDCreateFakeFlipper( LPDIRECTDRAW lpDD,
 }
 
 HRESULT DDWinConfigure( LPDIRECTDRAW lpDD,
-							LPDIRECTDRAWSURFACE* lplpDDSPrimary,
-							LPDIRECTDRAWSURFACE* lplpDDSBack,
-							LPDIRECTDRAWCLIPPER* lplpDDClipper,
-							LPDIRECTDRAWSURFACE* lplpDDOverlay,
-							HWND hWnd )
+						LPDIRECTDRAWSURFACE* lplpDDSPrimary,
+						LPDIRECTDRAWSURFACE* lplpDDSBack,
+						LPDIRECTDRAWCLIPPER* lplpDDClipper,
+						LPDIRECTDRAWSURFACE* lplpDDOverlay,
+						HWND hWnd )
 {
     HRESULT	ddrval;
 
 	ddrval = DDCreateFakeFlipper( lpDD, lplpDDSPrimary, lplpDDSBack );
-	if FAILED( ddrval ) return ddrval;
+	if FAILED( ddrval ) 
+		return ddrval;
 
 	// Create a clipper and attach it to the primary surface
 	ddrval = lpDD->CreateClipper( 0, lplpDDClipper, NULL );
-	if FAILED( ddrval ) return ddrval;
+	if FAILED( ddrval ) 
+		return ddrval;
 
 	ddrval = (*lplpDDClipper)->SetHWnd( 0, hWnd );
-	if FAILED( ddrval ) return ddrval;
+	if FAILED( ddrval ) 
+		return ddrval;
 
 	(*lplpDDSPrimary)->SetClipper( *lplpDDClipper );
-	// So clipper will go away "automatically" when the primary
-	// is released.
+	
+	// So clipper will go away "automatically" when the primary is released.
 	(*lplpDDClipper)->Release();
 
 	// Load art where ever it will fit
@@ -307,10 +302,8 @@ HRESULT DDTextOut( LPDIRECTDRAWSURFACE lpDDSSurface,
                                 int posx,
                                 int posy)
 {  
-    HRESULT ddrval;
-    HDC hdc;
-     
-    ddrval = lpDDSSurface->GetDC( &hdc );
+    HDC hdc = NULL; 
+    HRESULT ddrval = lpDDSSurface->GetDC( &hdc );
     if SUCCEEDED( ddrval )
     {
         SetBkColor( hdc, BackColor );
@@ -323,24 +316,21 @@ HRESULT DDTextOut( LPDIRECTDRAWSURFACE lpDDSSurface,
 
 DWORD DDCheckOverlay( GUID *lpGUID )
 {
-    LPDIRECTDRAW	lpDD;
-	DDCAPS			ddCaps;
-	DWORD			dwResult;
-
 	// A non-zero result indicates overlays are available,
 	// and the required stretch factor is returned.
+	DWORD dwResult = 0;
 
-	dwResult = 0;
+	LPDIRECTDRAW	lpDD = NULL;
+	if FAILED( DirectDrawCreate( lpGUID, &lpDD, NULL ) )
+		return dwResult;
 
-	if FAILED( DirectDrawCreate( lpGUID, &lpDD, NULL ) ) return dwResult;
+    // Check the hardware caps for "uncomplicated" overlay support
 
-    // Check the hardware caps for "uncomplicated"
-    // overlay support
-
-    ddCaps.dwSize = sizeof( DDCAPS );
+	DDCAPS ddCaps = {sizeof(DDCAPS)};
     lpDD->GetCaps( &ddCaps, NULL );
 
-    if (!( ddCaps.dwCaps & DDCAPS_OVERLAY )) goto CleanUp; 
+    if (!( ddCaps.dwCaps & DDCAPS_OVERLAY )) 
+		goto CleanUp; 
 
     // Some type of support is provided, check further
     // We won't tolerate any alignment requirements
