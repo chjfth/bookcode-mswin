@@ -219,7 +219,7 @@ BOOL InitDDraw( HWND hwnd )
 	}
 
 	// Create a surface and load our "sprite" into it.
-	lpDDSDonut = DDLoadBitmap( lpDD, "donut.bmp", 0, 0 );
+	lpDDSDonut = DDLoadBitmap( lpDD, "donut.bmp", 0, 0, DDSCAPS_OFFSCREENPLAIN);
 
 	if ( lpDDSDonut == NULL )
 	{

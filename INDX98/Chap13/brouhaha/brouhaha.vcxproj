@@ -209,7 +209,7 @@
   <ItemGroup>
     <ClCompile Include="brouhaha.cpp" />
     <ClCompile Include="ddtools.cpp" />
-    <ClCompile Include="ddutil.cpp" />
+    <ClCompile Include="..\..\share\ddutil.cpp" />
     <ClCompile Include="gameutil.cpp" />
     <ClCompile Include="sprites.cpp" />
     <ClCompile Include="utility.cpp" />
@@ -223,7 +223,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="ddtools.h" />
-    <ClInclude Include="ddutil.h" />
+    <ClInclude Include="..\..\share\ddutil.h" />
     <ClInclude Include="gameutil.h" />
     <ClInclude Include="sprites.h" />
     <ClInclude Include="utility.h" />

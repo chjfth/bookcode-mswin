@@ -18,9 +18,9 @@
  *  create a DirectDrawSurface from a bitmap resource.
  *
  */
-extern "C" IDirectDrawSurface * DDLoadBitmap(IDirectDraw *pdd, LPCSTR szBitmap, 
-                                                int dx, int dy, DWORD dwFlags, 
-												LPDDPIXELFORMAT lpddpfFormat )
+IDirectDrawSurface * DDLoadBitmap(IDirectDraw *pdd, LPCSTR szBitmap, 
+	int dx, int dy, DWORD dwFlags, 
+	LPDDPIXELFORMAT lpddpfFormat )
 {
     HBITMAP             hbm;
     BITMAP              bm;
@@ -110,7 +110,7 @@ HRESULT DDReLoadBitmap(IDirectDrawSurface *pdds, LPCSTR szBitmap)
  *  draw a bitmap into a DirectDrawSurface
  *
  */
-extern "C" HRESULT DDCopyBitmap(IDirectDrawSurface *pdds, HBITMAP hbm, int x, int y, int dx, int dy)
+HRESULT DDCopyBitmap(IDirectDrawSurface *pdds, HBITMAP hbm, int x, int y, int dx, int dy)
 {
     HDC                 hdcImage;
     HDC                 hdc;
@@ -165,7 +165,7 @@ extern "C" HRESULT DDCopyBitmap(IDirectDrawSurface *pdds, HBITMAP hbm, int x, in
 //  if the resource does not exist or NULL is passed create a
 //  default 332 palette.
 //
-extern "C" IDirectDrawPalette * DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap)
+IDirectDrawPalette * DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap)
 {
     IDirectDrawPalette* ddpal;
     int                 i;
@@ -260,7 +260,7 @@ extern "C" IDirectDrawPalette * DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap)
  * we do this by leting GDI SetPixel() do the color matching
  * then we lock the memory and see what it got mapped to.
  */
-extern "C" DWORD DDColorMatch(IDirectDrawSurface *pdds, COLORREF rgb)
+DWORD DDColorMatch(IDirectDrawSurface *pdds, COLORREF rgb)
 {
     COLORREF rgbT;
     HDC hdc;
@@ -311,7 +311,7 @@ extern "C" DWORD DDColorMatch(IDirectDrawSurface *pdds, COLORREF rgb)
  * if you pass CLR_INVALID as the color key, the pixel
  * in the upper-left corner will be used.
  */
-extern "C" HRESULT DDSetColorKey(IDirectDrawSurface *pdds, COLORREF rgb)
+HRESULT DDSetColorKey(IDirectDrawSurface *pdds, COLORREF rgb)
 {
     DDCOLORKEY          ddck;
 

@@ -7,17 +7,25 @@
  *
  ***************************************************************************/
 
-#ifdef __cplusplus
-extern "C" {            /* Assume C declarations for C++ */
-#endif	/* __cplusplus */
+#ifndef __DDUTIL_H
+#define __DDUTIL_H
+
 
 extern IDirectDrawPalette * DDLoadPalette(IDirectDraw *pdd, LPCSTR szBitmap);
-extern IDirectDrawSurface * DDLoadBitmap(IDirectDraw *pdd, LPCSTR szBitmap, int dx, int dy);
+
+extern IDirectDrawSurface * DDLoadBitmap(IDirectDraw *pdd, LPCSTR szBitmap, 
+	int dx, int dy, DWORD ddsCaps, 
+	LPDDPIXELFORMAT lpddpfFormat=NULL );
+
+
 extern HRESULT              DDReLoadBitmap(IDirectDrawSurface *pdds, LPCSTR szBitmap);
+
+
 extern HRESULT              DDCopyBitmap(IDirectDrawSurface *pdds, HBITMAP hbm, int x, int y, int dx, int dy);
 extern DWORD                DDColorMatch(IDirectDrawSurface *pdds, COLORREF rgb);
 extern HRESULT              DDSetColorKey(IDirectDrawSurface *pdds, COLORREF rgb);
 
-#ifdef __cplusplus
-}
-#endif	/* __cplusplus */
+
+
+
+#endif // DDUTIL_H

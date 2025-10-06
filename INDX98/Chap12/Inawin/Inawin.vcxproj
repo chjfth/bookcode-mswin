@@ -208,7 +208,7 @@
    -->
   <ItemGroup>
     <ClCompile Include="Inawin.cpp" />
-    <ClCompile Include="ddutil.cpp" />
+    <ClCompile Include="..\..\share\ddutil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Inawin.rc" />
@@ -217,7 +217,7 @@
     <None Include="Inawin.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ddutil.h" />
+    <ClInclude Include="..\..\share\ddutil.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   
