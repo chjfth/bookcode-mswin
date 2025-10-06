@@ -1,4 +1,5 @@
 #define WIN32_LEAN_AND_MEAN
+#include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <stdlib.h>
@@ -48,9 +49,9 @@ double randDouble(
 
 void DebugPrintf( LPSTR fmt, ... )
 {
-    char    buff[256];
+    char    buff[2560];
 
-    sprintf( buff, fmt, (LPSTR)(&fmt+1) );
+    _sntprintf_s( buff, _TRUNCATE, fmt, (LPSTR)(&fmt+1) );
 
 	OutputDebugString( buff );
 

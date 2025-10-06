@@ -28,8 +28,8 @@ LPNODE	CreateShip( double, double, double, double, int, int );
 LPNODE 	CreateShot( double, double, double, double, int );
 void	UpdateShip( LPNODE );
 HRESULT FlipSurfaces( DWORD );
-HWND	CreateDesktopWindow( HANDLE, WNDPROC, DWORD, DWORD );
-HWND	CreateFullScreenWindow( HANDLE, WNDPROC );
+HWND	CreateDesktopWindow( HINSTANCE, WNDPROC, DWORD, DWORD );
+HWND	CreateFullScreenWindow( HINSTANCE, WNDPROC );
 
 // Frame rate variables
 extern DWORD					g_dwFrameTime;

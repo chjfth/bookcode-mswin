@@ -11,7 +11,7 @@ LPDIRECTDRAWSURFACE		lpDDSShips;
 LPDIRECTDRAWSURFACE		lpDDSShots;
 LPDIRECTDRAWSURFACE		lpDDSGhost;
 
-HANDLE                  g_hInstance;
+HINSTANCE               g_hInstance;
 HWND                	g_hwnd;
 PLAYERINFO 				g_Players[4];
 BOOL                    g_bActive;       
@@ -31,7 +31,7 @@ char*	g_szShipBitmap = "SHIPS";
 char*	g_szShotBitmap = "SHOTS";
 char*	g_szGhostBitmap = "GHOST";
 
-long FAR PASCAL WindowProc( HWND hWnd, UINT message, 
+LRESULT WINAPI WindowProc( HWND hWnd, UINT message, 
                             WPARAM wParam, LPARAM lParam )
 {
     switch( message )
@@ -275,7 +275,7 @@ BOOL DDInit( void )
     return TRUE;
 }
 
-static BOOL doInit( HANDLE hInstance, int nCmdShow )
+static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 {
     g_hInstance = hInstance;
 
@@ -294,7 +294,7 @@ static BOOL doInit( HANDLE hInstance, int nCmdShow )
     return TRUE;
 }
 
-int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                         LPSTR lpCmdLine, int nCmdShow)
 {
     MSG         msg;
@@ -316,7 +316,7 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     	{
         	if( !GetMessage( &msg, NULL, 0, 0 ) )
         	{
-            	return msg.wParam;
+            	return (int)msg.wParam;
         	}
         	TranslateMessage(&msg);
         	DispatchMessage(&msg);
@@ -341,4 +341,3 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	CoUninitialize();
 	CloseLinkedList();
 }
-

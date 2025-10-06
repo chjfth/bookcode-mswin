@@ -355,7 +355,7 @@ HRESULT UpdateFrame( BOOL bFull )
 {
     char str[255];
     DWORD time, time2;
-    HRESULT ddrval;
+    HRESULT ddrval = DD_FALSE;
 
     // Update everyone's position
 	UpdateStates();
@@ -390,7 +390,7 @@ HRESULT UpdateFrame( BOOL bFull )
         g_dwFrameTime = timeGetTime();
         g_dwFrameCount = 0;
     }
-    sprintf(str, "%d", g_dwFrames);
+    _sntprintf_s(str, _TRUNCATE, "%d", g_dwFrames);
     DDTextOut( lpDDSBack,str, RGB(0,0,0), RGB(255,255,0), 320, 20 );
 
     if FAILED( FlipSurfaces( g_dwRenderSetup ) )
@@ -647,7 +647,7 @@ HRESULT FlipSurfaces( DWORD dwMode )
     return ddrval;
 }
 
-HWND CreateDesktopWindow(   HANDLE hInstance,
+HWND CreateDesktopWindow(   HINSTANCE hInstance,
                             WNDPROC WindowProc,
                             DWORD dwWidth,  // client area width
                             DWORD dwHeight  // client area height
@@ -710,7 +710,7 @@ HWND CreateDesktopWindow(   HANDLE hInstance,
     return hwnd;
 }
 
-HWND CreateFullScreenWindow(HANDLE hInstance,
+HWND CreateFullScreenWindow(HINSTANCE hInstance,
                             WNDPROC WindowProc
                         )
 {

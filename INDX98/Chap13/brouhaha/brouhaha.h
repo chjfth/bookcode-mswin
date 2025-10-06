@@ -3,6 +3,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <ddraw.h>
@@ -30,7 +31,7 @@ extern LPDIRECTDRAWSURFACE		lpDDSGhost;
 extern LPDIRECTDRAWPALETTE		lpDDPalette;
 extern LPDIRECTDRAWCLIPPER		lpDDClipper;
 
-extern HANDLE					g_hInstance;
+extern HINSTANCE				g_hInstance;
 extern HWND						g_hwnd;
 extern RECT						g_rcWindow;
 extern BOOL						g_bFullScreen;

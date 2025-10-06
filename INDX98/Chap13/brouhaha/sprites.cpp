@@ -12,8 +12,8 @@ LPNODE g_top_node;
 
 void InitLinkedList( void )
 {
-    g_bottom_node == NULL;
-    g_top_node == NULL;
+    g_bottom_node = NULL;
+    g_top_node = NULL;
 }
 
 void CloseLinkedList( void )
