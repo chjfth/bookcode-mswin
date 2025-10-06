@@ -212,7 +212,7 @@ LRESULT WINAPI WindowProc( HWND hWnd, UINT message,
 
 BOOL DDInit( void )
 {
-    // Use globals to intialize DD setup
+    // Use globals to initialize DD setup
 
 	if ( GetSystemMetrics( SM_CXSCREEN ) == 640 )
 	{
@@ -287,7 +287,8 @@ static BOOL doInit( HINSTANCE hInstance, int nCmdShow )
 		return FALSE;
 	}
 
- 	if( !GameInit() ) return FALSE;
+ 	if( !GameInit() ) 
+		return FALSE;
 
 	ShowWindow( g_hwnd, SW_SHOW );
           

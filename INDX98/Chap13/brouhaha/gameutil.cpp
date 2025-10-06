@@ -351,7 +351,7 @@ BOOL LoadGameArt( DWORD dwFlags, LPDDPIXELFORMAT lpddpfFormat )
     return TRUE;
 }
 
-HRESULT UpdateFrame( BOOL bFull )
+HRESULT UpdateFrame( BOOL bActive )
 {
     char str[255];
     DWORD time, time2;
@@ -364,7 +364,8 @@ HRESULT UpdateFrame( BOOL bFull )
 
 	CheckForHits( g_Players[0].lpNode );
 
-	if ( !bFull ) return TRUE;
+	if ( !bActive ) 
+		return TRUE;
 
 	// If it's ok to update the screen, do that too
 
@@ -390,8 +391,9 @@ HRESULT UpdateFrame( BOOL bFull )
         g_dwFrameTime = timeGetTime();
         g_dwFrameCount = 0;
     }
+
     _sntprintf_s(str, _TRUNCATE, "%d", g_dwFrames);
-    DDTextOut( lpDDSBack,str, RGB(0,0,0), RGB(255,255,0), 320, 20 );
+    DDTextOut( lpDDSBack, str, RGB(0,0,0), RGB(255,255,0), 320, 20 );
 
     if FAILED( FlipSurfaces( g_dwRenderSetup ) )
     {
@@ -477,10 +479,10 @@ void UpdateShot( LPNODE shot )
     shot->posy += ( shot->vely * FrameRatio );
 
 // Uncomment this section of code if you'd like shots
-// to dissappear when they hit the edge of the screen.
+// to disappear when they hit the edge of the screen.
 // Move the comments to the next section, of course.
 /*
-    // shots dissapear if they go off the screen/window
+    // shots disapear if they go off the screen/window
     if (  (shot->posx > SHOT_X ) ||
             ( shot->posx < 0 ) ||
             ( shot->posy > SHOT_Y ) ||
@@ -701,11 +703,11 @@ HWND CreateDesktopWindow(   HINSTANCE hInstance,
 
     // Adjust the window to the new size
     MoveWindow( hwnd, 
-                    0, 
-                    0, 
-                    rc.right-rc.left, 
-                    rc.bottom-rc.top, 
-                    FALSE );
+                0, 
+                0, 
+                rc.right-rc.left, 
+                rc.bottom-rc.top, 
+                FALSE );
 
     return hwnd;
 }
@@ -751,9 +753,3 @@ HWND CreateFullScreenWindow(HINSTANCE hInstance,
 
     return hwnd;
 }
-
-
-
-
-
-
