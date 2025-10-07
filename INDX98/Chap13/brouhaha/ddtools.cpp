@@ -252,7 +252,10 @@ HRESULT DDWinConfigure( LPDIRECTDRAW lpDD,
 						LPDIRECTDRAWSURFACE* lplpDDOverlay,
 						HWND hWnd )
 {
-    HRESULT	ddrval;
+	// [2025-10-07] Chj: Damn! lpDDSOverlay does not get assigned in this func.
+	// So lpDDSOverlay global pointer is always NULL.
+
+    HRESULT	ddrval = 0;
 
 	ddrval = DDCreateFakeFlipper( lpDD, lplpDDSPrimary, lplpDDSBack );
 	if FAILED( ddrval ) 

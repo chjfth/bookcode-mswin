@@ -163,14 +163,17 @@ BOOL CreateSprite(  LPSPRITESET lpSprite,
                     int width,
                     LPCSTR szBitmap,
                     LPDDCOLORKEY lpddck,
-                    DWORD dwFlags,
+                    DWORD ddsCaps,
 					LPDDPIXELFORMAT lpddpfFormat )
 {
-    HRESULT ddrval;
+	// [2025-10-07] Chj memo: Create a new DirectDraw surface to accommodate `lpSprite`.
+	// The newly created surface is returned via *lplpDDSSurface .
+
+    HRESULT ddrval = 0;
 
     // create a surface for the sprite and load the bitmap into it
     (*lplpDDSSurface) = DDLoadBitmap( lpDD, szBitmap, 0, 0, 
-											dwFlags, lpddpfFormat );
+									ddsCaps, lpddpfFormat );
 
     if( (*lplpDDSSurface) == NULL )
     {
@@ -291,7 +294,7 @@ BOOL CreatePalette( LPDIRECTDRAW lpDD,
     return TRUE;
 }
 
-BOOL LoadGameArt( DWORD dwFlags, LPDDPIXELFORMAT lpddpfFormat ) 
+BOOL LoadGameArt( DWORD ddsCaps, LPDDPIXELFORMAT lpddpfFormat ) 
 {
 	DDPIXELFORMAT ddpf = {sizeof(DDPIXELFORMAT)};
 
@@ -322,7 +325,7 @@ BOOL LoadGameArt( DWORD dwFlags, LPDDPIXELFORMAT lpddpfFormat )
     ddck.dwColorSpaceHighValue = 0x00;
 
     if FAILED( CreateSprite( &g_shipsprite, lpDD, &lpDDSShips, 10,
-                    32, 32, g_szShipBitmap, &ddck, dwFlags, lpddpfFormat ) ) 
+                    32, 32, g_szShipBitmap, &ddck, ddsCaps, lpddpfFormat ) ) 
     {   
         OutputDebugString( 
 			"LoadGameArt: Couldn't load ship sprite.\n" );
@@ -330,7 +333,7 @@ BOOL LoadGameArt( DWORD dwFlags, LPDDPIXELFORMAT lpddpfFormat )
     }
 
     if FAILED( CreateSprite( &g_shotsprite, lpDD, &lpDDSShots, 4,
-                    3, 3, g_szShotBitmap, &ddck, dwFlags, lpddpfFormat ) ) 
+                    3, 3, g_szShotBitmap, &ddck, ddsCaps, lpddpfFormat ) ) 
     {   
         OutputDebugString( 
 			"LoadGameArt: Couldn't load shot sprite.\n" );
@@ -338,7 +341,7 @@ BOOL LoadGameArt( DWORD dwFlags, LPDDPIXELFORMAT lpddpfFormat )
     }
 
 	if FAILED( CreateSprite( &g_ghostsprite, lpDD, &lpDDSGhost, 10,
-                    32, 32, g_szGhostBitmap, &ddck, dwFlags, lpddpfFormat ) ) 
+                    32, 32, g_szGhostBitmap, &ddck, ddsCaps, lpddpfFormat ) ) 
     {   
         OutputDebugString( 
 			"LoadGameArt: Couldn't load ghost sprite.\n" );
