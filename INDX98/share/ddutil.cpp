@@ -113,12 +113,6 @@ HRESULT DDReLoadBitmap(IDirectDrawSurface *pdds, LPCSTR szBitmap)
  */
 HRESULT DDCopyBitmap(IDirectDrawSurface *pdds, HBITMAP hbm, int x, int y, int dx, int dy)
 {
-    HDC                 hdcImage;
-    HDC                 hdc;
-    BITMAP              bm;
-    DDSURFACEDESC       ddsd;
-    HRESULT             hr;
-
     if (hbm == NULL || pdds == NULL)
         return E_FAIL;
 
@@ -130,7 +124,7 @@ HRESULT DDCopyBitmap(IDirectDrawSurface *pdds, HBITMAP hbm, int x, int y, int dx
     //
     //  select bitmap into a memoryDC so we can use it.
     //
-    hdcImage = CreateCompatibleDC(NULL);
+    HDC hdcImage = CreateCompatibleDC(NULL);
 	if (!hdcImage)
 		OutputDebugString("CreateCompatibleDC() failed\n");
 
@@ -139,6 +133,7 @@ HRESULT DDCopyBitmap(IDirectDrawSurface *pdds, HBITMAP hbm, int x, int y, int dx
     //
     // get size of the bitmap
     //
+	BITMAP bm = {};
     GetObject(hbm, sizeof(bm), &bm);    // get size of bitmap
     dx = dx == 0 ? bm.bmWidth  : dx;    // use the passed size, unless zero
     dy = dy == 0 ? bm.bmHeight : dy;
@@ -146,11 +141,13 @@ HRESULT DDCopyBitmap(IDirectDrawSurface *pdds, HBITMAP hbm, int x, int y, int dx
     //
     // get size of surface.
     //
-    ddsd.dwSize = sizeof(ddsd);
-    ddsd.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
+	DDSURFACEDESC ddsd = {sizeof(ddsd)};
+//  ddsd.dwFlags = DDSD_HEIGHT | DDSD_WIDTH; // Chj: no need according to MSDN 2015
     pdds->GetSurfaceDesc(&ddsd);
 
-    if ((hr = pdds->GetDC(&hdc)) == DD_OK)
+	HDC hdc = NULL;
+	HRESULT  hr = pdds->GetDC(&hdc);
+    if (hr == DD_OK)
     {
         StretchBlt(hdc, 0, 0, ddsd.dwWidth, ddsd.dwHeight, hdcImage, x, y, dx, dy, SRCCOPY);
         pdds->ReleaseDC(hdc);
