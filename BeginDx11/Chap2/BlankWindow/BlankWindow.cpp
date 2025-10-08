@@ -4,7 +4,7 @@
     (orignial name: main.cpp)
 */
 
-#include <tchar.h>  // [2025-10-08] Chj modified it to be stramphibian
+#include <tchar.h>  // [2025-10-08] Chj modified this .cpp to be stramphibian
 #include <Windows.h>
 
 LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam );

@@ -89,7 +89,7 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
 
     if( FAILED( result ) )
     {
-        DXTRACE_MSG( "Failed to create the Direct3D device!" );
+        DXTRACE_MSG( _T("Failed to create the Direct3D device!") );
         return false;
     }
 
@@ -99,7 +99,7 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
 
     if( FAILED( result ) )
     {
-        DXTRACE_MSG( "Failed to get the swap chain back buffer!" );
+        DXTRACE_MSG( _T("Failed to get the swap chain back buffer!") );
         return false;
     }
 
@@ -110,7 +110,7 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
 
     if( FAILED( result ) )
     {
-        DXTRACE_MSG( "Failed to create the render target view!" );
+        DXTRACE_MSG( _T("Failed to create the render target view!") );
         return false;
     }
 
