@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- 
+  	For VC2010 (v100), we need DirectX SDK June 2007 to have ddraw.lib etc. 
+  	User should have:
+  		d:\DXSDK-for-INDX98\Lib\x86\ddraw.lib
+  		d:\DXSDK-for-INDX98\Lib\x64\ddraw.lib
+  -->
+  
+  <PropertyGroup>
+    <dirDxsdk2010>d:\DXSDK-Jun-2010</dirDxsdk2010>
+    <IsUsingVc2010 Condition="'$(PlatformToolset)'=='v100'">true</IsUsingVc2010>
+  </PropertyGroup>
+<!-- 
+  <PropertyGroup Condition="'$(IsUsingVc2010)'=='true'">
+    <LibraryPath>$(dirDxsdk2010)\Lib\$(PlatformX);$(LibraryPath)</LibraryPath>
+    <PathDdrawLib>$(dirDxsdk2010)\Lib\$(PlatformX)\ddraw.lib</PathDdrawLib>
+    <NeedDxsdkAlert Condition="'$(IsUsingVc2010)'=='true' and !exists('$(PathDdrawLib)')">true</NeedDxsdkAlert>
+  </PropertyGroup>
+ -->  
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>d3d11.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+      <!-- 
+      <AdditionalDependencies>d3dx11.lib;dxerr.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+       -->
+    </Link>
+  </ItemDefinitionGroup>
+<!-- 
+  <Target Name="VC2010_DXSDK_ChjAlert" BeforeTargets="PrepareForBuild">
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] Since you are using VC2010 and/or Win7SDK, you need extra DirectX SDK to provide ddraw.lib etc.'" Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathDdrawLib)', so EXE linking will fail." Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] Suggested: DirectX SDK June 2007 version." Importance="high" />
+    
+    <Message Condition="'$(IsUsingVc2010)'=='true' and '$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk2010) ." Importance="high" />
+  </Target>
+ -->
+</Project>
