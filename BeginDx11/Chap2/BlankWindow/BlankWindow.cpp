@@ -4,13 +4,13 @@
     (orignial name: main.cpp)
 */
 
-
-#include<Windows.h>
+#include <tchar.h>  // [2025-10-08] Chj modified it to be stramphibian
+#include <Windows.h>
 
 LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam );
 
 
-int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine, int cmdShow )
+int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PTSTR cmdLine, int cmdShow )
 {
     UNREFERENCED_PARAMETER( prevInstance );
     UNREFERENCED_PARAMETER( cmdLine );
@@ -23,7 +23,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine
     wndClass.hCursor = LoadCursor( NULL, IDC_ARROW );
     wndClass.hbrBackground = ( HBRUSH )( COLOR_WINDOW + 1 );
     wndClass.lpszMenuName = NULL;
-    wndClass.lpszClassName = "DX11BookWindowClass";
+    wndClass.lpszClassName = _T("DX11BookWindowClass");
 
     if( !RegisterClassEx( &wndClass ) )
         return -1;
@@ -32,8 +32,13 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine
     AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
 
     HWND hwnd = CreateWindowA( "DX11BookWindowClass", "Blank Win32 Window",
-        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left,
-        rc.bottom - rc.top, NULL, NULL, hInstance, NULL );
+        WS_OVERLAPPEDWINDOW, 
+		CW_USEDEFAULT, CW_USEDEFAULT, 
+		rc.right - rc.left,
+        rc.bottom - rc.top, 
+		NULL, 
+		NULL, 
+		hInstance, NULL );
 
     if( !hwnd )
         return -1;
