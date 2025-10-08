@@ -75,10 +75,19 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
 
     for( driver = 0; driver < totalDriverTypes; ++driver )
     {
-        result = D3D11CreateDeviceAndSwapChain( 0, driverTypes[driver], 0, creationFlags,
-                                                featureLevels, totalFeatureLevels,
-                                                D3D11_SDK_VERSION, &swapChainDesc, &swapChain_,
-                                                &d3dDevice_, &featureLevel_, &d3dContext_ );
+        result = D3D11CreateDeviceAndSwapChain( 
+			nullptr, 
+			driverTypes[driver], 
+			nullptr, 
+			creationFlags,
+            featureLevels, 
+			totalFeatureLevels,
+            D3D11_SDK_VERSION, 
+			&swapChainDesc, 
+			&swapChain_,
+            &d3dDevice_, 
+			&featureLevel_, 
+			&d3dContext_ );
 
         if( SUCCEEDED( result ) )
         {
@@ -93,9 +102,9 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
         return false;
     }
 
-    ID3D11Texture2D* backBufferTexture;
+    ID3D11Texture2D* backBufferTexture = nullptr;
 
-    result = swapChain_->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&backBufferTexture );
+    result = swapChain_->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (LPVOID*)&backBufferTexture );
 
     if( FAILED( result ) )
     {
