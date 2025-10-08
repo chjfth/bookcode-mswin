@@ -76,7 +76,7 @@ extern PLAYERINFO 				g_Players[4];
 #define SHOT_Y      ( SCREEN_Y - 3 )
 
 #define FRAME_RATE		25		// 40 frames per second (ms)
-#define SHOTLIFE		2000	// lifetime of shote (ms)
+#define SHOTLIFE		2000	// lifetime of shots (ms)
 #define SHOTFREQ		500		// time between shots (ms)
 #define DISABLEDTIME	4000	// time disabled after hit
 #define INPUT_RATE		25		// 40 times per second (ms)

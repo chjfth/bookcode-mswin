@@ -179,7 +179,8 @@ LRESULT WINAPI WindowProc( HWND hWnd, UINT message,
                 OutputDebugString( "Alt enter...\n" );
 
 				// If windowed configs aren't allowed, get out
-				if ( !g_bAllowWindowed ) break;
+				if ( !g_bAllowWindowed ) 
+					break;
 
                 g_bReInitialize = TRUE;
                 g_bFullScreen = !g_bFullScreen;
