@@ -210,7 +210,13 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="BlankD3DWindow.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="BlankDemo.cpp" />
+    <ClCompile Include="Dx11DemoBase.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BlankDemo.h" />
+    <ClInclude Include="Dx11DemoBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BlankD3DWindow.rc" />

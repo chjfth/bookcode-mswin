@@ -1,16 +1,18 @@
 /*
     Beginning DirectX 11 Game Programming
     By Allen Sherrod and Wendy Jones
-    (orignial name: main.cpp)
 */
 
-#include <tchar.h>  // [2025-10-08] Chj modified it to be stramphibian
-#include <Windows.h>
+
+#include<Windows.h>
+#include<memory>
+#include"BlankDemo.h"
+
 
 LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam );
 
 
-int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PTSTR cmdLine, int cmdShow )
+int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine, int cmdShow )
 {
     UNREFERENCED_PARAMETER( prevInstance );
     UNREFERENCED_PARAMETER( cmdLine );
@@ -23,7 +25,7 @@ int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PTSTR cmdLine
     wndClass.hCursor = LoadCursor( NULL, IDC_ARROW );
     wndClass.hbrBackground = ( HBRUSH )( COLOR_WINDOW + 1 );
     wndClass.lpszMenuName = NULL;
-    wndClass.lpszClassName = _T("DX11BookWindowClass");
+    wndClass.lpszClassName = "DX11BookWindowClass";
 
     if( !RegisterClassEx( &wndClass ) )
         return -1;
@@ -31,21 +33,22 @@ int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PTSTR cmdLine
     RECT rc = { 0, 0, 640, 480 };
     AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
 
-    HWND hwnd = CreateWindowA( "DX11BookWindowClass", "Blank Win32 Window",
-        WS_OVERLAPPEDWINDOW, 
-		CW_USEDEFAULT, CW_USEDEFAULT, 
-		rc.right - rc.left,
-        rc.bottom - rc.top, 
-		NULL, 
-		NULL, 
-		hInstance, NULL );
+    HWND hwnd = CreateWindowA( "DX11BookWindowClass", "Blank Direct3D 11 Window", WS_OVERLAPPEDWINDOW,
+                                CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top,
+                                NULL, NULL, hInstance, NULL );
 
     if( !hwnd )
         return -1;
 
     ShowWindow( hwnd, cmdShow );
 
+    BlankDemo demo;
+
     // Demo Initialize
+    bool result = demo.Initialize( hInstance, hwnd );
+
+    if( result == false )
+        return -1;
 
     MSG msg = { 0 };
 
@@ -56,14 +59,14 @@ int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PTSTR cmdLine
             TranslateMessage( &msg );
             DispatchMessage( &msg );
         }
-        else
-        {
-            // Update
-            // Draw
-        }
+
+        // Update and Draw
+        demo.Update( 0.0f );
+        demo.Render( );
     }
 
     // Demo Shutdown
+    demo.Shutdown( );
 
     return static_cast<int>( msg.wParam );
 }
