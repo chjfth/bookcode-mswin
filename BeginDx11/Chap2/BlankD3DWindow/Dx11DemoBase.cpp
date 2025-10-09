@@ -9,8 +9,9 @@
 #include"Dx11DemoBase.h"
 
 
-Dx11DemoBase::Dx11DemoBase( ) : driverType_( D3D_DRIVER_TYPE_NULL ), featureLevel_( D3D_FEATURE_LEVEL_11_0 ),
-                                d3dDevice_( 0 ), d3dContext_( 0 ), swapChain_( 0 ), backBufferTarget_( 0 )
+Dx11DemoBase::Dx11DemoBase( ) 
+	: driverType_( D3D_DRIVER_TYPE_NULL ), featureLevel_( D3D_FEATURE_LEVEL_11_0 ),
+	d3dDevice_( 0 ), d3dContext_( 0 ), swapChain_( 0 ), backBufferTarget_( 0 )
 {
 
 }
@@ -70,7 +71,7 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
     creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-    HRESULT result;
+    HRESULT result = 0;
     unsigned int driver = 0;
 
     for( driver = 0; driver < totalDriverTypes; ++driver )
