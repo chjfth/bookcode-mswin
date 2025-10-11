@@ -556,7 +556,7 @@ void guiUpdatePrivileges()
 
 		LARGE_INTEGER li = {luidaa.Luid.LowPart, luidaa.Luid.HighPart};
 
-		_sntprintf_s(abListBoxText, abListBoxText.Size(), _TRUNCATE, _T("%s%s%s (LUID=%I64d)"),
+		_sntprintf_s(abListBoxText, (int)abListBoxText.Size(), _TRUNCATE, _T("%s%s%s (LUID=%I64d)"),
 			abName.Bufptr(), hypens, abDispName.Bufptr(), li.QuadPart);
 
 		// Add the string to the enable/disable privilege list
