@@ -90,7 +90,7 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
 
     if( FAILED( result ) )
     {
-        DXTRACE_MSG( "Failed to create the Direct3D device!" );
+        DXTRACE_MSG( _T("Failed to create the Direct3D device!") );
         return false;
     }
 
@@ -100,7 +100,7 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
 
     if( FAILED( result ) )
     {
-        DXTRACE_MSG( "Failed to get the swap chain back buffer!" );
+        DXTRACE_MSG( _T("Failed to get the swap chain back buffer!") );
         return false;
     }
 
@@ -111,7 +111,7 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
 
     if( FAILED( result ) )
     {
-        DXTRACE_MSG( "Failed to create the render target view!" );
+        DXTRACE_MSG( _T("Failed to create the render target view!") );
         return false;
     }
 
@@ -131,7 +131,8 @@ bool Dx11DemoBase::Initialize( HINSTANCE hInstance, HWND hwnd )
 }
 
 
-bool Dx11DemoBase::CompileD3DShader( char* filePath, char* entry, char* shaderModel, ID3DBlob** buffer )
+bool Dx11DemoBase::CompileD3DShader( 
+	TCHAR* filePath, char* entry, char* shaderModel, ID3DBlob** buffer )
 {
     DWORD shaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 
@@ -149,7 +150,9 @@ bool Dx11DemoBase::CompileD3DShader( char* filePath, char* entry, char* shaderMo
     {
         if( errorBuffer != 0 )
         {
-            OutputDebugStringA( ( char* )errorBuffer->GetBufferPointer( ) );
+            OutputDebugStringA( ( char* )errorBuffer->GetBufferPointer( ) ); 
+			// -- Chj: always narrow chars?
+
             errorBuffer->Release( );
         }
 
