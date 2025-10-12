@@ -44,8 +44,11 @@ bool TriangleDemo::LoadContent( )
 
     HRESULT d3dResult;
 
-    d3dResult = d3dDevice_->CreateVertexShader( vsBuffer->GetBufferPointer( ),
-        vsBuffer->GetBufferSize( ), 0, &solidColorVS_ );
+    d3dResult = d3dDevice_->CreateVertexShader( 
+		vsBuffer->GetBufferPointer( ),
+        vsBuffer->GetBufferSize( ), 
+		0, 
+		&solidColorVS_ );
 
     if( FAILED( d3dResult ) )
     {
@@ -62,8 +65,12 @@ bool TriangleDemo::LoadContent( )
 
     unsigned int totalLayoutElements = ARRAYSIZE( solidColorLayout );
 
-    d3dResult = d3dDevice_->CreateInputLayout( solidColorLayout, totalLayoutElements,
-        vsBuffer->GetBufferPointer( ), vsBuffer->GetBufferSize( ), &inputLayout_ );
+    d3dResult = d3dDevice_->CreateInputLayout( 
+		solidColorLayout, 
+		totalLayoutElements,
+        vsBuffer->GetBufferPointer( ), 
+		vsBuffer->GetBufferSize( ), 
+		&inputLayout_ );
 
     vsBuffer->Release( );
 
@@ -74,7 +81,8 @@ bool TriangleDemo::LoadContent( )
 
     ID3DBlob* psBuffer = 0;
 
-    compileResult = CompileD3DShader( _T("SolidGreenColor.fx"), "PS_Main", "ps_4_0", &psBuffer );
+    compileResult = CompileD3DShader( _T("SolidGreenColor.fx"), 
+		"PS_Main", "ps_4_0", &psBuffer );
 
     if( compileResult == false )
     {
