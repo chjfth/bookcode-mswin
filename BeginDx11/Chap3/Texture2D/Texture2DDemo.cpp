@@ -9,6 +9,7 @@
 #include"Texture2DDemo.h"
 #include<xnamath.h>
 
+#define FX_FILENAME "CH3-2-TextureMap.fx"
 
 struct VertexPos
 {
@@ -35,7 +36,7 @@ bool TextureDemo::LoadContent( )
 {
     ID3DBlob* vsBuffer = 0;
 
-    bool compileResult = CompileD3DShader( _T("TextureMap.fx"), 
+    bool compileResult = CompileD3DShader( _T(FX_FILENAME), 
 		"VS_Main", "vs_4_0", &vsBuffer );
 
     if( compileResult == false )
@@ -80,7 +81,7 @@ bool TextureDemo::LoadContent( )
 
     ID3DBlob* psBuffer = 0;
 
-    compileResult = CompileD3DShader( _T("TextureMap.fx"), 
+    compileResult = CompileD3DShader( _T(FX_FILENAME), 
 		"PS_Main", "ps_4_0", &psBuffer );
 
     if( compileResult == false )

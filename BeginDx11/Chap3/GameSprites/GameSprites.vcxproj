@@ -228,7 +228,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="GameSprites.ico" />
-    <None Include="TextureMap.fx" />
+    <None Include="CH3-3-TextureMap.fx" />
+    <None Include="CH3-3-decal.dds" />
   </ItemGroup>
 
   <!-- Import shared project properties used by this book. -->

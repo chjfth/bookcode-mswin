@@ -9,7 +9,7 @@
 #include"GameSpriteDemo.h"
 #include"GameSprite.h"
 
-
+#define FX_FILENAME "CH3-3-TextureMap.fx"
 
 
 struct VertexPos
@@ -38,7 +38,7 @@ bool GameSpriteDemo::LoadContent( )
 {
     ID3DBlob* vsBuffer = 0;
 
-    bool compileResult = CompileD3DShader( "TextureMap.fx", "VS_Main", "vs_4_0", &vsBuffer );
+    bool compileResult = CompileD3DShader( FX_FILENAME, "VS_Main", "vs_4_0", &vsBuffer );
 
     if( compileResult == false )
     {
@@ -82,7 +82,7 @@ bool GameSpriteDemo::LoadContent( )
 
     ID3DBlob* psBuffer = 0;
 
-    compileResult = CompileD3DShader( "TextureMap.fx", "PS_Main", "ps_4_0", &psBuffer );
+    compileResult = CompileD3DShader( FX_FILENAME, "PS_Main", "ps_4_0", &psBuffer );
 
     if( compileResult == false )
     {
@@ -103,7 +103,7 @@ bool GameSpriteDemo::LoadContent( )
 
 
     d3dResult = D3DX11CreateShaderResourceViewFromFile( d3dDevice_,
-        "decal.dds", 0, 0, &colorMap_, 0 );
+        "CH3-3-decal.dds", 0, 0, &colorMap_, 0 );
 
     if( FAILED( d3dResult ) )
     {

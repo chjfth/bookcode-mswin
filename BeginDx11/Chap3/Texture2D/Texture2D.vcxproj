@@ -226,7 +226,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Texture2D.ico" />
-    <None Include="TextureMap.fx" />
+    <None Include="CH3-2-TextureMap.fx" />
+    <None Include="CH3-2-decal.dds" />
   </ItemGroup>
 
   <!-- Import shared project properties used by this book. -->
