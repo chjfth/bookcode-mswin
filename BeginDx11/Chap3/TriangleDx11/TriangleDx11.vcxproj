@@ -160,7 +160,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -214,11 +214,11 @@
    -->
   <ItemGroup>
     <ClCompile Include="main-3-1.cpp" />
-    <ClCompile Include="Dx11DemoBase.cpp" />
+    <ClCompile Include="..\Dx11DemoBase.cpp" />
     <ClCompile Include="TriangleDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Dx11DemoBase.h" />
+    <ClInclude Include="..\Dx11DemoBase.h" />
     <ClInclude Include="TriangleDemo.h" />
   </ItemGroup>
   <ItemGroup>
