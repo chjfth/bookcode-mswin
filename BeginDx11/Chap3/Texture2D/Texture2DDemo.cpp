@@ -35,11 +35,12 @@ bool TextureDemo::LoadContent( )
 {
     ID3DBlob* vsBuffer = 0;
 
-    bool compileResult = CompileD3DShader( "TextureMap.fx", "VS_Main", "vs_4_0", &vsBuffer );
+    bool compileResult = CompileD3DShader( _T("TextureMap.fx"), 
+		"VS_Main", "vs_4_0", &vsBuffer );
 
     if( compileResult == false )
     {
-        DXTRACE_MSG( "Error compiling the vertex shader!" );
+        DXTRACE_MSG( _T("Error compiling the vertex shader!") );
         return false;
     }
 
@@ -50,7 +51,7 @@ bool TextureDemo::LoadContent( )
 
     if( FAILED( d3dResult ) )
     {
-        DXTRACE_MSG( "Error creating the vertex shader!" );
+        DXTRACE_MSG( _T("Error creating the vertex shader!") );
 
         if( vsBuffer )
             vsBuffer->Release( );
@@ -73,17 +74,18 @@ bool TextureDemo::LoadContent( )
 
     if( FAILED( d3dResult ) )
     {
-        DXTRACE_MSG( "Error creating the input layout!" );
+        DXTRACE_MSG( _T("Error creating the input layout!") );
         return false;
     }
 
     ID3DBlob* psBuffer = 0;
 
-    compileResult = CompileD3DShader( "TextureMap.fx", "PS_Main", "ps_4_0", &psBuffer );
+    compileResult = CompileD3DShader( _T("TextureMap.fx"), 
+		"PS_Main", "ps_4_0", &psBuffer );
 
     if( compileResult == false )
     {
-        DXTRACE_MSG( "Error compiling pixel shader!" );
+        DXTRACE_MSG( _T("Error compiling pixel shader!") );
         return false;
     }
 
@@ -94,7 +96,7 @@ bool TextureDemo::LoadContent( )
 
     if( FAILED( d3dResult ) )
     {
-        DXTRACE_MSG( "Error creating pixel shader!" );
+        DXTRACE_MSG( _T("Error creating pixel shader!") );
         return false;
     }
 
@@ -123,16 +125,20 @@ bool TextureDemo::LoadContent( )
 
     if( FAILED( d3dResult ) )
     {
-        DXTRACE_MSG( "Failed to create vertex buffer!" );
+        DXTRACE_MSG( _T("Failed to create vertex buffer!") );
         return false;
     }
 
     d3dResult = D3DX11CreateShaderResourceViewFromFile( d3dDevice_,
-        "decal.dds", 0, 0, &colorMap_, 0 );
+        _T("decal.dds"), 
+		NULL, 
+		NULL, 
+		&colorMap_, 
+		NULL);
 
     if( FAILED( d3dResult ) )
     {
-        DXTRACE_MSG( "Failed to load the texture image!" );
+        DXTRACE_MSG( _T("Failed to load the texture image!") );
         return false;
     }
 
@@ -149,7 +155,7 @@ bool TextureDemo::LoadContent( )
 
     if( FAILED( d3dResult ) )
     {
-        DXTRACE_MSG( "Failed to create color map sampler state!" );
+        DXTRACE_MSG( _T("Failed to create color map sampler state!") );
         return false;
     }
 

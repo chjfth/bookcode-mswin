@@ -3,16 +3,16 @@
     By Allen Sherrod and Wendy Jones
 */
 
-
-#include<Windows.h>
-#include<memory>
-#include"Texture2DDemo.h"
+#include <tchar.h>
+#include <Windows.h>
+#include <memory>
+#include "Texture2DDemo.h"
 
 
 LRESULT CALLBACK WndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam );
 
 
-int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine, int cmdShow )
+int WINAPI _tWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PTSTR cmdLine, int cmdShow )
 {
     UNREFERENCED_PARAMETER( prevInstance );
     UNREFERENCED_PARAMETER( cmdLine );
@@ -25,7 +25,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine
     wndClass.hCursor = LoadCursor( NULL, IDC_ARROW );
     wndClass.hbrBackground = ( HBRUSH )( COLOR_WINDOW + 1 );
     wndClass.lpszMenuName = NULL;
-    wndClass.lpszClassName = "DX11BookWindowClass";
+    wndClass.lpszClassName = _T("DX11BookWindowClass");
 
     if( !RegisterClassEx( &wndClass ) )
         return -1;
@@ -33,9 +33,14 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine
     RECT rc = { 0, 0, 640, 480 };
     AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
 
-    HWND hwnd = CreateWindowA( "DX11BookWindowClass", "2D Texture Mapping", WS_OVERLAPPEDWINDOW,
-                                CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top,
-                                NULL, NULL, hInstance, NULL );
+    HWND hwnd = CreateWindow( 
+		_T("DX11BookWindowClass"), 
+		_T("2D Texture Mapping"), 
+		WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, 
+		rc.right - rc.left, 
+		rc.bottom - rc.top,
+        NULL, NULL, hInstance, NULL );
 
     if( !hwnd )
         return -1;
