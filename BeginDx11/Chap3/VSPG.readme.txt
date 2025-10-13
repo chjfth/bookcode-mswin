@@ -1,5 +1,0 @@
-*.fx should be copied alongside EXE to make EXE work.
-
-So in VSPU-CopyOrClean.bat, we need to have:
-
-	set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%" "%ProjectDir%\*.fx"
