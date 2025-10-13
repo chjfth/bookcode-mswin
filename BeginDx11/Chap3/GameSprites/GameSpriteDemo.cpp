@@ -130,12 +130,21 @@ bool GameSpriteDemo::LoadContent( )
         return false;
     }
 
-    ID3D11Resource* colorTex;
+    ID3D11Resource* colorTex = NULL;
     colorMap_->GetResource( &colorTex );
 
-    D3D11_TEXTURE2D_DESC colorTexDesc;
-    ( ( ID3D11Texture2D* )colorTex )->GetDesc( &colorTexDesc );
-    colorTex->Release( );
+	D3D11_TEXTURE2D_DESC colorTexDesc = {};
+    //dynamic_cast<ID3D11Texture2D*>(colorTex)->GetDesc( &colorTexDesc );
+	ID3D11Texture2D* pt2d = ( ID3D11Texture2D* )colorTex;
+	// -- [2025-10-13] Chj: In d3d11.h, ID3D11Texture2D is child class of ID3D11Resource.
+	//    Verified: pt2d has the same value as colorTex .
+	//    But, if I use `dynamic_cast<ID3D11Texture2D*>(colorTex)`, program crashes with:
+	//    
+	//		Microsoft C++ exception: std::__non_rtti_object at memory location 0x0018fec0
+
+	pt2d->GetDesc( &colorTexDesc );
+    
+	colorTex->Release( );
 
     float halfWidth = ( float )colorTexDesc.Width / 2.0f;
     float halfHeight = ( float )colorTexDesc.Height / 2.0f;
