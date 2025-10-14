@@ -2,7 +2,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- 
-  	For VC2010 (v100), we need DirectX SDK June 2010 to have d3dx11.lib, DxErr.lib etc. 
+    This project needs VC2010, VC2015 or newer. 
+    If using VC2015+, we need to link in extra legacy_stdio_definitions.lib .
+  	
+  	We always need [DirectX SDK June 2010] to have d3dx11.lib, DxErr.lib etc. 
   	User should have:
   		d:\DXSDK-Jun-2010\Lib\x86\d3dx11.lib
   		d:\DXSDK-Jun-2010\Lib\x64\d3dx11.lib
@@ -10,28 +13,33 @@
   
   <PropertyGroup>
     <dirDxsdk2010>d:\DXSDK-Jun-2010</dirDxsdk2010>
+    
     <IsUsingVc2010 Condition="'$(PlatformToolset)'=='v100'">true</IsUsingVc2010>
+    
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsUsingVc2010)'=='true'">
+  <PropertyGroup>
     <IncludePath>$(dirDxsdk2010)\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(dirDxsdk2010)\Lib\$(PlatformX);$(LibraryPath)</LibraryPath>
     
     <PathD3dxLib>$(dirDxsdk2010)\Lib\$(PlatformX)\d3dx11.lib</PathD3dxLib>
-    <NeedDxsdkAlert Condition="'$(IsUsingVc2010)'=='true' and !exists('$(PathD3dxLib)')">true</NeedDxsdkAlert>
+    <NeedDxsdkAlert Condition="!exists('$(PathD3dxLib)')">true</NeedDxsdkAlert>
   </PropertyGroup>
 
   <ItemDefinitionGroup>
     <Link>
       <AdditionalDependencies>d3d11.lib;d3dx11.lib;dxerr.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+
+	  <!-- Add legacy_stdio_definitions.lib for VC2015+ (bcz DxErr.lib needs _vsnwprintf) -->
+      <AdditionalDependencies Condition="'$(IsUsingVc2010)'!='true'">legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
-  <Target Name="VC2010_DXSDK_ChjAlert" BeforeTargets="PrepareForBuild">
-    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] Since you are using VC2010, you need [DirectX SDK June 2010] to provide d3dx11.lib etc.'" Importance="high" />
+  <Target Name="DXSDK2010_ChjAlert" BeforeTargets="PrepareForBuild">
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX SDK June 2010] to provide d3dx11.lib etc.'" Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathD3dxLib)', most code samples will not compile." Importance="high" />
     
-    <Message Condition="'$(IsUsingVc2010)'=='true' and '$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk2010) ." Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk2010) ." Importance="high" />
   </Target>
 
 </Project>
