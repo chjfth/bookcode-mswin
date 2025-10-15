@@ -137,7 +137,7 @@ bool Dx11DemoBase::CompileD3DShader(
     DWORD shaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 
 #if defined( DEBUG ) || defined( _DEBUG )
-    shaderFlags |= D3DCOMPILE_DEBUG;
+    shaderFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
     ID3DBlob* errorBuffer = 0;
