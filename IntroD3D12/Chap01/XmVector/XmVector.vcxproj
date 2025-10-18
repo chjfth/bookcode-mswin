@@ -207,9 +207,6 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="InitFunctions.cpp" />
-    <ClCompile Include="tol.cpp" />
-    <ClCompile Include="VectorOps.cpp" />
     <ClCompile Include="xmvec3-main.cpp" />
 <!--
     <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
