@@ -49,7 +49,7 @@ inline bool myXMMatrixNearEqual(FXMMATRIX M1, FXMMATRIX M2, float epsilon)
 }
 
 
-void TestRotateXYZ(FXMVECTOR inputv, float degree)
+XMVECTOR testRotateXYZ(FXMVECTOR inputv, float degree)
 {
 	float rad = degree * XM_PI / 180;
 
@@ -84,7 +84,12 @@ void TestRotateXYZ(FXMVECTOR inputv, float degree)
 	cout << "Input  vector: " << inputv << endl;
 	cout << "Output vector: " << zdone << endl;
 
-	cout << endl;
+	return zdone;
+}
+
+XMVECTOR testRotateAlong111(FXMVECTOR inputv, float degree)
+{
+	float rad = degree * XM_PI / 180;
 
 	// Experiment two: Rotate along axis(1,1,1).
 
@@ -97,9 +102,7 @@ void TestRotateXYZ(FXMVECTOR inputv, float degree)
 	cout << "Input  vector: " << inputv << endl;
 	cout << "Output vector: " << rdone << endl;
 
-	XMVECTOR Epsilon = XMVectorReplicate(epsilon);
-	assert(!XMVector3NearEqual(zdone, rdone, Epsilon));
-
+	return rdone;
 }
 
 int main()
@@ -115,7 +118,17 @@ int main()
 
 	XMVECTOR inputv = XMVectorSet(3, 2, 1, 0);
 //	inputv = inputv * 2;
-	TestRotateXYZ(inputv, 30);
+
+	float degree = 30.0f;
+
+	XMVECTOR v1 = testRotateXYZ(inputv, degree);
+	cout << endl;
+
+	XMVECTOR v2 = testRotateAlong111(inputv, degree);
+	// -- v2 = (2.57735, 2.57735, 0.845299), X=Y, so coincidental?
+
+	XMVECTOR Epsilon = XMVectorReplicate(0.00001f);
+	assert(!XMVector3NearEqual(v1, v2, Epsilon));
 
 	return 0;
 }
