@@ -1,5 +1,7 @@
-// Chj: Answering the question:
-// Build a rotation matrix that rotates 30бу along the axis (1, 1, 1)
+// [2025-10-24] Chj: 
+//This program shows that, the following operations are NOT equal:
+// 1. Apply 3  rotations on inputv, along X-axis, then Y-axis, then Z-axis,
+// 2. Apply one rotation on inputv, along axis(1,1,1).
 
 #include <assert.h>
 #include <windows.h> // for XMVerifyCPUSupport
@@ -47,50 +49,16 @@ inline bool myXMMatrixNearEqual(FXMMATRIX M1, FXMMATRIX M2, float epsilon)
 }
 
 
-XMMATRIX myCalRotateMatrix(FXMVECTOR axis, float rad)
-{
-	XMVECTOR modulen = XMVector3Length(axis);
-	XMVECTOR axisunit = axis / modulen;
-
-	float x = XMVectorGetX(axisunit);
-	float y = XMVectorGetY(axisunit);
-	float z = XMVectorGetZ(axisunit);
-
-	float s = sin(rad);
-	float c = cos(rad);
-
-	XMMATRIX Rn(
-		c+(1-c)*x*x,    (1-c)*x*y+s*z,  (1-c)*x*z-s*y,  0,
-		(1-c)*x*y-s*z , c+(1-c)*y*y,    (1-c)*y*z+s*x,  0,
-		(1-c)*x*z+s*y , (1-c)*y*z-s*x,  c+(1-c)*z*z,    0,
-		0 ,0 ,0, 1); // final `1` in accordance with XMMatrixRotationAxis().
-
-	// [2025-10-23] Pending Q: XMMatrixRotationAxis() internally does NOT use such direct 
-	// matrix element calculation. How does he do it?
-
-	return Rn; 
-	
-	// TODO: Can I apply C++11 Move Semantics?
-}
-
-
-void SeeRotateMatrix(float degree)
+void TestRotateXYZ(FXMVECTOR inputv, float degree)
 {
 	float rad = degree * XM_PI / 180;
 
-	// We will rotate along (1,1,1), set this in axis111.
-	XMVECTOR axis111 = XMVectorSet(1, 1, 1, 0);
+	// Experiment one: Rotate along X-axis, then Y-axis, then Z-axis
 
-	XMMATRIX answer = XMMatrixRotationAxis(axis111, rad);
-
-	cout << "Chap03 Ex5, XMMatrixRotationAxis() "<< degree <<" degree, produces answer:" 
-		<< endl << answer;
-
-/*
 	XMMATRIX Rx(
 		1,  0,        0,        0,
 		0,  cos(rad), sin(rad), 0,
-		0 ,-sin(rad), cos(rad), 0, 
+		0 ,-sin(rad), cos(rad), 0,
 		0,  0,        0,        1);
 	XMMATRIX Ry(
 		cos(rad), 0, -sin(rad), 0,
@@ -98,26 +66,40 @@ void SeeRotateMatrix(float degree)
 		sin(rad), 0,  cos(rad), 0,
 		0,        0,         0, 1);
 	XMMATRIX Rz(
-		 cos(rad), sin(rad), 0, 0,
+		cos(rad), sin(rad), 0, 0,
 		-sin(rad), cos(rad), 0, 0,
-		 0,        0,        1, 0,
-		 0,        0,        0, 1);
+		0,        0,        1, 0,
+		0,        0,        0, 1);
 
-	XMVECTOR unitx = XMVectorSet(1, 0, 0, 0);
-	XMVECTOR unity = XMVectorSet(1, 1, 0, 0);
-	XMVECTOR unitz = XMVectorSet(0, 0, 1, 0);
-*/
+	float epsilon = 0.00001f;
+	assert( myXMMatrixNearEqual(Rx, XMMatrixRotationX(rad), epsilon) );
+	assert( myXMMatrixNearEqual(Ry, XMMatrixRotationY(rad), epsilon) );
+	assert( myXMMatrixNearEqual(Rz, XMMatrixRotationZ(rad), epsilon) );
+
+	XMVECTOR xdone = XMVector3TransformNormal(inputv , Rx);
+	XMVECTOR ydone = XMVector3TransformNormal(xdone, Ry);
+	XMVECTOR zdone = XMVector3TransformNormal(ydone, Rz);
+
+	cout << "Rotate "<< degree <<" degree along X-axis, Y-axis, then Z-axis." << endl;
+	cout << "Input  vector: " << inputv << endl;
+	cout << "Output vector: " << zdone << endl;
 
 	cout << endl;
-	cout << "Now we verify it using p64 Rn matrix. Result:" << endl;
 
-	XMMATRIX myRn = myCalRotateMatrix(axis111, rad);
-	cout << myRn << endl;
+	// Experiment two: Rotate along axis(1,1,1).
 
-	bool equal = myXMMatrixNearEqual(answer, myRn, 0.00001f);
-	cout << "Near equal: " << equal << endl;
-	
-	assert(equal);
+	XMVECTOR axis111 = XMVectorSet(1, 1, 1, 0);
+	XMMATRIX rmatrix = XMMatrixRotationAxis(axis111, rad);
+
+	XMVECTOR rdone = XMVector3TransformNormal(inputv, rmatrix);
+
+	cout << "Rotate " << degree << " degree along axis(1,1,1)." << endl;
+	cout << "Input  vector: " << inputv << endl;
+	cout << "Output vector: " << rdone << endl;
+
+	XMVECTOR Epsilon = XMVectorReplicate(epsilon);
+	assert(!XMVector3NearEqual(zdone, rdone, Epsilon));
+
 }
 
 int main()
@@ -131,7 +113,9 @@ int main()
 
 	cout.setf(ios_base::boolalpha);
 
-	SeeRotateMatrix(30);
+	XMVECTOR inputv = XMVectorSet(3, 2, 1, 0);
+//	inputv = inputv * 2;
+	TestRotateXYZ(inputv, 30);
 
 	return 0;
 }
