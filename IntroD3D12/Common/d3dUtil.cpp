@@ -119,7 +119,13 @@ std::wstring DxException::ToString()const
     _com_error err(ErrorCode);
     std::wstring msg = err.ErrorMessage();
 
-    return FunctionName + L" failed in " + Filename + L"; line " + std::to_wstring(LineNumber) + L"; error: " + msg;
+	std::wstringstream hrhex;
+	hrhex << L"0x" << std::hex << ErrorCode;
+
+    return FunctionName + L" Failed in: " + Filename + L"\n\n" +
+		L"Line: " + std::to_wstring(LineNumber) + L"\n\n" +
+		L"HRESULT: " + hrhex.str() + L"\n\n" +
+		L"ErrorMsg: " + msg;
 }
 
 
