@@ -36,7 +36,7 @@
   </ItemDefinitionGroup>
 
   <Target Name="DXSDK2010_ChjAlert" BeforeTargets="PrepareForBuild">
-    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX SDK June 2010] to provide d3dx11.lib etc.'" Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX SDK June 2010] to provide d3dx11.lib etc." Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathD3dxLib)', most code samples will not compile." Importance="high" />
     
     <Message Condition="'$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk2010) ." Importance="high" />
