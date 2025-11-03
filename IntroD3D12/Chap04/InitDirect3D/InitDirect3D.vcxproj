@@ -84,6 +84,7 @@
 
 	<!-- Require currently installed newest Win10SDK version.
 		We cannot use the default Win8.1 SDK here, bcz .cpp code has `#include <dxgi1_4.h>` .
+		On success, WindowsTargetPlatformVersion will be "10.0.10240.0", "10.0.14393.0", etc.
 	 -->
 	<WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
 
@@ -233,6 +234,11 @@
     <ClInclude Include="..\..\__WinConst\mswin\WinError.itc.h" />
 -->
   </ItemGroup>
+
+  <!-- Import shared project properties used by this book. -->
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\IntroD3D12.props" />
+  </ImportGroup>
 
   <!-- MSBuild system stock Cpp.targets -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

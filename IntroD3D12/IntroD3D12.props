@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- 
+    This project needs VC2015 with Win10SDK(at least 10.0.10240).
+  -->
+  
+  <Target Name="Chj_CheckWin10SDK" BeforeTargets="PrepareForBuild">
+    <Message Condition="'$(WindowsTargetPlatformVersion)'=='8.1'" Text="[ALERT] You do not have a Win10SDK installed with your Visual Studio, compiling will fail due to missing dxgi1_4.h " Importance="high" />
+  </Target>
+
+</Project>
