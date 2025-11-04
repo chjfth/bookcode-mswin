@@ -416,11 +416,12 @@ bool D3DApp::InitDirect3D()
 {
 #if defined(DEBUG) || defined(_DEBUG) 
 	// Enable the D3D12 debug layer.
-{
-	ComPtr<ID3D12Debug> debugController;
-	ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
-	debugController->EnableDebugLayer();
-}
+	if(1)
+	{
+		ComPtr<ID3D12Debug> debugController;
+		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
+		debugController->EnableDebugLayer();
+	}
 #endif
 
 	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&mdxgiFactory)));
@@ -434,6 +435,7 @@ bool D3DApp::InitDirect3D()
 	// Fallback to WARP device.
 	if(FAILED(hardwareResult))
 	{
+		OutputDebugString(L"Fallback to WARP device.");
 		ComPtr<IDXGIAdapter> pWarpAdapter;
 		ThrowIfFailed(mdxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&pWarpAdapter)));
 
@@ -467,9 +469,9 @@ bool D3DApp::InitDirect3D()
     m4xMsaaQuality = msQualityLevels.NumQualityLevels;
 	assert(m4xMsaaQuality > 0 && "Unexpected MSAA quality level.");
 	
-#ifdef _DEBUG
+//#ifdef _DEBUG
     LogAdapters();
-#endif
+//#endif
 
 	CreateCommandObjects();
     CreateSwapChain();
@@ -605,6 +607,14 @@ void D3DApp::CalculateFrameStats()
 	}
 }
 
+
+std::wstring myLuidToHexString(const LUID& luid) {
+	std::wstringstream ss;
+	ULONGLONG luidValue = (static_cast<ULONGLONG>(luid.HighPart) << 32) | luid.LowPart;
+	ss << L" (AdapterLuid=0x" << std::hex << std::uppercase <<  luidValue << L")";
+	return ss.str();
+}
+
 void D3DApp::LogAdapters()
 {
     UINT i = 0;
@@ -617,6 +627,9 @@ void D3DApp::LogAdapters()
 
         std::wstring text = L"***Adapter: ";
         text += desc.Description;
+
+		text += myLuidToHexString(desc.AdapterLuid);
+
         text += L"\n";
 
         OutputDebugString(text.c_str());
