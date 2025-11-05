@@ -506,54 +506,54 @@ void D3DApp::CreateCommandObjects()
 
 void D3DApp::CreateSwapChain()
 {
-    // Release the previous swapchain we will be recreating.
-    mSwapChain.Reset();
+	// Release the previous swapchain we will be recreating.
+	mSwapChain.Reset();
 
-    DXGI_SWAP_CHAIN_DESC sd;
-    sd.BufferDesc.Width = mClientWidth;
-    sd.BufferDesc.Height = mClientHeight;
-    sd.BufferDesc.RefreshRate.Numerator = 60;
-    sd.BufferDesc.RefreshRate.Denominator = 1;
-    sd.BufferDesc.Format = mBackBufferFormat;
-    sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-    sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-    sd.SampleDesc.Count = m4xMsaaState ? 4 : 1;
-    sd.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
-    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.BufferCount = SwapChainBufferCount;
-    sd.OutputWindow = mhMainWnd;
-    sd.Windowed = true;
+	DXGI_SWAP_CHAIN_DESC sd = {};
+	sd.BufferDesc.Width = mClientWidth;
+	sd.BufferDesc.Height = mClientHeight;
+	sd.BufferDesc.RefreshRate.Numerator = 60;
+	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.Format = mBackBufferFormat;
+	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	sd.SampleDesc.Count = m4xMsaaState ? 4 : 1;
+	sd.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	sd.BufferCount = SwapChainBufferCount;
+	sd.OutputWindow = mhMainWnd;
+	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	// Note: Swap chain uses queue to perform flush.
-    ThrowIfFailed(mdxgiFactory->CreateSwapChain(
+	ThrowIfFailed(mdxgiFactory->CreateSwapChain(
 		mCommandQueue.Get(),
-		&sd, 
+		&sd,
 		mSwapChain.GetAddressOf()));
 }
 
 void D3DApp::FlushCommandQueue()
 {
 	// Advance the fence value to mark commands up to this fence point.
-    mCurrentFence++;
+	mCurrentFence++;
 
-    // Add an instruction to the command queue to set a new fence point.  Because we 
+	// Add an instruction to the command queue to set a new fence point.  Because we 
 	// are on the GPU timeline, the new fence point won't be set until the GPU finishes
 	// processing all the commands prior to this Signal().
-    ThrowIfFailed(mCommandQueue->Signal(mFence.Get(), mCurrentFence));
+	ThrowIfFailed(mCommandQueue->Signal(mFence.Get(), mCurrentFence));
 
 	// Wait until the GPU has completed commands up to this fence point.
-    if(mFence->GetCompletedValue() < mCurrentFence)
+	if (mFence->GetCompletedValue() < mCurrentFence)
 	{
 		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
 
-        // Fire event when GPU hits current fence.  
-        ThrowIfFailed(mFence->SetEventOnCompletion(mCurrentFence, eventHandle));
+		// Fire event when GPU hits current fence.  
+		ThrowIfFailed(mFence->SetEventOnCompletion(mCurrentFence, eventHandle));
 
-        // Wait until the GPU hits current fence event is fired.
+		// Wait until the GPU hits current fence event is fired.
 		WaitForSingleObject(eventHandle, INFINITE);
-        CloseHandle(eventHandle);
+		CloseHandle(eventHandle);
 	}
 }
 
@@ -580,27 +580,27 @@ void D3DApp::CalculateFrameStats()
 	// Code computes the average frames per second, and also the 
 	// average time it takes to render one frame.  These stats 
 	// are appended to the window caption bar.
-    
+
 	static int frameCnt = 0;
 	static float timeElapsed = 0.0f;
 
 	frameCnt++;
 
 	// Compute averages over one second period.
-	if( (mTimer.TotalTime() - timeElapsed) >= 1.0f )
+	if ((mTimer.TotalTime() - timeElapsed) >= 1.0f)
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
 
-        wstring fpsStr = to_wstring(fps);
-        wstring mspfStr = to_wstring(mspf);
+		wstring fpsStr = to_wstring(fps);
+		wstring mspfStr = to_wstring(mspf);
 
-        wstring windowText = mMainWndCaption +
-            L"    fps: " + fpsStr +
-            L"   mspf: " + mspfStr;
+		wstring windowText = mMainWndCaption +
+			L"    fps: " + fpsStr +
+			L"   mspf: " + mspfStr;
 
-        SetWindowText(mhMainWnd, windowText.c_str());
-		
+		SetWindowText(mhMainWnd, windowText.c_str());
+
 		// Reset for next average.
 		frameCnt = 0;
 		timeElapsed += 1.0f;
@@ -617,78 +617,78 @@ std::wstring myLuidToHexString(const LUID& luid) {
 
 void D3DApp::LogAdapters()
 {
-    UINT i = 0;
-    IDXGIAdapter* adapter = nullptr;
-    std::vector<IDXGIAdapter*> adapterList;
-    while(mdxgiFactory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND)
-    {
-        DXGI_ADAPTER_DESC desc;
-        adapter->GetDesc(&desc);
+	UINT i = 0;
+	IDXGIAdapter* adapter = nullptr;
+	std::vector<IDXGIAdapter*> adapterList;
+	while (mdxgiFactory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND)
+	{
+		DXGI_ADAPTER_DESC desc;
+		adapter->GetDesc(&desc);
 
-        std::wstring text = L"***Adapter: ";
-        text += desc.Description;
+		std::wstring text = L"***Adapter: ";
+		text += desc.Description;
 
 		text += myLuidToHexString(desc.AdapterLuid);
 
-        text += L"\n";
+		text += L"\n";
 
-        OutputDebugString(text.c_str());
+		OutputDebugString(text.c_str());
 
-        adapterList.push_back(adapter);
-        
-        ++i;
-    }
+		adapterList.push_back(adapter);
 
-    for(size_t i = 0; i < adapterList.size(); ++i)
-    {
-        LogAdapterOutputs(adapterList[i]);
-        ReleaseCom(adapterList[i]);
-    }
+		++i;
+	}
+
+	for (size_t i = 0; i < adapterList.size(); ++i)
+	{
+		LogAdapterOutputs(adapterList[i]);
+		ReleaseCom(adapterList[i]);
+	}
 }
 
 void D3DApp::LogAdapterOutputs(IDXGIAdapter* adapter)
 {
-    UINT i = 0;
-    IDXGIOutput* output = nullptr;
-    while(adapter->EnumOutputs(i, &output) != DXGI_ERROR_NOT_FOUND)
-    {
-        DXGI_OUTPUT_DESC desc;
-        output->GetDesc(&desc);
-        
-        std::wstring text = L"***Output: ";
-        text += desc.DeviceName;
-        text += L"\n";
-        OutputDebugString(text.c_str());
+	UINT i = 0;
+	IDXGIOutput* output = nullptr;
+	while (adapter->EnumOutputs(i, &output) != DXGI_ERROR_NOT_FOUND)
+	{
+		DXGI_OUTPUT_DESC desc;
+		output->GetDesc(&desc);
 
-        LogOutputDisplayModes(output, mBackBufferFormat);
+		std::wstring text = L"***Output: ";
+		text += desc.DeviceName;
+		text += L"\n";
+		OutputDebugString(text.c_str());
 
-        ReleaseCom(output);
+		LogOutputDisplayModes(output, mBackBufferFormat);
 
-        ++i;
-    }
+		ReleaseCom(output);
+
+		++i;
+	}
 }
 
 void D3DApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 {
-    UINT count = 0;
-    UINT flags = 0;
+	UINT count = 0;
+	UINT flags = 0;
 
-    // Call with nullptr to get list count.
-    output->GetDisplayModeList(format, flags, &count, nullptr);
+	// Call with nullptr to get list count.
+	output->GetDisplayModeList(format, flags, &count, nullptr);
 
-    std::vector<DXGI_MODE_DESC> modeList(count);
-    output->GetDisplayModeList(format, flags, &count, &modeList[0]);
+	std::vector<DXGI_MODE_DESC> modeList(count);
+	output->GetDisplayModeList(format, flags, &count, &modeList[0]);
 
-    for(auto& x : modeList)
-    {
-        UINT n = x.RefreshRate.Numerator;
-        UINT d = x.RefreshRate.Denominator;
-        std::wstring text =
-            L"Width = " + std::to_wstring(x.Width) + L" " +
-            L"Height = " + std::to_wstring(x.Height) + L" " +
-            L"Refresh = " + std::to_wstring(n) + L"/" + std::to_wstring(d) +
-            L"\n";
+	for (auto& x : modeList)
+	{
+		UINT n = x.RefreshRate.Numerator;
+		UINT d = x.RefreshRate.Denominator;
+		std::wstring text =
+			L"Width = " + std::to_wstring(x.Width) + L" " +
+			L"Height = " + std::to_wstring(x.Height) + L" " +
+			L"Refresh = " + std::to_wstring(n) + L"/" + std::to_wstring(d) +
+			L"\n";
 
-        ::OutputDebugString(text.c_str());
-    }
+		::OutputDebugString(text.c_str());
+	}
 }
