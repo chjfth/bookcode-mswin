@@ -88,7 +88,7 @@
 	 -->
 	<WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
 
-    <ProjectName>Ch7Shapes</ProjectName>
+    <ProjectName>ch7-Shapes</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
