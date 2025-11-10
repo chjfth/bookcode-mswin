@@ -352,7 +352,7 @@ void BoxApp::BuildShadersAndInputLayout()
 {
 	HRESULT hr = S_OK;
 
-	const WCHAR *hlsl = L"Shaders\\ch6-Box.hlsl";
+	const WCHAR *hlsl = L"Shaders\\ch06-Box.hlsl";
 	mvsByteCode = d3dUtil::CompileShader(hlsl, nullptr, "VS", "vs_5_0");
 	mpsByteCode = d3dUtil::CompileShader(hlsl, nullptr, "PS", "ps_5_0");
 

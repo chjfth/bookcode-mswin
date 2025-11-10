@@ -514,7 +514,7 @@ void ShapesApp::BuildRootSignature()
 
 void ShapesApp::BuildShadersAndInputLayout()
 {
-	const WCHAR *hlsl = L"Shaders\\ch7-Shapes.hlsl";
+	const WCHAR *hlsl = L"Shaders\\ch07-Shapes.hlsl";
 	mShaders["standardVS"] = d3dUtil::CompileShader(hlsl, nullptr, "VS", "vs_5_1");
 	mShaders["opaquePS"] = d3dUtil::CompileShader(hlsl, nullptr, "PS", "ps_5_1");
 	

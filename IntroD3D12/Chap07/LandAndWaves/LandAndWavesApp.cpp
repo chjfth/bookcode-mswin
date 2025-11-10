@@ -484,7 +484,7 @@ void LandAndWavesApp::BuildRootSignature()
 
 void LandAndWavesApp::BuildShadersAndInputLayout()
 {
-	const WCHAR *hlsl = L"Shaders\\ch7-LandAndWaves.hlsl";
+	const WCHAR *hlsl = L"Shaders\\ch07-LandAndWaves.hlsl";
 	mShaders["standardVS"] = d3dUtil::CompileShader(hlsl, nullptr, "VS", "vs_5_0");
 	mShaders["opaquePS"] = d3dUtil::CompileShader(hlsl, nullptr, "PS", "ps_5_0");
 
