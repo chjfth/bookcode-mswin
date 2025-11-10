@@ -88,7 +88,7 @@
 	 -->
 	<WindowsTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</WindowsTargetPlatformVersion>
 
-    <ProjectName>ch7-LandAndWaves</ProjectName>
+    <ProjectName>ch07-LandAndWaves</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
