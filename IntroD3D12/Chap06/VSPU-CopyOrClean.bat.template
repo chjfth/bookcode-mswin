@@ -1,3 +1,7 @@
+:
+: Extra work: Copy Shaders\*.hlsl files into <exedir>\Shaders\*.hlsl
+:
+
 @echo off
 setlocal EnableDelayedExpansion
 set batfilenam=%~n0%~x0
