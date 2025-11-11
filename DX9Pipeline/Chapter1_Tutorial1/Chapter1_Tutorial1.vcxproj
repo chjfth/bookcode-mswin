@@ -220,14 +220,20 @@
     <ClCompile Include="..\BookCommon\src\dxutil.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Chapter1_Tutorial1.rc" />
+    <ResourceCompile Include="WinMain.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Chapter1_Tutorial1.ico" />
+    <None Include="..\BookCommon\directx.ico" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
+  
+  <!-- Import shared project properties used by this book. -->
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\BookShare.props" />
+  </ImportGroup>
+
   
   <!-- MSBuild system stock Cpp.targets -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

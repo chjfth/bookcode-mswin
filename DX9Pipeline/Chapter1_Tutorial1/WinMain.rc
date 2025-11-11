@@ -30,7 +30,7 @@ CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "VertexShader.manifest"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-1                       ICON                    "Chapter1_Tutorial1.ico"
+IDI_MAIN_ICON   ICON   "..\BookCommon\directx.ico"
 
 
 
