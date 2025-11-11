@@ -2,15 +2,15 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- 
-    This project needs VC2010 and DirectX SDK 9.0 . 
+    This project needs VC2010 and DirectX SDK 9.0b(2003), DXSDK version Oct 2004 is not compatible 
+    due to D3DXLoadMeshFromXof() parameter type change.
+    
     If using VC2015+, we need to link in extra legacy_stdio_definitions.lib . (to confirm)
   	
   	User should have:
   		d:\DXSDK9\Lib\d3dx9.lib
-  		d:\DXSDK9\Lib\d3dx9.lib
   
   	Note: DirectX SDK 9.0b provides only x86 static-libs, no x64 variants.
-  
   -->
   
   <PropertyGroup>
@@ -21,7 +21,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <!-- Note: We should place $(dirDxsdk9)\Include *behind* VC2010's Win7SDK include, 
+         bcz DXSDK carries outdated basetsd.h which is not compatible with Win7SDK's other headers. 
+    -->
     <IncludePath>$(IncludePath);..\BookCommon\Include;$(dirDxsdk9)\Include;</IncludePath>
+    
     <LibraryPath>$(dirDxsdk9)\Lib;$(LibraryPath)</LibraryPath>
     
     <PathD3dxLib>$(dirDxsdk9)\Lib\d3dx9.lib</PathD3dxLib>
