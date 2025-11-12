@@ -10,7 +10,7 @@
   	User should have:
   		d:\DXSDK9\Lib\d3dx9.lib
   
-  	Note: DirectX SDK 9.0b provides only x86 static-libs, no x64 variants. So we will [ALERT] on non x86 Platform.
+  	Note: DirectX SDK 9.0b provides only x86 static-libs, no x64 variants. So we will [ALERT] on non-x86 Platform.
   -->
   
   <PropertyGroup>

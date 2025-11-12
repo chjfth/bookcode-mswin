@@ -225,7 +225,7 @@ HRESULT CMyD3DApplication::Render()
             D3DXMatrixTranspose( &compMat, &compMat );
             m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMat, 4 );
 
-            m_pd3dDevice->SetVertexDeclaration( m_pVertexDeclaration);
+            m_pd3dDevice->SetVertexDeclaration(m_pVertexDeclaration);
             m_pd3dDevice->SetVertexShader(m_pAsm_VS);
             m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
             m_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
@@ -273,7 +273,7 @@ const char* strAssyVertexShader =
 ";\n"
 "";
 
-    // compile and create the vertex shader
+    // compile and create the vertex shader (chj: shader body)
     LPD3DXBUFFER pShader = NULL;
 
     hr = D3DXAssembleShader(
@@ -339,7 +339,8 @@ const char* strAssyVertexShader =
     D3DVERTEXELEMENT9 decl[] =
     {
         { 0, 0,  D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, 
-            D3DDECLUSAGE_POSITION, 0 },
+			D3DDECLUSAGE_POSITION,  // usage semantics
+			0 },                    // semantic index
         D3DDECL_END()
     };
 

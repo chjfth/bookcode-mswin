@@ -345,10 +345,10 @@ HRESULT CD3DFont::RestoreDeviceObjects()
     LPDIRECT3D9 pd3d9 = NULL;
     if( SUCCEEDED( m_pd3dDevice->GetDirect3D( &pd3d9 ) ) )
     {
-        D3DCAPS9 Caps;
-        D3DDISPLAYMODE Mode;
+		D3DCAPS9 Caps = {};
+		D3DDISPLAYMODE Mode = {};
         LPDIRECT3DSURFACE9 pSurf = NULL;
-        D3DSURFACE_DESC Desc;
+		D3DSURFACE_DESC Desc = {};
         m_pd3dDevice->GetDeviceCaps( &Caps );
         m_pd3dDevice->GetDisplayMode( 0, &Mode );
         if( SUCCEEDED( m_pd3dDevice->GetRenderTarget( 0, &pSurf ) ) )
