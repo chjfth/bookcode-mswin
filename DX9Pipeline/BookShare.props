@@ -45,6 +45,8 @@
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX SDK June 2010] to provide d3dx9.lib etc." Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathD3dxLib)', most code samples will not compile." Importance="high" />
     
+    <Message Condition="'$(PlatformX)'!='x86'" Text="[ALERT] DirectX 9.0b supports only 32bit Windodws, your 64bit EXE linking will fail." Importance="high" />
+
     <Message Condition="'$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk9) ." Importance="high" />
   </Target>
 
