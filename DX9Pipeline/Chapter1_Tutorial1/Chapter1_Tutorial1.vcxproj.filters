@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="VertexShader.cpp" />
+    <ClCompile Include="..\BookCommon\src\d3dapp.cpp">
+      <Filter>BookCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BookCommon\src\d3denumeration.cpp">
+      <Filter>BookCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BookCommon\src\d3dfile.cpp">
+      <Filter>BookCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BookCommon\src\d3dfont.cpp">
+      <Filter>BookCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BookCommon\src\d3dsettings.cpp">
+      <Filter>BookCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BookCommon\src\d3dutil.cpp">
+      <Filter>BookCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BookCommon\src\dxutil.cpp">
+      <Filter>BookCommon</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WinMain.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="BookCommon">
+      <UniqueIdentifier>{400f65d2-be56-4c63-b7d5-ed0e3c6cf83e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\BookCommon\directx.ico">
+      <Filter>BookCommon</Filter>
+    </None>
+  </ItemGroup>
+</Project>

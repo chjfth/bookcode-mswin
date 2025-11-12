@@ -491,7 +491,7 @@ void CD3DSettingsDialog::WindowedFullscreenChanged( void )
         TCHAR strResolution[50];
         dwResolutionData = MAKELONG( m_d3dSettings.Windowed_DisplayMode.Width,
                                      m_d3dSettings.Windowed_DisplayMode.Height );
-        _sntprintf( strResolution, 50, TEXT("%d by %d"), m_d3dSettings.Windowed_DisplayMode.Width, 
+        _sntprintf_s( strResolution, _TRUNCATE, TEXT("%d by %d"), m_d3dSettings.Windowed_DisplayMode.Width, 
             m_d3dSettings.Windowed_DisplayMode.Height );
         strResolution[49] = 0;
         ComboBoxClear( IDC_RESOLUTION_COMBO );
@@ -504,7 +504,7 @@ void CD3DSettingsDialog::WindowedFullscreenChanged( void )
         if( m_d3dSettings.Windowed_DisplayMode.RefreshRate == 0 )
             lstrcpy( strRefreshRate, TEXT("Default Rate") );
         else
-            _sntprintf( strRefreshRate, 50, TEXT("%d Hz"), m_d3dSettings.Windowed_DisplayMode.RefreshRate );
+            _sntprintf_s( strRefreshRate, _TRUNCATE, TEXT("%d Hz"), m_d3dSettings.Windowed_DisplayMode.RefreshRate );
         strRefreshRate[49] = 0;
         ComboBoxClear( IDC_REFRESHRATE_COMBO );
         ComboBoxAdd( IDC_REFRESHRATE_COMBO, ULongToPtr(m_d3dSettings.Windowed_DisplayMode.RefreshRate),
@@ -578,7 +578,7 @@ void CD3DSettingsDialog::AdapterFormatChanged( void )
                 DWORD dwResolutionData;
                 TCHAR strResolution[50];
                 dwResolutionData = MAKELONG( displayMode.Width, displayMode.Height );
-                _sntprintf( strResolution, 50, TEXT("%d by %d"), displayMode.Width, displayMode.Height );
+                _sntprintf_s( strResolution, _TRUNCATE, TEXT("%d by %d"), displayMode.Width, displayMode.Height );
                 strResolution[49] = 0;
                 if (!ComboBoxContainsText( IDC_RESOLUTION_COMBO, strResolution ) )
                 {
@@ -664,7 +664,7 @@ void CD3DSettingsDialog::ResolutionChanged( void )
             if( displayMode.RefreshRate == 0 )
                 lstrcpy( strRefreshRate, TEXT("Default Rate") );
             else
-                _sntprintf( strRefreshRate, 50, TEXT("%d Hz"), displayMode.RefreshRate );
+                _sntprintf_s( strRefreshRate, _TRUNCATE, TEXT("%d Hz"), displayMode.RefreshRate );
             strRefreshRate[49] = 0;
             if( !ComboBoxContainsText( IDC_REFRESHRATE_COMBO, strRefreshRate ) )
             {

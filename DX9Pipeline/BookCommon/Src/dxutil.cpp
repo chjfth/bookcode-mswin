@@ -13,6 +13,7 @@
 #include <tchar.h>
 #include <stdio.h> 
 #include <stdarg.h>
+#include <strsafe.h> // for StringCchCat, StringCchCopy
 #include "DXUtil.h"
 
 
@@ -35,7 +36,7 @@ HRESULT DXUtil_GetDXSDKMediaPathCch( TCHAR* strDest, int cchDest )
     if( strDest == NULL || cchDest < 1 )
         return E_INVALIDARG;
 
-    lstrcpy( strDest, TEXT("") );
+    strDest[0] = '\0';
 
     // Open the appropriate registry key
     HKEY  hKey;
@@ -50,6 +51,7 @@ HRESULT DXUtil_GetDXSDKMediaPathCch( TCHAR* strDest, int cchDest )
     lResult = RegQueryValueEx( hKey, _T("DX9SDK Samples Path"), NULL,
                               &dwType, (BYTE*)strDest, &dwSize );
     strDest[cchDest-1] = 0; // RegQueryValueEx doesn't NULL term if buffer too small
+							// Chj: No! RegQueryValueEx fills no char if buffer too small.
     RegCloseKey( hKey );
 
     if( ERROR_SUCCESS != lResult )
@@ -57,7 +59,7 @@ HRESULT DXUtil_GetDXSDKMediaPathCch( TCHAR* strDest, int cchDest )
 
     const TCHAR* strMedia = _T("\\Media\\");
     if( lstrlen(strDest) + lstrlen(strMedia) < cchDest )
-        _tcscat( strDest, strMedia );
+        StringCchCat( strDest, cchDest, strMedia );
     else
         return E_INVALIDARG;
 
@@ -85,8 +87,8 @@ HRESULT DXUtil_FindMediaFileCch( TCHAR* strDestPath, int cchDest, TCHAR* strFile
     if( NULL==strFilename || NULL==strDestPath || cchDest < 1 )
         return E_INVALIDARG;
 
-    lstrcpy( strDestPath, TEXT("") );
-    lstrcpy( strShortName, TEXT("") );
+    strDestPath[0] = '\0';
+    strShortName[0] = '\0';
 
     // Build full path name from strFileName (strShortName will be just the leaf filename)
     cchPath = GetFullPathName(strFilename, cchDest, strDestPath, &strShortNameTmp);
@@ -109,7 +111,7 @@ HRESULT DXUtil_FindMediaFileCch( TCHAR* strDestPath, int cchDest, TCHAR* strFile
                        OPEN_EXISTING, 0, NULL );
     if( INVALID_HANDLE_VALUE != file )
     {
-        _tcsncpy( strDestPath, strShortName, cchDest );
+        StringCchCopy( strDestPath, cchDest, strShortName);
         strDestPath[cchDest-1] = 0; // _tcsncpy doesn't NULL term if it runs out of space
         CloseHandle( file );
         return S_OK;
@@ -120,7 +122,7 @@ HRESULT DXUtil_FindMediaFileCch( TCHAR* strDestPath, int cchDest, TCHAR* strFile
         return hr;
 
     if( lstrlen(strDestPath) + lstrlen(strShortName) < cchDest )
-        lstrcat( strDestPath, strShortName );
+        StringCchCat( strDestPath, cchDest, strShortName );
     else
         return E_INVALIDARG;
 
@@ -133,7 +135,7 @@ HRESULT DXUtil_FindMediaFileCch( TCHAR* strDestPath, int cchDest, TCHAR* strFile
     }
 
     // On failure, just return the file as the path
-    _tcsncpy( strDestPath, strFilename, cchDest );
+    StringCchCopy( strDestPath, cchDest, strFilename);
     strDestPath[cchDest-1] = 0; // _tcsncpy doesn't NULL term if it runs out of space
     return HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND );
 }
@@ -157,7 +159,7 @@ HRESULT DXUtil_ReadStringRegKeyCch( HKEY hKey, TCHAR* strRegName, TCHAR* strDest
     if( ERROR_SUCCESS != RegQueryValueEx( hKey, strRegName, 0, &dwType, 
                                           (BYTE*)strDest, &cbDest ) )
     {
-        _tcsncpy( strDest, strDefault, cchDest );
+        StringCchCopy( strDest, cchDest, strDefault);
         strDest[cchDest-1] = 0;
 
         if( dwType != REG_SZ )
@@ -577,7 +579,7 @@ HRESULT DXUtil_ConvertGenericStringToAnsiCch( CHAR* strDestination, const TCHAR*
 #ifdef _UNICODE
     return DXUtil_ConvertWideStringToAnsiCch( strDestination, tstrSource, cchDestChar );
 #else
-    strncpy( strDestination, tstrSource, cchDestChar );
+    StringCchCopy( strDestination, cchDestChar, tstrSource);
     strDestination[cchDestChar-1] = '\0';
     return S_OK;
 #endif   
@@ -600,7 +602,7 @@ HRESULT DXUtil_ConvertGenericStringToWideCch( WCHAR* wstrDestination, const TCHA
         return E_INVALIDARG;
 
 #ifdef _UNICODE
-    wcsncpy( wstrDestination, tstrSource, cchDestChar );
+    StringCchCopy( wstrDestination, cchDestChar, tstrSource);
     wstrDestination[cchDestChar-1] = L'\0';
     return S_OK;
 #else
@@ -627,7 +629,7 @@ HRESULT DXUtil_ConvertAnsiStringToGenericCch( TCHAR* tstrDestination, const CHAR
 #ifdef _UNICODE
     return DXUtil_ConvertAnsiStringToWideCch( tstrDestination, strSource, cchDestChar );
 #else
-    strncpy( tstrDestination, strSource, cchDestChar );
+    StringCchCopy( tstrDestination, cchDestChar, strSource);
     tstrDestination[cchDestChar-1] = '\0';
     return S_OK;
 #endif    
@@ -650,7 +652,7 @@ HRESULT DXUtil_ConvertWideStringToGenericCch( TCHAR* tstrDestination, const WCHA
         return E_INVALIDARG;
 
 #ifdef _UNICODE
-    wcsncpy( tstrDestination, wstrSource, cchDestChar );
+    StringCchCopy( tstrDestination, cchDestChar, wstrSource);
     tstrDestination[cchDestChar-1] = L'\0';    
     return S_OK;
 #else
@@ -680,16 +682,11 @@ VOID DXUtil_LaunchReadme( HWND hWnd, TCHAR* strLoc )
 
     bool bSuccess = false;
     bool bFound = false;
-    TCHAR strReadmePath[1024];
-    TCHAR strExeName[MAX_PATH];
-    TCHAR strExePath[MAX_PATH];
-    TCHAR strSamplePath[MAX_PATH];
+	TCHAR strReadmePath[1024] = {};
+	TCHAR strExeName[MAX_PATH] = {};
+	TCHAR strExePath[MAX_PATH] = {};
+	TCHAR strSamplePath[MAX_PATH] = {};
     TCHAR* strLastSlash = NULL;
-
-    lstrcpy( strReadmePath, TEXT("") );
-    lstrcpy( strExePath, TEXT("") );
-    lstrcpy( strExeName, TEXT("") );
-    lstrcpy( strSamplePath, TEXT("") );
 
     // If the user provided a location for the readme, check there first.
     if( strLoc )
@@ -708,9 +705,8 @@ VOID DXUtil_LaunchReadme( HWND hWnd, TCHAR* strLoc )
             
             if( ERROR_SUCCESS == lResult )
             {
-                _sntprintf( strReadmePath, 1023, TEXT("%s\\C++\\%s\\readme.txt"), 
+                _sntprintf_s( strReadmePath, _TRUNCATE, TEXT("%s\\C++\\%s\\readme.txt"), 
                             strSamplePath, strLoc );
-                strReadmePath[1023] = 0;
 
                 if( GetFileAttributes( strReadmePath ) != 0xFFFFFFFF )
                     bFound = TRUE;
@@ -727,7 +723,7 @@ VOID DXUtil_LaunchReadme( HWND hWnd, TCHAR* strLoc )
     strLastSlash = _tcsrchr( strExePath, TEXT('\\') );
     if( strLastSlash )
     {
-        _tcsncpy( strExeName, &strLastSlash[1], MAX_PATH );
+        StringCchCopy( strExeName, ARRAYSIZE(strExeName), &strLastSlash[1]);
         strExeName[MAX_PATH-1]=0;
 
         // Chop the exe name from the exe path
@@ -741,15 +737,15 @@ VOID DXUtil_LaunchReadme( HWND hWnd, TCHAR* strLoc )
 
     if( !bFound )
     {
-        // Search in "%EXE_DIR%\..\%EXE_NAME%".  This matchs the DirectX SDK layout
-        _tcscpy( strReadmePath, strExePath );
+        // Search in "%EXE_DIR%\..\%EXE_NAME%".  This matches the DirectX SDK layout
+        StringCchCopy( strReadmePath, ARRAYSIZE(strReadmePath), strExePath );
 
         strLastSlash = _tcsrchr( strReadmePath, TEXT('\\') );
         if( strLastSlash )
             *strLastSlash = 0;
-        lstrcat( strReadmePath, TEXT("\\") );
-        lstrcat( strReadmePath, strExeName );
-        lstrcat( strReadmePath, TEXT("\\readme.txt") );
+        StringCchCat( strReadmePath, ARRAYSIZE(strReadmePath), TEXT("\\") );
+        StringCchCat( strReadmePath, ARRAYSIZE(strReadmePath), strExeName );
+        StringCchCat( strReadmePath, ARRAYSIZE(strReadmePath), TEXT("\\readme.txt") );
         if( GetFileAttributes( strReadmePath ) != 0xFFFFFFFF )
             bFound = TRUE;
     }
@@ -757,8 +753,8 @@ VOID DXUtil_LaunchReadme( HWND hWnd, TCHAR* strLoc )
     if( !bFound )
     {
         // Search in "%EXE_DIR%\"
-        _tcscpy( strReadmePath, strExePath );
-        lstrcat( strReadmePath, TEXT("\\readme.txt") );
+        StringCchCopy( strReadmePath, ARRAYSIZE(strReadmePath), strExePath );
+        StringCchCat( strReadmePath, ARRAYSIZE(strReadmePath), TEXT("\\readme.txt") );
         if( GetFileAttributes( strReadmePath ) != 0xFFFFFFFF )
             bFound = TRUE;
     }
@@ -766,11 +762,11 @@ VOID DXUtil_LaunchReadme( HWND hWnd, TCHAR* strLoc )
     if( !bFound )
     {
         // Search in "%EXE_DIR%\.."
-        _tcscpy( strReadmePath, strExePath );
+        StringCchCopy( strReadmePath, ARRAYSIZE(strReadmePath), strExePath );
         strLastSlash = _tcsrchr( strReadmePath, TEXT('\\') );
         if( strLastSlash )
             *strLastSlash = 0;
-        lstrcat( strReadmePath, TEXT("\\readme.txt") );
+        StringCchCat( strReadmePath, ARRAYSIZE(strReadmePath), TEXT("\\readme.txt") );
         if( GetFileAttributes( strReadmePath ) != 0xFFFFFFFF )
             bFound = TRUE;
     }
@@ -778,14 +774,14 @@ VOID DXUtil_LaunchReadme( HWND hWnd, TCHAR* strLoc )
     if( !bFound )
     {
         // Search in "%EXE_DIR%\..\.."
-        _tcscpy( strReadmePath, strExePath );
+        StringCchCopy( strReadmePath, ARRAYSIZE(strReadmePath), strExePath );
         strLastSlash = _tcsrchr( strReadmePath, TEXT('\\') );
         if( strLastSlash )
             *strLastSlash = 0;
         strLastSlash = _tcsrchr( strReadmePath, TEXT('\\') );
         if( strLastSlash )
             *strLastSlash = 0;
-        lstrcat( strReadmePath, TEXT("\\readme.txt") );
+        StringCchCat( strReadmePath, ARRAYSIZE(strReadmePath), TEXT("\\readme.txt") );
         if( GetFileAttributes( strReadmePath ) != 0xFFFFFFFF )
             bFound = TRUE;
     }
@@ -839,7 +835,7 @@ VOID DXUtil_Trace( TCHAR* strMsg, ... )
     
     va_list args;
     va_start(args, strMsg);
-    _vsntprintf( strBuffer, 512, strMsg, args );
+    _vsntprintf_s( strBuffer, _TRUNCATE, strMsg, args );
     va_end(args);
 
     OutputDebugString( strBuffer );
@@ -897,12 +893,13 @@ HRESULT DXUtil_ConvertStringToGUID( const TCHAR* strSrc, GUID* pGuidDest )
 //-----------------------------------------------------------------------------
 HRESULT DXUtil_ConvertGUIDToStringCch( const GUID* pGuidSrc, TCHAR* strDest, int cchDestChar )
 {
-    int nResult = _sntprintf( strDest, cchDestChar, TEXT("{%0.8X-%0.4X-%0.4X-%0.2X%0.2X-%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X}"),
-               pGuidSrc->Data1, pGuidSrc->Data2, pGuidSrc->Data3,
-               pGuidSrc->Data4[0], pGuidSrc->Data4[1],
-               pGuidSrc->Data4[2], pGuidSrc->Data4[3],
-               pGuidSrc->Data4[4], pGuidSrc->Data4[5],
-               pGuidSrc->Data4[6], pGuidSrc->Data4[7] );
+    int nResult = _sntprintf_s( strDest, cchDestChar, _TRUNCATE,
+		TEXT("{%0.8X-%0.4X-%0.4X-%0.2X%0.2X-%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X}"),
+		pGuidSrc->Data1, pGuidSrc->Data2, pGuidSrc->Data3,
+		pGuidSrc->Data4[0], pGuidSrc->Data4[1],
+		pGuidSrc->Data4[2], pGuidSrc->Data4[3],
+		pGuidSrc->Data4[4], pGuidSrc->Data4[5],
+		pGuidSrc->Data4[6], pGuidSrc->Data4[7] );
 
     if( nResult < 0 )
         return E_FAIL;

@@ -813,7 +813,7 @@ HRESULT CD3DApplication::Initialize3DEnvironment()
                 pAdapterInfo->AdapterIdentifier.Description, cchDesc );
             int maxAppend = sizeof(m_strDeviceStats) / sizeof(TCHAR) -
                 lstrlen( m_strDeviceStats ) - 1;
-            _tcsncat( m_strDeviceStats, szDescription, maxAppend );
+            _tcsncat_s( m_strDeviceStats, szDescription, maxAppend );
         }
 
         // Store render target surface desc
@@ -1387,7 +1387,7 @@ void CD3DApplication::UpdateStats()
         fLastTime = fTime;
         dwFrames  = 0;
 
-        TCHAR strFmt[100];
+		TCHAR strFmt[100] = {};
         D3DFORMAT fmtAdapter = m_d3dSettings.DisplayMode().Format;
         if( fmtAdapter == m_d3dsdBackBuffer.Format )
         {
@@ -1395,7 +1395,7 @@ void CD3DApplication::UpdateStats()
         }
         else
         {
-            _sntprintf( strFmt, 100, TEXT("backbuf %s, adapter %s"), 
+            _sntprintf_s( strFmt, _TRUNCATE, TEXT("backbuf %s, adapter %s"), 
                 D3DUtil_D3DFormatToString( m_d3dsdBackBuffer.Format, false ), 
                 D3DUtil_D3DFormatToString( fmtAdapter, false ) );
         }
@@ -1404,7 +1404,7 @@ void CD3DApplication::UpdateStats()
         TCHAR strDepthFmt[100];
         if( m_d3dEnumeration.AppUsesDepthBuffer )
         {
-            _sntprintf( strDepthFmt, 100, TEXT(" (%s)"), 
+            _sntprintf_s( strDepthFmt, _TRUNCATE, TEXT(" (%s)"), 
                 D3DUtil_D3DFormatToString( m_d3dSettings.DepthStencilBufferFormat(), false ) );
             strDepthFmt[99] = TEXT('\0');
         }
@@ -1436,11 +1436,9 @@ void CD3DApplication::UpdateStats()
         default:                        pstrMultiSample = TEXT(""); break;
         }
 
-        const int cchMaxFrameStats = sizeof(m_strFrameStats) / sizeof(TCHAR);
-        _sntprintf( m_strFrameStats, cchMaxFrameStats, _T("%.02f fps (%dx%d), %s%s%s"), m_fFPS,
+        _sntprintf_s( m_strFrameStats, _TRUNCATE, _T("%.02f fps (%dx%d), %s%s%s"), m_fFPS,
                     m_d3dsdBackBuffer.Width, m_d3dsdBackBuffer.Height,
                     strFmt, strDepthFmt, pstrMultiSample );
-        m_strFrameStats[cchMaxFrameStats - 1] = TEXT('\0');
     }
 }
 
@@ -1512,7 +1510,7 @@ void CD3DApplication::Cleanup3DEnvironment()
 HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
 {
     static bool s_bFatalErrorReported = false;
-    TCHAR strMsg[512];
+	TCHAR strMsg[512] = {};
 
     // If a fatal error message has already been reported, the app
     // is already shutting down, so don't show more error messages.
@@ -1522,7 +1520,7 @@ HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
     switch( hr )
     {
         case D3DAPPERR_NODIRECT3D:
-            _tcscpy( strMsg, _T("Could not initialize Direct3D. You may\n")
+            _tcscpy_s( strMsg, _T("Could not initialize Direct3D. You may\n")
                              _T("want to check that the latest version of\n")
                              _T("DirectX is correctly installed on your\n")
                              _T("system.  Also make sure that this program\n")
@@ -1531,12 +1529,12 @@ HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
             break;
 
         case D3DAPPERR_NOCOMPATIBLEDEVICES:
-            _tcscpy( strMsg, _T("Could not find any compatible Direct3D\n")
+            _tcscpy_s( strMsg, _T("Could not find any compatible Direct3D\n")
                              _T("devices.") );
             break;
 
         case D3DAPPERR_NOWINDOWABLEDEVICES:
-            _tcscpy( strMsg, _T("This sample cannot run in a desktop\n")
+            _tcscpy_s( strMsg, _T("This sample cannot run in a desktop\n")
                              _T("window with the current display settings.\n")
                              _T("Please change your desktop settings to a\n")
                              _T("16- or 32-bit display mode and re-run this\n")
@@ -1544,25 +1542,25 @@ HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
             break;
 
         case D3DAPPERR_NOHARDWAREDEVICE:
-            _tcscpy( strMsg, _T("No hardware-accelerated Direct3D devices\n")
+            _tcscpy_s( strMsg, _T("No hardware-accelerated Direct3D devices\n")
                              _T("were found.") );
             break;
 
         case D3DAPPERR_HALNOTCOMPATIBLE:
-            _tcscpy( strMsg, _T("This sample requires functionality that is\n")
+            _tcscpy_s( strMsg, _T("This sample requires functionality that is\n")
                              _T("not available on your Direct3D hardware\n")
                              _T("accelerator.") );
             break;
 
         case D3DAPPERR_NOWINDOWEDHAL:
-            _tcscpy( strMsg, _T("Your Direct3D hardware accelerator cannot\n")
+            _tcscpy_s( strMsg, _T("Your Direct3D hardware accelerator cannot\n")
                              _T("render into a window.\n")
                              _T("Press F2 while the app is running to see a\n")
                              _T("list of available devices and modes.") );
             break;
 
         case D3DAPPERR_NODESKTOPHAL:
-            _tcscpy( strMsg, _T("Your Direct3D hardware accelerator cannot\n")
+            _tcscpy_s( strMsg, _T("Your Direct3D hardware accelerator cannot\n")
                              _T("render into a window with the current\n")
                              _T("desktop display settings.\n")
                              _T("Press F2 while the app is running to see a\n")
@@ -1570,7 +1568,7 @@ HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
             break;
 
         case D3DAPPERR_NOHALTHISMODE:
-            _tcscpy( strMsg, _T("This sample requires functionality that is\n")
+            _tcscpy_s( strMsg, _T("This sample requires functionality that is\n")
                              _T("not available on your Direct3D hardware\n")
                              _T("accelerator with the current desktop display\n")
                              _T("settings.\n")
@@ -1580,22 +1578,22 @@ HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
 
         case D3DAPPERR_MEDIANOTFOUND:
 		//case HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND ): // VC2010 cannot write this, bcz HRESULT_FROM_WIN32() is an inline function.
-        case __HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND ): // Chj: VC2010 use this instead.
-            _tcscpy( strMsg, _T("Could not load required media." ) );
+        case __HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND ): // Chj: VC2010 should use this instead, which remains a macro.
+            _tcscpy_s( strMsg, _T("Could not load required media." ) );
             break;
 
         case D3DAPPERR_RESETFAILED:
-            _tcscpy( strMsg, _T("Could not reset the Direct3D device." ) );
+            _tcscpy_s( strMsg, _T("Could not reset the Direct3D device." ) );
             break;
 
         case D3DAPPERR_NONZEROREFCOUNT:
-            _tcscpy( strMsg, _T("A D3D object has a non-zero reference\n")
+            _tcscpy_s( strMsg, _T("A D3D object has a non-zero reference\n")
                              _T("count (meaning things were not properly\n")
                              _T("cleaned up).") );
             break;
 
         case D3DAPPERR_NULLREFDEVICE:
-            _tcscpy( strMsg, _T("Warning: Nothing will be rendered.\n")
+            _tcscpy_s( strMsg, _T("Warning: Nothing will be rendered.\n")
                              _T("The reference rendering device was selected, but your\n")
                              _T("computer only has a reduced-functionality reference device\n")
                              _T("installed.  Install the DirectX SDK to get the full\n")
@@ -1603,27 +1601,27 @@ HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
             break;
 
         case E_OUTOFMEMORY:
-            _tcscpy( strMsg, _T("Not enough memory.") );
+            _tcscpy_s( strMsg, _T("Not enough memory.") );
             break;
 
         case D3DERR_OUTOFVIDEOMEMORY:
-            _tcscpy( strMsg, _T("Not enough video memory.") );
+            _tcscpy_s( strMsg, _T("Not enough video memory.") );
             break;
 
         case D3DERR_DRIVERINTERNALERROR:
-            _tcscpy( strMsg, _T("A serious problem occured inside the display driver.") );
+            _tcscpy_s( strMsg, _T("A serious problem occured inside the display driver.") );
             dwType = MSGERR_APPMUSTEXIT;
             break;
 
         default:
-            _tcscpy( strMsg, _T("Generic application error. Enable\n")
+            _tcscpy_s( strMsg, _T("Generic application error. Enable\n")
                              _T("debug output for detailed information.") );
     }
 
     if( MSGERR_APPMUSTEXIT == dwType )
     {
         s_bFatalErrorReported = true;
-        _tcscat( strMsg, _T("\n\nThis sample will now exit.") );
+        _tcscat_s( strMsg, _T("\n\nThis sample will now exit.") );
         MessageBox( NULL, strMsg, m_strWindowTitle, MB_ICONERROR|MB_OK );
 
         // Close the window, which shuts down the app
@@ -1633,7 +1631,7 @@ HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
     else
     {
         if( MSGWARN_SWITCHEDTOREF == dwType )
-            _tcscat( strMsg, _T("\n\nSwitching to the reference rasterizer,\n")
+            _tcscat_s( strMsg, _T("\n\nSwitching to the reference rasterizer,\n")
                              _T("a software device that implements the entire\n")
                              _T("Direct3D feature set, but runs very slowly.") );
         MessageBox( NULL, strMsg, m_strWindowTitle, MB_ICONWARNING|MB_OK );
