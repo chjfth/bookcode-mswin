@@ -21,8 +21,6 @@
 #include "resource.h"
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
 // Desc: Application class. The base class (CD3DApplication) provides the 
@@ -164,23 +162,23 @@ HRESULT CMyD3DApplication::FrameMove()
     D3DXVECTOR3 vT( 0.0f, 0.0f, 0.0f );
     D3DXVECTOR3 vR( 0.0f, 0.0f, 0.0f );
 
-    if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )                 vT.x -= 1.0f; // Slide Left
-    if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )                vT.x += 1.0f; // Slide Right
-    if( m_bKey[VK_DOWN] )                                       vT.y -= 1.0f; // Slide Down
-    if( m_bKey[VK_UP] )                                         vT.y += 1.0f; // Slide Up
-    if( m_bKey['W'] )                                           vT.z -= 2.0f; // Move Forward
-    if( m_bKey['S'] )                                           vT.z += 2.0f; // Move Backward
-    if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )                     vR.x -= 1.0f; // Pitch Down
-    if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )                     vR.x += 1.0f; // Pitch Up
-    if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )                     vR.y -= 1.0f; // Turn Right
-    if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )                     vR.y += 1.0f; // Turn Left
-    if( m_bKey[VK_NUMPAD9] )                                    vR.z -= 2.0f; // Roll CW
-    if( m_bKey[VK_NUMPAD7] )                                    vR.z += 2.0f; // Roll CCW
+    if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )  vT.x -= 1.0f; // Slide Left
+    if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] ) vT.x += 1.0f; // Slide Right
+    if( m_bKey[VK_DOWN] )                        vT.y -= 1.0f; // Slide Down
+    if( m_bKey[VK_UP] )                          vT.y += 1.0f; // Slide Up
+    if( m_bKey['W'] )                            vT.z -= 2.0f; // Move Forward
+    if( m_bKey['S'] )                            vT.z += 2.0f; // Move Backward
+    if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )      vR.x -= 1.0f; // Pitch Down
+    if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )      vR.x += 1.0f; // Pitch Up
+    if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )      vR.y -= 1.0f; // Turn Right
+    if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )      vR.y += 1.0f; // Turn Left
+    if( m_bKey[VK_NUMPAD9] )                     vR.z -= 2.0f; // Roll CW
+    if( m_bKey[VK_NUMPAD7] )                     vR.z += 2.0f; // Roll CCW
 
     m_vVelocity        = m_vVelocity * 0.9f + vT * 0.1f;
     m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
 
-    // Update position and view matricies
+    // Update position and view matrices
     D3DXMATRIXA16     matT, matR;
     D3DXQUATERNION qR;
 

@@ -5,12 +5,12 @@
     This project needs VC2010 and DirectX SDK 9.0b(2003), DXSDK version Oct 2004 is not compatible 
     due to D3DXLoadMeshFromXof() parameter type change.
     
-    If using VC2015+, we need to link in extra legacy_stdio_definitions.lib . (to confirm)
+    Using VC2015 is also OK, at least on Chap1 code. 
   	
   	User should have:
   		d:\DXSDK9\Lib\d3dx9.lib
   
-  	Note: DirectX SDK 9.0b provides only x86 static-libs, no x64 variants.
+  	Note: DirectX SDK 9.0b provides only x86 static-libs, no x64 variants. So we will [ALERT] on non x86 Platform.
   -->
   
   <PropertyGroup>
@@ -36,13 +36,14 @@
     <Link>
       <AdditionalDependencies>d3d9.lib;d3dx9.lib;d3dxof.lib;dxguid.lib;winmm.lib;;%(AdditionalDependencies)</AdditionalDependencies>
 
-	  <!-- Add legacy_stdio_definitions.lib for VC2015+ (bcz DxErr.lib needs _vsnwprintf) -->
+	  <!-- Add legacy_stdio_definitions.lib for VC2015+ (bcz d3dx9.lib refers to _snprintf etc). -->
       <AdditionalDependencies Condition="'$(IsUsingVc2010)'!='true'">legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       
     </Link>
   </ItemDefinitionGroup>
 
   <Target Name="DXSDK2010_ChjAlert" BeforeTargets="PrepareForBuild">
-    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX SDK June 2010] to provide d3dx9.lib etc." Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX 9.0b] to provide d3dx9.lib etc." Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathD3dxLib)', most code samples will not compile." Importance="high" />
     
     <Message Condition="'$(PlatformX)'!='x86'" Text="[ALERT] DirectX 9.0b supports only 32bit Windodws, your 64bit EXE linking will fail." Importance="high" />
