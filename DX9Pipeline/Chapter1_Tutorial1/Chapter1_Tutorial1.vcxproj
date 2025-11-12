@@ -84,6 +84,10 @@
     <ProjectName>Chapter1_Tutorial1</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
+
+      <!-- We must assign /manifest:NO to have VC linker use our custom VertexShader.manifest . -->
+      <GenerateManifest>false</GenerateManifest>
+
   </PropertyGroup>
   
   <!-- Microsoft.Cpp.Default.props 
