@@ -853,9 +853,9 @@ VOID DXUtil_Trace( TCHAR* strMsg, ... )
 //-----------------------------------------------------------------------------
 HRESULT DXUtil_ConvertStringToGUID( const TCHAR* strSrc, GUID* pGuidDest )
 {
-    UINT aiTmp[10];
+	UINT aiTmp[10] = {};
 
-    if( _stscanf( strSrc, TEXT("{%8X-%4X-%4X-%2X%2X-%2X%2X%2X%2X%2X%2X}"),
+    if( _stscanf_s( strSrc, TEXT("{%8X-%4X-%4X-%2X%2X-%2X%2X%2X%2X%2X%2X}"),
                     &pGuidDest->Data1, 
                     &aiTmp[0], &aiTmp[1], 
                     &aiTmp[2], &aiTmp[3],
