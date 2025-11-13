@@ -266,11 +266,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 {
     HRESULT hr = S_OK;
 
-const char* strAssyVertexShader = 
+	const char* strAssyVertexShader =
 "vs_1_1              // version instruction\n"
 "dcl_position v0     // define position data in register v0\n"
+"dcl_color v1        // define color data in register v1\n"
 "m4x4 oPos, v0, c0   // transform vertices by view/projection matrix\n"
-";\n"
+"mov oD0, v1         // output diffuse color\n"
 "";
 
     // compile and create the vertex shader (chj: shader body)
@@ -307,12 +308,12 @@ const char* strAssyVertexShader =
 
     ///////////////////////////////////////////////////////////
     // Initialize three vertices for rendering a triangle
-    CUSTOMVERTEX vertices[] =
-    {
-        {-1, -1,  0}, // lower left
-        { 0,  1,  0}, // top
-        { 1, -1,  0}, // lower right
-    };
+	CUSTOMVERTEX vertices[] = 
+	{							// == NEW == add color info
+		{ -1, -1, 0, D3DCOLOR_RGBA(255,255,255,0) }, // white lower left
+		{ 0,  1,  0, D3DCOLOR_RGBA(255,0,0,0) }, // red top
+		{ 1, -1,  0, D3DCOLOR_RGBA(0,0,255,0) }, // blue lower right
+	};
 
     // Create the vertex buffer. Here we are allocating enough memory
     // (from the default pool) to hold all our 3 custom vertices.
@@ -341,7 +342,11 @@ const char* strAssyVertexShader =
         { 0, 0,  D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, 
 			D3DDECLUSAGE_POSITION,  // usage semantics
 			0 },                    // semantic index
-        D3DDECL_END()
+		// == NEW in Tutorial1a ==
+		{ 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT,
+			D3DDECLUSAGE_COLOR,		// usage semantics
+			0 },					// semantic index
+		D3DDECL_END()
     };
 
     if( FAILED( hr = m_pd3dDevice->CreateVertexDeclaration( decl, 
