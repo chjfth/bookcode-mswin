@@ -111,7 +111,7 @@ CMyD3DApplication::CMyD3DApplication()
 	m_pVertexDeclaration	= NULL;
 	m_pVB					= NULL;
 
-    m_strWindowTitle   = _T("VertexShader");
+    m_strWindowTitle   = _T("VertexShader 1.1a");
     m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
     m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -266,7 +266,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 {
     HRESULT hr = S_OK;
 
-	const char* strAssyVertexShader =
+	const char* strAssyVertexShader = // == NEW in Tutorial1a ==
 "vs_1_1              // version instruction\n"
 "dcl_position v0     // define position data in register v0\n"
 "dcl_color v1        // define color data in register v1\n"
@@ -340,11 +340,11 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
     D3DVERTEXELEMENT9 decl[] =
     {
         { 0, 0,  D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, 
-			D3DDECLUSAGE_POSITION,  // usage semantics
+			D3DDECLUSAGE_POSITION,  // usage semantics =0
 			0 },                    // semantic index
 		// == NEW in Tutorial1a ==
 		{ 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT,
-			D3DDECLUSAGE_COLOR,		// usage semantics
+			D3DDECLUSAGE_COLOR,		// usage semantics =10
 			0 },					// semantic index
 		D3DDECL_END()
     };

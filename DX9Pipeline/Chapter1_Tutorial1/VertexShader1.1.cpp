@@ -111,7 +111,7 @@ CMyD3DApplication::CMyD3DApplication()
 	m_pVertexDeclaration	= NULL;
 	m_pVB					= NULL;
 
-    m_strWindowTitle   = _T("VertexShader");
+    m_strWindowTitle   = _T("VertexShader 1.1");
     m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
     m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );

@@ -214,7 +214,7 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="VertexShader.cpp" />
+    <ClCompile Include="VertexShader1.1.cpp" />
     <ClCompile Include="..\BookCommon\src\d3dapp.cpp" />
     <ClCompile Include="..\BookCommon\src\d3denumeration.cpp" />
     <ClCompile Include="..\BookCommon\src\d3dfile.cpp" />
