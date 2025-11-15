@@ -215,13 +215,6 @@
    -->
   <ItemGroup>
     <ClCompile Include="VertexShader1.1.cpp" />
-    <ClCompile Include="..\BookCommon\src\d3dapp.cpp" />
-    <ClCompile Include="..\BookCommon\src\d3denumeration.cpp" />
-    <ClCompile Include="..\BookCommon\src\d3dfile.cpp" />
-    <ClCompile Include="..\BookCommon\src\d3dfont.cpp" />
-    <ClCompile Include="..\BookCommon\src\d3dsettings.cpp" />
-    <ClCompile Include="..\BookCommon\src\d3dutil.cpp" />
-    <ClCompile Include="..\BookCommon\src\dxutil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinMain.rc" />
@@ -231,6 +224,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+  </ItemGroup>
+
+  <!-- Reference BookCommon.lib -->
+  <ItemGroup>
+    <ProjectReference Include="..\BookCommon\BookCommon.vcxproj">
+      <Project>{20251115-0000-0000-0000-092344000001}</Project>
+    </ProjectReference>
   </ItemGroup>
   
   <!-- Import shared project properties used by this book. -->

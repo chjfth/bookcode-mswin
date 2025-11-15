@@ -80,14 +80,10 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20251113-0000-0000-0000-112217000001}</ProjectGuid>
-    <ProjectName>DX9P-Chap1-Tut1a</ProjectName>
+    <ProjectGuid>{20251115-0000-0000-0000-092344000001}</ProjectGuid>
+    <ProjectName>BookCommon</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
-    <ConfigurationType>Application</ConfigurationType>
-
-      <!-- We must assign /manifest:NO to have VC linker use our custom VertexShader.manifest . -->
-      <GenerateManifest>false</GenerateManifest>
-
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   
   <!-- Microsoft.Cpp.Default.props 
@@ -125,10 +121,6 @@
         "v143" on VC2022
       -->
     <PlatformToolset Condition="$(DefaultPlatformToolset)!=''">$(DefaultPlatformToolset)</PlatformToolset>
-
-    <!-- Chj special: For VC2013 and VC2015, I want them to produce WinXP-runnable EXE. (I want v120_xp or v140_xp) -->
-    <PlatformToolset Condition="$(DefaultPlatformToolset)=='v120' or $(DefaultPlatformToolset)=='v140'">$(DefaultPlatformToolset)_xp</PlatformToolset>
-    
   </PropertyGroup>
 
   <!---->
@@ -163,19 +155,17 @@
       <!-- EXE/DLL's .pdb is truly intermediate, so we put it in $(IntDir), with some fancy file-naming -->
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
-      <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDataBaseFile>$(TargetPath).pdb</ProgramDataBaseFile>
-      <ImportLibrary>$(OutDir)$(TargetName)--imp.lib</ImportLibrary>
       <GenerateMapFile>true</GenerateMapFile>
-      <AdditionalLibraryDirectories>;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'"  >;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Psapi.lib;ComCtl32.Lib;;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ComCtl32.Lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <!-- Better build.log file naming -->
     <BuildLog>
@@ -192,7 +182,6 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <RandomizedBaseAddress Condition="!$(Platform.StartsWith('ARM64'))">false</RandomizedBaseAddress>
     </Link>
   </ItemDefinitionGroup>
   <!-- 
@@ -214,31 +203,30 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="VertexShader1.1a.cpp" />
+    <ClCompile Include=".\src\d3dapp.cpp" />
+    <ClCompile Include=".\src\d3denumeration.cpp" />
+    <ClCompile Include=".\src\d3dfile.cpp" />
+    <ClCompile Include=".\src\d3dfont.cpp" />
+    <ClCompile Include=".\src\d3dsettings.cpp" />
+    <ClCompile Include=".\src\d3dutil.cpp" />
+    <ClCompile Include=".\src\dxutil.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="WinMain.rc" />
+    <ClInclude Include="d3dapp.h" />
+    <ClInclude Include="d3denumeration.h" />
+    <ClInclude Include="d3dfile.h" />
+    <ClInclude Include="d3dfont.h" />
+    <ClInclude Include="d3dres.h" />
+    <ClInclude Include="d3dsettings.h" />
+    <ClInclude Include="d3dutil.h" />
+    <ClInclude Include="dxutil.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\BookCommon\directx.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  
-  <!-- Reference BookCommon.lib -->
-  <ItemGroup>
-    <ProjectReference Include="..\BookCommon\BookCommon.vcxproj">
-      <Project>{20251115-0000-0000-0000-092344000001}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  
+
   <!-- Import shared project properties used by this book. -->
   <ImportGroup Label="PropertySheets">
     <Import Project="..\BookShare.props" />
   </ImportGroup>
 
-  
   <!-- MSBuild system stock Cpp.targets -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
@@ -246,8 +234,7 @@
 
   <!-- import VSPG start -->
   <PropertyGroup>
-    <VSPG_BootsDir_NoTBS Condition="exists('..\..\__VSPG\_VSPG\boots\_VSPG.props')" >..\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>
-    <VSPG_BootsDir_NoTBS Condition="exists('$(SolutionDir)_VSPG\boots\_VSPG.props')">$(SolutionDir)_VSPG\boots</VSPG_BootsDir_NoTBS>
+    <VSPG_BootsDir_NoTBS>..\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(VSPG_BootsDir_NoTBS)\_VSPG.props" Condition="exists('$(VSPG_BootsDir_NoTBS)\_VSPG.props')"/>
