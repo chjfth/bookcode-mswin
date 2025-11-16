@@ -20,6 +20,8 @@
 #include "D3DUtil.h"
 #include "resource.h"
 
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
 
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
@@ -264,6 +266,8 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::RestoreDeviceObjects()
 {
+	vaDbgTs(_T("RestoreDeviceObjects() >>>"));
+
     HRESULT hr = S_OK;
 
 const char* strAssyVertexShader = 
@@ -365,6 +369,8 @@ const char* strAssyVertexShader =
     // Set up the projection matrix
     D3DXMatrixPerspectiveFovLH( &m_matProj, D3DX_PI/4, 
         1.0f, 0.1f, 100.0f );
+
+	vaDbgTs(_T("RestoreDeviceObjects() <<< S_OK"));
 
     return S_OK;
 }
