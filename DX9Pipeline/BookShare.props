@@ -11,6 +11,8 @@
   		d:\DXSDK9\Lib\d3dx9.lib
   
   	Note: DirectX SDK 9.0b provides only x86 static-libs, no x64 variants. So we will [ALERT] on non-x86 Platform.
+  	I just can't turn to newer DXSDK Jun 2010 for x64 libs shortly, bcz the book authoer use d3dapp.h framework code
+  	that refers to LPDIRECTXFILEDATA. That D3DApp framework code and LPDIRECTXFILEDATA are removed from newer DXSDKs.
   -->
   
   <PropertyGroup>
