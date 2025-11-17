@@ -80,8 +80,8 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20251111-0000-0000-0000-091659000001}</ProjectGuid>
-    <ProjectName>DX9P-Chap1-1</ProjectName>
+    <ProjectGuid>{20251117-0000-0000-0000-170959000001}</ProjectGuid>
+    <ProjectName>DX9P-Chap1-chj</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
 
@@ -214,7 +214,7 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="VertexShader1.1.cpp" />
+    <ClCompile Include="VertexShader1_chj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinMain.rc" />
@@ -222,7 +222,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
-
+  
   <!-- Reference BookCommon.lib -->
   <ItemGroup>
     <ProjectReference Include="..\BookCommon\BookCommon.vcxproj">

@@ -81,7 +81,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20251113-0000-0000-0000-112217000001}</ProjectGuid>
-    <ProjectName>DX9P-Chap1-Tut1a</ProjectName>
+    <ProjectName>DX9P-Chap1-1a</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
 
