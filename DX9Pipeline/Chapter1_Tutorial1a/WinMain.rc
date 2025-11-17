@@ -21,7 +21,7 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "VertexShader.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID  RT_MANIFEST    "..\BookCommon\VertexShader.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
