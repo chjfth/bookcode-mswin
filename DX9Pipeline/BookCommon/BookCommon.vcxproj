@@ -212,14 +212,14 @@
     <ClCompile Include=".\src\dxutil.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="d3dapp.h" />
-    <ClInclude Include="d3denumeration.h" />
-    <ClInclude Include="d3dfile.h" />
-    <ClInclude Include="d3dfont.h" />
-    <ClInclude Include="d3dres.h" />
-    <ClInclude Include="d3dsettings.h" />
-    <ClInclude Include="d3dutil.h" />
-    <ClInclude Include="dxutil.h" />
+    <ClInclude Include=".\Include\d3dapp.h" />
+    <ClInclude Include=".\Include\d3denumeration.h" />
+    <ClInclude Include=".\Include\d3dfile.h" />
+    <ClInclude Include=".\Include\d3dfont.h" />
+    <ClInclude Include=".\Include\d3dres.h" />
+    <ClInclude Include=".\Include\d3dsettings.h" />
+    <ClInclude Include=".\Include\d3dutil.h" />
+    <ClInclude Include=".\Include\dxutil.h" />
   </ItemGroup>
 
   <!-- Import shared project properties used by this book. -->
