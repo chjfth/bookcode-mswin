@@ -220,9 +220,6 @@
     <ResourceCompile Include="WinMain.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\BookCommon\directx.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
   
