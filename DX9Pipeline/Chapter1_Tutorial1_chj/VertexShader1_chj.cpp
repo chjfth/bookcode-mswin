@@ -24,6 +24,8 @@
 #define CHHI_ALL_IMPL
 #include <vaDbgTs_util.h>
 
+#include "../BookCommon/chjshare.h"
+
 
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
@@ -284,6 +286,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
     // compile and create the vertex shader (chj: shader body)
     LPD3DXBUFFER pShader = NULL;
+	LPD3DXBUFFER pErrBuf = NULL;
 
     hr = D3DXAssembleShader(
         strAssyVertexShader,
@@ -292,11 +295,20 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
         NULL,
         D3DXSHADER_DEBUG, 
         &pShader, 
-        NULL // error messages 
+        &pErrBuf // error messages 
         );
+
+	Cec_Release cec_errmsg = pErrBuf;
 
     if( FAILED(hr) )
     {
+		if(pErrBuf)
+		{
+			const char *errmsg = (const char*)pErrBuf->GetBufferPointer();
+			sdring<TCHAR> s1 = makeTsdring(errmsg);
+			vaDbgTs(_T("D3DXAssembleShader() fail with hr=0x%X: %s"), hr, s1.c_str());
+		}
+
 		SAFE_RELEASE(pShader);
 		return hr;
     }
