@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------------
 
 #define STRICT
+#include <assert.h>
 #include <Windows.h>
 #include <commctrl.h>
 #include <stdio.h>
@@ -325,6 +326,13 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	// ChatGPT says they are "DWORD-aligned shader tokens".
 	const DWORD *pShaderTokens = (DWORD*)pGpuBytes->GetBufferPointer();
 	DWORD nGpuBytes = pGpuBytes->GetBufferSize();
+	assert(nGpuBytes%4==0);
+	vaDbgTs(
+		_T("DX9 shader bytecode dump (%d DWORDs):\n")
+		_T("%k%R%*.-4m") // -4: dump as little-endian DWORDs
+		,
+		nGpuBytes/4,
+		_T(" "), 16, nGpuBytes, pShaderTokens);
 
 	// Create the vertex shader
 	hr = m_pd3dDevice->CreateVertexShader(pShaderTokens, &m_pAsm_VS);
