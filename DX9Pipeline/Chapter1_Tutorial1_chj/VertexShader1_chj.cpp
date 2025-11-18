@@ -22,6 +22,7 @@
 #include "resource.h"
 
 #define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
 #include <vaDbgTs_util.h>
 
 #include "../BookCommon/chjshare.h"
@@ -95,6 +96,8 @@ public:
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 {
+	vaDbg_set_vsnprintf(my_mm_vsnprintf); // Chj
+
 	CMyD3DApplication d3dApp;
 
 	InitCommonControls();
@@ -284,6 +287,11 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 "mov oD0, v1         // output diffuse color\n"
 "";
 
+#ifdef _DEBUG
+	DWORD shader_flags = D3DXSHADER_DEBUG;
+#else
+	DWORD shader_flags = 0;
+#endif
 	// compile and create the vertex shader (chj: shader body)
 	LPD3DXBUFFER pGpuBytes = NULL;
 	LPD3DXBUFFER pErrBuf = NULL;
@@ -293,7 +301,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		(UINT)strlen(strAssyVertexShader),
 		NULL,
 		NULL,
-		D3DXSHADER_DEBUG, 
+		shader_flags, 
 		&pGpuBytes, 
 		&pErrBuf // error messages 
 		);
