@@ -293,7 +293,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 #else
 	DWORD shader_flags = 0;
 #endif
-	// compile and create the vertex shader (chj: shader body)
+	// compile and create the vertex shader (chj: the "DX9 shader bytecode" representation)
 	LPD3DXBUFFER pGpuBytes = NULL;
 	LPD3DXBUFFER pErrBuf = NULL;
 
@@ -334,7 +334,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		nGpuBytes/4,
 		_T(" "), 16, nGpuBytes, pShaderTokens);
 
-	// Create the vertex shader
+	// Create the vertex shader (chj: the shader program loaded into GPU)
 	hr = m_pd3dDevice->CreateVertexShader(pShaderTokens, &m_pAsm_VS);
 
 	if( FAILED(hr) )
