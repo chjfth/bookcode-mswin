@@ -26,7 +26,15 @@
     <!-- Note: We should place $(dirDxsdk9)\Include *behind* VC2010's Win7SDK include, 
          bcz DXSDK carries outdated basetsd.h which is not compatible with Win7SDK's other headers. 
     -->
-    <IncludePath>..\BookCommon\Include;..\..\__chjcxx\common-include\include\mswin;..\..\__chjcxx\common-include\include;..\..\__chjcxx\mm_snprintf\libsrc\include;$(IncludePath);$(dirDxsdk9)\Include;</IncludePath>
+    <IncludePath>$([System.String]::Concat(
+      '..\BookCommon\Include;',
+      '..\..\__chjcxx\common-include\include\mswin;',
+      '..\..\__chjcxx\common-include\include;',
+      '..\..\__chjcxx\mm_snprintf\libsrc\include;',
+      '$(IncludePath);',
+      '$(dirDxsdk9)\Include;'
+      ))
+    </IncludePath>
     
     <LibraryPath>$(dirDxsdk9)\Lib;$(LibraryPath)</LibraryPath>
     
