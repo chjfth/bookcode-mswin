@@ -121,7 +121,7 @@ CMyD3DApplication::CMyD3DApplication()
 	m_pVertexDeclaration	= NULL;
 	m_pVB					= NULL;
 
-	m_strWindowTitle   = _T("VertexShader 1.1a");
+	m_strWindowTitle   = _T("VertexShader 1.1 chj");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -337,10 +337,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	// Create the vertex shader (chj: the shader program loaded into GPU)
 	hr = m_pd3dDevice->CreateVertexShader(pShaderTokens, &m_pAsm_VS);
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(m_pAsm_VS);  
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 	///////////////////////////////////////////////////////////
@@ -358,16 +356,14 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		3*sizeof(CUSTOMVERTEX), 0, 0, D3DPOOL_DEFAULT, 
 		&m_pVB, NULL ) ) )
 	{
-		return hr;
+		goto ERROR_END;
 	}
 
 	// Now we fill the vertex buffer. To do this, we need to Lock() the VB to
 	// gain access to the vertices. 
 	VOID* pVertices;
-	if( FAILED( hr = m_pVB->Lock( 0, sizeof(vertices), 
-		(VOID**)&pVertices, 0 ) ) )
-	{
-		return hr;
+	if(FAILED( hr = m_pVB->Lock( 0, sizeof(vertices), (VOID**)&pVertices, 0 ) )) {
+		goto ERROR_END;
 	}
 	memcpy( pVertices, vertices, sizeof(vertices) );
 	hr = m_pVB->Unlock();
@@ -386,11 +382,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		D3DDECL_END()
 	};
 
-	if( FAILED( hr = m_pd3dDevice->CreateVertexDeclaration( decl, 
-		&m_pVertexDeclaration ) ) )
-	{
-		SAFE_RELEASE(m_pVertexDeclaration);
-		return hr;
+	if(FAILED( hr = m_pd3dDevice->CreateVertexDeclaration(decl, &m_pVertexDeclaration) )) {
+		goto ERROR_END;
 	}
 
 
@@ -409,6 +402,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		1.0f, 0.1f, 100.0f );
 
 	return S_OK;
+
+ERROR_END:
+	SAFE_RELEASE(m_pAsm_VS);
+	SAFE_RELEASE(m_pVB);
+	SAFE_RELEASE(m_pVertexDeclaration);
+	return hr;
 }
 
 
