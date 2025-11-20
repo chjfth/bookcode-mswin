@@ -220,7 +220,7 @@ HRESULT CMyD3DApplication::FrameMove()
 HRESULT CMyD3DApplication::Render()
 {
 	// Clear the backbuffer
-	m_pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER,
+	HRESULT hr = m_pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER,
 						 0x000000ff, 1.0f, 0L );
 
 	// Begin the scene
@@ -233,14 +233,18 @@ HRESULT CMyD3DApplication::Render()
 			D3DXMatrixMultiply(&compMat, &m_matWorld, &m_matView);
 			D3DXMatrixMultiply(&compMat, &compMat, &m_matProj);
 			D3DXMatrixTranspose( &compMat, &compMat );
-			m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMat, 4 );
+			hr = m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMat, 4 );
 
-			m_pd3dDevice->SetVertexDeclaration(m_pVertexDeclaration);
-			m_pd3dDevice->SetVertexShader(m_pAsm_VS);
-			m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
-			m_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+			hr = m_pd3dDevice->SetVertexShader(m_pAsm_VS);
+			hr = m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
+			hr = m_pd3dDevice->SetVertexDeclaration(m_pVertexDeclaration);
 
-			m_pd3dDevice->SetVertexShader(NULL);
+			hr = m_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+			if (FAILED(hr)) {
+				vaDbgTs(_T("In Render(), DrawPrimitive() fails with hr=0x%08X"), hr);
+			}
+
+			hr = m_pd3dDevice->SetVertexShader(NULL);
 		}
 
 		// End the scene.
@@ -524,6 +528,3 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 	// Pass remaining messages to default handler
 	return CD3DApplication::MsgProc( hWnd, uMsg, wParam, lParam );
 }
-
-
-
