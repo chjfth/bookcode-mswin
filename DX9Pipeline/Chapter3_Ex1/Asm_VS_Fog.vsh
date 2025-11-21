@@ -1,0 +1,26 @@
+vs_1_1              // version instruction
+#define fogStart c9.x
+#define fogEnd   c9.z
+//#define fogEnd   c9.y 
+def c9,  2, 2.33, 2.66,  3  // fog start values
+def c10, 3, 4.5,  6, 10     // fog end values
+
+dcl_position v0    
+dcl_texcoord v7
+m4x4 r0, v0, c0    // transform vertices by world-view-projection matrix
+mov oPos, r0
+mov oT0, v7
+
+m4x4 r1, v0, c4          // transform vertices by world-view matrix
+
+mov r2.x, fogStart       // 
+sub r2.y, fogEnd, r2.x   // (fog end - fog start)
+rcp r2.z, r2.y           // 1 / (fog end - fog start)
+
+sub r3.z, fogEnd, r1.z   // (fog end - distance)
+mul r3.x, r3.z, r2.z     // (fog end - distance)/(fog end - fog start)
+
+max r3.x, c10.x, r3.z    // clamp above 0
+min r3.x, c10.z, r3.z    // clamp below 1
+mov oFog, r3.x           // output per-vertex fog factor
+
