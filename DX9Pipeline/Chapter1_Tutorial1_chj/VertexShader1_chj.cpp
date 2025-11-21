@@ -477,6 +477,11 @@ HRESULT CMyD3DApplication::FinalCleanup()
 HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 					  D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
 {
+	vaDbgTs(_T("my::ConfirmDevice(), dwBehavior=0x%X (will return %s), VS_ver=0x%X"), 
+		dwBehavior,
+		(dwBehavior & D3DCREATE_PUREDEVICE) ? _T("E_FAIL") : _T("S_OK"),
+		pCaps->VertexShaderVersion);
+
 	if( dwBehavior & D3DCREATE_PUREDEVICE )
 		return E_FAIL;
 
