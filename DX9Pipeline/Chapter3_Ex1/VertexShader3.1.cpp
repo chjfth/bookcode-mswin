@@ -27,8 +27,6 @@ struct CUSTOM_VERTEX
 	float		tu,tv;
 };
 
-
-
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
 // Desc: Application class. The base class (CD3DApplication) provides the 
@@ -85,8 +83,6 @@ public:
 };
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: Entry point to the program. Initializes everything, and goes into a
@@ -102,8 +98,6 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 
 	return d3dApp.Run();
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -137,8 +131,6 @@ CMyD3DApplication::CMyD3DApplication()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: OneTimeSceneInit()
 // Desc: Called during initial app startup, this function performs all the
@@ -155,8 +147,6 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -250,6 +240,8 @@ HRESULT CMyD3DApplication::Render()
 			// Set up post texturing fog render states
 			m_pd3dDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
 			m_pd3dDevice->SetRenderState(D3DRS_FOGCOLOR, D3DCOLOR_RGBA(255,0,255,0));
+			// -- [2025-11-22] Chj: These two can be moved to RestoreDeviceObjects(),
+			//    so that they are called only once. Verified on Win10.22H2.
 
 			// Draw sphere
 			DWORD dwNumSphereVerts = 2*m_dwNumSphereRings*(m_dwNumSphereSegments+1);
@@ -265,8 +257,6 @@ HRESULT CMyD3DApplication::Render()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: InitDeviceObjects()
 // Desc: Initialize scene objects.
@@ -276,11 +266,8 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	m_pFont->InitDeviceObjects( m_pd3dDevice );
 	m_pFontSmall->InitDeviceObjects( m_pd3dDevice );
 
-
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -437,8 +424,6 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: InvalidateDeviceObjects()
 // Desc:
@@ -450,8 +435,6 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -474,8 +457,6 @@ HRESULT CMyD3DApplication::DeleteDeviceObjects()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: FinalCleanup()
 // Desc: Called before the app exits, this function gives the app the chance
@@ -487,8 +468,6 @@ HRESULT CMyD3DApplication::FinalCleanup()
 	SAFE_DELETE( m_pFontSmall );
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -514,8 +493,6 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
