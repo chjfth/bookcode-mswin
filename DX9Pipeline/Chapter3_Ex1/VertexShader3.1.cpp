@@ -121,7 +121,7 @@ CMyD3DApplication::CMyD3DApplication()
 	m_dwNumSphereSegments	= 24;
 	m_dwNumSphereRings		= m_dwNumSphereSegments;
 
-	m_strWindowTitle    = _T("VertexShader");
+	m_strWindowTitle    = _T("VertexShader3.1");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -188,7 +188,7 @@ HRESULT CMyD3DApplication::FrameMove()
 	m_vVelocity        = m_vVelocity * 0.9f + vT * 0.1f;
 	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
 
-	// Update position and view matricies
+	// Update position and view matrices
 	D3DXMATRIXA16     matT, matR;
 	D3DXQUATERNION qR;
 
@@ -233,15 +233,15 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetStreamSource( 0, m_pVBSphere, 0, sizeof(CUSTOM_VERTEX) );
 
 			D3DXMATRIX compMat, compMatTranspose;
-			D3DXMatrixMultiply( &compMat, &m_matWorld, &m_matView);
-			D3DXMatrixTranspose( &compMatTranspose, &compMat );
 
 			// Set world-view matrix
-			m_pd3dDevice->SetVertexShaderConstantF( 4, (float*)&compMatTranspose, 4 );
-			D3DXMatrixMultiply( &compMat, &compMat, &m_matProj);
+			D3DXMatrixMultiply( &compMat, &m_matWorld, &m_matView);
 			D3DXMatrixTranspose( &compMatTranspose, &compMat );
+			m_pd3dDevice->SetVertexShaderConstantF( 4, (float*)&compMatTranspose, 4 );
 
 			// set world-view-projection matrix
+			D3DXMatrixMultiply( &compMat, &compMat, &m_matProj);
+			D3DXMatrixTranspose( &compMatTranspose, &compMat );
 			m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMatTranspose, 4 );
 			
 			// Set up texture stage 0
@@ -327,7 +327,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, 
 			D3DDECLUSAGE_POSITION, 0 },
 		{ 0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, 
-			D3DDECLUSAGE_TEXCOORD, 0 },
+			D3DDECLUSAGE_TEXCOORD, 0 }, // ==new==: texture coord usage
 		D3DDECL_END()
 	};
 
@@ -341,7 +341,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 
 	DWORD dwNumSphereVerts = 2*m_dwNumSphereRings*(m_dwNumSphereSegments+1);
-	// once for the top, once for the bottom vertices
+	// -- once for the top, once for the bottom vertices
 
 	if(FAILED(m_pd3dDevice->CreateVertexBuffer(
 							dwNumSphereVerts*sizeof(CUSTOM_VERTEX),
@@ -352,7 +352,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 			return hr;
 
 
-	CUSTOM_VERTEX* pVertices;
+	CUSTOM_VERTEX* pVertices = NULL;
 	hr = m_pVBSphere->Lock(0, dwNumSphereVerts*sizeof(CUSTOM_VERTEX), 
 							(VOID**)&pVertices, 0);
 	if(SUCCEEDED(hr))
@@ -400,8 +400,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 
 	TCHAR szEarth[MAX_PATH];
-	hr = DXUtil_FindMediaFileCb(szEarth, sizeof(szEarth), 
-		_T("earth.bmp"));
+	hr = DXUtil_FindMediaFileCb(szEarth, sizeof(szEarth), _T("earth.bmp"));
 	if( FAILED(hr) )
 	{
 		return hr;
@@ -416,7 +415,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 	// Set up the world matrix
 	D3DXMatrixIdentity( &m_matWorld );
-	D3DXMatrixRotationY(&m_matWorld, 5.0f*3.14f/8.0f);
+	D3DXMatrixRotationY(&m_matWorld, 5.0f*D3DX_PI/8.0f);
+	// -- Chj: Rotation angle determines what longitude of the earth we see.
 
 
 	// Set up the projection matrix
