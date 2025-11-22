@@ -84,6 +84,8 @@
     <ProjectName>BookCommon</ProjectName>
      <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>StaticLibrary</ConfigurationType>
+    
+    <dirThisBook>..</dirThisBook>
   </PropertyGroup>
   
   <!-- Microsoft.Cpp.Default.props 

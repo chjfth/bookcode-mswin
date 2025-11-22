@@ -27,10 +27,10 @@
          bcz DXSDK carries outdated basetsd.h which is not compatible with Win7SDK's other headers. 
     -->
     <IncludePath>$([System.String]::Concat(
-      '..\BookCommon\Include;',
-      '..\..\__chjcxx\common-include\include\mswin;',
-      '..\..\__chjcxx\common-include\include;',
-      '..\..\__chjcxx\mm_snprintf\libsrc\include;',
+      '$(dirThisBook)\BookCommon\Include;',
+      '$(dirThisBook)\..\__chjcxx\common-include\include\mswin;',
+      '$(dirThisBook)\..\__chjcxx\common-include\include;',
+      '$(dirThisBook)\..\__chjcxx\mm_snprintf\libsrc\include;',
       '$(IncludePath);',
       '$(dirDxsdk9)\Include;'
       ))
@@ -53,6 +53,8 @@
   </ItemDefinitionGroup>
 
   <Target Name="DXSDK2010_ChjAlert" BeforeTargets="PrepareForBuild">
+	<Error Condition="'$(dirThisBook)'==''" Text="The MSBuild property 'dirThisBook' must be defined in your .vcxproj file." />
+
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX 9.0b] to provide d3dx9.lib etc." Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathD3dxLib)', most code samples will not compile." Importance="high" />
     
