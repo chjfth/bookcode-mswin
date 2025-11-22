@@ -3,7 +3,7 @@ vs_1_1              // version instruction
 #define fogEnd   c9.z
 
 def c9,  2, -1, 2.66, -1  // fog start & end values
-def c10, 3, -1, 6,    -1  // fog end values
+def c10, 0, -1, 1,    -1  // fog end values
 
 dcl_position v0
 dcl_texcoord v7
@@ -24,7 +24,7 @@ sub r3.z, fogEnd, r1.z   // (fog end - distance)      r3.z = 0.56
 mul r3.x, r3.z, r2.z     // (fog end - distance)/(fog end - fog start)
                          //                           r3.x = 0.8484 (ratio)
 
-max r3.x, c10.x, r3.z    // clamp above 0
-min r3.x, c10.z, r3.z    // clamp below 1
+max r3.x, c10.x, r3.x    // clamp above 0
+min r3.x, c10.z, r3.x    // clamp below 1
 mov oFog, r3.x           // output per-vertex fog factor
 
