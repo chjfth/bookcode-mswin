@@ -32,7 +32,8 @@ REM
 if "%PlatformShortName%" == "amd64" set PlatformShortName=x64
 
 set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%#%TargetName%-%PlatformShortName%.exe"
-REM -- Notice the '#' above, I will copy DigClock.exe to DigClock-x86.exe and/or DigClock-x64.exe .
+REM -- Notice the '#' above, it is recognized by CopyFilePatternsToDirs.bat .
+REM    The net effect is: copy DigClock.exe to DigClock-x86.exe and/or DigClock-x64.exe .
 REM 
 REM		This sets what files (concrete filenames, separated by spaces) or 
 REM     file-pattern (*.exe etc) to copy or clean. You can mix both.

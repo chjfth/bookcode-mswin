@@ -12,8 +12,9 @@ REM call :EchoVar PlatformName
 REM call :EchoVar ExeDllDir
 REM call :EchoVar TargetName
 
-REM //// Call team's same-name .bat first ////
-call "%ProjectDir%\_VSPG\%batfilenam%"
+REM ////////////////////////////// Team Purpose //////////////////////////////
+REM After EXE generated, copy ..\..\BookCommon\Media\earth.bmp and Asm_VS_Fog.vsh
+REM alongside the EXE, because the cpp code wants to load that two files at runtime.
 
 REM =========================================================================
 REM This bat copies VSIDE project output(EXE/DLL etc) to other target directories,
@@ -30,7 +31,7 @@ REM Three variables control the copy operation implemented in this bat.
 REM 
 REM (1) AGILE_COPY_PATTERNS
 REM
-set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%" "%ProjectDir%\*.vsh" "%ProjectDir%\..\..\BookCommon\Media\*.bmp"
+set AGILE_COPY_PATTERNS="%ProjectDir%\..\..\BookCommon\Media\earth.bmp" "%ProjectDir%\Asm_VS_Fog.vsh"
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
 REM 
 REM		This sets what files (concrete filenames, separated by spaces) or 
@@ -46,12 +47,7 @@ REM		NOTE: If a pattern/filepath has space char, you must wrap it in double-quot
 REM	
 REM	(2) AGILE_BARN_DIRS
 REM 
-if exist "d:\AGILE_BARN_DIRS.txt" (
-    < d:\AGILE_BARN_DIRS.txt set /p AGILE_BARN_DIRS=
-) else (
-    call :Echos Oops. d:\AGILE_BARN_DIRS.txt does noooot exist.
-    exit /b 4
-)
+set AGILE_BARN_DIRS="%ExeDllDir%"
 REM
 REM		You can list multiple barn dirs, separated by spaces.
 REM 
@@ -67,7 +63,7 @@ REM     so this subdir specification comes to help.
 REM     Hint: You must NOT surround BARN_SUBDIR's value with double-quotes, bcz
 REM           when we pass it to CopyFilePatternsToDirs.bat, double-quotes is added there.
 REM 
-set BARN_SUBDIR=%PlatformName%\__%BuildConf%\DX9Pipeline
+REM set BARN_SUBDIR=%PlatformName%\__%BuildConf%
 REM 
 REM =========================================================================
 
