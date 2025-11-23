@@ -248,7 +248,7 @@
 
   <!-- import VSPG start -->
   <PropertyGroup>
-    <VSPG_BootsDir_NoTBS Condition="exists('$(dirThisBook)\..\__VSPG\_VSPG\boots\_VSPG.props')" >..\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>
+    <VSPG_BootsDir_NoTBS Condition="exists('$(dirThisBook)\..\__VSPG\_VSPG\boots\_VSPG.props')" >$(dirThisBook)\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>
     <VSPG_BootsDir_NoTBS Condition="exists('$(SolutionDir)_VSPG\boots\_VSPG.props')">$(SolutionDir)_VSPG\boots</VSPG_BootsDir_NoTBS>
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">

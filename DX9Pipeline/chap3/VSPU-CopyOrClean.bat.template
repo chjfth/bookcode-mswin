@@ -27,7 +27,7 @@ REM Three variables control the copy operation implemented in this bat.
 REM 
 REM (1) AGILE_COPY_PATTERNS
 REM
-set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%" "%ProjectDir%\*.vsh" "%SolutionDir%\BookCommon\Media\*.bmp"
+set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%" "%ProjectDir%\*.vsh" "%ProjectDir%\..\..\BookCommon\Media\*.bmp"
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
 REM 
 REM		This sets what files (concrete filenames, separated by spaces) or 

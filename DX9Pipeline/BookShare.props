@@ -52,7 +52,7 @@
     </Link>
   </ItemDefinitionGroup>
 
-  <Target Name="DXSDK2010_ChjAlert" BeforeTargets="PrepareForBuild">
+  <Target Name="SDK_Checking_ChjAlert" BeforeTargets="InitializeBuildStatus">
 	<Error Condition="'$(dirThisBook)'==''" Text="The MSBuild property 'dirThisBook' must be defined in your .vcxproj file." />
 
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX 9.0b] to provide d3dx9.lib etc." Importance="high" />
