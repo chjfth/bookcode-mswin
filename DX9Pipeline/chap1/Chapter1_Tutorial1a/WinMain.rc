@@ -21,7 +21,7 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 
-CREATEPROCESS_MANIFEST_RESOURCE_ID  RT_MANIFEST    "..\BookCommon\VertexShader.manifest"
+CREATEPROCESS_MANIFEST_RESOURCE_ID  RT_MANIFEST    "..\..\BookCommon\VertexShader.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -30,7 +30,7 @@ CREATEPROCESS_MANIFEST_RESOURCE_ID  RT_MANIFEST    "..\BookCommon\VertexShader.m
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_MAIN_ICON   ICON   "..\BookCommon\directx.ico"
+IDI_MAIN_ICON   ICON   "..\..\BookCommon\directx.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
