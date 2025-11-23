@@ -115,7 +115,7 @@ CMyD3DApplication::CMyD3DApplication()
 	m_dwNumSphereSegments	= 24;
 	m_dwNumSphereRings		= m_dwNumSphereSegments;
 
-	m_strWindowTitle    = _T("VertexShader3.1");
+	m_strWindowTitle    = _T("VertexShader3.1_chj");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );

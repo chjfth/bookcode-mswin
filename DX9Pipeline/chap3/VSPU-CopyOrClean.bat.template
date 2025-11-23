@@ -12,9 +12,6 @@ REM call :EchoVar PlatformName
 REM call :EchoVar ExeDllDir
 REM call :EchoVar TargetName
 
-REM //// Call team's same-name .bat first ////
-call "%ProjectDir%\_VSPG\%batfilenam%"
-
 REM =========================================================================
 REM This bat copies VSIDE project output(EXE/DLL etc) to other target directories,
 REM or clean(=delete) them from those target directories(called barns here). 
