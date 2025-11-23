@@ -26,10 +26,15 @@ Since 2024.10:
 #include <shlwapi.h>
 #include "resource.h"
 
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
+#include <vaDbgTs_util.h>
+
+#include <CHHI_vaDBG_is_vaDbgTs.h>
+
 #include "iversion.h"
 #include "utils.h"
 
-#include <CHHI_vaDBG_is_vaDbgTs.h>
 
 #define Editbox_EnableKbdAdjustNumber_IMPL
 #define Editbox_EnableKbdAdjustNumber_DEBUG

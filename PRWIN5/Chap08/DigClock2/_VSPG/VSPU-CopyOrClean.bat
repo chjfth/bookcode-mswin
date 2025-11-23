@@ -29,9 +29,7 @@ REM Three variables control the copy operation implemented in this bat.
 REM 
 REM (1) AGILE_COPY_PATTERNS
 REM
-if "%PlatformShortName%" == "amd64" set PlatformShortName=x64
-
-set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%#%TargetName%-%PlatformShortName%.exe"
+set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%#%TargetName%-%PlatformX%.exe"
 REM -- Notice the '#' above, it is recognized by CopyFilePatternsToDirs.bat .
 REM    The net effect is: copy DigClock.exe to DigClock-x86.exe and/or DigClock-x64.exe .
 REM 
@@ -59,9 +57,9 @@ REM       or set them from parent environment.
 REM 
 REM (3) BARN_SUBDIR
 REM     This creates extra subdir(s) inside a barn dir.
-REM     Usually, we want to separate Debug/Release outputs, and separate Win32/x64 output,
+REM     Usually, we want to separate Debug/Release outputs, and separate Win32/x64 outputs,
 REM     so this subdir specification comes to help.
-REM     Hint: You don't need to surround BARN_SUBDIR's value with double-quotes, bcz
+REM     Hint: You must NOT surround BARN_SUBDIR's value with double-quotes, bcz
 REM           when we pass it to CopyFilePatternsToDirs.bat, double-quotes is added there.
 REM 
 rem set BARN_SUBDIR=%PlatformName%\__%BuildConf%

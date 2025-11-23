@@ -70,6 +70,13 @@
       <Platform>ARM64EC</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  
+  <PropertyGroup>
+    <!-- Define PlatformX var, using 'x86' instead of 'Win32'. The 'X' refers to the X in x86 & x64. -->
+    <PlatformX>$(Platform)</PlatformX>
+    <PlatformX Condition="'$(Platform)'=='Win32'">x86</PlatformX>
+  </PropertyGroup>
+  
   <!-- User project properties -->
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20241019-0000-0000-0000-081319000001}</ProjectGuid>
@@ -105,8 +112,8 @@
         "v120" on VC2013
         "v140" on VC2015
         "v141" on VC2017
-          "v142" on VC2019
-          "v143" on VC2022
+        "v142" on VC2019
+        "v143" on VC2022
       -->
     <PlatformToolset Condition="$(DefaultPlatformToolset)!=''">$(DefaultPlatformToolset)</PlatformToolset>
   </PropertyGroup>
@@ -137,7 +144,7 @@
       <!-- EXE/DLL's .pdb is truly intermediate, so we put it in $(IntDir), with some fancy file-naming -->
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\..\..\share;..\..\..\__chjcxx\common-include\include;..\..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\..\share;..\..\..\__chjcxx\common-include\include\mswin;..\..\..\__chjcxx\common-include\include;..\..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -188,7 +195,6 @@
   <ItemGroup>
     <ClCompile Include="DigClock2.cpp" />
     <ClCompile Include="..\..\BeginPaint_NoFlicker.cpp" />
-    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -199,7 +205,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\BeginPaint_NoFlicker.h" />
-    <ClInclude Include="..\..\..\share\vaDbg.h" />
     <ClInclude Include="iversion.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="resource.h" />

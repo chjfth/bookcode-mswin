@@ -9,7 +9,11 @@
 #include <windowsx.h>
 #include <Shlwapi.h>
 
-#include "vaDbg.h"
+#include <vaDbgTs.h>
+#include <vaDbgTs_util.h>
+using namespace vaDbgTs_util;
+
+//#include "vaDbg.h"
 #include "..\..\BeginPaint_NoFlicker.h"
 
 
