@@ -64,7 +64,7 @@ REM     so this subdir specification comes to help.
 REM     Hint: You must NOT surround BARN_SUBDIR's value with double-quotes, bcz
 REM           when we pass it to CopyFilePatternsToDirs.bat, double-quotes is added there.
 REM 
-set BARN_SUBDIR=%PlatformName%\__%BuildConf%
+set BARN_SUBDIR=%PlatformName%\__%BuildConf%\DX9Pipeline
 REM 
 REM =========================================================================
 
