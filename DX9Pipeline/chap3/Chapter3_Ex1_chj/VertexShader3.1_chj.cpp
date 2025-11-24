@@ -82,6 +82,16 @@ protected:
 		D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat );
 	LRESULT MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
+	static int CalRequiredVertexes(int rings, int segments)
+	{
+		// ChatGPT:
+		// The two params control how finely the sphere is tessellated.
+		// Think of a sphere made from "latitude" and "longitude" lines :
+		// Segments = number of longitudinal divisions(like slicing an orange vertically)
+		// Rings = number of latitudinal divisions(like slicing it horizontally)
+		return (2 * rings) * (segments + 1);
+	}
+
 public:
 	CMyD3DApplication();
 };
@@ -94,6 +104,9 @@ public:
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 {
+	vaDbg_set_vsnprintf(my_mm_vsnprintf); // Chj
+	vaDbgTs_set_seq_width(3); // Chj
+
 	CMyD3DApplication d3dApp;
 
 	InitCommonControls();
@@ -245,7 +258,7 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMatTranspose, 4 );
 			
 			// Draw sphere
-			DWORD dwNumSphereVerts = 2*m_dwNumSphereRings*(m_dwNumSphereSegments+1);
+			DWORD dwNumSphereVerts = CalRequiredVertexes(m_dwNumSphereRings, m_dwNumSphereSegments);
 			m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, dwNumSphereVerts - 2 );
 		}					
 		
@@ -316,8 +329,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		goto ERROR_END;
 	}
 
-	DWORD dwNumSphereVerts = 2*m_dwNumSphereRings*(m_dwNumSphereSegments+1);
-	// -- once for the top, once for the bottom vertices
+	DWORD dwNumSphereVerts = CalRequiredVertexes(m_dwNumSphereRings, m_dwNumSphereSegments);
 
 	hr = m_pd3dDevice->CreateVertexBuffer(
 			dwNumSphereVerts*sizeof(CUSTOM_VERTEX),
@@ -333,6 +345,9 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	CUSTOM_VERTEX* pVertices = NULL;
 	hr = m_pVBSphere->Lock(0, dwNumSphereVerts*sizeof(CUSTOM_VERTEX), 
 							(VOID**)&pVertices, 0);
+
+	vaDbgTs(_T("==== Generating vertexes for the earth. ===="));
+
 	if(SUCCEEDED(hr))
 	{
 		FLOAT fDeltaRingAngle = ( D3DX_PI / m_dwNumSphereRings );
@@ -354,7 +369,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 				FLOAT x1 =  r1 * sinf( seg * fDeltaSegAngle );
 				FLOAT z1 =  r1 * cosf( seg * fDeltaSegAngle );
 
-				// Add two vertices to the strip which makes up the sphere
+				// Add two vertices to the triangle-strip which makes up the sphere
 				// (using the transformed normal to generate texture coords)
 				pVertices->x = x0;
 				pVertices->y = y0;
@@ -369,6 +384,13 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 				pVertices->tu = -((FLOAT)seg)/m_dwNumSphereSegments;
 				pVertices->tv = (ring+1)/(FLOAT)m_dwNumSphereRings;
 				pVertices++;
+
+				vaDbgTs(_T("Ring [%2d~%2d]/%2d, Seg [%2d~%2d]/%2d : ") 
+					_T("(% .-3f,% .-3f,% .-3f) (% .-3f,% .-3f,% .-3f)")
+					,
+					ring, ring+1, m_dwNumSphereRings+1,  seg, seg+1, m_dwNumSphereSegments,
+					x0, y0, z0,  x1, y1, z1
+					);
 			}
 		}
 
