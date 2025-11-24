@@ -3,7 +3,7 @@
 //
 // Desc: Example code showing how to do vertex shaders in D3D.
 //
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Chj v1.1
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -239,15 +239,6 @@ HRESULT CMyD3DApplication::Render()
 			D3DXMatrixTranspose( &compMatTranspose, &compMat );
 			m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMatTranspose, 4 );
 			
-			// Set up texture stage 0
-			m_pd3dDevice->SetTexture( 0, m_pTexture );
-
-			// Set up post texturing fog render states
-			m_pd3dDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
-			m_pd3dDevice->SetRenderState(D3DRS_FOGCOLOR, D3DCOLOR_RGBA(255,0,255,0));
-			// -- [2025-11-22] Chj: These two can be moved to RestoreDeviceObjects(),
-			//    so that they are called only once. Verified on Win10.22H2.
-
 			// Draw sphere
 			DWORD dwNumSphereVerts = 2*m_dwNumSphereRings*(m_dwNumSphereSegments+1);
 			m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, dwNumSphereVerts - 2 );
@@ -406,9 +397,14 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();
 
-	// Set up render states
-	m_pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
-	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	// Set up texture stage 0
+	m_pd3dDevice->SetTexture(0, m_pTexture);
+
+	// Set up post texturing fog render states
+	m_pd3dDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
+	m_pd3dDevice->SetRenderState(D3DRS_FOGCOLOR, D3DCOLOR_RGBA(255, 0, 255, 0));
+	// -- [2025-11-22] Chj: These two can be moved to RestoreDeviceObjects(),
+	//    so that they are called only once. Verified on Win10.22H2.
 
 	return S_OK;
 
