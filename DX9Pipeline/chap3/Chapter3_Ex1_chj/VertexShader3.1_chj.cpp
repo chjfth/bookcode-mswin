@@ -374,6 +374,9 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 		hr = m_pVBSphere->Unlock();
 	}
+	else {
+		goto ERROR_END;
+	}
 
 
 	TCHAR szEarth[MAX_PATH] = {};
