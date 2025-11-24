@@ -126,7 +126,7 @@ CMyD3DApplication::CMyD3DApplication()
 	m_pFontSmall       = new CD3DFont( _T("Arial"),  9, D3DFONT_BOLD );
 
 	ZeroMemory( m_bKey, sizeof(m_bKey) );
-	m_fSpeed           = 5.0f;
+	m_fSpeed           = 2.0f;
 	m_fAngularSpeed    = 1.0f;
 	m_bShowHelp        = FALSE;
 
@@ -164,30 +164,35 @@ HRESULT CMyD3DApplication::FrameMove()
 	FLOAT fSecsPerFrame = m_fElapsedTime;
 
 	// Process keyboard input
-	D3DXVECTOR3 vT( 0.0f, 0.0f, 0.0f );
-	D3DXVECTOR3 vR( 0.0f, 0.0f, 0.0f );
+	D3DXVECTOR3 vT( 0.0f, 0.0f, 0.0f ); // T: translation (position shifting)
+	D3DXVECTOR3 vR( 0.0f, 0.0f, 0.0f ); // R: rotation
 
 	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )    vT.x -= 1.0f; // Slide Left
 	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )   vT.x += 1.0f; // Slide Right
+	
 	if( m_bKey[VK_DOWN] )                          vT.y -= 1.0f; // Slide Down
 	if( m_bKey[VK_UP] )                            vT.y += 1.0f; // Slide Up
+	
 	if( m_bKey['W'] )                              vT.z -= 2.0f; // Move Forward
 	if( m_bKey['S'] )                              vT.z += 2.0f; // Move Backward
+	
 	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )        vR.x -= 1.0f; // Pitch Down
 	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )        vR.x += 1.0f; // Pitch Up
+	
 	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )        vR.y -= 1.0f; // Turn Right
 	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )        vR.y += 1.0f; // Turn Left
+	
 	if( m_bKey[VK_NUMPAD9] )                       vR.z -= 2.0f; // Roll CW
 	if( m_bKey[VK_NUMPAD7] )                       vR.z += 2.0f; // Roll CCW
 
-	m_vVelocity        = m_vVelocity * 0.9f + vT * 0.1f;
+	m_vVelocity        = m_vVelocity        * 0.9f + vT * 0.1f;
 	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
 
 	// Update position and view matrices
-	D3DXMATRIXA16     matT, matR;
+	D3DXMATRIXA16  matT, matR;
 	D3DXQUATERNION qR;
 
-	vT = m_vVelocity * fSecsPerFrame * m_fSpeed;
+	vT = m_vVelocity        * fSecsPerFrame * m_fSpeed;
 	vR = m_vAngularVelocity * fSecsPerFrame * m_fAngularSpeed;
 
 	D3DXMatrixTranslation( &matT, vT.x, vT.y, vT.z);
@@ -469,7 +474,7 @@ HRESULT CMyD3DApplication::FinalCleanup()
 //       for some minimum set of capabilities
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
-										  D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
+	D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
 {
 	if( dwBehavior & D3DCREATE_PUREDEVICE )
 		return E_FAIL;
@@ -492,8 +497,7 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 // Name: MsgProc()
 // Desc: Message proc function to handle key and menu input
 //-----------------------------------------------------------------------------
-LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
-									LPARAM lParam )
+LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	// Handle key presses
 	switch( uMsg )
