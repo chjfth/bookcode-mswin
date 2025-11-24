@@ -31,7 +31,10 @@ REM Three variables control the copy operation implemented in this bat.
 REM 
 REM (1) AGILE_COPY_PATTERNS
 REM
-set AGILE_COPY_PATTERNS="%ProjectDir%\..\..\BookCommon\Media\earth.bmp" "%ProjectDir%\Asm_VS_Fog.vsh"
+
+call :GetAbsPath  fpBmp  "%ProjectDir%\..\..\BookCommon\Media\earth.bmp"
+
+set AGILE_COPY_PATTERNS="%fpBmp%" "%ProjectDir%\Asm_VS_Fog.vsh"
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
 REM 
 REM		This sets what files (concrete filenames, separated by spaces) or 
@@ -82,6 +85,10 @@ REM We do not check whether vspg_COPYORCLEAN_DO_CLEAN=1 here, bcz CopyFilePatter
 REM 
 call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ExeDllDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
 
+if not exist "%ProjectDir%\earth.bmp" (
+	call :Echos We need earth.bmp alongside .vcxproj for direct F5/Ctrl+F5 local debug/run.
+	call :EchoAndExec copy "%fpBmp%" "%ProjectDir%"
+)
 
 exit /b %ERRORLEVEL%
 

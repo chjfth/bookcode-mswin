@@ -20,6 +20,11 @@
 #include "D3DUtil.h"
 #include "resource.h"
 
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
+#include <vaDbgTs_util.h>
+
+#include "../BookCommon/chjshare.h"
 
 struct CUSTOM_VERTEX
 {
@@ -38,7 +43,6 @@ class CMyD3DApplication : public CD3DApplication
 	LPDIRECT3DVERTEXSHADER9			m_pAsm_VS;
 	LPDIRECT3DVERTEXDECLARATION9	m_pVertexDeclaration;
 	LPDIRECT3DTEXTURE9				m_pTexture;
-
 
 	LPDIRECT3DVERTEXBUFFER9			m_pVBSphere;
 	DWORD							m_dwNumSphereSegments;
@@ -138,12 +142,13 @@ CMyD3DApplication::CMyD3DApplication()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::OneTimeSceneInit()
 {
-		D3DXVECTOR3 from( 0.0f, 0.0f, -3.0f );
-		D3DXVECTOR3 at( 0.0f, 0.0f, 0.0f );
-		D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
-		D3DXMatrixIdentity( &m_matView );
-		D3DXMatrixLookAtLH( &m_matView, &from, &at, &up );
-		D3DXMatrixInverse( &m_matPosition, NULL, &m_matView );
+	D3DXVECTOR3 from( 0.0f, 0.0f, -3.0f );
+	D3DXVECTOR3 at( 0.0f, 0.0f, 0.0f );
+	D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
+	
+	D3DXMatrixIdentity( &m_matView );
+	D3DXMatrixLookAtLH( &m_matView, &from, &at, &up );
+	D3DXMatrixInverse( &m_matPosition, NULL, &m_matView );
 
 	return S_OK;
 }
@@ -162,18 +167,18 @@ HRESULT CMyD3DApplication::FrameMove()
 	D3DXVECTOR3 vT( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vR( 0.0f, 0.0f, 0.0f );
 
-	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )                 vT.x -= 1.0f; // Slide Left
-	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )                vT.x += 1.0f; // Slide Right
-	if( m_bKey[VK_DOWN] )                                       vT.y -= 1.0f; // Slide Down
-	if( m_bKey[VK_UP] )                                         vT.y += 1.0f; // Slide Up
-	if( m_bKey['W'] )                                           vT.z -= 2.0f; // Move Forward
-	if( m_bKey['S'] )                                           vT.z += 2.0f; // Move Backward
-	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )                     vR.x -= 1.0f; // Pitch Down
-	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )                     vR.x += 1.0f; // Pitch Up
-	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )                     vR.y -= 1.0f; // Turn Right
-	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )                     vR.y += 1.0f; // Turn Left
-	if( m_bKey[VK_NUMPAD9] )                                    vR.z -= 2.0f; // Roll CW
-	if( m_bKey[VK_NUMPAD7] )                                    vR.z += 2.0f; // Roll CCW
+	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )    vT.x -= 1.0f; // Slide Left
+	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )   vT.x += 1.0f; // Slide Right
+	if( m_bKey[VK_DOWN] )                          vT.y -= 1.0f; // Slide Down
+	if( m_bKey[VK_UP] )                            vT.y += 1.0f; // Slide Up
+	if( m_bKey['W'] )                              vT.z -= 2.0f; // Move Forward
+	if( m_bKey['S'] )                              vT.z += 2.0f; // Move Backward
+	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )        vR.x -= 1.0f; // Pitch Down
+	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )        vR.x += 1.0f; // Pitch Up
+	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )        vR.y -= 1.0f; // Turn Right
+	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )        vR.y += 1.0f; // Turn Left
+	if( m_bKey[VK_NUMPAD9] )                       vR.z -= 2.0f; // Roll CW
+	if( m_bKey[VK_NUMPAD7] )                       vR.z += 2.0f; // Roll CCW
 
 	m_vVelocity        = m_vVelocity * 0.9f + vT * 0.1f;
 	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
@@ -248,7 +253,6 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, dwNumSphereVerts - 2 );
 		}					
 		
-
 		// End the scene
 		m_pd3dDevice->EndScene();
 	}
@@ -276,7 +280,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::RestoreDeviceObjects()
 {
-	HRESULT hr;
+	HRESULT hr = 0;
 
 	// Assemble vertex shader
 	LPD3DXBUFFER pShader = NULL;
@@ -289,24 +293,17 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL 
 		);
 
+	Cec_Release cec_Shader = pShader; // ensure Release() on function exit
+
 	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
 		return hr;
-	}
 
 	// Create the vertex shader
 	hr = m_pd3dDevice->CreateVertexShader( 
 		(DWORD*)pShader->GetBufferPointer(), &m_pAsm_VS );
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(m_pAsm_VS);
-		SAFE_RELEASE(pShader);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
-
-	SAFE_RELEASE(pShader);
-
 
 	// Create the vertex declaration
 	D3DVERTEXELEMENT9 decl[] =
@@ -318,25 +315,23 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		D3DDECL_END()
 	};
 
-	if( FAILED( hr = m_pd3dDevice->CreateVertexDeclaration( decl, 
-		&m_pVertexDeclaration ) ) )
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(m_pVertexDeclaration);
-		return hr;
+	hr = m_pd3dDevice->CreateVertexDeclaration( decl, &m_pVertexDeclaration );
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
-
 
 	DWORD dwNumSphereVerts = 2*m_dwNumSphereRings*(m_dwNumSphereSegments+1);
 	// -- once for the top, once for the bottom vertices
 
-	if(FAILED(m_pd3dDevice->CreateVertexBuffer(
-							dwNumSphereVerts*sizeof(CUSTOM_VERTEX),
-							0, 
-							0, // don't need an FVF code
-							D3DPOOL_DEFAULT, 
-							&m_pVBSphere, NULL) ) )
-			return hr;
+	hr = m_pd3dDevice->CreateVertexBuffer(
+			dwNumSphereVerts*sizeof(CUSTOM_VERTEX),
+			0, 
+			0, // don't need an FVF code
+			D3DPOOL_DEFAULT, 
+			&m_pVBSphere, NULL);
+	if (FAILED(hr)) {
+		goto ERROR_END;
+	}
 
 
 	CUSTOM_VERTEX* pVertices = NULL;
@@ -379,32 +374,27 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 				pVertices->tv = (ring+1)/(FLOAT)m_dwNumSphereRings;
 				pVertices++;
 			}
-
 		}
 
 		hr = m_pVBSphere->Unlock();
 	}
 
 
-	TCHAR szEarth[MAX_PATH];
+	TCHAR szEarth[MAX_PATH] = {};
 	hr = DXUtil_FindMediaFileCb(szEarth, sizeof(szEarth), _T("earth.bmp"));
-	if( FAILED(hr) )
-	{
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
-	hr = D3DXCreateTextureFromFile( m_pd3dDevice, szEarth, &m_pTexture);
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(m_pTexture);
-		return hr;
+	hr = D3DXCreateTextureFromFile(m_pd3dDevice, szEarth, &m_pTexture);
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 	// Set up the world matrix
 	D3DXMatrixIdentity( &m_matWorld );
 	D3DXMatrixRotationY(&m_matWorld, 5.0f*D3DX_PI/8.0f);
 	// -- Chj: Rotation angle determines what longitude of the earth we see.
-
 
 	// Set up the projection matrix
 	D3DXMatrixIdentity( &m_matProj );
@@ -421,6 +411,13 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 
 	return S_OK;
+
+ERROR_END:
+	SAFE_RELEASE(m_pAsm_VS);
+	SAFE_RELEASE(m_pVBSphere);
+	SAFE_RELEASE(m_pVertexDeclaration);
+	SAFE_RELEASE(m_pTexture);
+	return hr;
 }
 
 
