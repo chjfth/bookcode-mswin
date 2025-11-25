@@ -3,7 +3,8 @@
 //
 // Desc: Example code showing how to do vertex shaders in D3D.
 //
-// Chj v1.1
+// Chj v1.1:
+// * Press 1/2/Home/End to rotate the earth, 0 to reset, code in FrameMove() .
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -88,7 +89,8 @@ protected:
 		// The two params control how finely the sphere is tessellated.
 		// Think of a sphere made from "latitude" and "longitude" lines :
 		// Segments = number of longitudinal divisions(like slicing an orange vertically)
-		// Rings = number of latitudinal divisions(like slicing it horizontally)
+		// Rings = number of latitudinal divisions(like slicing it horizontally)
+
 		return (2 * rings) * (segments + 1);
 	}
 
@@ -155,13 +157,14 @@ CMyD3DApplication::CMyD3DApplication()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::OneTimeSceneInit()
 {
-	D3DXVECTOR3 from( 0.0f, 0.0f, -3.0f );
-	D3DXVECTOR3 at( 0.0f, 0.0f, 0.0f );
+	D3DXVECTOR3 from( 0.0f, 0.0f, -3.0f );	// camera position
+	D3DXVECTOR3 at( 0.0f, 0.0f, 0.0f );		// (object)focus position
 	D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
 	
 	D3DXMatrixIdentity( &m_matView );
 	D3DXMatrixLookAtLH( &m_matView, &from, &at, &up );
-	D3DXMatrixInverse( &m_matPosition, NULL, &m_matView );
+	
+	D3DXMatrixInverse( &m_matPosition, NULL_OUT, &m_matView );
 
 	return S_OK;
 }
@@ -174,9 +177,12 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::FrameMove()
 {
-	FLOAT fSecsPerFrame = m_fElapsedTime;
+	static int si = 0;
+	si++; // debugging purpose
 
-	// Process keyboard input
+	FLOAT fSecsPerFrame = m_fElapsedTime; // calculated by framework, eg 0.03
+
+	// Process keyboard input, v: Velocity factor
 	D3DXVECTOR3 vT( 0.0f, 0.0f, 0.0f ); // T: translation (position shifting)
 	D3DXVECTOR3 vR( 0.0f, 0.0f, 0.0f ); // R: rotation
 
@@ -186,8 +192,8 @@ HRESULT CMyD3DApplication::FrameMove()
 	if( m_bKey[VK_DOWN] )                          vT.y -= 1.0f; // Slide Down
 	if( m_bKey[VK_UP] )                            vT.y += 1.0f; // Slide Up
 	
-	if( m_bKey['W'] )                              vT.z -= 2.0f; // Move Forward
-	if( m_bKey['S'] )                              vT.z += 2.0f; // Move Backward
+	if( m_bKey['W'] )                              vT.z -= 1.0f; // Move Forward
+	if( m_bKey['S'] )                              vT.z += 1.0f; // Move Backward
 	
 	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )        vR.x -= 1.0f; // Pitch Down
 	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )        vR.x += 1.0f; // Pitch Up
@@ -195,17 +201,17 @@ HRESULT CMyD3DApplication::FrameMove()
 	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )        vR.y -= 1.0f; // Turn Right
 	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )        vR.y += 1.0f; // Turn Left
 	
-	if( m_bKey[VK_NUMPAD9] )                       vR.z -= 2.0f; // Roll CW
-	if( m_bKey[VK_NUMPAD7] )                       vR.z += 2.0f; // Roll CCW
+	if( m_bKey[VK_NUMPAD9] )                       vR.z -= 1.0f; // Roll CW
+	if( m_bKey[VK_NUMPAD7] )                       vR.z += 1.0f; // Roll CCW
 
-	m_vVelocity        = m_vVelocity        * 0.9f + vT * 0.1f;
-	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
+	m_vVelocity        =        m_vVelocity * 0.9f + vT * 0.1f; // always btw (0,1)
+	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f; // always btw (0,1)
 
 	// Update position and view matrices
 	D3DXMATRIXA16  matT, matR;
 	D3DXQUATERNION qR;
 
-	vT = m_vVelocity        * fSecsPerFrame * m_fSpeed;
+	vT =        m_vVelocity * fSecsPerFrame * m_fSpeed;
 	vR = m_vAngularVelocity * fSecsPerFrame * m_fAngularSpeed;
 
 	D3DXMatrixTranslation( &matT, vT.x, vT.y, vT.z);
@@ -216,6 +222,33 @@ HRESULT CMyD3DApplication::FrameMove()
 
 	D3DXMatrixMultiply( &m_matPosition, &matR, &m_matPosition );
 	D3DXMatrixInverse( &m_matView, NULL, &m_matPosition );
+
+	// Chj test code >>>
+	if (m_bKey['1'] || m_bKey['2']) 
+	{
+		// Rotate the earth along Y-axis, by changing m_matWorld.
+		int sign = m_bKey['1'] ? 1 : -1;
+
+		D3DXMATRIXA16 roty;
+		D3DXMatrixRotationY(&roty, sign * D3DX_PI / 5 * fSecsPerFrame);
+
+		D3DXMatrixMultiply(&m_matWorld, &m_matWorld, &roty);
+	}
+	else if (m_bKey[VK_HOME] || m_bKey[VK_END])
+	{
+		// Rotate the earth along X-axis.
+		int sign = m_bKey[VK_HOME] ? 1 : -1;
+
+		D3DXMATRIXA16 rotx;
+		D3DXMatrixRotationX(&rotx, sign * D3DX_PI /5 * fSecsPerFrame);
+
+		D3DXMatrixMultiply(&m_matWorld, &m_matWorld, &rotx);
+	}
+	else if (m_bKey['0'])
+	{
+		D3DXMatrixIdentity(&m_matWorld);
+	}
+	// Chj test code <<<
 
 	return S_OK;
 }
@@ -374,22 +407,24 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 				pVertices->x = x0;
 				pVertices->y = y0;
 				pVertices->z = z0;
-				pVertices->tu = -((FLOAT)seg)/m_dwNumSphereSegments;
-				pVertices->tv = (ring+0)/(FLOAT)m_dwNumSphereRings;
+				FLOAT tu0 = pVertices->tu = -((FLOAT)seg)/m_dwNumSphereSegments;
+				FLOAT tv0 = pVertices->tv =  (ring+0)/(FLOAT)m_dwNumSphereRings;
 				pVertices++;
 
 				pVertices->x = x1;
 				pVertices->y = y1;
 				pVertices->z = z1;
-				pVertices->tu = -((FLOAT)seg)/m_dwNumSphereSegments;
-				pVertices->tv = (ring+1)/(FLOAT)m_dwNumSphereRings;
+				FLOAT tu1 = pVertices->tu = -((FLOAT)seg)/m_dwNumSphereSegments;
+				FLOAT tv1 = pVertices->tv =  (ring+1)/(FLOAT)m_dwNumSphereRings;
 				pVertices++;
 
-				vaDbgTs(_T("Ring [%2d~%2d]/%2d, Seg [%2d~%2d]/%2d : ") 
-					_T("(% .-3f,% .-3f,% .-3f) (% .-3f,% .-3f,% .-3f)")
+				vaDbgTs(_T("Ring [%2d~%2d]/%-2d, Seg [%2d~%2d]/%-2d ") 
+					_T("V: (% .-3f,% .-3f,% .-3f) (% .-3f,% .-3f,% .-3f) ") // 2 vertexes per line
+					_T("T: (%.-2f, %.-2f) (%.-2f, %.-2f)") // texture (x,y) as scaled into (0,1)
 					,
 					ring, ring+1, m_dwNumSphereRings+1,  seg, seg+1, m_dwNumSphereSegments,
-					x0, y0, z0,  x1, y1, z1
+					x0, y0, z0,  x1, y1, z1,
+					tu0, tv0,  tu1, tv1
 					);
 			}
 		}
@@ -414,15 +449,19 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 	// Set up the world matrix
 	D3DXMatrixIdentity( &m_matWorld );
-	D3DXMatrixRotationY(&m_matWorld, 5.0f*D3DX_PI/8.0f);
-	// -- Chj: Rotation angle determines what longitude of the earth we see.
+	D3DXMatrixRotationY(&m_matWorld, 5.0f * D3DX_PI / 8.0f);
+	// -- Chj: Rotation angle determines what longitude is towards the camera.
 
 	// Set up the projection matrix
 	D3DXMatrixIdentity( &m_matProj );
 	FLOAT fAspectRatio = 
 		(FLOAT)m_d3dsdBackBuffer.Width / (FLOAT)m_d3dsdBackBuffer.Height;
-	D3DXMatrixPerspectiveFovLH( &m_matProj, D3DX_PI/4, fAspectRatio, 
-		0.5f, 1000.0f );
+	D3DXMatrixPerspectiveFovLH( &m_matProj, 
+		D3DX_PI/4,    // field of view Y
+		fAspectRatio, // viewport width/height ratio
+		0.5f, 1000.0f // near & far view-plane distance
+	);
+	// -- [2025-11-25] I think this can be moved into OneTimeSceneInit().
 
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();

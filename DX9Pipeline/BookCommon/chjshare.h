@@ -1,5 +1,6 @@
 #pragma once
 
+#include <commdefs.h>
 #include <sdring.h>
 #include <makeTsdring.h>
 
