@@ -27,7 +27,7 @@ REM Three variables control the copy operation implemented in this bat.
 REM 
 REM (1) AGILE_COPY_PATTERNS
 REM
-set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%" "%ProjectDir%\*.vsh" "%ProjectDir%\..\..\BookCommon\Media\*.bmp"
+set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%"
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
 REM 
 REM		This sets what files (concrete filenames, separated by spaces) or 
@@ -82,9 +82,21 @@ if not defined AGILE_COPY_PATTERNS (
 REM We do not check whether vspg_COPYORCLEAN_DO_CLEAN=1 here, bcz CopyFilePatternsToDirs.bat will take care of it.
 REM 
 call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ExeDllDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
+if not !errorlevel!==0 exit /b 4 
 
 
-exit /b %ERRORLEVEL%
+REM ======================================
+REM ======== This project special ======== 
+REM ======================================
+REM Cope with VSPG_ExeDataFiles, these files are relative to %ProjectDir%, not %ExeDllDir%.
+REM Replace [path1;path2] into ["path1" "path2"] and set new values of:
+set AGILE_COPY_PATTERNS="%VSPG_ExeDataFiles:;=" "%"
+
+REM Extra for AGILE_COPY_PATTERNS
+call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ProjectDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
+if not !errorlevel!==0 exit /b 4
+
+exit /b 0
 
 
 

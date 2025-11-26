@@ -225,6 +225,23 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   
+  
+  <PropertyGroup>
+    <VSPG_ExeDataFiles>Asm_VS_Fog.vsh
+    ;..\..\BookCommon\Media\earth.bmp
+    </VSPG_ExeDataFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CustomBuild Include="$(VSPG_ExeDataFiles)">
+      <FileType>Document</FileType>
+      <Message>#### VSPG source file: %(FullPath)</Message>
+      <Command>if not exist "%(FullPath)" echo .  -- [NOTE] Above file does NOT exist, CustomBuild will be triggered everytime.</Command>
+      <Outputs>$(TargetPath)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  
+  
   <!-- Reference BookCommon.lib -->
   <ItemGroup>
     <ProjectReference Include="$(dirThisBook)\BookCommon\BookCommon.vcxproj">
@@ -239,13 +256,14 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="$(dirThisBook)\BookShare.props" />
   </ImportGroup>
-
+  
   
   <!-- MSBuild system stock Cpp.targets -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-
+  
+  
   <!-- import VSPG start -->
   <PropertyGroup>
     <VSPG_BootsDir_NoTBS Condition="exists('$(dirThisBook)\..\__VSPG\_VSPG\boots\_VSPG.props')" >$(dirThisBook)\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>

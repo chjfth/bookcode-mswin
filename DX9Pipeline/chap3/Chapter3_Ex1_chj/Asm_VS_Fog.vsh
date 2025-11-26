@@ -27,4 +27,3 @@ mul r3.x, r3.z, r2.z     // (fog end - distance)/(fog end - fog start)
 max r3.x, c10.x, r3.x    // clamp above 0
 min r3.x, c10.z, r3.x    // clamp below 1
 mov oFog, r3.x           // output per-vertex fog factor
-
