@@ -3,7 +3,7 @@ vs_1_1              // version instruction
 #define fogEnd   c9.z
 
 def c9,  2, -1, 2.66, -1  // fog start & end values
-def c10, 0, -1, 1,    -1  // fog end values
+def c10, 0, -1, 1,    -1  
 
 dcl_position v0
 dcl_texcoord v7
@@ -14,9 +14,9 @@ mov oT0, v7
 
 m4x4 r1, v0, c4          // transform vertices by world-view matrix
 
-mov r2.x, fogStart       //                           r2.x = 2
-sub r2.y, fogEnd, r2.x   // (fog end - fog start)     r2.y = 0.66
-rcp r2.z, r2.y           // 1 / (fog end - fog start) r2.z = 1.515
+mov r2.x, fogStart       //                         r2.x = 2
+sub r2.y, fogEnd, r2.x   // (fog end - fog start)   r2.y = 0.66
+rcp r2.z, r2.y           // 1/(fog end - fog start) r2.z = 1.515
 
 // Assume that r1.z = 2.10 (a little inside fog)
 
