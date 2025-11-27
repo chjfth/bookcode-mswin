@@ -158,8 +158,8 @@ CMyD3DApplication::CMyD3DApplication()
 HRESULT CMyD3DApplication::OneTimeSceneInit()
 {
 	D3DXVECTOR3 from( 0.0f, 0.0f, -3.0f );	// camera position
-	D3DXVECTOR3 at( 0.0f, 0.0f, 0.0f );		// (object)focus position
-	D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
+	D3DXVECTOR3 at  ( 0.0f, 0.0f, 0.0f );	// (object)focus position
+	D3DXVECTOR3 up  ( 0.0f, 1.0f, 0.0f );
 	
 	D3DXMatrixIdentity( &m_matView );
 	D3DXMatrixLookAtLH( &m_matView, &from, &at, &up );
@@ -278,17 +278,18 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetVertexDeclaration( m_pVertexDeclaration );
 			m_pd3dDevice->SetStreamSource( 0, m_pVBSphere, 0, sizeof(CUSTOM_VERTEX) );
 
+			const UINT c0 = 0, c4 = 4;
 			D3DXMATRIX compMat, compMatTranspose;
 
 			// Set world-view matrix
 			D3DXMatrixMultiply( &compMat, &m_matWorld, &m_matView);
 			D3DXMatrixTranspose( &compMatTranspose, &compMat );
-			m_pd3dDevice->SetVertexShaderConstantF( 4, (float*)&compMatTranspose, 4 );
+			m_pd3dDevice->SetVertexShaderConstantF( c4, (float*)&compMatTranspose, 4 );
 
 			// set world-view-projection matrix
 			D3DXMatrixMultiply( &compMat, &compMat, &m_matProj);
 			D3DXMatrixTranspose( &compMatTranspose, &compMat );
-			m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMatTranspose, 4 );
+			m_pd3dDevice->SetVertexShaderConstantF( c0, (float*)&compMatTranspose, 4 );
 			
 			// Draw sphere
 			DWORD dwNumSphereVerts = CalRequiredVertexes(m_dwNumSphereRings, m_dwNumSphereSegments);

@@ -20,9 +20,9 @@ rcp r2.z, r2.y           // 1/(fog end - fog start) r2.z = 1.515
 
 // Assume that r1.z = 2.10 (a little inside fog)
 
-sub r3.z, fogEnd, r1.z   // (fog end - distance)      r3.z = 0.56
+sub r3.z, fogEnd, r1.z   // (fog end - distance)    r3.z = 0.56
 mul r3.x, r3.z, r2.z     // (fog end - distance)/(fog end - fog start)
-                         //                           r3.x = 0.8484 (ratio)
+                         //                         r3.x = 0.8484 (ratio)
 
 max r3.x, c10.x, r3.x    // clamp above 0
 min r3.x, c10.z, r3.x    // clamp below 1
