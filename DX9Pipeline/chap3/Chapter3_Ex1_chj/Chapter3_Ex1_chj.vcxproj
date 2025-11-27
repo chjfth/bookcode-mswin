@@ -209,6 +209,9 @@
     </ClCompile>
     <Link>
       <OptimizeReferences>true</OptimizeReferences>
+      
+      <!-- DX9's lib requires /SAFESEH:NO . We must set this for VC2015 when linking Release EXE. -->
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
 
