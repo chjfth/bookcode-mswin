@@ -64,7 +64,7 @@ REM     so this subdir specification comes to help.
 REM     Hint: You must NOT surround BARN_SUBDIR's value with double-quotes, bcz
 REM           when we pass it to CopyFilePatternsToDirs.bat, double-quotes is added there.
 REM 
-set BARN_SUBDIR=%PlatformName%\__%BuildConf%
+set BARN_SUBDIR=%PlatformName%\__%BuildConf%\BeginDx11
 REM 
 REM =========================================================================
 
@@ -82,8 +82,20 @@ if not defined AGILE_COPY_PATTERNS (
 REM We do not check whether vspg_COPYORCLEAN_DO_CLEAN=1 here, bcz CopyFilePatternsToDirs.bat will take care of it.
 REM 
 call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ExeDllDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
+if not !errorlevel!==0 exit /b 4
 
-exit /b %ERRORLEVEL%
+
+REM ======================================
+REM ======== This project special ======== 
+REM ======================================
+REM Cope with VSPG_ExeDataFiles, these files are relative to %ProjectDir%, not %ExeDllDir%.
+REM Replace [path1;path2] into ["path1" "path2"] and set new values of:
+set AGILE_COPY_PATTERNS="%VSPG_ExeDataFiles:;=" "%"
+
+call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ProjectDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
+if not !errorlevel!==0 exit /b 4
+
+exit /b 0
 
 
 

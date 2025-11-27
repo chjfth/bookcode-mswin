@@ -224,14 +224,14 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
-  
-  
+
+
   <PropertyGroup>
     <VSPG_ExeDataFiles>Asm_VS_Fog.vsh
     ;..\..\BookCommon\Media\earth.bmp
     </VSPG_ExeDataFiles>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <CustomBuild Include="$(VSPG_ExeDataFiles)">
       <FileType>Document</FileType>
@@ -240,8 +240,8 @@
       <Outputs>$(TargetPath)</Outputs>
     </CustomBuild>
   </ItemGroup>
-  
-  
+
+
   <!-- Reference BookCommon.lib -->
   <ItemGroup>
     <ProjectReference Include="$(dirThisBook)\BookCommon\BookCommon.vcxproj">
