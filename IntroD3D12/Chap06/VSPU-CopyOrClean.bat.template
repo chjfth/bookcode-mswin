@@ -1,5 +1,6 @@
 :
 : Extra work: Copy Shaders\*.hlsl files into <exedir>\Shaders\*.hlsl
+: -- via VSPG_ExeDataFiles
 :
 
 @echo off
@@ -32,7 +33,6 @@ REM
 REM (1) AGILE_COPY_PATTERNS
 REM
 set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%" 
-set AGILE_COPY_PATTERNS1="%ProjectDir%\Shaders\*.hlsl"
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
 REM 
 REM		This sets what files (concrete filenames, separated by spaces) or 
@@ -69,7 +69,7 @@ REM     so this subdir specification comes to help.
 REM     Hint: You must NOT surround BARN_SUBDIR's value with double-quotes, bcz
 REM           when we pass it to CopyFilePatternsToDirs.bat, double-quotes is added there.
 REM 
-set BARN_SUBDIR=%PlatformName%\__%BuildConf%
+set BARN_SUBDIR=%PlatformName%\__%BuildConf%\IntroD3D12
 REM 
 REM =========================================================================
 
@@ -87,12 +87,15 @@ if not defined AGILE_COPY_PATTERNS (
 REM We do not check whether vspg_COPYORCLEAN_DO_CLEAN=1 here, bcz CopyFilePatternsToDirs.bat will take care of it.
 REM 
 call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ExeDllDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
-
-REM Extra for copying .hlsl files into 'Shaders' subdir:
-call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ProjectDir%" AGILE_COPY_PATTERNS1 AGILE_BARN_DIRS "%BARN_SUBDIR%\Shaders"
+if not !errorlevel!==0 exit /b 4
 
 
-exit /b %ERRORLEVEL%
+REM ==== Extra for copying .hlsl files into 'Shaders' subdir: ====
+set AGILE_COPY_PATTERNS="%VSPG_ExeDataFiles:;=" "%"
+call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ProjectDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%\Shaders"
+if not !errorlevel!==0 exit /b 4
+
+exit /b 0
 
 
 
