@@ -380,7 +380,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	hr = m_pVBSphere->Lock(0, dwNumSphereVerts*sizeof(CUSTOM_VERTEX), 
 							(VOID**)&pVertices, 0);
 
-	vaDbgTs(_T("==== Generating vertexes for the earth. ===="));
+	vaDbgTs(_T("==== Generating vertexes for the earth. %d ring-belts, %d segs, total %d vertexes ===="),
+		m_dwNumSphereRings, m_dwNumSphereSegments, CalRequiredVertexes(m_dwNumSphereRings, m_dwNumSphereSegments));
 
 	if(SUCCEEDED(hr))
 	{
