@@ -62,7 +62,7 @@ class CMyD3DApplication : public CD3DApplication
 	D3DXVECTOR3 m_vVelocity;
 	D3DXVECTOR3 m_vAngularVelocity;
 
-protected:
+protected: // virtual overides
 	HRESULT OneTimeSceneInit();
 	HRESULT InitDeviceObjects();
 	HRESULT RestoreDeviceObjects();
@@ -207,7 +207,7 @@ HRESULT CMyD3DApplication::FrameMove()
 		D3DXVECTOR4 vCos( 1.0f, -1.0f/2.0f, 1.0f/ 24.0f, -1.0f/ 720.0f );
 
 		m_pd3dDevice->SetVertexShaderConstantF(  0, (float*)&mat,  4 );
-		m_pd3dDevice->SetVertexShaderConstantF(  4, (float*)&vA,   1 );
+		m_pd3dDevice->SetVertexShaderConstantF(  4, (float*)&vA,   1 ); // only  vA.x changes overtime
 		m_pd3dDevice->SetVertexShaderConstantF(  7, (float*)&vD,   1 );
 		m_pd3dDevice->SetVertexShaderConstantF( 10, (float*)&vSin, 1 );
 		m_pd3dDevice->SetVertexShaderConstantF( 11, (float*)&vCos, 1 );
