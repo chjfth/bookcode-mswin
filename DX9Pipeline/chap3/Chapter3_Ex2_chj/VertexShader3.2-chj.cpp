@@ -4,7 +4,7 @@
 // Desc: Example code showing how to do vertex shaders in D3D.
 //
 // Original: $DXSDK9\Samples\C++\Direct3D\VertexShader\VertexShader.cpp
-// Modified by Chj due to learning purpose.
+// v1.1 modified by Chj for learning purpose.
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -21,6 +21,11 @@
 #include "D3DUtil.h"
 #include "resource.h"
 
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
+#include <vaDbgTs_util.h>
+
+#include "../BookCommon/chjshare.h"
 
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
@@ -98,7 +103,7 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 //-----------------------------------------------------------------------------
 CMyD3DApplication::CMyD3DApplication()
 {
-	m_strWindowTitle    = _T("VertexShader");
+	m_strWindowTitle    = _T("VertexShader Ex3.2 chj");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -272,62 +277,60 @@ HRESULT CMyD3DApplication::Render()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::InitDeviceObjects()
 {
-	HRESULT hr;
+	HRESULT hr = 0;
 
 	m_pFont->InitDeviceObjects( m_pd3dDevice );
 	m_pFontSmall->InitDeviceObjects( m_pd3dDevice );
 
+	TCHAR        strVertexShaderPath[512] = {};
+	LPD3DXBUFFER pCode = NULL;
+	Cec_Release cec_ShaderCode;
+
+	D3DVERTEXELEMENT9 decl[] =
 	{
-		TCHAR        strVertexShaderPath[512];
-		LPD3DXBUFFER pCode;
+		{ 0, 0, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+		D3DDECL_END()
+	};
 
-		D3DVERTEXELEMENT9 decl[] =
-		{
-			{ 0, 0, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-			D3DDECL_END()
-		};
+	hr = m_pd3dDevice->CreateVertexDeclaration( decl, &m_pVertexDeclaration );
+	if( FAILED(hr) ) {
+		goto ERROR_END;
+	}
 
-		if( FAILED( hr = m_pd3dDevice->CreateVertexDeclaration( decl, 
-			&m_pVertexDeclaration ) ) )
-		{
-			SAFE_RELEASE(m_pVertexDeclaration);
-			return hr;
-		}
+	// Find the vertex shader file
+	if( FAILED( hr = DXUtil_FindMediaFileCb( strVertexShaderPath, 
+		sizeof(strVertexShaderPath), _T("Ripple.vsh") ) ) )
+	{
+		goto ERROR_END;
+	}
 
-		// Find the vertex shader file
-		if( FAILED( hr = DXUtil_FindMediaFileCb( strVertexShaderPath, 
-			sizeof(strVertexShaderPath), _T("Ripple.vsh") ) ) )
-		{
-			return hr;
-		}
-
-		DWORD dwFlags = 0;
+	DWORD dwFlags = 0;
 #if defined( _DEBUG ) || defined( DEBUG )
-		dwFlags |= D3DXSHADER_DEBUG;
+	dwFlags |= D3DXSHADER_DEBUG;
 #endif
 
-		// Assemble the vertex shader from the file
-		if( FAILED( hr = D3DXAssembleShaderFromFile( strVertexShaderPath, 
-						  NULL, NULL, dwFlags, &pCode, NULL ) ) )
-		{
-		   SAFE_RELEASE(pCode);
-		   return hr;
-		}
+	// Assemble the vertex shader from the file
+	hr = D3DXAssembleShaderFromFile( strVertexShaderPath, NULL, NULL, 
+		dwFlags, 
+		&pCode, NULL );
+	cec_ShaderCode = pCode; // ensure Release() on function exit
+	if( FAILED(hr) ) {
+		goto ERROR_END;
+	}
 
-		// Create the vertex shader
-		hr = m_pd3dDevice->CreateVertexShader( 
-			(DWORD*)pCode->GetBufferPointer(), &m_pAsm_VS );
-		if( FAILED(hr) )
-		{
-			SAFE_RELEASE(pCode);
-			SAFE_RELEASE(m_pAsm_VS);
-			return hr;
-		}
-		SAFE_RELEASE(pCode);
-
+	// Create the vertex shader
+	hr = m_pd3dDevice->CreateVertexShader((DWORD*)pCode->GetBufferPointer(), &m_pAsm_VS );
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 	return S_OK;
+
+ERROR_END:
+	SAFE_RELEASE(m_pVertexDeclaration);
+	SAFE_RELEASE(m_pAsm_VS);
+
+	return hr;
 }
 
 
@@ -337,7 +340,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::RestoreDeviceObjects()
 {
-	HRESULT hr;
+	HRESULT hr = 0;
 
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();
@@ -348,15 +351,17 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 	// Create index buffer
 	{
-		WORD* pIndices;
+		WORD* pIndices = NULL;
 
-		if( FAILED( hr = m_pd3dDevice->CreateIndexBuffer( 
+		hr = m_pd3dDevice->CreateIndexBuffer(
 			m_dwNumIndices*sizeof(WORD), 0, D3DFMT_INDEX16,
-			  D3DPOOL_DEFAULT, &m_pIB, NULL ) ) )
-			return hr;
+			D3DPOOL_DEFAULT, &m_pIB, NULL );
+		if( FAILED(hr) )
+			goto ERROR_END;
 
-		if( FAILED( hr = m_pIB->Lock( 0, 0, (void**)&pIndices, 0 ) ) )
-			return hr;
+		hr = m_pIB->Lock( 0, 0, (void**)&pIndices, 0 );
+		if( FAILED(hr) )
+			goto ERROR_END;
 
 		for( DWORD y=1; y<m_dwSize; y++ )
 		{
@@ -372,21 +377,23 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 			}
 		}
 
-		if( FAILED( hr = m_pIB->Unlock() ) )
+		if( FAILED( hr = m_pIB->Unlock() ) ) // Chj: Can this possibly fail?
 			return hr;
 	}
 
 
 	// Create vertex buffer
 	{
-		D3DXVECTOR2 *pVertices;
+		D3DXVECTOR2 *pVertices = NULL;
 
-		if( FAILED( hr = m_pd3dDevice->CreateVertexBuffer( 
+		hr = m_pd3dDevice->CreateVertexBuffer( 
 			m_dwNumVertices*sizeof(D3DXVECTOR2), 0, 0, D3DPOOL_DEFAULT, 
-			&m_pVB, NULL ) ) )
-			return hr;
+			&m_pVB, NULL );
+		if( FAILED(hr) )
+			goto ERROR_END;
 
-		if( FAILED( hr = m_pVB->Lock( 0, 0, (void**)&pVertices, 0 ) ) )
+		hr = m_pVB->Lock( 0, 0, (void**)&pVertices, 0 );
+		if( FAILED(hr) )
 			return hr;
 
 		for( DWORD y=0; y<m_dwSize; y++ )
@@ -399,7 +406,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 			}
 		}
 
-		if( FAILED( hr = m_pVB->Unlock() ) )
+		if( FAILED( hr = m_pVB->Unlock() ) ) // Chj: Can this possibly fail?
 			return hr;
 	}
 
@@ -410,6 +417,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		fAspectRatio, 0.1f, 100.0f );
 
 	return S_OK;
+
+ERROR_END:
+	SAFE_RELEASE(m_pIB);
+	SAFE_RELEASE(m_pVB);
+
+	return hr;
 }
 
 
