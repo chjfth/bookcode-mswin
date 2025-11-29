@@ -1,9 +1,10 @@
 //-----------------------------------------------------------------------------
-// File: VertexShader3.2.cpp
+// File: VertexShader3.2-chj.cpp
 //
 // Desc: Example code showing how to do vertex shaders in D3D.
 //
 // Original: $DXSDK9\Samples\C++\Direct3D\VertexShader\VertexShader.cpp
+// Modified by Chj due to learning purpose.
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -19,8 +20,6 @@
 #include "D3DFont.h"
 #include "D3DUtil.h"
 #include "resource.h"
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -76,8 +75,6 @@ public:
 };
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: Entry point to the program. Initializes everything, and goes into a
@@ -93,8 +90,6 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 
 	return d3dApp.Run();
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -127,8 +122,6 @@ CMyD3DApplication::CMyD3DApplication()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: OneTimeSceneInit()
 // Desc: Called during initial app startup, this function performs all the
@@ -147,8 +140,6 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -222,8 +213,6 @@ HRESULT CMyD3DApplication::FrameMove()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: Render()
 // Desc: Called once per frame, the call is the entry point for 3d
@@ -275,8 +264,6 @@ HRESULT CMyD3DApplication::Render()
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -342,8 +329,6 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -428,8 +413,6 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: InvalidateDeviceObjects()
 // Desc:
@@ -443,8 +426,6 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -463,8 +444,6 @@ HRESULT CMyD3DApplication::DeleteDeviceObjects()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: FinalCleanup()
 // Desc: Called before the app exits, this function gives the app the chance
@@ -476,8 +455,6 @@ HRESULT CMyD3DApplication::FinalCleanup()
 	SAFE_DELETE( m_pFontSmall );
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -503,8 +480,6 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
