@@ -3,7 +3,7 @@
 //
 // Desc: Example code showing how to do vertex shaders in D3D.
 //
-// Chj v1.1:
+// Chj v1.2:
 // * Press 1/2/Home/End to rotate the earth, 0 to reset, code in FrameMove() .
 //-----------------------------------------------------------------------------
 #define STRICT
@@ -71,7 +71,7 @@ class CMyD3DApplication : public CD3DApplication
 	D3DXVECTOR3 m_vAngularVelocity;
 
 protected:
-	HRESULT OneTimeSceneInit();
+//	HRESULT OneTimeSceneInit();
 	HRESULT InitDeviceObjects();
 	HRESULT RestoreDeviceObjects();
 	HRESULT InvalidateDeviceObjects();
@@ -93,6 +93,8 @@ protected:
 
 		return (2 * rings) * (segments + 1);
 	}
+
+	void ChjRestoreSceneInit(); // replace OneTimeSceneInit()
 
 public:
 	CMyD3DApplication();
@@ -154,9 +156,27 @@ CMyD3DApplication::CMyD3DApplication()
 // Name: OneTimeSceneInit()
 // Desc: Called during initial app startup, this function performs all the
 //       permanent initialization.
+// Chj: NOT using this, but use ChjRestoreSceneInit() instead!
 //-----------------------------------------------------------------------------
-HRESULT CMyD3DApplication::OneTimeSceneInit()
+
+void CMyD3DApplication::ChjRestoreSceneInit()
 {
+	// This is called inside RestoreDeviceObjects().
+	// We should NOT do these in OneTimeSceneInit(), bcz when OneTimeSceneInit()
+	// is called by D3Dapp framework, m_d3dsdBackBuffer has NOT been initialized yet. 
+
+	//
+	// Set up initial world matrix
+	//
+
+	D3DXMatrixIdentity( &m_matWorld );
+	D3DXMatrixRotationY(&m_matWorld, 5.0f * D3DX_PI / 8.0f);
+	// -- Chj: Rotation angle determines what longitude is towards the camera.
+
+	//
+	// Set up initial view matrix
+	//
+
 	D3DXVECTOR3 from( 0.0f, 0.0f, -3.0f );	// camera position
 	D3DXVECTOR3 at  ( 0.0f, 0.0f, 0.0f );	// (object)focus position
 	D3DXVECTOR3 up  ( 0.0f, 1.0f, 0.0f );
@@ -166,7 +186,18 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 	
 	D3DXMatrixInverse( &m_matPosition, NULL_OUT, &m_matView );
 
-	return S_OK;
+	//
+	// Set up the projection matrix
+	//
+
+	D3DXMatrixIdentity( &m_matProj );
+	FLOAT fAspectRatio = 
+		(FLOAT)m_d3dsdBackBuffer.Width / (FLOAT)m_d3dsdBackBuffer.Height;
+	D3DXMatrixPerspectiveFovLH( &m_matProj, 
+		D3DX_PI/4,    // field of view Y
+		fAspectRatio, // viewport width/height ratio
+		0.5f, 1000.0f // near & far view-plane distance
+		);
 }
 
 
@@ -449,21 +480,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		goto ERROR_END;
 	}
 
-	// Set up the world matrix
-	D3DXMatrixIdentity( &m_matWorld );
-	D3DXMatrixRotationY(&m_matWorld, 5.0f * D3DX_PI / 8.0f);
-	// -- Chj: Rotation angle determines what longitude is towards the camera.
-
-	// Set up the projection matrix
-	D3DXMatrixIdentity( &m_matProj );
-	FLOAT fAspectRatio = 
-		(FLOAT)m_d3dsdBackBuffer.Width / (FLOAT)m_d3dsdBackBuffer.Height;
-	D3DXMatrixPerspectiveFovLH( &m_matProj, 
-		D3DX_PI/4,    // field of view Y
-		fAspectRatio, // viewport width/height ratio
-		0.5f, 1000.0f // near & far view-plane distance
-	);
-	// -- [2025-11-25] I think this can be moved into OneTimeSceneInit().
+	ChjRestoreSceneInit();
 
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();
