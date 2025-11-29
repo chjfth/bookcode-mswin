@@ -80,8 +80,8 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20251121-0000-0000-0000-210451000001}</ProjectGuid>
-    <ProjectName>DX9P-Chap3-1</ProjectName>
+    <ProjectGuid>{20251129-0000-0000-0000-103952000001}</ProjectGuid>
+    <ProjectName>DX9P-Chap3-2</ProjectName>
     <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
 
@@ -219,7 +219,7 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="VertexShader3.1.cpp" />
+    <ClCompile Include="VertexShader3.2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinMain.rc" />
@@ -227,18 +227,16 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
-  
-  
+
+
   <PropertyGroup>
-    <VSPG_ExeDataFiles>Asm_VS_Fog.vsh
-    ;..\..\BookCommon\Media\earth.bmp
-    </VSPG_ExeDataFiles>
+    <VSPG_ExeDataFiles>Ripple.vsh</VSPG_ExeDataFiles>
   </PropertyGroup>
   
   <ItemGroup>
     <CustomBuild Include="$(VSPG_ExeDataFiles)">
       <FileType>Document</FileType>
-      <Message>#### VSPG source file: %(FullPath)</Message>
+      <Message>#### VSPG_ExeDataFiles: %(FullPath)</Message>
       <Command>if not exist "%(FullPath)" echo .  -- [NOTE] Above file does NOT exist, CustomBuild will be triggered everytime.</Command>
       <Outputs>$(TargetPath)</Outputs>
     </CustomBuild>
