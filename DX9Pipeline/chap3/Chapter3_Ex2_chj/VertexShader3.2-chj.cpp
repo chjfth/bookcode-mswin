@@ -191,7 +191,9 @@ HRESULT CMyD3DApplication::FrameMove()
 
 	D3DXMatrixMultiply( &m_matPosition, &matR, &m_matPosition );
 	D3DXMatrixInverse( &m_matView, NULL, &m_matPosition );
-	m_pd3dDevice->SetTransform( D3DTS_VIEW, &m_matView );
+	
+	// m_pd3dDevice->SetTransform( D3DTS_VIEW, &m_matView ); 
+	// -- This is useless bcz this program use custom shader(not fixed-function pipeline).
 
 	// Set up the vertex shader constants
 	{
