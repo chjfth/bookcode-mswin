@@ -285,6 +285,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	TCHAR        strVertexShaderPath[512] = {};
 	LPD3DXBUFFER pCode = NULL;
 	Cec_Release cec_ShaderCode;
+	Cec_Release cec_errmsg;
 
 	D3DVERTEXELEMENT9 decl[] =
 	{
@@ -310,11 +311,21 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 #endif
 
 	// Assemble the vertex shader from the file
+	LPD3DXBUFFER pErrBuf = NULL;
 	hr = D3DXAssembleShaderFromFile( strVertexShaderPath, NULL, NULL, 
 		dwFlags, 
-		&pCode, NULL );
+		&pCode, &pErrBuf );
 	cec_ShaderCode = pCode; // ensure Release() on function exit
-	if( FAILED(hr) ) {
+	cec_errmsg = pErrBuf;
+	if( FAILED(hr) ) 
+	{
+		if(pErrBuf)
+		{
+			const char *errmsg = (const char*)pErrBuf->GetBufferPointer();
+			sdring<TCHAR> s1 = makeTsdring(errmsg);
+			vaDbgTs(_T("D3DXAssembleShaderFromFile() fail with hr=0x%X: %s"), hr, s1.c_str());
+		}
+		
 		goto ERROR_END;
 	}
 
