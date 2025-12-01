@@ -35,7 +35,7 @@ class CMyD3DApplication : public CD3DApplication
 	struct CUSTOMVERTEX
 	{
 		FLOAT x, y, z;   // The transformed position for the vertex
-		DWORD color;     // The vertex color
+		DWORD color;     // The vertex color (Chj: This is redundant but do not harm.)
 	};
 
 	LPDIRECT3DVERTEXBUFFER9 m_pVB; // FVF Triangle

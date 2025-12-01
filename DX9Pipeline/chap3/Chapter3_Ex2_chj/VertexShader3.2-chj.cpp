@@ -176,7 +176,7 @@ HRESULT CMyD3DApplication::FrameMove()
 	m_vVelocity        = m_vVelocity * 0.9f + vT * 0.1f;
 	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
 
-	// Update position and view matricies
+	// Update position and view matrices
 	D3DXMATRIXA16     matT, matR;
 	D3DXQUATERNION qR;
 

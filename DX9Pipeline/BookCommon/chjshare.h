@@ -1,6 +1,7 @@
 #pragma once
 
 #include <commdefs.h>
+#include <_MINMAX_.h>
 #include <sdring.h>
 #include <makeTsdring.h>
 

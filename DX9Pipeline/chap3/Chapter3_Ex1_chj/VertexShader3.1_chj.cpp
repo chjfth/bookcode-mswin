@@ -1,10 +1,11 @@
 //-----------------------------------------------------------------------------
-// File: VertexShader.cpp
+// File: VertexShader3.1_chj.cpp
 //
 // Desc: Example code showing how to do vertex shaders in D3D.
 //
-// Chj v1.2:
+// Chj v1.3:
 // * Press 1/2/Home/End to rotate the earth, 0 to reset, code in FrameMove() .
+// * Program parameter "6 12"(no quotes) to assign rings=6, segments=12.
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -26,6 +27,11 @@
 #include <vaDbgTs_util.h>
 
 #include "../BookCommon/chjshare.h"
+
+#define VERSTR "1.3"
+
+int g_rings = 24;    // configurable via cmdline
+int g_segments = 24; // configurable via cmdline
 
 struct CUSTOM_VERTEX
 {
@@ -101,6 +107,26 @@ public:
 };
 
 
+static void ChjInit()
+{
+	int argc = __argc;
+
+#ifdef UNICODE
+	PCTSTR* argv = (PCTSTR*) CommandLineToArgvW(GetCommandLine(), &argc);
+#else
+	PCTSTR* argv = (PCTSTR*) __argv;
+#endif
+
+	if(argc>1)
+		g_rings = _MAX_(3, _ttoi(argv[1]));
+
+	if(argc>2)
+		g_segments = _MAX_(3, _ttoi(argv[2]));
+
+	vaDbg_set_vsnprintf(my_mm_vsnprintf); // Chj
+	vaDbgTs_set_seq_width(3); // Chj
+}
+
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: Entry point to the program. Initializes everything, and goes into a
@@ -108,8 +134,7 @@ public:
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 {
-	vaDbg_set_vsnprintf(my_mm_vsnprintf); // Chj
-	vaDbgTs_set_seq_width(3); // Chj
+	ChjInit();
 
 	CMyD3DApplication d3dApp;
 
@@ -133,10 +158,10 @@ CMyD3DApplication::CMyD3DApplication()
 	m_pTexture = NULL;
 
 	m_pVBSphere = NULL;
-	m_dwNumSphereSegments	= 24;
-	m_dwNumSphereRings		= m_dwNumSphereSegments;
+	m_dwNumSphereSegments	= g_segments;
+	m_dwNumSphereRings		= g_rings;
 
-	m_strWindowTitle    = _T("VertexShader3.1_chj");
+	m_strWindowTitle    = _T("DX9Pipeline Ex3-1 v") _T(VERSTR);
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );

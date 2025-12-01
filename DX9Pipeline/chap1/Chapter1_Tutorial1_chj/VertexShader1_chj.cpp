@@ -88,8 +88,6 @@ public:
 };
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: Entry point to the program. Initializes everything, and goes into a
@@ -107,8 +105,6 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 
 	return d3dApp.Run();
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -138,8 +134,6 @@ CMyD3DApplication::CMyD3DApplication()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: OneTimeSceneInit()
 // Desc: Called during initial app startup, this function performs all the
@@ -155,8 +149,6 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -209,8 +201,6 @@ HRESULT CMyD3DApplication::FrameMove()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: Render()
 // Desc: Called once per frame, the call is the entry point for 3d
@@ -255,8 +245,6 @@ HRESULT CMyD3DApplication::Render()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: InitDeviceObjects()
 // Desc: Initialize scene objects.
@@ -270,8 +258,6 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -430,8 +416,6 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: DeleteDeviceObjects()
 // Desc: Called when the app is exiting, or the device is being changed,
@@ -450,8 +434,6 @@ HRESULT CMyD3DApplication::DeleteDeviceObjects()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: FinalCleanup()
 // Desc: Called before the app exits, this function gives the app the chance
@@ -463,8 +445,6 @@ HRESULT CMyD3DApplication::FinalCleanup()
 	SAFE_DELETE( m_pFontSmall );
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -495,8 +475,6 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
