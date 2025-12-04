@@ -1,13 +1,13 @@
 //-----------------------------------------------------------------------------
-// File: VertexBlend.cpp
+// File: VertexBlend3.3_chj.cpp
 //
 // Desc: Example code showing how to do a skinning effect, using the vertex
 //       blending feature of Direct3D. Normally, Direct3D transforms each
 //       vertex through the world matrix. The vertex blending feature,
-//       however, uses mulitple world matrices and a per-vertex blend factor
+//       however, uses multiple world matrices and a per-vertex blend factor
 //       to transform each vertex.
 //
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Original: $DXSDK9\Samples\C++\Direct3D\VertexBlend\vertexblend.cpp
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -24,6 +24,12 @@
 #include "D3DUtil.h"
 #include "resource.h"
 
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
+#include <vaDbgTs_util.h>
+
+#include "../BookCommon/chjshare.h"
+
 
 //-----------------------------------------------------------------------------
 // Name: struct BLENDVERTEX
@@ -33,8 +39,8 @@ struct BLENDVERTEX
 {
 	D3DXVECTOR3 v;       // Referenced as v0 in the vertex shader
 	FLOAT       blend;   // Referenced as v1.x in the vertex shader
-	D3DXVECTOR3 n;       // Referenced as v3 in the vertex shader
-	FLOAT       tu, tv;  // Referenced as v7 in the vertex shader
+	D3DXVECTOR3 n;       // Referenced as v3 in the vertex shader (vertex's normal)
+	FLOAT       tu, tv;  // Referenced as v7 in the vertex shader (texture coord)
 
 	static const DWORD FVF;
 };
@@ -102,7 +108,7 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 //-----------------------------------------------------------------------------
 CMyD3DApplication::CMyD3DApplication()
 {
-	m_strWindowTitle    = _T("VertexBlend: Surface Skinning Example");
+	m_strWindowTitle    = _T("Ex3-3 VertexBlend: Surface Skinning Example");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont             = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -246,8 +252,9 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	if( FAILED( m_pObject->Create( m_pd3dDevice, _T("mslogo.x") ) ) )
 		return D3DAPPERR_MEDIANOTFOUND;
 
-	if( ( ( m_dwCreateFlags & D3DCREATE_HARDWARE_VERTEXPROCESSING ) ||
-		  ( m_dwCreateFlags & D3DCREATE_MIXED_VERTEXPROCESSING ) ) &&
+	if( (( m_dwCreateFlags & D3DCREATE_HARDWARE_VERTEXPROCESSING ) ||
+		  ( m_dwCreateFlags & D3DCREATE_MIXED_VERTEXPROCESSING ))
+		&& 
 		m_d3dCaps.VertexShaderVersion < D3DVS_VERSION(1,1) )
 	{
 		// No VS available, so don't try to use it or allow user to
@@ -257,8 +264,8 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	}
 	else if( m_d3dCaps.MaxVertexBlendMatrices < 2 )
 	{
-		// No blend matrices available, so don't try to use them or 
-		// allow user to switch to them
+		// No blend matrices available, so don't  
+		// [ try to use them or allow user to switch to them ]
 		m_bUseVertexShader = TRUE;
 		EnableMenuItem( GetMenu( m_hWnd ), IDM_USEVERTEXSHADER, MF_GRAYED );
 	}
@@ -275,10 +282,12 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
 	// Add blending weights to the mesh
 	{
-		// Gain acces to the mesh's vertices
-		LPDIRECT3DVERTEXBUFFER9 pVB;
-		BLENDVERTEX* pVertices;
-		DWORD        dwNumVertices = m_pObject->GetSysMemMesh()->GetNumVertices();
+		// Gain access to the mesh's vertices
+		LPDIRECT3DVERTEXBUFFER9 pVB = NULL;
+		BLENDVERTEX* pVertices = NULL;
+		
+		DWORD dwNumVertices = m_pObject->GetSysMemMesh()->GetNumVertices();
+
 		m_pObject->GetSysMemMesh()->GetVertexBuffer( &pVB );
 		pVB->Lock( 0, 0, (void**)&pVertices, 0 );
 
@@ -310,7 +319,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	if( ( m_dwCreateFlags & D3DCREATE_SOFTWARE_VERTEXPROCESSING ) ||
 		m_d3dCaps.VertexShaderVersion >= D3DVS_VERSION(1,1) )
 	{
-		TCHAR        strVertexShaderPath[512];
+		TCHAR        strVertexShaderPath[512] ={};
 		LPD3DXBUFFER pCode;
 
 		// Find the vertex shader file
