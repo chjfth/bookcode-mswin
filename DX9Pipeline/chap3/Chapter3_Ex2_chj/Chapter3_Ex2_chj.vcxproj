@@ -219,7 +219,7 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="VertexShader3.2-chj.cpp" />
+    <ClCompile Include="VertexShader3.2_chj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinMain.rc" />
