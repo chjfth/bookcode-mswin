@@ -13,8 +13,8 @@ REM call :EchoVar ExeDllDir
 REM call :EchoVar TargetName
 
 REM ////////////////////////////// Team Extras //////////////////////////////
-REM After EXE generated, copy ..\..\BookCommon\Media\earth.bmp and Asm_VS_Fog.vsh
-REM alongside the EXE, because the cpp code wants to load that two files at runtime.
+REM After EXE generated, copy Blend_2_0.vsh and mslogo.x alongside the EXE, 
+REM because the cpp code wants to load that two files at runtime.
 
 REM =========================================================================
 REM This bat copies VSIDE project output(EXE/DLL etc) to other target directories,
@@ -32,9 +32,7 @@ REM
 REM (1) AGILE_COPY_PATTERNS
 REM
 
-call :GetAbsPath  fpBmp  "%ProjectDir%\..\..\BookCommon\Media\earth.bmp"
-
-set AGILE_COPY_PATTERNS="%fpBmp%" "%ProjectDir%\Asm_VS_Fog.vsh"
+set AGILE_COPY_PATTERNS="%ProjectDir%\Blend_2_0.vsh" "%ProjectDir%\mslogo.x" 
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
 REM 
 REM		This sets what files (concrete filenames, separated by spaces) or 
@@ -84,16 +82,8 @@ if not defined AGILE_COPY_PATTERNS (
 REM We do not check whether vspg_COPYORCLEAN_DO_CLEAN=1 here, bcz CopyFilePatternsToDirs.bat will take care of it.
 REM 
 call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ExeDllDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
-
 if not !errorlevel!==0 exit /b 4 
 
-
-REM ////////////////////////////// Team Extras //////////////////////////////
-if not exist "%ProjectDir%\earth.bmp" (
-	call :Echos We need earth.bmp alongside .vcxproj for direct F5/Ctrl+F5 local debug/run.
-	call :EchoAndExec copy "%fpBmp%" "%ProjectDir%"
-	if not !errorlevel!==0 exit /b 4 
-)
 
 exit /b 0
 

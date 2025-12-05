@@ -38,13 +38,16 @@
 struct BLENDVERTEX
 {
 	D3DXVECTOR3 v;       // Referenced as v0 in the vertex shader
-	FLOAT       blend;   // Referenced as v1.x in the vertex shader
+	FLOAT       blend;   // Referenced as v1.x in the vertex shader (blend weight 0..1)
 	D3DXVECTOR3 n;       // Referenced as v3 in the vertex shader (vertex's normal)
 	FLOAT       tu, tv;  // Referenced as v7 in the vertex shader (texture coord)
 
 	static const DWORD FVF;
 };
 const DWORD BLENDVERTEX::FVF = D3DFVF_XYZB1 | D3DFVF_NORMAL | D3DFVF_TEX1;
+// --[2025-12-05] Chj memo: This actual FVF value (0x116) represent a specific vertex format
+// that we tell GPU's fixed-function pipeline to use. And, when using a our custom shader,
+// we need to replicate that very vertex format, which is exactly BLENDVERTEX above.
 
 
 //-----------------------------------------------------------------------------
