@@ -8,6 +8,7 @@
 //       to transform each vertex.
 //
 // Original: $DXSDK9\Samples\C++\Direct3D\VertexBlend\vertexblend.cpp
+// v1.1: Dump data from mslogo.x inside InitDeviceObjects().
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -88,6 +89,20 @@ public:
 };
 
 
+static void ChjInit()
+{
+	int argc = __argc;
+
+#ifdef UNICODE
+	PCTSTR* argv = (PCTSTR*) CommandLineToArgvW(GetCommandLine(), &argc);
+#else
+	PCTSTR* argv = (PCTSTR*) __argv;
+#endif
+
+	vaDbg_set_vsnprintf(my_mm_vsnprintf);
+	vaDbgTs_set_seq_width(3);
+}
+
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: Entry point to the program. Initializes everything, and goes into a
@@ -95,6 +110,8 @@ public:
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 {
+	ChjInit();
+
 	CMyD3DApplication d3dApp;
 	
 	InitCommonControls();
@@ -111,7 +128,7 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 //-----------------------------------------------------------------------------
 CMyD3DApplication::CMyD3DApplication()
 {
-	m_strWindowTitle    = _T("Ex3-3 VertexBlend: Surface Skinning Example");
+	m_strWindowTitle    = _T("Ex3-3 VertexBlend v1.1 - Surface Skinning Example");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont             = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -246,13 +263,14 @@ HRESULT CMyD3DApplication::Render()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::InitDeviceObjects()
 {
-	HRESULT hr;
+	HRESULT hr = 0;
+	const TCHAR * xfilepath = _T("mslogo.x");
 
 	// Initialize the font's internal textures
 	m_pFont->InitDeviceObjects( m_pd3dDevice );
 
 	// Load an object to render
-	if( FAILED( m_pObject->Create( m_pd3dDevice, _T("mslogo.x") ) ) )
+	if( FAILED( m_pObject->Create( m_pd3dDevice, xfilepath ) ) )
 		return D3DAPPERR_MEDIANOTFOUND;
 
 	if( (( m_dwCreateFlags & D3DCREATE_HARDWARE_VERTEXPROCESSING ) ||
@@ -294,9 +312,11 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		m_pObject->GetSysMemMesh()->GetVertexBuffer( &pVB );
 		pVB->Lock( 0, 0, (void**)&pVertices, 0 );
 
-		// Calculate the min/max z values for all the vertices
-		FLOAT fMinX =  1e10f;
-		FLOAT fMaxX = -1e10f;
+		// Find out min/max .v.x values among all the vertices.
+		// Chj: .v.x values in mslogo.x are between [-4.616, +4.481]
+
+		FLOAT fMinX = +10000; // assume a large value
+		FLOAT fMaxX = -10000; // assume a small malue
 
 		DWORD i;
 		for(i=0; i<dwNumVertices; i++ )
@@ -307,11 +327,21 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 				fMaxX = pVertices[i].v.x;
 		}
 
+		// Now fMinX and fMaxX is confirmed.
+
+		vaDbgTs(_T("From %s, total %d vertexes; fMinX=%+.3f , fMaxX=%+.3f"), 
+			      xfilepath,     dwNumVertices, fMinX,       fMaxX);
+
 		for( i=0; i<dwNumVertices; i++ )
 		{
+			vaDbgTs(_T("Vertex#%d: X,Y,Z=(% .4f,% .4f,% .4f) Normal=(% .4f,% .4f,% .4f)"), 
+				i,
+				pVertices[i].v.x, pVertices[i].v.y, pVertices[i].v.z,
+				pVertices[i].n.x, pVertices[i].n.y, pVertices[i].n.z);
+
 			// Set the blend factors for the vertices
-			FLOAT a = ( pVertices[i].v.x - fMinX ) / ( fMaxX - fMinX );
-			pVertices[i].blend = 1.0f-sinf(a*D3DX_PI*1.0f);
+			FLOAT frac = ( pVertices[i].v.x - fMinX ) / ( fMaxX - fMinX );
+			pVertices[i].blend = 1.0f - sinf(frac*D3DX_PI);
 		}
 
 		// Done with the mesh's vertex buffer data
