@@ -51,7 +51,7 @@ public:
     HRESULT InvalidateDeviceObjects();
 
     // Creation/destruction
-    HRESULT Create( LPDIRECT3DDEVICE9 pd3dDevice, TCHAR* strFilename );
+    HRESULT Create( LPDIRECT3DDEVICE9 pd3dDevice, const TCHAR* strFilename );
     HRESULT Create( LPDIRECT3DDEVICE9 pd3dDevice, LPDIRECTXFILEDATA pFileData );
     HRESULT Destroy();
 

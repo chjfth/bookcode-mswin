@@ -54,7 +54,7 @@ CD3DMesh::~CD3DMesh()
 // Name:
 // Desc:
 //-----------------------------------------------------------------------------
-HRESULT CD3DMesh::Create( LPDIRECT3DDEVICE9 pd3dDevice, TCHAR* strFilename )
+HRESULT CD3DMesh::Create( LPDIRECT3DDEVICE9 pd3dDevice, const TCHAR* strFilename )
 {
     TCHAR        strPath[MAX_PATH];
     LPD3DXBUFFER pAdjacencyBuffer = NULL;

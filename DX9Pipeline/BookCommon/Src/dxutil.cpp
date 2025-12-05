@@ -76,7 +76,7 @@ HRESULT DXUtil_GetDXSDKMediaPathCch( TCHAR* strDest, int cchDest )
 //       cchDest is the size in TCHARs of strDestPath.  Be careful not to 
 //       pass in sizeof(strDest) on UNICODE builds.
 //-----------------------------------------------------------------------------
-HRESULT DXUtil_FindMediaFileCch( TCHAR* strDestPath, int cchDest, TCHAR* strFilename )
+HRESULT DXUtil_FindMediaFileCch( TCHAR* strDestPath, int cchDest, const TCHAR* strFilename )
 {
     HRESULT hr;
     HANDLE file;
@@ -1093,7 +1093,7 @@ HRESULT DXUtil_GetDXSDKMediaPathCb( TCHAR* szDest, int cbDest )
     return DXUtil_GetDXSDKMediaPathCch( szDest, cbDest / sizeof(TCHAR) );
 }
 
-HRESULT DXUtil_FindMediaFileCb( TCHAR* szDestPath, int cbDest, TCHAR* strFilename )
+HRESULT DXUtil_FindMediaFileCb( TCHAR* szDestPath, int cbDest, const TCHAR* strFilename )
 {
     return DXUtil_FindMediaFileCch( szDestPath, cbDest / sizeof(TCHAR), strFilename );
 }
