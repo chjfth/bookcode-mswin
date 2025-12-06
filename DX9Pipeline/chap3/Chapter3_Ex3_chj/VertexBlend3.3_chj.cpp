@@ -242,6 +242,7 @@ HRESULT CMyD3DApplication::Render()
 
 			// Display the object
 			m_pMeshObj->Render( m_pd3dDevice );
+			// -- Chj: It's m_pMeshObj->Render(), not m_pd3dDevice->Render().
 		}
 
 		// Output statistics
@@ -429,7 +430,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 	// Create a directional light. (Use yellow light to distinguish from
 	// vertex shader case.)
-	D3DLIGHT9 light;
+	D3DLIGHT9 light = {};
 	D3DUtil_InitLight( light, D3DLIGHT_DIRECTIONAL, -0.5f, -1.0f, 1.0f );
 	light.Diffuse.r = 1.0f;
 	light.Diffuse.g = 1.0f;
@@ -511,7 +512,7 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 	}
 	else
 	{
-		// Software vertex processing always supports vertex shaders
+		// Software vertex processing always supports (custom) vertex shaders
 		return S_OK;
 	}
 

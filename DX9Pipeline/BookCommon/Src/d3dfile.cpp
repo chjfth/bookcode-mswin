@@ -326,7 +326,7 @@ HRESULT CD3DMesh::Render( LPDIRECT3DDEVICE9 pd3dDevice, bool bDrawOpaqueSubsets,
     if( NULL == m_pLocalMesh )
         return E_FAIL;
 
-    // Frist, draw the subsets without alpha
+    // First, draw the subsets without alpha
     if( bDrawOpaqueSubsets )
     {
         for( DWORD i=0; i<m_dwNumMaterials; i++ )
