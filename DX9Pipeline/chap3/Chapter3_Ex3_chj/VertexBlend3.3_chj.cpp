@@ -316,7 +316,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		// Chj: .v.x values in mslogo.x are between [-4.616, +4.481]
 
 		FLOAT fMinX = +10000; // assume a large value
-		FLOAT fMaxX = -10000; // assume a small malue
+		FLOAT fMaxX = -10000; // assume a small value
 
 		DWORD i;
 		for(i=0; i<dwNumVertices; i++ )
@@ -327,21 +327,22 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 				fMaxX = pVertices[i].v.x;
 		}
 
-		// Now fMinX and fMaxX is confirmed.
+		// Now fMinX and fMaxX are confirmed.
 
 		vaDbgTs(_T("From %s, total %d vertexes; fMinX=%+.3f , fMaxX=%+.3f"), 
 			      xfilepath,     dwNumVertices, fMinX,       fMaxX);
 
 		for( i=0; i<dwNumVertices; i++ )
 		{
-			vaDbgTs(_T("Vertex#%d: X,Y,Z=(% .4f,% .4f,% .4f) Normal=(% .4f,% .4f,% .4f)"), 
-				i,
-				pVertices[i].v.x, pVertices[i].v.y, pVertices[i].v.z,
-				pVertices[i].n.x, pVertices[i].n.y, pVertices[i].n.z);
-
 			// Set the blend factors for the vertices
 			FLOAT frac = ( pVertices[i].v.x - fMinX ) / ( fMaxX - fMinX );
 			pVertices[i].blend = 1.0f - sinf(frac*D3DX_PI);
+
+			vaDbgTs(_T("Vertex#%d: X,Y,Z=(% .4f,% .4f,% .4f) Normal=(% .4f,% .4f,% .4f) Set-blend=%.3f"), 
+				i,
+				pVertices[i].v.x, pVertices[i].v.y, pVertices[i].v.z,
+				pVertices[i].n.x, pVertices[i].n.y, pVertices[i].n.z,
+				pVertices[i].blend);
 		}
 
 		// Done with the mesh's vertex buffer data
