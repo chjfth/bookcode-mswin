@@ -60,17 +60,17 @@ const DWORD BLENDVERTEX::FVF = D3DFVF_XYZB1 | D3DFVF_NORMAL | D3DFVF_TEX1;
 class CMyD3DApplication : public CD3DApplication
 {
 	CD3DFont*               m_pFont;
-	CD3DMesh*               m_pObject;           // Vertex blending object
+	CD3DMesh*               m_pMeshObj;       // Vertex blending object (was named m_pObject)
 	DWORD                   m_dwNumVertices;
 	DWORD                   m_dwNumFaces;
 	LPDIRECT3DVERTEXBUFFER9 m_pVB;    
 	LPDIRECT3DINDEXBUFFER9  m_pIB;
 
-	D3DXMATRIXA16           m_matUpperArm;       // Vertex blending matrices
+	D3DXMATRIXA16           m_matUpperArm;    // Vertex blending matrices
 	D3DXMATRIXA16           m_matLowerArm;
 
-	LPDIRECT3DVERTEXSHADER9 m_pVertexShader;    // Vertex shader
-	BOOL                    m_bUseVertexShader;
+	LPDIRECT3DVERTEXSHADER9 m_pVertexShader;  // Vertex shader
+	BOOL                    m_bUseCustomShader;
 
 protected:
 	HRESULT OneTimeSceneInit();
@@ -132,11 +132,11 @@ CMyD3DApplication::CMyD3DApplication()
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont             = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
-	m_pObject           = new CD3DMesh();
+	m_pMeshObj           = new CD3DMesh();
 	m_pVB               = NULL;
 	m_pIB               = NULL;
 	m_pVertexShader     = NULL;
-	m_bUseVertexShader  = FALSE;
+	m_bUseCustomShader  = FALSE;
 }
 
 
@@ -161,12 +161,13 @@ HRESULT CMyD3DApplication::FrameMove()
 	// Set the vertex blending matrices for this frame
 	D3DXVECTOR3 vAxis( 2+sinf(m_fTime*3.1f), 2+sinf(m_fTime*3.3f), sinf(m_fTime*3.5f) ); 
 	D3DXMatrixRotationAxis( &m_matLowerArm, &vAxis, sinf(3*m_fTime) );
+	
 	D3DXMatrixIdentity( &m_matUpperArm );
 
 	// Set the vertex shader constants. Note: outside of the blend matrices,
 	// most of these values don't change, so don't need to really be set every
 	// frame. It's just done here for clarity
-	if( m_bUseVertexShader )
+	if( m_bUseCustomShader )
 	{
 		// Some basic constants
 		D3DXVECTOR4 vZero(0,0,0,0);
@@ -182,9 +183,11 @@ HRESULT CMyD3DApplication::FrameMove()
 		// Vertex shader operations use transposed matrices
 		D3DXMATRIXA16 matWorld0Transpose, matWorld1Transpose;
 		D3DXMATRIXA16 matView, matProj, matViewProj, matViewProjTranspose;
+		
 		m_pd3dDevice->GetTransform( D3DTS_VIEW,       &matView );
 		m_pd3dDevice->GetTransform( D3DTS_PROJECTION, &matProj );
 		D3DXMatrixMultiply( &matViewProj, &matView, &matProj );
+		
 		D3DXMatrixTranspose( &matWorld0Transpose, &m_matUpperArm );
 		D3DXMatrixTranspose( &matWorld1Transpose, &m_matLowerArm );
 		D3DXMatrixTranspose( &matViewProjTranspose, &matViewProj );
@@ -219,8 +222,9 @@ HRESULT CMyD3DApplication::Render()
 	// Begin the scene
 	if( SUCCEEDED( m_pd3dDevice->BeginScene() ) )
 	{
-		if( m_bUseVertexShader )        
+		if( m_bUseCustomShader )        
 		{
+			// vertex blending using custom shader code
 			m_pd3dDevice->SetFVF( BLENDVERTEX::FVF );
 			m_pd3dDevice->SetVertexShader( m_pVertexShader );
 			m_pd3dDevice->SetStreamSource( 0, m_pVB, 0, sizeof(BLENDVERTEX) );
@@ -230,21 +234,21 @@ HRESULT CMyD3DApplication::Render()
 		}
 		else
 		{
-			// Enable vertex blending using API
+			// vertex blending using fixed-function pipeline
 			m_pd3dDevice->SetVertexShader( NULL );
 			m_pd3dDevice->SetTransform( D3DTS_WORLD,  &m_matUpperArm );
 			m_pd3dDevice->SetTransform( D3DTS_WORLD1, &m_matLowerArm );
 			m_pd3dDevice->SetRenderState( D3DRS_VERTEXBLEND, D3DVBF_1WEIGHTS );
 
 			// Display the object
-			m_pObject->Render( m_pd3dDevice );
+			m_pMeshObj->Render( m_pd3dDevice );
 		}
 
 		// Output statistics
 		m_pFont->DrawText( 2,  0, D3DCOLOR_ARGB(255,255,255,0), m_strFrameStats );
 		m_pFont->DrawText( 2, 20, D3DCOLOR_ARGB(255,255,255,0), m_strDeviceStats );
 
-		if( m_bUseVertexShader )
+		if( m_bUseCustomShader )
 			m_pFont->DrawText( 2, 40, D3DCOLOR_ARGB(255,255,255,255), _T("Using vertex shader") );
 		else
 			m_pFont->DrawText( 2, 40, D3DCOLOR_ARGB(255,255,255,255), _T("Using D3DRS_VERTEXBLEND") );
@@ -270,7 +274,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	m_pFont->InitDeviceObjects( m_pd3dDevice );
 
 	// Load an object to render
-	if( FAILED( m_pObject->Create( m_pd3dDevice, xfilepath ) ) )
+	if( FAILED( m_pMeshObj->Create( m_pd3dDevice, xfilepath ) ) )
 		return D3DAPPERR_MEDIANOTFOUND;
 
 	if( (( m_dwCreateFlags & D3DCREATE_HARDWARE_VERTEXPROCESSING ) ||
@@ -280,26 +284,26 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	{
 		// No VS available, so don't try to use it or allow user to
 		// switch to it
-		m_bUseVertexShader = FALSE;
+		m_bUseCustomShader = FALSE;
 		EnableMenuItem( GetMenu( m_hWnd ), IDM_USEVERTEXSHADER, MF_GRAYED );
 	}
 	else if( m_d3dCaps.MaxVertexBlendMatrices < 2 )
 	{
 		// No blend matrices available, so don't  
 		// [ try to use them or allow user to switch to them ]
-		m_bUseVertexShader = TRUE;
+		m_bUseCustomShader = TRUE;
 		EnableMenuItem( GetMenu( m_hWnd ), IDM_USEVERTEXSHADER, MF_GRAYED );
 	}
 	else
 	{
 		// Both techniques available, so default to blend matrices and 
 		// allow the user to switch techniques
-		m_bUseVertexShader = FALSE;
+		m_bUseCustomShader = FALSE;
 		EnableMenuItem( GetMenu( m_hWnd ), IDM_USEVERTEXSHADER, MF_ENABLED );
 	}
 
 	// Set a custom FVF for the mesh
-	m_pObject->SetFVF( m_pd3dDevice, BLENDVERTEX::FVF );
+	m_pMeshObj->SetFVF( m_pd3dDevice, BLENDVERTEX::FVF );
 
 	// Add blending weights to the mesh
 	{
@@ -307,9 +311,9 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		LPDIRECT3DVERTEXBUFFER9 pVB = NULL;
 		BLENDVERTEX* pVertices = NULL;
 		
-		DWORD dwNumVertices = m_pObject->GetSysMemMesh()->GetNumVertices();
+		DWORD dwNumVertices = m_pMeshObj->GetSysMemMesh()->GetNumVertices();
 
-		m_pObject->GetSysMemMesh()->GetVertexBuffer( &pVB );
+		m_pMeshObj->GetSysMemMesh()->GetVertexBuffer( &pVB );
 		pVB->Lock( 0, 0, (void**)&pVertices, 0 );
 
 		// Find out min/max .v.x values among all the vertices.
@@ -397,13 +401,13 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pFont->RestoreDeviceObjects();
 
 	// Restore mesh's local memory objects
-	m_pObject->RestoreDeviceObjects( m_pd3dDevice );
+	m_pMeshObj->RestoreDeviceObjects( m_pd3dDevice );
 
 	// Get access to the mesh vertex and index buffers
-	m_pObject->GetLocalMesh()->GetVertexBuffer( &m_pVB );
-	m_pObject->GetLocalMesh()->GetIndexBuffer( &m_pIB );
-	m_dwNumVertices = m_pObject->GetLocalMesh()->GetNumVertices();
-	m_dwNumFaces    = m_pObject->GetLocalMesh()->GetNumFaces();
+	m_pMeshObj->GetLocalMesh()->GetVertexBuffer( &m_pVB );
+	m_pMeshObj->GetLocalMesh()->GetIndexBuffer( &m_pIB );
+	m_dwNumVertices = m_pMeshObj->GetLocalMesh()->GetNumVertices();
+	m_dwNumFaces    = m_pMeshObj->GetLocalMesh()->GetNumFaces();
 
 	// Set miscellaneous render states
 	m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
@@ -445,7 +449,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 {
 	m_pFont->InvalidateDeviceObjects();
-	m_pObject->InvalidateDeviceObjects();
+	m_pMeshObj->InvalidateDeviceObjects();
 
 	SAFE_RELEASE( m_pVB );
 	SAFE_RELEASE( m_pIB );
@@ -462,7 +466,7 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 HRESULT CMyD3DApplication::DeleteDeviceObjects()
 {
 	m_pFont->DeleteDeviceObjects();
-	m_pObject->Destroy();
+	m_pMeshObj->Destroy();
 
 	SAFE_RELEASE( m_pVertexShader );
 
@@ -478,7 +482,7 @@ HRESULT CMyD3DApplication::DeleteDeviceObjects()
 HRESULT CMyD3DApplication::FinalCleanup()
 {
 	SAFE_DELETE( m_pFont );
-	SAFE_DELETE( m_pObject );
+	SAFE_DELETE( m_pMeshObj );
 
 	return S_OK;
 }
@@ -541,9 +545,9 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 		switch( LOWORD(wParam) )
 		{
 			case IDM_USEVERTEXSHADER:
-				m_bUseVertexShader = !m_bUseVertexShader;
+				m_bUseCustomShader = !m_bUseCustomShader;
 				CheckMenuItem( GetMenu(hWnd), IDM_USEVERTEXSHADER,
-							   m_bUseVertexShader ? MF_CHECKED : MF_UNCHECKED );
+							   m_bUseCustomShader ? MF_CHECKED : MF_UNCHECKED );
 				break;
 		}
 	}
