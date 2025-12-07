@@ -359,7 +359,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		m_d3dCaps.VertexShaderVersion >= D3DVS_VERSION(1,1) )
 	{
 		TCHAR        strVertexShaderPath[512] ={};
-		LPD3DXBUFFER pCode;
+		LPD3DXBUFFER pCode = NULL;
 
 		// Find the vertex shader file
 		if( FAILED( hr = DXUtil_FindMediaFileCb( strVertexShaderPath, 
@@ -372,20 +372,18 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		if( FAILED( hr = D3DXAssembleShaderFromFile( strVertexShaderPath, 
 										NULL, NULL, 0, &pCode, NULL ) ) )
 		{
-			SAFE_RELEASE(pCode);
 			return hr;
 		}
+
+		Cec_Release cec_ShaderCode = pCode;
 
 		// Create the vertex shader
 		hr = m_pd3dDevice->CreateVertexShader( (DWORD*)pCode->GetBufferPointer(),
 											   &m_pVertexShader );
 		if( FAILED( hr ) )
 		{
-			SAFE_RELEASE(m_pVertexShader);
-			SAFE_RELEASE(pCode);
 			return hr;
 		}
-		SAFE_RELEASE(pCode);
 	}
 
 	return S_OK;
