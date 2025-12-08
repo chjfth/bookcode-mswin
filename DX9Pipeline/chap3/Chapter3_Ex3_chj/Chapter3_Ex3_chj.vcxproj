@@ -220,6 +220,7 @@
    -->
   <ItemGroup>
     <ClCompile Include="VertexBlend3.3_chj.cpp" />
+    <ClCompile Include="CHHI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinMain.rc" />

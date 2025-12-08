@@ -25,7 +25,6 @@
 #include "D3DUtil.h"
 #include "resource.h"
 
-#define CHHI_ALL_IMPL
 #include <vaDbgTs.h>
 #include <vaDbgTs_util.h>
 
