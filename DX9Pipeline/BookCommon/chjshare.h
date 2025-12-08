@@ -17,6 +17,8 @@ using namespace itc;
 #include <DirectX\d3d9.itc.h>
 #include <DirectX\d3dx9.itc.h>
 #include <DirectX\directx_errors.itc.h>
+#include <DirectX\d3d9caps.itc.h>
+#include <DirectX\d3d9types.itc.h>
 
 
 inline void ComPtr_Release(IUnknown *puk)

@@ -530,21 +530,31 @@ static HRESULT in_ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 //       for some minimum set of capabilities
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior, 
-										  D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
+	D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
 {
 	g_idxConfirmDevice++;
 
 	vaDbgTs(_T("ConfirmDevice[#%d]:\n")
-		_T("  dwBehavior=0x%X : %s\n")
+		_T("  dwBehavior=0x%X : %s\n") // this varies 0x50, 0x40, 0x20
+		_T("  pCaps->VertexShaderVersion=0x%X\n")  // always same, eg =0xFFFE0300
+		_T("  pCaps->MaxVertexBlendMatrices=%d\n") // always same, eg =4
+		_T("  pCaps->VertexProcessingCaps=0x%X : %s\n") // always same, eg =0x17B
+		_T("  adapterFormat   =0x%X : %s\n")
+		_T("  backBufferFormat=0x%X : %s")
 		,
 		g_idxConfirmDevice,
-		dwBehavior, ITCSnv(dwBehavior, D3DCREATE)
+		dwBehavior, ITCSnv(dwBehavior, D3DCREATE),
+		pCaps->VertexShaderVersion,
+		pCaps->MaxVertexBlendMatrices,
+		pCaps->VertexProcessingCaps, ITCSnv(pCaps->VertexProcessingCaps, D3DVTXPCAPS),
+		adapterFormat, ITCSnv(adapterFormat, D3DFMT),
+		backBufferFormat, ITCSnv(backBufferFormat, D3DFMT)
 		);
 
 	HRESULT hr = in_ConfirmDevice(pCaps, dwBehavior, adapterFormat, backBufferFormat);
 
-
-	vaDbgTs(_T("ConfirmDevice[#%d] result=%s"), g_idxConfirmDevice, ITCSnv(hr, DxErr));
+	vaDbgTs(_T("ConfirmDevice[#%d] result: %s"), g_idxConfirmDevice, 
+		hr==S_OK ? _T("ACCEPT") : _T("DENY"));
 
 	return hr;
 }
