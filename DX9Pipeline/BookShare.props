@@ -31,6 +31,7 @@
       '$(dirThisBook)\..\__chjcxx\common-include\include\mswin;',
       '$(dirThisBook)\..\__chjcxx\common-include\include;',
       '$(dirThisBook)\..\__chjcxx\mm_snprintf\libsrc\include;',
+      '$(dirThisBook)\..\__WinConst\mswin;',
       '$(IncludePath);',
       '$(dirDxsdk9)\Include;'
       ))

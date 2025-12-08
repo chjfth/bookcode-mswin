@@ -25,9 +25,6 @@
 #include "D3DUtil.h"
 #include "resource.h"
 
-#include <vaDbgTs.h>
-#include <vaDbgTs_util.h>
-
 #include "../BookCommon/chjshare.h"
 
 
@@ -485,15 +482,13 @@ HRESULT CMyD3DApplication::FinalCleanup()
 	return S_OK;
 }
 
+int g_idxConfirmDevice = 0;
 
-//-----------------------------------------------------------------------------
-// Name: ConfirmDevice()
-// Desc: Called during device initialization, this code checks the device
-//       for some minimum set of capabilities
-//-----------------------------------------------------------------------------
-HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior, 
-										  D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
+
+static HRESULT in_ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior, 
+	D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
 {
+
 	if( dwBehavior & D3DCREATE_PUREDEVICE )
 		return E_FAIL; // GetTransform doesn't work on PUREDEVICE
 
@@ -527,6 +522,31 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 	}
 
 	return S_OK;
+}
+
+//-----------------------------------------------------------------------------
+// Name: ConfirmDevice()
+// Desc: Called during device initialization, this code checks the device
+//       for some minimum set of capabilities
+//-----------------------------------------------------------------------------
+HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior, 
+										  D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
+{
+	g_idxConfirmDevice++;
+
+	vaDbgTs(_T("ConfirmDevice[#%d]:\n")
+		_T("  dwBehavior=0x%X : %s\n")
+		,
+		g_idxConfirmDevice,
+		dwBehavior, ITCSnv(dwBehavior, D3DCREATE)
+		);
+
+	HRESULT hr = in_ConfirmDevice(pCaps, dwBehavior, adapterFormat, backBufferFormat);
+
+
+	vaDbgTs(_T("ConfirmDevice[#%d] result=%s"), g_idxConfirmDevice, ITCSnv(hr, DxErr));
+
+	return hr;
 }
 
 

@@ -6,5 +6,8 @@
 #include <CHHI_vaDBG_is_vaDbgTs.h> // optional
 
 #include <InterpretConst.h>
+#include <DirectX\d3d9.itc.h>
+#include <DirectX\d3dx9.itc.h>
+#include <DirectX\directx_errors.itc.h>
 
 

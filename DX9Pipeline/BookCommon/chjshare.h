@@ -8,6 +8,17 @@
 #include <EnsureClnup_mswin.h>
 #include <mm_snprintf.h>
 
+#include <vaDbgTs.h>
+#include <vaDbgTs_util.h>
+
+#include <InterpretConst.h>
+
+using namespace itc;
+#include <DirectX\d3d9.itc.h>
+#include <DirectX\d3dx9.itc.h>
+#include <DirectX\directx_errors.itc.h>
+
+
 inline void ComPtr_Release(IUnknown *puk)
 { 
 	puk->Release(); 
