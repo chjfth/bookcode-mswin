@@ -422,8 +422,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	D3DXMatrixLookAtLH( &matView, &vEyePt, &vLookatPt, &vUpVec );
 	m_pd3dDevice->SetTransform( D3DTS_VIEW, &matView );
 
-	// Create a directional light. (Use yellow light to distinguish from
-	// vertex shader case.)
+	// Create a directional light. (use yellow light)
 	D3DLIGHT9 light = {};
 	D3DUtil_InitLight( light, D3DLIGHT_DIRECTIONAL, -0.5f, -1.0f, 1.0f );
 	light.Diffuse.r = 1.0f;
@@ -539,16 +538,16 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 		_T("  pCaps->VertexShaderVersion=0x%X\n")  // always same, eg =0xFFFE0300
 		_T("  pCaps->MaxVertexBlendMatrices=%d\n") // always same, eg =4
 		_T("  pCaps->VertexProcessingCaps=0x%X : %s\n") // always same, eg =0x17B
-		_T("  adapterFormat   =0x%X : %s\n")
-		_T("  backBufferFormat=0x%X : %s")
+		_T("  adapterFormat   = %s\n") // always D3DFMT_X8R8G8B8(22)
+		_T("  backBufferFormat= %s")   // can be D3DFMT_A8R8G8B8(21), 22, 23, 24 35 etc
 		,
 		g_idxConfirmDevice,
 		dwBehavior, ITCSnv(dwBehavior, D3DCREATE),
 		pCaps->VertexShaderVersion,
 		pCaps->MaxVertexBlendMatrices,
 		pCaps->VertexProcessingCaps, ITCSnv(pCaps->VertexProcessingCaps, D3DVTXPCAPS),
-		adapterFormat, ITCSnv(adapterFormat, D3DFMT),
-		backBufferFormat, ITCSnv(backBufferFormat, D3DFMT)
+		ITCSnv(adapterFormat, D3DFMT),
+		ITCSnv(backBufferFormat, D3DFMT)
 		);
 
 	HRESULT hr = in_ConfirmDevice(pCaps, dwBehavior, adapterFormat, backBufferFormat);
