@@ -92,7 +92,6 @@ REM Cope with VSPG_ExeDataFiles, these files are relative to %ProjectDir%, not %
 REM Replace [path1;path2] into ["path1" "path2"] and set new values of:
 set AGILE_COPY_PATTERNS="%VSPG_ExeDataFiles:;=" "%"
 
-REM Extra for AGILE_COPY_PATTERNS
 call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ProjectDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
 if not !errorlevel!==0 exit /b 4
 

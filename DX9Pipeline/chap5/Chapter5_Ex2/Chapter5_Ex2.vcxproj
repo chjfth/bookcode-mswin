@@ -80,8 +80,8 @@
   <!-- User project properties -->
   
   <PropertyGroup Label="Configuration">
-    <ProjectGuid>{20251211-0000-0000-0000-202603000001}</ProjectGuid>
-    <ProjectName>DX9P-Chap5-1</ProjectName>
+    <ProjectGuid>{20251211-0000-0000-0000-204658000001}</ProjectGuid>
+    <ProjectName>DX9P-Chap5-2</ProjectName>
     <TargetName>$(ProjectName)</TargetName>
     <ConfigurationType>Application</ConfigurationType>
 
@@ -219,7 +219,7 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="ShaderDemo5.1.cpp" />
+    <ClCompile Include="ShaderDemo5.2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinMain.rc" />
@@ -230,7 +230,10 @@
 
 
   <PropertyGroup>
-    <VSPG_ExeDataFiles>..\..\BookCommon\Media\earth.bmp</VSPG_ExeDataFiles>
+    <VSPG_ExeDataFiles>
+    ;..\..\BookCommon\Media\earth.bmp
+    ;..\..\BookCommon\Media\DX5_Logo.bmp
+    </VSPG_ExeDataFiles>
   </PropertyGroup>
   
   <ItemGroup>
