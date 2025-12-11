@@ -399,6 +399,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pMeshObj->RestoreDeviceObjects( m_pd3dDevice );
 
 	// Get access to the mesh vertex and index buffers
+	assert(!m_pVB);
+	assert(!m_pIB);
 	m_pMeshObj->GetLocalMesh()->GetVertexBuffer( &m_pVB );
 	m_pMeshObj->GetLocalMesh()->GetIndexBuffer( &m_pIB );
 	m_dwNumVertices = m_pMeshObj->GetLocalMesh()->GetNumVertices();

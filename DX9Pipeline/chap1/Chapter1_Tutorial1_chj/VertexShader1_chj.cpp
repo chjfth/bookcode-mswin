@@ -412,6 +412,15 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 	m_pFont->InvalidateDeviceObjects();
 	m_pFontSmall->InvalidateDeviceObjects();
 
+	// [2025-12-11] Chj fix: 
+	// We need to release those resources created in RestoreDeviceObjects(),
+	// otherwise, dragging-mouse window resizing will crash the EXE.
+	// Immediately after return, `m_pd3dDevice->Reset( &m_d3dpp );` would fail with 
+	// 0x8876086c(D3DERR_INVALIDCALL).
+	SAFE_RELEASE(m_pAsm_VS);
+	SAFE_RELEASE(m_pVB);
+	SAFE_RELEASE(m_pVertexDeclaration);
+
 	return S_OK;
 }
 
