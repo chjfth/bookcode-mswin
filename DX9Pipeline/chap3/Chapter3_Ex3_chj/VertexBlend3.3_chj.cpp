@@ -11,6 +11,7 @@
 // v1.1: Dump data from mslogo.x inside InitDeviceObjects().
 //-----------------------------------------------------------------------------
 #define STRICT
+#include <assert.h>
 #include <Windows.h>
 #include <commctrl.h>
 #include <math.h>
