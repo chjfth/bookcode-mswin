@@ -77,6 +77,16 @@ protected:
 
 public:
 	CMyD3DApplication();
+
+protected:
+	void SafeReleaseAll()
+	{
+		SAFE_RELEASE(m_pAsm_VS);
+		SAFE_RELEASE(m_pAsm_PS);
+		SAFE_RELEASE(m_pVertexDeclaration);
+		SAFE_RELEASE(m_pTexture);
+		SAFE_RELEASE(m_pVB);
+	}
 };
 
 
@@ -216,8 +226,7 @@ HRESULT CMyD3DApplication::Render()
 
 		m_pd3dDevice->SetVertexDeclaration( m_pVertexDeclaration);
 		m_pd3dDevice->SetVertexShader(m_pAsm_VS);
-		m_pd3dDevice->SetStreamSource(0, m_pVB, 0, 
-			sizeof(CUSTOMVERTEX));
+		m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
 
 		m_pd3dDevice->SetTexture( 0, m_pTexture );
 		m_pd3dDevice->SetPixelShader(m_pAsm_PS);
@@ -256,6 +265,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	HRESULT hr = S_OK;
 
 	LPD3DXBUFFER pShader = NULL;
+	Cec_Release cec_ShaderCode = pShader;
 
 	const char* strAsmPixelShader = 
 "ps_1_1            // version instruction\n"
@@ -288,41 +298,30 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL // error messages 
 		);
+	cec_ShaderCode = pShader;
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
-
 
 	// Create the pixel shader
 	hr = m_pd3dDevice->CreatePixelShader( 
 		(DWORD*)pShader->GetBufferPointer(), &m_pAsm_PS );
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(m_pAsm_PS);
-		SAFE_RELEASE(pShader);  
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
-
-	SAFE_RELEASE(pShader);  
-
-
 	// Load a texture
-	TCHAR szEarth[MAX_PATH];
-	hr = DXUtil_FindMediaFileCb(szEarth, sizeof(szEarth), 
-		_T("earth.bmp"));
-	if( FAILED(hr) )
-		return D3DERR_NOTFOUND;
+	TCHAR szEarth[MAX_PATH] = {};
+	hr = DXUtil_FindMediaFileCb(szEarth, sizeof(szEarth), _T("earth.bmp"));
+	if( FAILED(hr) ) {
+		goto ERROR_END;
+	}
 
 	hr = D3DXCreateTextureFromFile( m_pd3dDevice, szEarth, &m_pTexture);
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(m_pTexture);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
@@ -348,35 +347,29 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL // error messages 
 		);
+	cec_ShaderCode = pShader; // will auto-release old pShader
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 	// Create the vertex shader
 	hr = m_pd3dDevice->CreateVertexShader( 
 		(DWORD*)pShader->GetBufferPointer(), &m_pAsm_VS );
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(m_pAsm_VS);
-		SAFE_RELEASE(pShader);  
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
-
-	SAFE_RELEASE(pShader);  
 
 
 	// Declare the vertex data
 	CUSTOMVERTEX vertices[] =
 	{
-	//  x      y      z   u,v
-	{ -1.0f, -1.0f, 0.0f, 0,0 },  // lower left
-	{ +1.0f, -1.0f, 0.0f, 1,0 },  // lower right
-	{ +1.0f, +1.0f, 0.0f, 1,1 },  // upper right
-	{ -1.0f, +1.0f, 0.0f, 0,1 },  // upper left
+		//  x      y      z    u, v
+		{ -1.0f, -1.0f, 0.0f,  0, 0 },  // lower left
+		{ +1.0f, -1.0f, 0.0f,  1, 0 },  // lower right
+		{ +1.0f, +1.0f, 0.0f,  1, 1 },  // upper right
+		{ -1.0f, +1.0f, 0.0f,  0, 1 },  // upper left
 	};
 
 	// Create the vertex buffer. Allocate enough memory
@@ -385,20 +378,22 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		sizeof(vertices), 0, 0, D3DPOOL_DEFAULT, 
 		&m_pVB, NULL ) ) )
 	{
-		SAFE_RELEASE(m_pVB);
-		return hr;
+		goto ERROR_END;
 	}
 
 	// Now we fill the vertex buffer. To do this, Lock() 
 	// the VB to gain access to the vertices.
-	VOID* pVertices;
-	if( FAILED( hr = m_pVB->Lock( 0, sizeof(vertices), 
-		(VOID**)&pVertices, 0 ) ) )
+	if(1)
 	{
-		return hr;
+		VOID* pVertices = NULL;;
+		if( FAILED( hr = m_pVB->Lock( 0, sizeof(vertices), 
+			(VOID**)&pVertices, 0 ) ) )
+		{
+			goto ERROR_END;
+		}
+		memcpy( pVertices, vertices, sizeof(vertices) );
+		hr = m_pVB->Unlock();
 	}
-	memcpy( pVertices, vertices, sizeof(vertices) );
-	hr = m_pVB->Unlock();
 
 
 	// Create the vertex declaration
@@ -414,8 +409,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	if( FAILED( hr = m_pd3dDevice->CreateVertexDeclaration( decl, 
 		&m_pVertexDeclaration ) ) )
 	{
-		SAFE_RELEASE(m_pVertexDeclaration);
-		return hr;
+		goto ERROR_END;
 	}
 
 
@@ -434,6 +428,10 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		1.0f, 0.1f, 100.0f );
 
 	return S_OK;
+
+ERROR_END:
+	SafeReleaseAll();
+	return hr;
 }
 
 
@@ -446,6 +444,8 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 	m_pFont->InvalidateDeviceObjects();
 	m_pFontSmall->InvalidateDeviceObjects();
 
+	SafeReleaseAll();
+
 	return S_OK;
 }
 
@@ -457,12 +457,7 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::DeleteDeviceObjects()
 {
-	SAFE_RELEASE( m_pAsm_PS );
-	SAFE_RELEASE( m_pAsm_VS );
-	SAFE_RELEASE( m_pVertexDeclaration );
-	SAFE_RELEASE( m_pVB );
-	SAFE_RELEASE( m_pTexture );
-
+	SafeReleaseAll();
 
 	m_pFont->DeleteDeviceObjects();
 	m_pFontSmall->DeleteDeviceObjects();
