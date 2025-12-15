@@ -120,7 +120,7 @@ CMyD3DApplication::CMyD3DApplication()
 	m_pTexture				= NULL;
 
 
-	m_strWindowTitle   = _T("VertexShader");
+	m_strWindowTitle   = _T("Ex5-1 PixelShader");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -265,7 +265,9 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	HRESULT hr = S_OK;
 
 	LPD3DXBUFFER pShader = NULL;
+	LPD3DXBUFFER pErrBuf = NULL;
 	Cec_Release cec_ShaderCode = pShader;
+	Cec_Release cec_errmsg = pErrBuf;
 
 	const char* strAsmPixelShader = 
 "ps_1_1            // version instruction\n"
@@ -296,11 +298,19 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL, // A #include handler
 		D3DXSHADER_DEBUG, 
 		&pShader, 
-		NULL // error messages 
+		&pErrBuf // error messages 
 		);
-	cec_ShaderCode = pShader;
+ 	cec_ShaderCode = pShader;
+	cec_errmsg = pErrBuf;
 
-	if( FAILED(hr) ) {
+	if( FAILED(hr) ) 
+	{
+		if(pErrBuf)
+		{
+			const char *errmsg = (const char*)pErrBuf->GetBufferPointer();
+			sdring<TCHAR> s1 = makeTsdring(errmsg);
+			vaDbgTs(_T("D3DXAssembleShader() fail with hr=%s: %s"), ITCSvn(hr, DxErr), s1.c_str());
+		}
 		goto ERROR_END;
 	}
 

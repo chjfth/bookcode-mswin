@@ -220,6 +220,7 @@
    -->
   <ItemGroup>
     <ClCompile Include="ShaderDemo5.1_chj.cpp" />
+    <ClCompile Include="CHHI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinMain.rc" />
