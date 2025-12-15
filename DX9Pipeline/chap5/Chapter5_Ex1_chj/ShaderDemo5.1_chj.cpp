@@ -334,7 +334,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 "dcl_position v0       // bind position data in register v0\n"
 "dcl_texcoord v1       // bind texture coordinate data in register v1\n"
 "m4x4 oPos, v0, c0     // transform with view/projection matrix\n"
-"mov oT0.xzw, v1.xzw   // output xzw texture coordinates\n"
+"mov oT0.xzw, v1.xzw   // output xzw texture coordinates (chj: zw just useless)\n"
 "mov oT0.y, -v1.y      // output and invert y texture coordinate\n"
 "";
 
