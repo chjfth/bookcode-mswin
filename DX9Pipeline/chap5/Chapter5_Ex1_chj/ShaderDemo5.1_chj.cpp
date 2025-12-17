@@ -221,8 +221,7 @@ HRESULT CMyD3DApplication::Render()
 		D3DXMatrixMultiply(&compMat, &m_matWorld, &m_matView);
 		D3DXMatrixMultiply(&compMat, &compMat, &m_matProj);
 		D3DXMatrixTranspose( &compMat, &compMat );
-		m_pd3dDevice->SetVertexShaderConstantF( 0, 
-			(float*)&compMat, 4 );
+		m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMat, 4 );
 
 		m_pd3dDevice->SetVertexDeclaration( m_pVertexDeclaration);
 		m_pd3dDevice->SetVertexShader(m_pAsm_VS);
@@ -274,8 +273,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 "def c0, 0,0,0,0   \n"
 "def c1, 1,1,1,1   \n"
-"def c2, 1.0, 0.5,     0, 0 \n"
-"def c3, 0,  -0.5, -0.25, 0 \n"
+"def c2, 1.0, 0.5, 0,       0 \n"
+"def c3, 0,  -0.5, -0.25,   0 \n"
 
 "tex t0             // sample texture at stage 0,\n" 
 "                   // with texture coordinate set 0\n"
