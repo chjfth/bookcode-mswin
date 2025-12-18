@@ -227,7 +227,6 @@ HRESULT CMyD3DApplication::Render()
 		m_pd3dDevice->SetVertexShader(m_pAsm_VS);
 		m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
 
-		m_pd3dDevice->SetTexture( 0, m_pTexture );
 		m_pd3dDevice->SetPixelShader(m_pAsm_PS);
 		m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, 2 );
 
@@ -321,22 +320,6 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		goto ERROR_END;
 	}
 
-	// Load a texture
-	TCHAR szEarth[MAX_PATH] = {};
-	hr = DXUtil_FindMediaFileCb(szEarth, sizeof(szEarth), _T("earth.bmp"));
-	if( FAILED(hr) ) {
-		goto ERROR_END;
-	}
-
-	hr = D3DXCreateTextureFromFile( m_pd3dDevice, szEarth, &m_pTexture);
-	if( FAILED(hr) ) {
-		goto ERROR_END;
-	}
-
-	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-
 
 	const char* strAsmVertexShader = 
 "vs_1_1                // version instruction\n"
@@ -420,6 +403,26 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	{
 		goto ERROR_END;
 	}
+
+	//
+	// Load a texture
+	//
+
+	TCHAR szEarth[MAX_PATH] = {};
+	hr = DXUtil_FindMediaFileCb(szEarth, sizeof(szEarth), _T("earth.bmp"));
+	if( FAILED(hr) ) {
+		goto ERROR_END;
+	}
+
+	hr = D3DXCreateTextureFromFile( m_pd3dDevice, szEarth, &m_pTexture);
+	if( FAILED(hr) ) {
+		goto ERROR_END;
+	}
+
+	m_pd3dDevice->SetTexture( 0, m_pTexture );
+	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 
 
 	m_pFont->RestoreDeviceObjects();
