@@ -30,7 +30,8 @@ class CMyD3DApplication : public CD3DApplication
 	LPDIRECT3DPIXELSHADER9         m_pAsm_PS;
 	LPDIRECT3DVERTEXSHADER9        m_pAsm_VS;
 	LPDIRECT3DVERTEXDECLARATION9   m_pVertexDeclaration;
-	LPDIRECT3DTEXTURE9             m_pTexture;
+	LPDIRECT3DTEXTURE9             m_pTexture0; // earth.bmp
+	LPDIRECT3DTEXTURE9             m_pTexture1; // DX5_Logo.bmp
 	
 	// A structure for our custom vertex type
 	struct CUSTOMVERTEX
@@ -84,7 +85,8 @@ protected:
 		SAFE_RELEASE(m_pAsm_VS);
 		SAFE_RELEASE(m_pAsm_PS);
 		SAFE_RELEASE(m_pVertexDeclaration);
-		SAFE_RELEASE(m_pTexture);
+		SAFE_RELEASE(m_pTexture0);
+		SAFE_RELEASE(m_pTexture1);
 		SAFE_RELEASE(m_pVB);
 	}
 };
@@ -117,10 +119,11 @@ CMyD3DApplication::CMyD3DApplication()
 	m_pAsm_VS				= NULL;
 	m_pVertexDeclaration	= NULL;
 	m_pVB					= NULL;
-	m_pTexture				= NULL;
+	m_pTexture0				= NULL;
+	m_pTexture1				= NULL;
 
 
-	m_strWindowTitle   = _T("Ex5-1 PixelShader");
+	m_strWindowTitle   = _T("Ex5-2 PixelShader");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -210,6 +213,8 @@ HRESULT CMyD3DApplication::FrameMove()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::Render()
 {
+	assert(m_pAsm_VS && m_pAsm_PS);
+
 	// Clear the backbuffer
 	m_pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER,
 						 0x000000ff, 1.0f, 0L );
@@ -228,6 +233,22 @@ HRESULT CMyD3DApplication::Render()
 		m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
 
 		m_pd3dDevice->SetPixelShader(m_pAsm_PS);
+
+#if 0
+		// Fixed-function multitexture blender set up that is no longer needed:
+
+		m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_ADD );
+		m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+		m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_TEXTURE );
+
+		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_MODULATE );
+		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAARG2, D3DTA_TEXTURE );
+
+		m_pd3dDevice->SetTextureStageState( 2, D3DTSS_COLOROP, D3DTOP_DISABLE );
+		m_pd3dDevice->SetTextureStageState( 2, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+#endif
+
 		m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, 2 );
 
 		m_pd3dDevice->SetVertexShader(NULL);
@@ -268,25 +289,24 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	Cec_Release cec_errmsg = pErrBuf;
 
 	const char* strAsmPixelShader = 
-"ps_1_1            // version instruction\n"
+"ps_2_x           // version instruction\n"
 
 "def c0, 0,0,0,0   \n"
 "def c1, 1,1,1,1   \n"
-"def c2, 1.0, 0.5, 0,       0 \n"
-"def c3, 0,  -0.5, -0.25,   0 \n"
+"def c2, 1.0,0.5,0.25,0   \n"
+"def c3, 0.2,0.2,0.2,0.2   \n"
 
-"tex t0             // sample texture at stage 0,\n" 
-"                   // with texture coordinate set 0\n"
+"dcl_2d s0          \n"
+"dcl t0             \n"
 
-"mov r0, t0         // output texture color\n"
+"dcl_2d s1          \n"
+"dcl t1             \n"
 
-//"mov r0, 1 - t0   // output inverted texture color\n"
+"texld r0, t0, s0   \n"
+"texld r1, t0, s1   \n"
 
-//"add r0, t0, c2   // add more reds and greens\n"
-
-//"add r0, t0, c3   // subtract greens and blues\n"
-
-//"mov r0, c2       // output solid pixel color\n"
+"lrp r2, c2, r0, r1 \n"
+"mov oC0, r2        \n"
 "";
 
 	hr = D3DXAssembleShader(
@@ -320,14 +340,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		goto ERROR_END;
 	}
 
-
 	const char* strAsmVertexShader = 
 "vs_1_1                // version instruction\n"
 "dcl_position v0       // bind position data in register v0\n"
 "dcl_texcoord v1       // bind texture coordinate data in register v1\n"
 "m4x4 oPos, v0, c0     // transform with view/projection matrix\n"
-"mov oT0.xzw, v1.xzw   // output xzw texture coordinates (chj: zw just useless)\n"
-"mov oT0.y, -v1.y      // output and invert y texture coordinate\n"
+"mov oT0, v1           // chj: relay texture coord to oT0\n"
 "";
 
 	hr = D3DXAssembleShader(
@@ -358,10 +376,10 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	CUSTOMVERTEX vertices[] =
 	{
 		//  x      y      z    u, v
-		{ -1.0f, -1.0f, 0.0f,  0, 0 },  // lower left
-		{ +1.0f, -1.0f, 0.0f,  1, 0 },  // lower right
-		{ +1.0f, +1.0f, 0.0f,  1, 1 },  // upper right
-		{ -1.0f, +1.0f, 0.0f,  0, 1 },  // upper left
+		{ -1.0f, -1.0f, 0.0f,  0, 1 },  // lower left
+		{ +1.0f, -1.0f, 0.0f,  1, 1 },  // lower right
+		{ +1.0f, +1.0f, 0.0f,  1, 0 },  // upper right
+		{ -1.0f, +1.0f, 0.0f,  0, 0 },  // upper left
 	};
 
 	// Create the vertex buffer. Allocate enough memory
@@ -405,25 +423,43 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	}
 
 	//
-	// Load a texture
+	// Load two textures
 	//
 
-	TCHAR szEarth[MAX_PATH] = {};
-	hr = DXUtil_FindMediaFileCch(szEarth, ARRAYSIZE(szEarth), _T("earth.bmp"));
+	TCHAR szTexturePath[MAX_PATH] = {};
+	hr = DXUtil_FindMediaFileCch(szTexturePath, ARRAYSIZE(szTexturePath), _T("earth.bmp"));
+	if( FAILED(hr) ) {
+		hr = D3DERR_NOTFOUND;
+		goto ERROR_END;
+	}
+	hr = D3DXCreateTextureFromFile( m_pd3dDevice, szTexturePath, &m_pTexture0);
 	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
 
-	hr = D3DXCreateTextureFromFile( m_pd3dDevice, szEarth, &m_pTexture);
+	hr = DXUtil_FindMediaFileCch(szTexturePath, ARRAYSIZE(szTexturePath), _T("DX5_Logo.bmp"));
+	if( FAILED(hr) ) {
+		hr = D3DERR_NOTFOUND;
+		goto ERROR_END;
+	}
+	hr = D3DXCreateTextureFromFile( m_pd3dDevice, szTexturePath, &m_pTexture1);
 	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
 
-	m_pd3dDevice->SetTexture( 0, m_pTexture );
-	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	hr = m_pd3dDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+	// Texture sampler 0
+	m_pd3dDevice->SetTexture( 0, m_pTexture0 );
+	m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	m_pd3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	m_pd3dDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 
+	// Texture sampler 1
+	m_pd3dDevice->SetTexture( 1, m_pTexture1 );
+	m_pd3dDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	m_pd3dDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	m_pd3dDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+
+	m_pd3dDevice->SetTexture( 2, NULL );
 
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();

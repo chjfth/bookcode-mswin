@@ -1,5 +1,6 @@
 #pragma once
 
+#include <assert.h>
 #include <commdefs.h>
 #include <_MINMAX_.h>
 #include <sdring.h>
