@@ -228,7 +228,7 @@ HRESULT CMyD3DApplication::Render()
 		D3DXMatrixTranspose( &compMat, &compMat );
 		m_pd3dDevice->SetVertexShaderConstantF( 0, (float*)&compMat, 4 );
 
-		m_pd3dDevice->SetVertexDeclaration( m_pVertexDeclaration);
+		m_pd3dDevice->SetVertexDeclaration(m_pVertexDeclaration);
 		m_pd3dDevice->SetVertexShader(m_pAsm_VS);
 		m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
 
@@ -300,7 +300,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 "dcl t0             \n"
 
 "dcl_2d s1          \n"
-"dcl t1           // t1 useless here \n"
+// "dcl t1           // t1 useless here \n"
 
 "texld r0, t0, s0   \n"
 "texld r1, t0, s1   \n"
@@ -467,7 +467,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pd3dDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	m_pd3dDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 
-	m_pd3dDevice->SetTexture( 2, NULL );
+	m_pd3dDevice->SetTexture( 2, NULL ); // chj: this line is redundant 
 
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();
