@@ -300,7 +300,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 "dcl t0             \n"
 
 "dcl_2d s1          \n"
-"dcl t1             \n"
+"dcl t1           // t1 useless here \n"
 
 "texld r0, t0, s0   \n"
 "texld r1, t0, s1   \n"
@@ -327,7 +327,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		{
 			const char *errmsg = (const char*)pErrBuf->GetBufferPointer();
 			sdring<TCHAR> s1 = makeTsdring(errmsg);
-			vaDbgTs(_T("D3DXAssembleShader() fail with hr=%s: %s"), ITCSvn(hr, DxErr), s1.c_str());
+			vaDbgTs(_T("D3DXAssembleShader() pixel-shader fail with hr=%s: %s"), ITCSvn(hr, DxErr), s1.c_str());
 		}
 		goto ERROR_END;
 	}
@@ -355,11 +355,19 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL, // A #include handler
 		D3DXSHADER_DEBUG, 
 		&pShader, 
-		NULL // error messages 
+		&pErrBuf // error messages 
 		);
 	cec_ShaderCode = pShader; // will auto-release old pShader
+	cec_errmsg = pErrBuf;
 
-	if( FAILED(hr) ) {
+	if( FAILED(hr) ) 
+	{
+		if(pErrBuf)
+		{
+			const char *errmsg = (const char*)pErrBuf->GetBufferPointer();
+			sdring<TCHAR> s1 = makeTsdring(errmsg);
+			vaDbgTs(_T("D3DXAssembleShader() vertex-shader fail with hr=%s: %s"), ITCSvn(hr, DxErr), s1.c_str());
+		}
 		goto ERROR_END;
 	}
 
