@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// ShaderDemo5.1_chj.cpp
+// ShaderDemo5.2_chj.cpp
 // Example code showing how to write simple pixel shader in D3D.
 //-----------------------------------------------------------------------------
 #define STRICT
@@ -291,10 +291,10 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	const char* strAsmPixelShader = 
 "ps_2_x           // version instruction\n"
 
-"def c0, 0,0,0,0   \n"
-"def c1, 1,1,1,1   \n"
-"def c2, 1.0,0.5,0.25,0   \n"
-"def c3, 0.2,0.2,0.2,0.2   \n"
+"def c0, 0,0,0,0  // useless yet \n"
+"def c1, 1,1,1,1  // useless yet \n"
+
+"def c2, 1.0, 0.5, 0.25, 0   \n"
 
 "dcl_2d s0          \n"
 "dcl t0             \n"
