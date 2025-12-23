@@ -232,21 +232,24 @@ HRESULT CMyD3DApplication::Render()
 		m_pd3dDevice->SetVertexShader(m_pAsm_VS);
 		m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
 
+#if 1
 		m_pd3dDevice->SetPixelShader(m_pAsm_PS);
 
-#if 0
+#else
 		// Fixed-function multitexture blender set up that is no longer needed:
 
-		m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_ADD );
+		m_pd3dDevice->SetVertexShader(NULL); // chj: must NULL it first
+
+		// [2025-12-23] Chj: Following 6 lines are from book p104, but they still cannot
+		// produce the same effect as pixel-shader asm from `strAsmPixelShader`. Buggy code!
+
+		m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG1 );
 		m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-		m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_TEXTURE );
 
-		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_MODULATE );
-		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAARG2, D3DTA_TEXTURE );
-
-		m_pd3dDevice->SetTextureStageState( 2, D3DTSS_COLOROP, D3DTOP_DISABLE );
-		m_pd3dDevice->SetTextureStageState( 2, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_TEXCOORDINDEX, 0);
+		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_ADD );
+		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+		m_pd3dDevice->SetTextureStageState( 1, D3DTSS_COLORARG2, D3DTA_CURRENT );
 #endif
 
 		m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, 2 );
