@@ -38,7 +38,7 @@ class CMyD3DApplication : public CD3DApplication
 	struct CUSTOMVERTEX
 	{
 		FLOAT x, y, z;   
-		DWORD color;     
+		DWORD color;     // redundant, but harmless, SetStreamSource() tells our stride.
 	};
 
 	LPDIRECT3DVERTEXBUFFER9 m_pVB; 
