@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// File: VertexShader6.1.cpp
+// File: VertexShader6.1a.cpp
 //
 // Desc: Example code showing how to do vertex shaders in D3D.
 //
@@ -273,12 +273,26 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	const char* strHLLVertexShader = 
 "float4x4 WorldViewProj : WORLDVIEWPROJ;\n"
 "\n"
-"float4 VertexShader_Tutorial_1(float4 inPos : POSITION) : POSITION\n"
-"{\n"
+"struct VS_OUTPUT\n"
+"{                                  \n"
+"    float4 Pos  : POSITION;        \n"
+"    float4 Diff : COLOR0;          \n"
+"};                                 \n"
 "\n"
-"  return mul(inPos, WorldViewProj);\n"
+"VS_OUTPUT VertexShader_Tutorial_1a(\n"
+"    float3 Pos  : POSITION,        \n" 
+"    float4 Diff : COLOR0           \n" 
+")                                  \n"
+"{\n"
+"    VS_OUTPUT Out = (VS_OUTPUT)0;  \n"
+"\n"
+"    Out.Pos = mul(float4(Pos, 1), WorldViewProj);  \n"
+"    Out.Diff = Diff*0.75f;  // darken a little     \n"
+"\n"
+"    return Out;                    \n"
 "}\n"
 "";
+
 	// Compile the vertex shader
 	LPD3DXBUFFER pShader = NULL;
 
@@ -287,7 +301,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		(UINT)strlen(strHLLVertexShader),
 		NULL,
 		NULL,
-		"VertexShader_Tutorial_1",
+		"VertexShader_Tutorial_1a",
 		"vs_1_1",  
 		D3DXSHADER_DEBUG, 
 		&pShader, 
@@ -319,9 +333,9 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	// Initialize three vertices for rendering a triangle
 	CUSTOMVERTEX vertices[] =
 	{
-		{-1, -1,  0}, // lower left
-		{ 0,  1,  0}, // top
-		{ 1, -1,  0}, // lower right
+		{-1, -1,  0, D3DCOLOR_RGBA(255,255,255,0)}, // white lower left
+		{ 0,  1,  0, D3DCOLOR_RGBA(255,0,0,0)},     // red top
+		{ 1, -1,  0, D3DCOLOR_RGBA(0,0,255,0)},     // blue lower right
 	};
 
 	// Create the vertex buffer. Allocate enough memory
@@ -351,6 +365,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	{
 		{ 0, 0,  D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, 
 			D3DDECLUSAGE_POSITION, 0 },
+		{ 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, 
+			D3DDECLUSAGE_COLOR, 0 },
 		D3DDECL_END()
 	};
 
