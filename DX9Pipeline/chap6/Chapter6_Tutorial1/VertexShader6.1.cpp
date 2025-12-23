@@ -226,13 +226,12 @@ HRESULT CMyD3DApplication::Render()
 			D3DXMatrixMultiply(&compMat, &m_matWorld, &m_matView);
 			D3DXMatrixMultiply(&compMat, &compMat, &m_matProj);
 
-			m_pConstantTable->SetMatrix(m_pd3dDevice, "WorldViewProj", 
-				&compMat); 
+			m_pConstantTable->SetMatrix(m_pd3dDevice, "WorldViewProj", &compMat); 
 
 			m_pd3dDevice->SetVertexDeclaration( m_pVertexDeclaration);
 			m_pd3dDevice->SetVertexShader(m_pHLL_VS);
-			m_pd3dDevice->SetStreamSource(0, m_pVB, 0, 
-				sizeof(CUSTOMVERTEX));
+			m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
+
 			m_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
 			m_pd3dDevice->SetVertexShader(NULL);
@@ -274,23 +273,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	const char* strHLLVertexShader = 
 "float4x4 WorldViewProj : WORLDVIEWPROJ;\n"
 "\n"
-"struct VS_OUTPUT\n"
+"float4 VertexShader_Tutorial_1(float4 inPos : POSITION) : POSITION\n"
 "{\n"
-"    float4 Pos  : POSITION;\n"
-"};\n"
 "\n"
-"VS_OUTPUT VertexShader_Tutorial_1(\n"
-"    float3 Pos  : POSITION\n" 
-")\n"
-"{\n"
-"    VS_OUTPUT Out = (VS_OUTPUT)0;\n"
-"\n"
-"    Out.Pos = mul(float4(Pos, 1), WorldViewProj);\n"
-"\n"
-"    return Out;\n"
+"  return mul(inPos, WorldViewProj);\n"
 "}\n"
 "";
-
 	// Compile the vertex shader
 	LPD3DXBUFFER pShader = NULL;
 
