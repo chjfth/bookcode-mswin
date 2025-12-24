@@ -294,9 +294,9 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	Cec_Release cec_ShaderCode;
 	Cec_Release cec_errmsg;
 
-	hr = D3DXCompileShaderFromResource(
-		NULL,
-		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
+	const TCHAR *fxfile = _T("Ex6-2a-chj.fx");
+
+	hr = D3DXCompileShaderFromFile(fxfile,
 		NULL,
 		NULL,
 		"VS_HLL_EX1",
@@ -328,9 +328,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	}
 
 	// Compile the pixel shader
-	hr = D3DXCompileShaderFromResource(
-		NULL,
-		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
+	hr = D3DXCompileShaderFromFile(fxfile,
 		NULL,
 		NULL,
 		"PS_HLL_EX1",
