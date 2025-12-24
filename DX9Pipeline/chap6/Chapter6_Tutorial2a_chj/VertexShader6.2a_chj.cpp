@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// File: VertexShader6.1a_chj.cpp
+// File: VertexShader6.2a_chj.cpp
 //
 // Desc: Example code showing how to do vertex shaders in D3D.
 //
@@ -22,6 +22,12 @@
 
 #include "../BookCommon/chjshare.h"
 
+struct CUSTOM_VERTEX
+{
+	float		x,y,z;
+	float		tu,tv;
+};
+
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
 // Desc: Application class. The base class (CD3DApplication) provides the 
@@ -30,17 +36,15 @@
 //-----------------------------------------------------------------------------
 class CMyD3DApplication : public CD3DApplication
 {
-	LPDIRECT3DVERTEXSHADER9        m_pHLL_VS;
-	LPDIRECT3DVERTEXDECLARATION9   m_pVertexDeclaration;
-	LPD3DXCONSTANTTABLE            m_pConstantTable; // new in chap6
-	LPDIRECT3DVERTEXBUFFER9 m_pVB; 
+	LPDIRECT3DVERTEXSHADER9			m_pHLL_VS;
+	LPDIRECT3DPIXELSHADER9			m_pHLL_PS;
+	LPDIRECT3DVERTEXDECLARATION9	m_pVertexDeclaration;
+	LPD3DXCONSTANTTABLE				m_pConstantTable;
+	LPDIRECT3DTEXTURE9				m_pTexture;
 
-	// A structure for our custom vertex type
-	struct CUSTOMVERTEX
-	{
-		FLOAT x, y, z;   
-		DWORD color;     
-	};
+	LPDIRECT3DVERTEXBUFFER9			m_pVBSphere;
+	DWORD							m_dwNumSphereSegments;
+	DWORD							m_dwNumSphereRings;
 
 	// Font for drawing text
 	CD3DFont* m_pFont;
@@ -83,9 +87,11 @@ protected:
 	void SafeReleaseAll()
 	{
 		SAFE_RELEASE(m_pHLL_VS);
+		SAFE_RELEASE(m_pHLL_PS);
 		SAFE_RELEASE(m_pVertexDeclaration);
 		SAFE_RELEASE(m_pConstantTable);
-		SAFE_RELEASE(m_pVB);
+		SAFE_RELEASE(m_pTexture);
+		SAFE_RELEASE(m_pVBSphere);
 	}
 };
 
@@ -113,12 +119,18 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 //-----------------------------------------------------------------------------
 CMyD3DApplication::CMyD3DApplication()
 {
-	m_pHLL_VS				= NULL;
-	m_pVertexDeclaration	= NULL;
-	m_pVB					= NULL;
-	m_pConstantTable		= NULL;
+	m_pHLL_VS = NULL;
+	m_pHLL_PS = NULL;
 
-	m_strWindowTitle   = _T("Ex6-1a-chj VertexShader");
+	m_pVertexDeclaration  = NULL;
+	m_pConstantTable      = NULL;
+	m_pTexture            = NULL;
+
+	m_pVBSphere             = NULL;
+	m_dwNumSphereSegments	= 12;
+	m_dwNumSphereRings		= m_dwNumSphereSegments;
+
+	m_strWindowTitle    = _T("Ex6-2a-chj VertexShader");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -145,6 +157,7 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 	D3DXVECTOR3 from( 0.0f, 0.0f, -3.0f );
 	D3DXVECTOR3 at( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
+	D3DXMatrixIdentity( &m_matView );
 	D3DXMatrixLookAtLH( &m_matView, &from, &at, &up );
 	D3DXMatrixInverse( &m_matPosition, NULL, &m_matView );
 
@@ -165,23 +178,23 @@ HRESULT CMyD3DApplication::FrameMove()
 	D3DXVECTOR3 vT( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vR( 0.0f, 0.0f, 0.0f );
 
-	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )                 vT.x -= 1.0f; // Slide Left
-	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )                vT.x += 1.0f; // Slide Right
-	if( m_bKey[VK_DOWN] )                                       vT.y -= 1.0f; // Slide Down
-	if( m_bKey[VK_UP] )                                         vT.y += 1.0f; // Slide Up
-	if( m_bKey['W'] )                                           vT.z -= 2.0f; // Move Forward
-	if( m_bKey['S'] )                                           vT.z += 2.0f; // Move Backward
-	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )                     vR.x -= 1.0f; // Pitch Down
-	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )                     vR.x += 1.0f; // Pitch Up
-	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )                     vR.y -= 1.0f; // Turn Right
-	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )                     vR.y += 1.0f; // Turn Left
-	if( m_bKey[VK_NUMPAD9] )                                    vR.z -= 2.0f; // Roll CW
-	if( m_bKey[VK_NUMPAD7] )                                    vR.z += 2.0f; // Roll CCW
+	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )    vT.x -= 1.0f; // Slide Left
+	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )   vT.x += 1.0f; // Slide Right
+	if( m_bKey[VK_DOWN] )                          vT.y -= 1.0f; // Slide Down
+	if( m_bKey[VK_UP] )                            vT.y += 1.0f; // Slide Up
+	if( m_bKey['W'] )                              vT.z -= 2.0f; // Move Forward
+	if( m_bKey['S'] )                              vT.z += 2.0f; // Move Backward
+	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )        vR.x -= 1.0f; // Pitch Down
+	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )        vR.x += 1.0f; // Pitch Up
+	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )        vR.y -= 1.0f; // Turn Right
+	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )        vR.y += 1.0f; // Turn Left
+	if( m_bKey[VK_NUMPAD9] )                       vR.z -= 2.0f; // Roll CW
+	if( m_bKey[VK_NUMPAD7] )                       vR.z += 2.0f; // Roll CCW
 
 	m_vVelocity        = m_vVelocity * 0.9f + vT * 0.1f;
 	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
 
-	// Update position and view matricies
+	// Update position and view matrices
 	D3DXMATRIXA16     matT, matR;
 	D3DXQUATERNION qR;
 
@@ -196,7 +209,6 @@ HRESULT CMyD3DApplication::FrameMove()
 
 	D3DXMatrixMultiply( &m_matPosition, &matR, &m_matPosition );
 	D3DXMatrixInverse( &m_matView, NULL, &m_matPosition );
-	m_pd3dDevice->SetTransform( D3DTS_VIEW, &m_matView );
 
 	return S_OK;
 }
@@ -217,26 +229,38 @@ HRESULT CMyD3DApplication::Render()
 	// Begin the scene
 	if( SUCCEEDED( m_pd3dDevice->BeginScene() ) )
 	{
-		// Draw a triangle with the vertex shader
-		
-		assert(m_pConstantTable);
-		
-		D3DXMATRIX compMat; 
-		D3DXMatrixMultiply(&compMat, &m_matWorld, &m_matView);
-		D3DXMatrixMultiply(&compMat, &compMat, &m_matProj);
+		HRESULT hr;
 
-		m_pConstantTable->SetMatrix(m_pd3dDevice, "WorldViewProj", &compMat); 
+		// Draw a sphere using a vertex shader and a pixel shader
+		if(m_pConstantTable)
+		{
+			// Setup vertex shader
+			m_pd3dDevice->SetVertexShader( m_pHLL_VS );
+			m_pd3dDevice->SetVertexDeclaration( m_pVertexDeclaration );
+			m_pd3dDevice->SetStreamSource( 0, m_pVBSphere, 0, sizeof(CUSTOM_VERTEX) );
 
-		m_pd3dDevice->SetVertexDeclaration( m_pVertexDeclaration);
-		m_pd3dDevice->SetVertexShader(m_pHLL_VS);
-		m_pd3dDevice->SetStreamSource(0, m_pVB, 0, sizeof(CUSTOMVERTEX));
+			D3DXMATRIX compMat;
+			D3DXMatrixMultiply( &compMat, &m_matWorld, &m_matView);
+			D3DXMatrixMultiply( &compMat, &compMat, &m_matProj);
+			m_pConstantTable->SetMatrix(m_pd3dDevice, "WorldViewProj", &compMat); 
 
-		m_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+			// Setup pixel shader
+			m_pd3dDevice->SetPixelShader( m_pHLL_PS );
+			m_pd3dDevice->SetTexture( 0, m_pTexture );
 
-		m_pd3dDevice->SetVertexShader(NULL);
+			// Draw sphere
+			DWORD dwNumSphereVerts = 2*m_dwNumSphereRings*(m_dwNumSphereSegments+1);
+			m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, dwNumSphereVerts - 2 );
+
+			m_pd3dDevice->SetTexture( 0, NULL );
+			// Release the programmable shaders before using the fixed function pipeline
+			m_pd3dDevice->SetPixelShader( NULL );
+			m_pd3dDevice->SetVertexShader( NULL );
+		}					
+
 
 		// End the scene
-		m_pd3dDevice->EndScene();
+		hr = m_pd3dDevice->EndScene();
 	}
 
 	return S_OK;
@@ -264,45 +288,22 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 {
 	HRESULT hr = 0;
 
-	const char* strHLLVertexShader = 
-"float4x4 WorldViewProj : WORLDVIEWPROJ;\n"
-"\n"
-"struct VS_OUTPUT\n"
-"{                                  \n"
-"    float4 Pos  : POSITION;        \n"
-"    float4 Diff : COLOR0;          \n"
-"};                                 \n"
-"\n"
-"VS_OUTPUT VertexShader_Tutorial_1a(\n"
-"    float3 Pos  : POSITION,        \n" 
-"    float4 Diff : COLOR0           \n" 
-")                                  \n"
-"{\n"
-"    VS_OUTPUT Out = (VS_OUTPUT)0;  \n"
-"\n"
-"    Out.Pos = mul(float4(Pos, 1), WorldViewProj);  \n"
-"    Out.Diff = Diff*0.75f;  // darken a little     \n"
-"\n"
-"    return Out;                    \n"
-"}\n"
-"";
-
 	// Compile the vertex shader
 	LPD3DXBUFFER pShader = NULL;
 	LPD3DXBUFFER pErrBuf = NULL;	
 	Cec_Release cec_ShaderCode;
 	Cec_Release cec_errmsg;
 
-	hr = D3DXCompileShader(
-		strHLLVertexShader,
-		(UINT)strlen(strHLLVertexShader),
+	hr = D3DXCompileShaderFromResource(
+		NULL,
+		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
 		NULL,
 		NULL,
-		"VertexShader_Tutorial_1a",
-		"vs_1_1",  
-		D3DXSHADER_DEBUG, 
+		"VS_HLL_EX1",
+		"vs_1_1",
+		D3DXSHADER_DEBUG,
 		&pShader, 
-		&pErrBuf, // error messages 
+		&pErrBuf, 
 		&m_pConstantTable 
 		);
 	cec_ShaderCode = pShader;
@@ -322,53 +323,52 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	// Create the vertex shader
 	hr = m_pd3dDevice->CreateVertexShader( 
 		(DWORD*)pShader->GetBufferPointer(), &m_pHLL_VS );
-
 	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
 
-	///////////////////////////////////////////////////////////
-	// Initialize three vertices for rendering a triangle
-	CUSTOMVERTEX vertices[] =
-	{
-		{-1, -1,  0, D3DCOLOR_RGBA(255,255,255,0)}, // white lower left
-		{ 0,  1,  0, D3DCOLOR_RGBA(255,0,0,0)},     // red top
-		{ 1, -1,  0, D3DCOLOR_RGBA(0,0,255,0)},     // blue lower right
-	};
+	// Compile the pixel shader
+	hr = D3DXCompileShaderFromResource(
+		NULL,
+		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
+		NULL,
+		NULL,
+		"PS_HLL_EX1",
+		"ps_1_1",
+		D3DXSHADER_DEBUG,
+		&pShader, 
+		&pErrBuf, 
+		NULL );
+	cec_ShaderCode = pShader;
+	cec_errmsg = pErrBuf;
 
-	// Create the vertex buffer. Allocate enough memory
-	// (from the default pool) to hold 3 custom vertices. 
-	if( FAILED( hr = m_pd3dDevice->CreateVertexBuffer( 
-		3*sizeof(CUSTOMVERTEX), 0, 0, D3DPOOL_DEFAULT, 
-		&m_pVB, NULL ) ) )
+	if( FAILED(hr) )
 	{
+		if(pErrBuf)
+		{
+			const char *errmsg = (const char*)pErrBuf->GetBufferPointer();
+			sdring<TCHAR> s1 = makeTsdring(errmsg);
+			vaDbgTs(_T("D3DXCompileShader() vertex-shader fail with hr=%s:\n%s"), ITCSvn(hr, DxErr), s1.c_str());
+		}
 		goto ERROR_END;
 	}
 
-	// Now we fill the vertex buffer. To do this, Lock() the VB to
-	// gain access to the vertices. 
-	if(1)
-	{
-		VOID* pVertices = NULL;
-		if( FAILED( hr = m_pVB->Lock( 0, sizeof(vertices), 
-			(VOID**)&pVertices, 0 ) ) )
-		{
-			goto ERROR_END;
-		}
-		memcpy( pVertices, vertices, sizeof(vertices) );
-		hr = m_pVB->Unlock();
-		if( FAILED(hr) ) // not likely
-			goto ERROR_END;
+	// Create the pixel shader
+	hr = m_pd3dDevice->CreatePixelShader( 
+		(DWORD*)pShader->GetBufferPointer(), &m_pHLL_PS );
+
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 
 	// Create the vertex declaration
 	D3DVERTEXELEMENT9 decl[] =
 	{
-		{ 0, 0,  D3DDECLTYPE_FLOAT3,   D3DDECLMETHOD_DEFAULT, 
+		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, 
 			D3DDECLUSAGE_POSITION, 0 },
-		{ 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, 
-			D3DDECLUSAGE_COLOR, 0 },
+		{ 0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, 
+			D3DDECLUSAGE_TEXCOORD, 0 },
 		D3DDECL_END()
 	};
 
@@ -379,6 +379,94 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	}
 
 
+	DWORD dwNumSphereVerts = 2*m_dwNumSphereRings*(m_dwNumSphereSegments+1);
+	// once for the top, once for the bottom vertices
+
+	if(FAILED(m_pd3dDevice->CreateVertexBuffer(
+		dwNumSphereVerts*sizeof(CUSTOM_VERTEX),
+		0, 
+		0, // don't need an FVF code
+		D3DPOOL_DEFAULT, 
+		&m_pVBSphere, NULL)	) )
+	{
+		goto ERROR_END;
+	}
+
+	CUSTOM_VERTEX* pVertices;
+	hr = m_pVBSphere->Lock(0, dwNumSphereVerts*sizeof(CUSTOM_VERTEX), 
+		(VOID**)&pVertices, 0);
+	if(SUCCEEDED(hr))
+	{
+		FLOAT fDeltaRingAngle = ( D3DX_PI / m_dwNumSphereRings );
+		FLOAT fDeltaSegAngle  = ( 2.0f * D3DX_PI / m_dwNumSphereSegments );
+
+		// Generate the group of rings for the sphere
+		for( DWORD ring = 0; ring < m_dwNumSphereRings; ring++ )
+		{
+			FLOAT r0 = sinf( (ring+0) * fDeltaRingAngle );
+			FLOAT r1 = sinf( (ring+1) * fDeltaRingAngle );
+			FLOAT y0 = cosf( (ring+0) * fDeltaRingAngle );
+			FLOAT y1 = cosf( (ring+1) * fDeltaRingAngle );
+
+			// Generate the group of segments for the current ring
+			for( DWORD seg = 0; seg < (m_dwNumSphereSegments+1); seg++ )
+			{
+				FLOAT x0 =  r0 * sinf( seg * fDeltaSegAngle );
+				FLOAT z0 =  r0 * cosf( seg * fDeltaSegAngle );
+				FLOAT x1 =  r1 * sinf( seg * fDeltaSegAngle );
+				FLOAT z1 =  r1 * cosf( seg * fDeltaSegAngle );
+
+				// Add two vertices to the strip which makes up the sphere
+				// (using the transformed normal to generate texture coords)
+				pVertices->x = x0;
+				pVertices->y = y0;
+				pVertices->z = z0;
+				pVertices->tu = -((FLOAT)seg)/m_dwNumSphereSegments;
+				pVertices->tv = (ring+0)/(FLOAT)m_dwNumSphereRings;
+				pVertices++;
+
+				pVertices->x = x1;
+				pVertices->y = y1;
+				pVertices->z = z1;
+				pVertices->tu = -((FLOAT)seg)/m_dwNumSphereSegments;
+				pVertices->tv = (ring+1)/(FLOAT)m_dwNumSphereRings;
+				pVertices++;
+			}
+
+		}
+
+		hr = m_pVBSphere->Unlock();
+	}
+
+
+	TCHAR szEarth[MAX_PATH] = {};
+
+	hr = DXUtil_FindMediaFileCb(szEarth, sizeof(szEarth), _T("earth.bmp"));
+
+	if( FAILED(hr) ) {
+		hr = D3DERR_NOTFOUND;
+		goto ERROR_END;
+	}
+
+	hr = D3DXCreateTextureFromFile( m_pd3dDevice, szEarth, &m_pTexture);
+	if( FAILED(hr) )
+	{
+		SAFE_RELEASE(m_pTexture);
+		return hr;
+	}
+
+	// Set up the world matrix
+	D3DXMatrixIdentity( &m_matWorld );
+	D3DXMatrixRotationY(&m_matWorld, 5.0f*3.14f/8.0f);
+
+
+	// Set up the projection matrix
+	D3DXMatrixIdentity( &m_matProj );
+	FLOAT fAspectRatio = 
+		(FLOAT)m_d3dsdBackBuffer.Width / (FLOAT)m_d3dsdBackBuffer.Height;
+	D3DXMatrixPerspectiveFovLH( &m_matProj, D3DX_PI/4, fAspectRatio, 
+		0.5f, 1000.0f );
+
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();
 
@@ -386,17 +474,11 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
 	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 
-	// Set up the world matrix
-	D3DXMatrixIdentity( &m_matWorld );
-
-	// Set up the projection matrix
-	D3DXMatrixPerspectiveFovLH( &m_matProj, D3DX_PI/4, 
-		1.0f, 0.1f, 100.0f );
-
 	return S_OK;
 
 ERROR_END:
 	SafeReleaseAll();
+
 	return hr;
 }
 
@@ -423,7 +505,7 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::DeleteDeviceObjects()
 {
-	SafeReleaseAll();
+	SafeReleaseAll();	
 
 	m_pFont->DeleteDeviceObjects();
 	m_pFontSmall->DeleteDeviceObjects();
@@ -456,6 +538,9 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 	if( dwBehavior & D3DCREATE_PUREDEVICE )
 		return E_FAIL;
 
+	if( pCaps->PixelShaderVersion < D3DPS_VERSION(1,1) )
+		return E_FAIL;
+
 	// If device doesn't support vs_1_1 in hardware, switch to 
 	// software vertex processing
 	if( pCaps->VertexShaderVersion < D3DVS_VERSION(1,1) )
@@ -465,6 +550,7 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 			return E_FAIL;
 		}
 	}
+
 	return S_OK;
 }
 
