@@ -13,8 +13,8 @@ REM call :EchoVar ExeDllDir
 REM call :EchoVar TargetName
 
 REM ////////////////////////////// Team Purpose //////////////////////////////
-REM After EXE generated, copy ..\..\BookCommon\Media\earth.bmp and DX5_Logo.bmp
-REM alongside the EXE, because the cpp code wants to load that two files at runtime.
+REM After EXE generated, copy ..\..\BookCommon\Media\earth.bmp and Ex6-2a-chj.fx 
+REM to EXE output dir, because the cpp code wants to load that two files at runtime.
 
 REM =========================================================================
 REM This bat copies VSIDE project output(EXE/DLL etc) to other target directories,

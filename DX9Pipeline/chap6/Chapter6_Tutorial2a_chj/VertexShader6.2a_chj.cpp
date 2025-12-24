@@ -390,7 +390,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		goto ERROR_END;
 	}
 
-	CUSTOM_VERTEX* pVertices;
+	CUSTOM_VERTEX* pVertices = NULL;
 	hr = m_pVBSphere->Lock(0, dwNumSphereVerts*sizeof(CUSTOM_VERTEX), 
 		(VOID**)&pVertices, 0);
 	if(SUCCEEDED(hr))
