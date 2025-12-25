@@ -210,6 +210,33 @@ HRESULT CMyD3DApplication::FrameMove()
 	D3DXMatrixMultiply( &m_matPosition, &matR, &m_matPosition );
 	D3DXMatrixInverse( &m_matView, NULL, &m_matPosition );
 
+	// Chj test code >>>
+	if (m_bKey['1'] || m_bKey['2']) 
+	{
+		// Rotate the earth along Y-axis, by changing m_matWorld.
+		int sign = m_bKey['1'] ? 1 : -1;
+
+		D3DXMATRIXA16 roty;
+		D3DXMatrixRotationY(&roty, sign * D3DX_PI / 5 * fSecsPerFrame);
+
+		D3DXMatrixMultiply(&m_matWorld, &m_matWorld, &roty);
+	}
+	else if (m_bKey[VK_HOME] || m_bKey[VK_END])
+	{
+		// Rotate the earth along X-axis.
+		int sign = m_bKey[VK_HOME] ? 1 : -1;
+
+		D3DXMATRIXA16 rotx;
+		D3DXMatrixRotationX(&rotx, sign * D3DX_PI /5 * fSecsPerFrame);
+
+		D3DXMatrixMultiply(&m_matWorld, &m_matWorld, &rotx);
+	}
+	else if (m_bKey['0'])
+	{
+		D3DXMatrixIdentity(&m_matWorld);
+	}
+	// Chj test code <<<
+
 	return S_OK;
 }
 

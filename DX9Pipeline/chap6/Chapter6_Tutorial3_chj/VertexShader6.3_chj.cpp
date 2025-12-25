@@ -152,7 +152,7 @@ CMyD3DApplication::CMyD3DApplication()
 	m_dwNumSphereSegments	= 24;
 	m_dwNumSphereRings		= m_dwNumSphereSegments;
 
-	m_strWindowTitle    = _T("VertexShader");
+	m_strWindowTitle    = _T("Ex6-3-chj VertexShader");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -233,6 +233,33 @@ HRESULT CMyD3DApplication::FrameMove()
 	D3DXMatrixMultiply( &m_matPosition, &matR, &m_matPosition );
 	D3DXMatrixInverse( &m_matView, NULL, &m_matPosition );
 
+	// Chj test code >>>
+	if (m_bKey['1'] || m_bKey['2']) 
+	{
+		// Rotate the earth along Y-axis, by changing m_matWorld.
+		int sign = m_bKey['1'] ? 1 : -1;
+
+		D3DXMATRIXA16 roty;
+		D3DXMatrixRotationY(&roty, sign * D3DX_PI / 5 * fSecsPerFrame);
+
+		D3DXMatrixMultiply(&m_matWorld, &m_matWorld, &roty);
+	}
+	else if (m_bKey[VK_HOME] || m_bKey[VK_END])
+	{
+		// Rotate the earth along X-axis.
+		int sign = m_bKey[VK_HOME] ? 1 : -1;
+
+		D3DXMATRIXA16 rotx;
+		D3DXMatrixRotationX(&rotx, sign * D3DX_PI /5 * fSecsPerFrame);
+
+		D3DXMatrixMultiply(&m_matWorld, &m_matWorld, &rotx);
+	}
+	else if (m_bKey['0'])
+	{
+		D3DXMatrixIdentity(&m_matWorld);
+	}
+	// Chj test code <<<
+
 	return S_OK;
 }
 
@@ -283,6 +310,10 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetTexture( 0, NULL );
 			m_pd3dDevice->SetPixelShader( NULL );
 			m_pd3dDevice->SetVertexShader( NULL );
+
+			// Draw hint text 
+			m_pFontSmall->DrawText( 2,  0, D3DCOLOR_ARGB(255,255,255,0), 
+				_T("Press 1/2/Home/End to rotate. 0 to reset.") );
 		}					
 
 
@@ -352,7 +383,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL,
 		"PS_HLL_EX1",
 		"ps_1_1",
-		D3DXSHADER_DEBUG,
+		shader_flags,
 		&pShader, 
 		NULL, 
 		NULL );
@@ -376,7 +407,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL, 
 		"TX_HLL_EX1",  
 		"tx_1_0", 
-		D3DXSHADER_DEBUG,
+		shader_flags,
 		&pShader, 
 		NULL, 
 		NULL );
@@ -521,7 +552,7 @@ ERROR_END:
 
 //-----------------------------------------------------------------------------
 // Name: InvalidateDeviceObjects()
-// Desc:
+// Desc: Will be called after user drags window border to change window size.
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 {

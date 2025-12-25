@@ -44,9 +44,10 @@ void mm_DebugProgress(void *ctx_user, const TCHAR *psz_dbginfo)
 
 		AllocConsole();
 
-		freopen("CONOUT$", "w", stdout);
-		freopen("CONIN$", "r", stdin);
-		freopen("CONOUT$", "w", stderr);
+		FILE *fp = NULL;
+		freopen_s(&fp, "CONOUT$", "w", stdout);
+		freopen_s(&fp, "CONIN$", "r", stdin);
+		freopen_s(&fp, "CONOUT$", "w", stderr);
 	}
 
 	_tprintf(_T("%s"), psz_dbginfo);
