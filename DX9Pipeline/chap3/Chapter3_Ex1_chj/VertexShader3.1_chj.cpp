@@ -104,6 +104,15 @@ protected:
 
 public:
 	CMyD3DApplication();
+
+protected:
+	void SafeReleaseAll()
+	{
+		SAFE_RELEASE(m_pAsm_VS);
+		SAFE_RELEASE(m_pVBSphere);
+		SAFE_RELEASE(m_pTexture);
+		SAFE_RELEASE(m_pVertexDeclaration);
+	}
 };
 
 
@@ -526,10 +535,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	return S_OK;
 
 ERROR_END:
-	SAFE_RELEASE(m_pAsm_VS);
-	SAFE_RELEASE(m_pVBSphere);
-	SAFE_RELEASE(m_pVertexDeclaration);
-	SAFE_RELEASE(m_pTexture);
+	SafeReleaseAll();
 	return hr;
 }
 
@@ -548,10 +554,7 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 	// otherwise, dragging-mouse window resizing will crash the EXE.
 	// Immediately after return, `m_pd3dDevice->Reset( &m_d3dpp );` would fail with 
 	// 0x8876086c(D3DERR_INVALIDCALL).
-	SAFE_RELEASE(m_pAsm_VS);
-	SAFE_RELEASE(m_pVBSphere);
-	SAFE_RELEASE(m_pTexture);
-	SAFE_RELEASE(m_pVertexDeclaration);
+	SafeReleaseAll();
 
 	return S_OK;
 }
@@ -564,14 +567,10 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::DeleteDeviceObjects()
 {
-	SAFE_RELEASE( m_pAsm_VS );
-	SAFE_RELEASE( m_pVertexDeclaration );
-	SAFE_RELEASE( m_pTexture );
-
-	SAFE_RELEASE(m_pVBSphere);
-
 	m_pFont->DeleteDeviceObjects();
 	m_pFontSmall->DeleteDeviceObjects();
+
+	SafeReleaseAll();
 
 	return S_OK;
 }
