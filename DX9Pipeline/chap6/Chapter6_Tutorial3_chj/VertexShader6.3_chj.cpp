@@ -42,7 +42,6 @@ class CMyD3DApplication : public CD3DApplication
 	LPD3DXCONSTANTTABLE				m_pConstantTable;
 	LPDIRECT3DTEXTURE9				m_pTexture;
 
-
 	LPDIRECT3DVERTEXBUFFER9			m_pVBSphere;
 	DWORD							m_dwNumSphereSegments;
 	DWORD							m_dwNumSphereRings;
@@ -83,6 +82,17 @@ protected:
 
 public:
 	CMyD3DApplication();
+
+protected:
+	void SafeReleaseAll()
+	{
+		SAFE_RELEASE(m_pHLL_VS);
+		SAFE_RELEASE(m_pHLL_PS);
+		SAFE_RELEASE(m_pVertexDeclaration);
+		SAFE_RELEASE(m_pConstantTable);
+		SAFE_RELEASE(m_pTexture);
+		SAFE_RELEASE(m_pVBSphere);
+	}
 };
 
 
@@ -169,18 +179,18 @@ HRESULT CMyD3DApplication::FrameMove()
 	D3DXVECTOR3 vT( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vR( 0.0f, 0.0f, 0.0f );
 
-	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )                 vT.x -= 1.0f; // Slide Left
-	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )                vT.x += 1.0f; // Slide Right
-	if( m_bKey[VK_DOWN] )                                       vT.y -= 1.0f; // Slide Down
-	if( m_bKey[VK_UP] )                                         vT.y += 1.0f; // Slide Up
-	if( m_bKey['W'] )                                           vT.z -= 2.0f; // Move Forward
-	if( m_bKey['S'] )                                           vT.z += 2.0f; // Move Backward
-	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )                     vR.x -= 1.0f; // Pitch Down
-	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )                     vR.x += 1.0f; // Pitch Up
-	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )                     vR.y -= 1.0f; // Turn Right
-	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )                     vR.y += 1.0f; // Turn Left
-	if( m_bKey[VK_NUMPAD9] )                                    vR.z -= 2.0f; // Roll CW
-	if( m_bKey[VK_NUMPAD7] )                                    vR.z += 2.0f; // Roll CCW
+	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )    vT.x -= 1.0f; // Slide Left
+	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )   vT.x += 1.0f; // Slide Right
+	if( m_bKey[VK_DOWN] )                          vT.y -= 1.0f; // Slide Down
+	if( m_bKey[VK_UP] )                            vT.y += 1.0f; // Slide Up
+	if( m_bKey['W'] )                              vT.z -= 2.0f; // Move Forward
+	if( m_bKey['S'] )                              vT.z += 2.0f; // Move Backward
+	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )        vR.x -= 1.0f; // Pitch Down
+	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )        vR.x += 1.0f; // Pitch Up
+	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )        vR.y -= 1.0f; // Turn Right
+	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )        vR.y += 1.0f; // Turn Left
+	if( m_bKey[VK_NUMPAD9] )                       vR.z -= 2.0f; // Roll CW
+	if( m_bKey[VK_NUMPAD7] )                       vR.z += 2.0f; // Roll CCW
 
 	m_vVelocity        = m_vVelocity * 0.9f + vT * 0.1f;
 	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
@@ -271,7 +281,6 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	m_pFont->InitDeviceObjects( m_pd3dDevice );
 	m_pFontSmall->InitDeviceObjects( m_pd3dDevice );
 
-
 	return S_OK;
 }
 
@@ -282,10 +291,18 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::RestoreDeviceObjects()
 {
-	HRESULT hr;
+	HRESULT hr = 0;
+
+	LPD3DXBUFFER pShader = NULL;
+	LPD3DXBUFFER pErrBuf = NULL;	
+	Cec_Release cec_ShaderCode;
+	Cec_Release cec_errmsg;
+
+	const TCHAR *fxfile = _T("Ex6-3-chj.fx");
+
+	DWORD shader_flags = D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
 
 	// Compile the vertex shader
-	LPD3DXBUFFER pShader = NULL;
 	hr = D3DXCompileShaderFromResource(
 		NULL,
 		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
@@ -293,30 +310,23 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL,
 		"VS_HLL_EX1",
 		"vs_1_1",
-		D3DXSHADER_DEBUG,
+		shader_flags,
 		&pShader, 
-		NULL, 
+		&pErrBuf, 
 		&m_pConstantTable );
+	cec_ShaderCode = pShader;
+	cec_errmsg = pErrBuf;
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pConstantTable);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 	// Create the vertex shader
 	hr = m_pd3dDevice->CreateVertexShader( 
 		(DWORD*)pShader->GetBufferPointer(), &m_pHLL_VS );
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pConstantTable);
-		SAFE_RELEASE(m_pHLL_VS);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
-
-	SAFE_RELEASE(pShader);
 
 	// Compile the pixel shader
 	hr = D3DXCompileShaderFromResource(
@@ -331,26 +341,19 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL, 
 		NULL );
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 	// Create the pixel shader
 	hr = m_pd3dDevice->CreatePixelShader( 
 		(DWORD*)pShader->GetBufferPointer(), &m_pHLL_PS );
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pHLL_PS);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
-	SAFE_RELEASE(pShader);
-
-	// Compile the procedural texture
+	// Compile the procedural texture (new in Ex6-3)
 	hr = D3DXCompileShaderFromResource(
 		NULL,
 		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
@@ -363,14 +366,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL, 
 		NULL );
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 
-	// Create the procedural texture
+	// Create the procedural texture (new in Ex6-3)
 	hr = D3DXCreateTexture(
 		m_pd3dDevice,
 		64, 64,           // width, height
@@ -380,25 +381,18 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		D3DPOOL_MANAGED,  // memory pool
 		&m_pTexture);
 
-	if(FAILED(hr))
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pTexture);
+	if(FAILED(hr)) {
+		goto ERROR_END;
 	}
 
 
-	// Procedurally fill the texture
+	// Procedurally fill the texture (new in Ex6-3)
 	hr = D3DXFillTextureTX(m_pTexture, 
 		(CONST DWORD*)pShader->GetBufferPointer(), NULL, 0);
 
-	if( FAILED(hr) )
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pTexture);
-		return hr;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
-
-	SAFE_RELEASE(pShader);
 
 	// Set the sampler state for the procedural texture
 	m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
@@ -418,8 +412,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	if( FAILED( hr = m_pd3dDevice->CreateVertexDeclaration( decl, 
 		&m_pVertexDeclaration ) ) )
 	{
-		SAFE_RELEASE(m_pVertexDeclaration);
-		return hr;
+		goto ERROR_END;
 	}
 
 
@@ -432,7 +425,9 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		0, // don't need an FVF code
 		D3DPOOL_DEFAULT, 
 		&m_pVBSphere, NULL)	) )
-		return E_FAIL;
+	{
+		goto ERROR_END;
+	}
 
 
 	CUSTOM_VERTEX* pVertices;
@@ -502,6 +497,10 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 
 	return S_OK;
+
+ERROR_END:
+	SafeReleaseAll();
+	return hr;
 }
 
 
@@ -511,6 +510,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 {
+	SafeReleaseAll();
+
 	m_pFont->InvalidateDeviceObjects();
 	m_pFontSmall->InvalidateDeviceObjects();
 
@@ -525,13 +526,7 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::DeleteDeviceObjects()
 {
-	SAFE_RELEASE( m_pHLL_VS );
-	SAFE_RELEASE( m_pHLL_PS );
-	SAFE_RELEASE( m_pVertexDeclaration );
-	SAFE_RELEASE( m_pConstantTable );
-	SAFE_RELEASE( m_pTexture );
-
-	SAFE_RELEASE(m_pVBSphere);
+	SafeReleaseAll();
 
 	m_pFont->DeleteDeviceObjects();
 	m_pFontSmall->DeleteDeviceObjects();
