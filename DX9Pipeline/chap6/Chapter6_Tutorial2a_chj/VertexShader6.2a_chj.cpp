@@ -290,35 +290,25 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 	// Compile the vertex shader
 	LPD3DXBUFFER pShader = NULL;
-	LPD3DXBUFFER pErrBuf = NULL;	
 	Cec_Release cec_ShaderCode;
-	Cec_Release cec_errmsg;
 
 	const TCHAR *fxfile = _T("Ex6-2a-chj.fx");
 
 	DWORD shader_flags = D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
 
-	hr = D3DXCompileShaderFromFile(fxfile,
+	hr = D3DXCompileShaderFromFile_dbg(fxfile,
 		NULL,
 		NULL,
 		"VS_HLL_EX1",
 		"vs_1_1",
 		shader_flags,
 		&pShader, 
-		&pErrBuf, 
+		NULL, 
 		&m_pConstantTable 
 		);
 	cec_ShaderCode = pShader;
-	cec_errmsg = pErrBuf;
 
-	if( FAILED(hr) ) 
-	{
-		if(pErrBuf)
-		{
-			const char *errmsg = (const char*)pErrBuf->GetBufferPointer();
-			sdring<TCHAR> s1 = makeTsdring(errmsg);
-			vaDbgTs(_T("D3DXCompileShader() vertex-shader fail with hr=%s:\n%s"), ITCSvn(hr, DxErr), s1.c_str());
-		}
+	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
 
@@ -330,26 +320,18 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	}
 
 	// Compile the pixel shader
-	hr = D3DXCompileShaderFromFile(fxfile,
+	hr = D3DXCompileShaderFromFile_dbg(fxfile,
 		NULL,
 		NULL,
 		"PS_HLL_EX1",
 		"ps_1_1",
 		shader_flags,
 		&pShader, 
-		&pErrBuf, 
+		NULL, 
 		NULL );
 	cec_ShaderCode = pShader;
-	cec_errmsg = pErrBuf;
 
-	if( FAILED(hr) )
-	{
-		if(pErrBuf)
-		{
-			const char *errmsg = (const char*)pErrBuf->GetBufferPointer();
-			sdring<TCHAR> s1 = makeTsdring(errmsg);
-			vaDbgTs(_T("D3DXCompileShader() vertex-shader fail with hr=%s:\n%s"), ITCSvn(hr, DxErr), s1.c_str());
-		}
+	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
 

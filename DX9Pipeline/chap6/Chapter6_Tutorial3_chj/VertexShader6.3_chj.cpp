@@ -96,6 +96,26 @@ protected:
 };
 
 
+static void ChjInit()
+{
+	int argc = __argc;
+
+#ifdef UNICODE
+	PCTSTR* argv = (PCTSTR*) CommandLineToArgvW(GetCommandLine(), &argc);
+#else
+	PCTSTR* argv = (PCTSTR*) __argv;
+#endif
+
+// 	if(argc>1)
+// 		g_rings = _MAX_(3, _ttoi(argv[1]));
+// 
+// 	if(argc>2)
+// 		g_segments = _MAX_(3, _ttoi(argv[2]));
+
+	vaDbg_set_vsnprintf(my_mm_vsnprintf); // Chj
+}
+
+
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: Entry point to the program. Initializes everything, and goes into a
@@ -103,6 +123,8 @@ protected:
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 {
+	ChjInit();
+
 	CMyD3DApplication d3dApp;
 
 	InitCommonControls();
@@ -294,29 +316,24 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	HRESULT hr = 0;
 
 	LPD3DXBUFFER pShader = NULL;
-	LPD3DXBUFFER pErrBuf = NULL;	
 	Cec_Release cec_ShaderCode;
-	Cec_Release cec_errmsg;
 
 	const TCHAR *fxfile = _T("Ex6-3-chj.fx");
 
 	DWORD shader_flags = D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
 
 	// Compile the vertex shader
-	hr = D3DXCompileShaderFromResource(
-		NULL,
-		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
+	hr = D3DXCompileShaderFromFile_dbg(
+		fxfile,
 		NULL,
 		NULL,
 		"VS_HLL_EX1",
 		"vs_1_1",
 		shader_flags,
 		&pShader, 
-		&pErrBuf, 
+		NULL, 
 		&m_pConstantTable );
 	cec_ShaderCode = pShader;
-	cec_errmsg = pErrBuf;
-
 	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
@@ -329,9 +346,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	}
 
 	// Compile the pixel shader
-	hr = D3DXCompileShaderFromResource(
-		NULL,
-		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
+	hr = D3DXCompileShaderFromFile_dbg(
+		fxfile,
 		NULL,
 		NULL,
 		"PS_HLL_EX1",
@@ -340,7 +356,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL, 
 		NULL );
-
+	cec_ShaderCode = pShader;
 	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
@@ -354,9 +370,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	}
 
 	// Compile the procedural texture (new in Ex6-3)
-	hr = D3DXCompileShaderFromResource(
-		NULL,
-		MAKEINTRESOURCE(ID_EXAMPLE1_FX),
+	hr = D3DXCompileShaderFromFile_dbg(
+		fxfile,
 		NULL, 
 		NULL, 
 		"TX_HLL_EX1",  
@@ -365,7 +380,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL, 
 		NULL );
-
+	cec_ShaderCode = pShader;
 	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
@@ -403,9 +418,9 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	D3DVERTEXELEMENT9 decl[] =
 	{
 		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, 
-		D3DDECLUSAGE_POSITION, 0 },
+			D3DDECLUSAGE_POSITION, 0 },
 		{ 0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, 
-		D3DDECLUSAGE_TEXCOORD, 0 },
+			D3DDECLUSAGE_TEXCOORD, 0 },
 		D3DDECL_END()
 	};
 
