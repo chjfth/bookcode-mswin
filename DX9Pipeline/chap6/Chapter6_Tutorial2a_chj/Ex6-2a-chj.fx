@@ -17,10 +17,10 @@ void PS_HLL_EX1(
     out float4 oCol  : COLOR0)
 {
 	// texture
-	//oCol = tex2D(DiffuseSampler, vTex);
+	oCol = tex2D(DiffuseSampler, vTex);
 
 	// 2a - complement
-	oCol = 1.0 - tex2D(DiffuseSampler, vTex);
+	oCol = 1.0 - oCol;
 
 	// 2b - darken
 	//oCol = 0.5 * tex2D(DiffuseSampler, vTex);

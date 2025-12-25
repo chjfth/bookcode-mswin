@@ -296,12 +296,14 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 	const TCHAR *fxfile = _T("Ex6-2a-chj.fx");
 
+	DWORD shader_flags = D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
+
 	hr = D3DXCompileShaderFromFile(fxfile,
 		NULL,
 		NULL,
 		"VS_HLL_EX1",
 		"vs_1_1",
-		D3DXSHADER_DEBUG,
+		shader_flags,
 		&pShader, 
 		&pErrBuf, 
 		&m_pConstantTable 
@@ -333,7 +335,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		NULL,
 		"PS_HLL_EX1",
 		"ps_1_1",
-		D3DXSHADER_DEBUG,
+		shader_flags,
 		&pShader, 
 		&pErrBuf, 
 		NULL );
