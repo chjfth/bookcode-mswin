@@ -17,6 +17,7 @@
 #include "D3DUtil.h"
 #include "resource.h"
 
+#include "../BookCommon/chjshare.h"
 
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
@@ -378,6 +379,8 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
 	for( DWORD i=0; i < m_dwNumMaterials; i++ )
 	{
+		sdring<TCHAR> tsTextureFilename = makeTsdring(d3dxMaterials[i].pTextureFilename);
+
 		// Copy the material
 		m_pMeshMaterials[i] = d3dxMaterials[i].MatD3D;
 
@@ -386,11 +389,11 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
 		m_pMeshTextures[i] = NULL;
 		if( d3dxMaterials[i].pTextureFilename != NULL && 
-			lstrlen(d3dxMaterials[i].pTextureFilename) > 0 )
+			lstrlen(tsTextureFilename) > 0 )
 		{
 			// Find the path to the texture and create that texture
 			DXUtil_FindMediaFileCb( strMediaPath, sizeof(strMediaPath), 
-				d3dxMaterials[i].pTextureFilename );
+				tsTextureFilename );
 			
 			// Create the texture
 			if( FAILED( D3DXCreateTextureFromFile( m_pd3dDevice, 

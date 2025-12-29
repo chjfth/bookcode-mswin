@@ -220,6 +220,7 @@
    -->
   <ItemGroup>
     <ClCompile Include="ShaderDemo8.1_chj.cpp" />
+    <ClCompile Include="CHHI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinMain.rc" />
@@ -235,6 +236,7 @@
   <PropertyGroup>
     <VSPG_ExeDataFiles>
     ;..\..\BookCommon\Media\lake.bmp
+    ;..\..\BookCommon\Media\tiger.bmp
     ;..\..\BookCommon\Media\tiger.x
     ;HLSL_Glow.fx
     </VSPG_ExeDataFiles>

@@ -33,7 +33,8 @@ REM (1) AGILE_COPY_PATTERNS
 REM
 
 call :GetAbsPath  fpData1  "%ProjectDir%\..\..\BookCommon\Media\lake.bmp"
-call :GetAbsPath  fpData2  "%ProjectDir%\..\..\BookCommon\Media\tiger.x"
+call :GetAbsPath  fpData2  "%ProjectDir%\..\..\BookCommon\Media\tiger.bmp"
+call :GetAbsPath  fpData3  "%ProjectDir%\..\..\BookCommon\Media\tiger.x"
 
 set AGILE_COPY_PATTERNS="%fpData1%" "%ProjectDir%\HLSL_Glow.fx"
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
@@ -90,6 +91,10 @@ REM ==== Extra work ====
 if not exist "%ProjectDir%\lake.bmp" (
 	call :Echos We need lake.bmp alongside .vcxproj for direct F5/Ctrl+F5 local debug/run.
 	call :EchoAndExec copy "%fpData1%" "%ProjectDir%"
+)
+if not exist "%ProjectDir%\tiger.bmp" (
+	call :Echos We need tiger.bmp alongside .vcxproj for direct F5/Ctrl+F5 local debug/run.
+	call :EchoAndExec copy "%fpData2%" "%ProjectDir%"
 )
 if not exist "%ProjectDir%\tiger.x" (
 	call :Echos We need tiger.x alongside .vcxproj for direct F5/Ctrl+F5 local debug/run.
