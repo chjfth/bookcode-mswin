@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// File: VertexShader8.1.cpp
+// File: VertexShader8.1_chj.cpp
 //
 //-----------------------------------------------------------------------------
 #define STRICT
@@ -80,6 +80,40 @@ protected:
 
 public:
 	CMyD3DApplication();
+
+protected:
+	void SafeReleaseDevice()
+	{
+		SAFE_RELEASE(m_pVS_Texture);
+		SAFE_RELEASE(m_pTexture_ConstantTable);
+		SAFE_RELEASE(m_pVS_Glow);
+		SAFE_RELEASE(m_pGlow_ConstantTable);
+		SAFE_RELEASE(m_pVBBackground);
+	}
+
+	void SafeReleaseMesh()
+	{
+		SAFE_RELEASE(m_pBackgroundTexture);
+
+		SAFE_RELEASE( m_pMesh );
+
+		if( m_pMeshMaterials != NULL ) 
+		{
+			delete[] m_pMeshMaterials;
+			m_pMeshMaterials = NULL;
+		}
+
+		if( m_pMeshTextures )
+		{
+			for( DWORD i = 0; i < m_dwNumMaterials; i++ )
+			{
+				SAFE_RELEASE( m_pMeshTextures[i] );
+			}
+			delete[] m_pMeshTextures;
+			m_pMeshTextures = NULL;
+		}
+
+	}
 };
 
 
@@ -162,23 +196,23 @@ HRESULT CMyD3DApplication::FrameMove()
 	D3DXVECTOR3 vT( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vR( 0.0f, 0.0f, 0.0f );
 
-	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )                 vT.x -= 1.0f; // Slide Left
-	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )                vT.x += 1.0f; // Slide Right
-	if( m_bKey[VK_DOWN] )                                       vT.y -= 1.0f; // Slide Down
-	if( m_bKey[VK_UP] )                                         vT.y += 1.0f; // Slide Up
-	if( m_bKey['W'] )                                           vT.z -= 2.0f; // Move Forward
-	if( m_bKey['S'] )                                           vT.z += 2.0f; // Move Backward
-	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )                     vR.x -= 1.0f; // Pitch Down
-	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )                     vR.x += 1.0f; // Pitch Up
-	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )                     vR.y -= 1.0f; // Turn Right
-	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )                     vR.y += 1.0f; // Turn Left
-	if( m_bKey[VK_NUMPAD9] )                                    vR.z -= 2.0f; // Roll CW
-	if( m_bKey[VK_NUMPAD7] )                                    vR.z += 2.0f; // Roll CCW
+	if( m_bKey[VK_LEFT] || m_bKey[VK_NUMPAD1] )    vT.x -= 1.0f; // Slide Left
+	if( m_bKey[VK_RIGHT] || m_bKey[VK_NUMPAD3] )   vT.x += 1.0f; // Slide Right
+	if( m_bKey[VK_DOWN] )                          vT.y -= 1.0f; // Slide Down
+	if( m_bKey[VK_UP] )                            vT.y += 1.0f; // Slide Up
+	if( m_bKey['W'] )                              vT.z -= 2.0f; // Move Forward
+	if( m_bKey['S'] )                              vT.z += 2.0f; // Move Backward
+	if( m_bKey['A'] || m_bKey[VK_NUMPAD8] )        vR.x -= 1.0f; // Pitch Down
+	if( m_bKey['Z'] || m_bKey[VK_NUMPAD2] )        vR.x += 1.0f; // Pitch Up
+	if( m_bKey['E'] || m_bKey[VK_NUMPAD6] )        vR.y -= 1.0f; // Turn Right
+	if( m_bKey['Q'] || m_bKey[VK_NUMPAD4] )        vR.y += 1.0f; // Turn Left
+	if( m_bKey[VK_NUMPAD9] )                       vR.z -= 2.0f; // Roll CW
+	if( m_bKey[VK_NUMPAD7] )                       vR.z += 2.0f; // Roll CCW
 
 	m_vVelocity        = m_vVelocity * 0.9f + vT * 0.1f;
 	m_vAngularVelocity = m_vAngularVelocity * 0.9f + vR * 0.1f;
 
-	// Update position and view matricies
+	// Update position and view matrices
 	D3DXMATRIXA16     matT, matR;
 	D3DXQUATERNION qR;
 
@@ -539,15 +573,15 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	// Set up a set of points which represents the screen
 	static struct { float x,y,z,w; float u,v; } s_Verts[] =
 	{
-		{750.0f,  -0.5f, 0.5f, 1.0f, 1,0},
-		{750.0f, 750.0f, 0.5f, 1.0f, 1,1},
-		{ -0.5f,  -0.5f, 0.5f, 1.0f, 0,0},
-		{ -0.5f, 750.0f, 0.5f, 1.0f, 0,1},
+		{750.0f,  -0.5f, 0.5f, 1.0f,  1, 0},
+		{750.0f, 750.0f, 0.5f, 1.0f,  1, 1},
+		{ -0.5f,  -0.5f, 0.5f, 1.0f,  0, 0},
+		{ -0.5f, 750.0f, 0.5f, 1.0f,  0, 1},
 	};
 
 	s_Verts[0].x = (float)m_d3dsdBackBuffer.Width - 0.5f;
 	s_Verts[1].x = (float)m_d3dsdBackBuffer.Width - 0.5f;
-	s_Verts[1].y = (float)m_d3dsdBackBuffer.Height - 0.5f;
+	s_Verts[1].y = (float)m_d3dsdBackBuffer.Height - 0.5f; // s_Verts[1] ?
 	s_Verts[3].y = (float)m_d3dsdBackBuffer.Height - 0.5f; 
  
 	// Copy them into the buffer
@@ -580,10 +614,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 //-----------------------------------------------------------------------------
 // Name: InvalidateDeviceObjects()
-// Desc:
+// Desc: Will be called after user drags window border to change window size.
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 {
+	SafeReleaseDevice();
+
 	m_pFont->InvalidateDeviceObjects();
 	m_pFontSmall->InvalidateDeviceObjects();
 
@@ -598,33 +634,8 @@ HRESULT CMyD3DApplication::InvalidateDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::DeleteDeviceObjects()
 {
-	SAFE_RELEASE( m_pBackgroundTexture );
-	SAFE_RELEASE( m_pVBBackground );
-
-
-	if( m_pMeshMaterials != NULL ) 
-		delete[] m_pMeshMaterials;
-
-	if( m_pMeshTextures )
-	{
-		for( DWORD i = 0; i < m_dwNumMaterials; i++ )
-		{
-			if( m_pMeshTextures[i] )
-				m_pMeshTextures[i]->Release();
-		}
-		delete[] m_pMeshTextures;
-	}
-	if( m_pMesh != NULL )
-		m_pMesh->Release();
-
-	// texture vertex shader
-	SAFE_RELEASE( m_pVS_Texture );
-	SAFE_RELEASE( m_pTexture_ConstantTable );
-
-	// glow vertex shader
-	SAFE_RELEASE( m_pVS_Glow );
-	SAFE_RELEASE( m_pGlow_ConstantTable );
-
+	SafeReleaseDevice();
+	SafeReleaseMesh();
 
 	m_pFont->DeleteDeviceObjects();
 	m_pFontSmall->DeleteDeviceObjects();
@@ -640,6 +651,9 @@ HRESULT CMyD3DApplication::DeleteDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::FinalCleanup()
 {
+	SafeReleaseDevice();
+	SafeReleaseMesh();
+
 	SAFE_DELETE( m_pFont );
 	SAFE_DELETE( m_pFontSmall );
 	return S_OK;
