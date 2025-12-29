@@ -315,7 +315,7 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );
 
 			m_pd3dDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_TEX1);
-			m_pd3dDevice->SetStreamSource( 0, m_pVBBackground, 0, 6*sizeof(float) );
+			m_pd3dDevice->SetStreamSource( 0, m_pVBBackground, 0, 6*sizeof(float) ); // 6 floats in s_Verts[]
 			m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2 );
 			
 			m_pd3dDevice->SetTexture(0, NULL);
@@ -325,7 +325,9 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 		}
 
+
 		// Draw the solid tiger and the glow
+
 		if(m_pTexture_ConstantTable)
 		{
 			// Initialize the texture constants
@@ -466,7 +468,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	DWORD dw32BitFlag = (opt & D3DXMESH_32BIT);
 
 	// We need to extract the material properties and texture names from 
-	// the pD3DXMtrlBuffer
+	// the l_pD3DXMtrlBuffer
 	D3DXMATERIAL* d3dxMaterials = (D3DXMATERIAL*)l_pD3DXMtrlBuffer->GetBufferPointer();
 
 	m_arMeshMaterials = new D3DMATERIAL9[m_dwNumMaterials];
@@ -605,18 +607,20 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	}
 
 	// Set up a set of points which represents the screen
+	const float fPend = 750.0; // pending to set, casual init-value
+	const float fHalf = 0.5;   // half-pixel/pixel-center tuning const
 	static struct { float x,y,z,w; float u,v; } s_Verts[] =
 	{
-		{750.0f,  -0.5f, 0.5f, 1.0f,  1, 0},
-		{750.0f, 750.0f, 0.5f, 1.0f,  1, 1},
-		{ -0.5f,  -0.5f, 0.5f, 1.0f,  0, 0},
-		{ -0.5f, 750.0f, 0.5f, 1.0f,  0, 1},
+		{fPend,  -fHalf,   +fHalf, 1.0f,  1, 0}, // at (400, 0)
+		{fPend,   fPend,   +fHalf, 1.0f,  1, 1}, // at (400, 300)
+		{-fHalf, -fHalf,   +fHalf, 1.0f,  0, 0}, // at (0, 0)
+		{-fHalf,  fPend,   +fHalf, 1.0f,  0, 1}, // at (0, 300)
 	};
 
-	s_Verts[0].x = (float)m_d3dsdBackBuffer.Width - 0.5f;
-	s_Verts[1].x = (float)m_d3dsdBackBuffer.Width - 0.5f;
-	s_Verts[1].y = (float)m_d3dsdBackBuffer.Height - 0.5f; // why s_Verts[1] ?
-	s_Verts[3].y = (float)m_d3dsdBackBuffer.Height - 0.5f; 
+	s_Verts[0].x = (float)m_d3dsdBackBuffer.Width  - fHalf;
+	s_Verts[1].x = (float)m_d3dsdBackBuffer.Width  - fHalf;
+	s_Verts[1].y = (float)m_d3dsdBackBuffer.Height - fHalf;
+	s_Verts[3].y = (float)m_d3dsdBackBuffer.Height - fHalf; 
  
 	// Copy them into the buffer
 	if(1)
