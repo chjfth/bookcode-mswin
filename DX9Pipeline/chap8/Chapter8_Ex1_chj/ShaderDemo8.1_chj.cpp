@@ -434,6 +434,8 @@ HRESULT CMyD3DApplication::Render()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::InitDeviceObjects()
 {
+	// Chj: SafeReleaseMesh(); reveals what resources are allocated in InitDeviceObjects().
+
 	// Load the texture for the background image
 	if( FAILED( D3DUtil_CreateTexture( m_pd3dDevice, _T("Lake.bmp"),
 									   &m_pBackgroundTexture )))
@@ -460,12 +462,13 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		goto ERROR_END;
 	}
 
-	DWORD dw32BitFlag = (m_pMesh->GetOptions() & D3DXMESH_32BIT);
+	DWORD opt = m_pMesh->GetOptions();
+	DWORD dw32BitFlag = (opt & D3DXMESH_32BIT);
 
 	// We need to extract the material properties and texture names from 
 	// the pD3DXMtrlBuffer
-	D3DXMATERIAL* d3dxMaterials = 
-		(D3DXMATERIAL*)l_pD3DXMtrlBuffer->GetBufferPointer();
+	D3DXMATERIAL* d3dxMaterials = (D3DXMATERIAL*)l_pD3DXMtrlBuffer->GetBufferPointer();
+
 	m_arMeshMaterials = new D3DMATERIAL9[m_dwNumMaterials];
 	m_arMeshTextures  = new LPDIRECT3DTEXTURE9[m_dwNumMaterials];
 	memset(m_arMeshMaterials, 0, m_dwNumMaterials*sizeof(D3DMATERIAL9));
@@ -546,15 +549,16 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	LPD3DXBUFFER pShader = NULL;
 	Cec_Release cec_Shader;
 
+	const TCHAR *fxfile = _T("HLSL_Glow.fx");
+	DWORD shader_flags = D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
+
 	// Compile the texturing shader
-	hr = D3DXCompileShaderFromResource(
-		NULL,
-		MAKEINTRESOURCE(ID_HLSL_GLOW),
+	hr = D3DXCompileShaderFromFile_dbg(fxfile,
 		NULL, // a NULL terminated array of D3DXMACROs
 		NULL, // a #include handler
 		"VS_HLSL_Texture",  
 		"vs_1_1",
-		D3DXSHADER_DEBUG,
+		shader_flags,
 		&pShader, 
 		NULL, // error messages 
 		&m_pTexture_ConstantTable );
@@ -571,14 +575,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	}
 
 	// Compile the glow shader
-	hr = D3DXCompileShaderFromResource(
-		NULL,
-		MAKEINTRESOURCE(ID_HLSL_GLOW),
+	hr = D3DXCompileShaderFromFile_dbg(fxfile,
 		NULL, // a NULL terminated array of D3DXMACROs
 		NULL, // a #include handler
 		"VS_HLSL_Glow",  
 		"vs_1_1",
-		D3DXSHADER_DEBUG,
+		shader_flags,
 		&pShader, 
 		NULL, // error messages 
 		&m_pGlow_ConstantTable );

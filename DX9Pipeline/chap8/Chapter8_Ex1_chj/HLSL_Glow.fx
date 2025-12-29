@@ -3,17 +3,17 @@ float4x3 WorldView  : WORLDVIEW;
 float4x4 Projection : PROJECTION; 
  
 static float3 LightDir < string UIDirectional = "Light Direction"; > = 
-normalize(float3(1.0f, 0.0f, -1.0f)); 
+	normalize(float3(1.0f, 0.0f, -1.0f)); 
  
 struct VS_OUTPUT 
 { 
 	float4 Position : POSITION; 
 	float4 Diffuse  : COLOR; 
-	float2 TexCoord : TEXCOORD0; 
+	float2 TexCoord : TEXCOORD0;
 }; 
  
 VS_OUTPUT VS_HLSL_Texture( 
-	float4 Position : POSITION,  
+	float4 Position : POSITION, 
 	float3 Normal   : NORMAL, 
 	float2 TexCoord : TEXCOORD0 
 ) 
@@ -25,7 +25,7 @@ VS_OUTPUT VS_HLSL_Texture(
 	float3 N = normalize(mul(Normal, (float3x3)WorldView)); // normal (view space) 
  
 	Out.Position = mul(float4(P, 1), Projection);   // projected position 
-	Out.Diffuse  = max(0, dot(N, L)); // diffuse  
+	Out.Diffuse  = max(0, dot(N, L));               // diffuse (grayed RGB)
 	Out.TexCoord = TexCoord;                        // texture coordinates 
  
 	return Out; 
@@ -47,7 +47,7 @@ struct VSGLOW_OUTPUT
 // Draw the glow 
 VSGLOW_OUTPUT VS_HLSL_Glow 
 	( 
-	float4 Position : POSITION,  
+	float4 Position : POSITION, 
 	float3 Normal   : NORMAL 
 	) 
 { 
