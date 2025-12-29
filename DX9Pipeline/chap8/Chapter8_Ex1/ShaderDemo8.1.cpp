@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// File: VertexShader8.1.cpp
+// File: VertexShader8.1_chj.cpp
 //
 // This original book code can only be compiled with "Debug ANSI" convig.
 //
