@@ -53,6 +53,7 @@ class CMyD3DApplication : public CD3DApplication
 
 	// Transforms
 	D3DXMATRIXA16  m_matPosition;
+	D3DXMATRIXA16  m_matWorld;
 	D3DXMATRIXA16  m_matView;
 	D3DXMATRIXA16  m_matProj;
 
@@ -112,8 +113,9 @@ protected:
 			delete[] m_pMeshTextures;
 			m_pMeshTextures = NULL;
 		}
-
 	}
+
+	void ChjRestoreSceneInit();
 };
 
 
@@ -182,6 +184,33 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 	return S_OK;
 }
 
+void CMyD3DApplication::ChjRestoreSceneInit()
+{
+	// As Sub-function in RestoreDeviceObjects()
+
+	//
+	// Set up initial world matrix
+	//
+	D3DXMatrixIdentity( &m_matWorld );
+
+	//
+	// Setup the view matrix
+	//
+	D3DXVECTOR3 vEye = D3DXVECTOR3( 2.5f, 0.5f, 0.0f ); 
+	D3DXVECTOR3 vAt  = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
+	D3DXVECTOR3 vUp  = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
+	D3DXMatrixLookAtLH( &m_matView, &vEye, &vAt, &vUp );
+
+	// Set the position matrix
+	D3DXMatrixInverse( &m_matPosition, NULL, &m_matView );
+
+	//
+	// Set up the projection matrix
+	//
+	FLOAT fAspectRatio = (FLOAT)m_d3dsdBackBuffer.Width / (FLOAT)m_d3dsdBackBuffer.Height;
+	D3DXMatrixPerspectiveFovLH( &m_matProj, D3DXToRadian(60.0f), fAspectRatio, 0.1f, 100.0f );
+	m_pd3dDevice->SetTransform( D3DTS_PROJECTION, &m_matProj );
+}
 
 //-----------------------------------------------------------------------------
 // Name: FrameMove()
@@ -228,6 +257,33 @@ HRESULT CMyD3DApplication::FrameMove()
 	D3DXMatrixMultiply( &m_matPosition, &matR, &m_matPosition );
 	D3DXMatrixInverse( &m_matView, NULL, &m_matPosition );
 
+	// Chj test code >>>
+	if (m_bKey['1'] || m_bKey['2']) 
+	{
+		// Rotate the earth along Y-axis, by changing m_matWorld.
+		int sign = m_bKey['1'] ? 1 : -1;
+
+		D3DXMATRIXA16 roty;
+		D3DXMatrixRotationY(&roty, sign * D3DX_PI / 5 * fSecsPerFrame);
+
+		D3DXMatrixMultiply(&m_matWorld, &m_matWorld, &roty);
+	}
+	else if (m_bKey[VK_HOME] || m_bKey[VK_END])
+	{
+		// Rotate the earth along X-axis.
+		int sign = m_bKey[VK_HOME] ? 1 : -1;
+
+		D3DXMATRIXA16 rotx;
+		D3DXMatrixRotationX(&rotx, sign * D3DX_PI /5 * fSecsPerFrame);
+
+		D3DXMatrixMultiply(&m_matWorld, &m_matWorld, &rotx);
+	}
+	else if (m_bKey['0'])
+	{
+		D3DXMatrixIdentity(&m_matWorld);
+	}
+	// Chj test code <<<
+
 	return S_OK;
 }
 
@@ -273,7 +329,9 @@ HRESULT CMyD3DApplication::Render()
 		if(m_pTexture_ConstantTable)
 		{
 			// Initialize the texture constants
-			m_pTexture_ConstantTable->SetMatrix(m_pd3dDevice, "WorldView", &m_matView); 
+			D3DXMATRIXA16 matWorldView;
+			D3DXMatrixMultiply(&matWorldView, &m_matWorld, &m_matView);
+			m_pTexture_ConstantTable->SetMatrix(m_pd3dDevice, "WorldView", &matWorldView);
 			m_pTexture_ConstantTable->SetMatrix(m_pd3dDevice, "Projection", &m_matProj); 
 
 			// Dry up the texture and light blending
@@ -349,11 +407,11 @@ HRESULT CMyD3DApplication::Render()
 			m_pFontSmall->DrawText(  2, 40, D3DCOLOR_ARGB(255,255,255,255),
 									_T("Keyboard controls:") );
 			m_pFontSmall->DrawText( 20, 60, D3DCOLOR_ARGB(255,255,255,255),
-									_T("Move\nTurn\nPitch\nSlide\n")
-									_T("Help\nChange device\nExit") );
+									_T("Far,Near\nTurn\nPitch\nSlide\n")
+									_T("Rotate tiger\n") );
 			m_pFontSmall->DrawText( 210, 60, D3DCOLOR_ARGB(255,255,255,255),
 									_T("W,S\nE,Q\nA,Z\nArrow keys\n")
-									_T("F1\nF2\nEsc") );
+									_T("1,2,Home,End,0\n") );
 		}
 		else
 		{
@@ -469,21 +527,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	m_pFont->InitDeviceObjects( m_pd3dDevice );
 	m_pFontSmall->InitDeviceObjects( m_pd3dDevice );
 
-
-	// Setup the view matrix
-	D3DXVECTOR3 vEye = D3DXVECTOR3( 2.5f, 0.5f, 0.0f ); 
-	D3DXVECTOR3 vAt  = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
-	D3DXVECTOR3 vUp  = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
-	D3DXMatrixLookAtLH( &m_matView, &vEye, &vAt, &vUp );
-
-	// Set the position matrix
-	D3DXMatrixInverse( &m_matPosition, NULL, &m_matView );
-
-
-	// Set up the projection matrix
-	FLOAT fAspectRatio = (FLOAT)m_d3dsdBackBuffer.Width / (FLOAT)m_d3dsdBackBuffer.Height;
-	D3DXMatrixPerspectiveFovLH( &m_matProj, D3DXToRadian(60.0f), fAspectRatio, 0.1f, 100.0f );
-	m_pd3dDevice->SetTransform( D3DTS_PROJECTION, &m_matProj );
+	ChjRestoreSceneInit();
 
 	return S_OK;
 }
