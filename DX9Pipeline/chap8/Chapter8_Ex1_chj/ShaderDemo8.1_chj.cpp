@@ -43,8 +43,8 @@ class CMyD3DApplication : public CD3DApplication
 	TCHAR m_strInitialDir[256];
 	TCHAR m_strMeshFilename[256];
 	LPD3DXMESH           m_pMesh;           // Our mesh object in sysmem	
-	D3DMATERIAL9*        m_pMeshMaterials;  // Materials for our mesh
-	LPDIRECT3DTEXTURE9*  m_pMeshTextures;   // Textures for our mesh
+	D3DMATERIAL9*        m_arMeshMaterials;  // Materials for our mesh
+	LPDIRECT3DTEXTURE9*  m_arMeshTextures;   // Textures for our mesh
 	DWORD                m_dwNumMaterials;  // Number of mesh materials
 
 	// Font for drawing text
@@ -94,24 +94,24 @@ protected:
 
 	void SafeReleaseMesh()
 	{
-		SAFE_RELEASE(m_pBackgroundTexture);
+		SAFE_RELEASE(m_pBackgroundTexture);	// -
 
-		SAFE_RELEASE( m_pMesh );
+		SAFE_RELEASE( m_pMesh );			// -
 
-		if( m_pMeshMaterials != NULL ) 
+		if( m_arMeshMaterials != NULL ) 
 		{
-			delete[] m_pMeshMaterials;
-			m_pMeshMaterials = NULL;
+			delete[] m_arMeshMaterials;
+			m_arMeshMaterials = NULL;		//-
 		}
 
-		if( m_pMeshTextures )
+		if( m_arMeshTextures )
 		{
 			for( DWORD i = 0; i < m_dwNumMaterials; i++ )
 			{
-				SAFE_RELEASE( m_pMeshTextures[i] );
+				SAFE_RELEASE( m_arMeshTextures[i] );
 			}
-			delete[] m_pMeshTextures;
-			m_pMeshTextures = NULL;
+			delete[] m_arMeshTextures;
+			m_arMeshTextures = NULL;			// -
 		}
 	}
 
@@ -152,8 +152,8 @@ CMyD3DApplication::CMyD3DApplication()
 	m_pVBBackground      = NULL;
 
 	m_pMesh          = NULL; // Our mesh object in sysmem	
-	m_pMeshMaterials = NULL; // Materials for our mesh
-	m_pMeshTextures  = NULL; // Textures for our mesh
+	m_arMeshMaterials = NULL; // Materials for our mesh
+	m_arMeshTextures  = NULL; // Textures for our mesh
 	m_dwNumMaterials = 0L;   // Number of mesh materials
 
 	m_strWindowTitle    = _T("Ex8-1 chj VertexShader");
@@ -347,8 +347,8 @@ HRESULT CMyD3DApplication::Render()
 			for( i=0; i < m_dwNumMaterials; i++ )
 			{
 				// Set the material and texture for this subset
-				m_pd3dDevice->SetMaterial( &m_pMeshMaterials[i] );
-				m_pd3dDevice->SetTexture( 0, m_pMeshTextures[i] );
+				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] );
+				m_pd3dDevice->SetTexture( 0, m_arMeshTextures[i] );
 			
 				// Draw the mesh subset
 				m_pMesh->DrawSubset( i );
@@ -383,8 +383,8 @@ HRESULT CMyD3DApplication::Render()
 			for( i=0; i < m_dwNumMaterials; i++ )
 			{
 				// Set the material and texture for this subset
-				m_pd3dDevice->SetMaterial( &m_pMeshMaterials[i] );
-				m_pd3dDevice->SetTexture( 0, m_pMeshTextures[i] );
+				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] );
+				m_pd3dDevice->SetTexture( 0, m_arMeshTextures[i] );
 			
 				// Draw the mesh subset
 				m_pMesh->DrawSubset(i);
@@ -440,73 +440,74 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		return D3DAPPERR_MEDIANOTFOUND;
 
 
-	TCHAR        strMediaPath[512];
-	LPD3DXBUFFER l_pD3DXMtrlBuffer;
-	LPD3DXMESH   l_pTempMesh;
+	TCHAR        strMediaPath[512] = {};
+	LPD3DXBUFFER l_pD3DXMtrlBuffer = NULL;
+	HRESULT hr = 0;
 
    // Find the path to the mesh
-	if( FAILED( DXUtil_FindMediaFileCb( strMediaPath, sizeof(strMediaPath), 
-			TEXT("Tiger.x") ) ) )
+	hr = DXUtil_FindMediaFileCch( strMediaPath, ARRAYSIZE(strMediaPath), 
+		TEXT("Tiger.x") // Tiger.x refers to Tiger.bmp inside.
+		);
+	if( FAILED(hr) )
 		return D3DAPPERR_MEDIANOTFOUND;
 	
-	
 	// Load the mesh from the specified file
-	if( FAILED( D3DXLoadMeshFromX( strMediaPath, D3DXMESH_SYSTEMMEM, 
+	hr = D3DXLoadMeshFromX( strMediaPath, D3DXMESH_SYSTEMMEM, 
 		m_pd3dDevice, NULL, &l_pD3DXMtrlBuffer, NULL, 
-		&m_dwNumMaterials, &m_pMesh ) ) )
-	{
-		SAFE_RELEASE( m_pMesh );
-		SAFE_RELEASE( l_pD3DXMtrlBuffer )
+		&m_dwNumMaterials, &m_pMesh );
+	Cec_Release cec_pD3DXMtrlBuffer = l_pD3DXMtrlBuffer;
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
-	DWORD        dw32BitFlag;
-	dw32BitFlag = (m_pMesh->GetOptions() & D3DXMESH_32BIT);
+	DWORD dw32BitFlag = (m_pMesh->GetOptions() & D3DXMESH_32BIT);
 
 	// We need to extract the material properties and texture names from 
 	// the pD3DXMtrlBuffer
 	D3DXMATERIAL* d3dxMaterials = 
 		(D3DXMATERIAL*)l_pD3DXMtrlBuffer->GetBufferPointer();
-	m_pMeshMaterials = new D3DMATERIAL9[m_dwNumMaterials];
-	m_pMeshTextures  = new LPDIRECT3DTEXTURE9[m_dwNumMaterials];
+	m_arMeshMaterials = new D3DMATERIAL9[m_dwNumMaterials];
+	m_arMeshTextures  = new LPDIRECT3DTEXTURE9[m_dwNumMaterials];
+	memset(m_arMeshMaterials, 0, m_dwNumMaterials*sizeof(D3DMATERIAL9));
+	memset(m_arMeshTextures,  0, m_dwNumMaterials*sizeof(LPDIRECT3DTEXTURE9));
 
 	for( DWORD i=0; i < m_dwNumMaterials; i++ )
 	{
 		sdring<TCHAR> tsTextureFilename = makeTsdring(d3dxMaterials[i].pTextureFilename);
 
 		// Copy the material
-		m_pMeshMaterials[i] = d3dxMaterials[i].MatD3D;
+		m_arMeshMaterials[i] = d3dxMaterials[i].MatD3D;
 
 		// Set the ambient color for the material (D3DX does not do this)
-		m_pMeshMaterials[i].Ambient = m_pMeshMaterials[i].Diffuse;
+		m_arMeshMaterials[i].Ambient = m_arMeshMaterials[i].Diffuse;
 
-		m_pMeshTextures[i] = NULL;
 		if( d3dxMaterials[i].pTextureFilename != NULL && 
 			lstrlen(tsTextureFilename) > 0 )
 		{
 			// Find the path to the texture and create that texture
-			DXUtil_FindMediaFileCb( strMediaPath, sizeof(strMediaPath), 
-				tsTextureFilename );
+			DXUtil_FindMediaFileCch(strMediaPath, ARRAYSIZE(strMediaPath), tsTextureFilename);
 			
 			// Create the texture
 			if( FAILED( D3DXCreateTextureFromFile( m_pd3dDevice, 
-				strMediaPath, &m_pMeshTextures[i] ) ) )
+				strMediaPath, &m_arMeshTextures[i] ) ) )
 			{
-				m_pMeshTextures[i] = NULL;
+				goto ERROR_END;
 			}
 
 		}
 	}
 
-	HRESULT hr;
 	if ( !(m_pMesh->GetFVF() & D3DFVF_NORMAL) )
 	{
+		LPD3DXMESH   l_pTempMesh = NULL;
+
 		hr = m_pMesh->CloneMeshFVF( dw32BitFlag | D3DXMESH_MANAGED, 
 			m_pMesh->GetFVF() | D3DFVF_NORMAL, m_pd3dDevice, 
 			&l_pTempMesh );
-		if (FAILED(hr))
-		{
-			SAFE_RELEASE( l_pTempMesh );
-			l_pTempMesh = NULL;	
+		
+		if (FAILED(hr))	{
+			assert(!l_pTempMesh);
+			goto ERROR_END;
 		}
 
 		D3DXComputeNormals( l_pTempMesh, NULL );
@@ -514,10 +515,6 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		m_pMesh->Release();
 		m_pMesh = l_pTempMesh;
 	}
-
-	// Done with the material buffer
-	l_pD3DXMtrlBuffer->Release();
-	l_pD3DXMtrlBuffer = NULL;
 
 	// used for debugging
 	//D3DVERTEXELEMENT9 meshDeclaration[MAX_FVF_DECL_SIZE];
@@ -530,6 +527,11 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	ChjRestoreSceneInit();
 
 	return S_OK;
+
+ERROR_END:
+
+	SafeReleaseMesh();
+	return hr;
 }
 
 
@@ -539,9 +541,11 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::RestoreDeviceObjects()
 {
-	HRESULT hr;
+	HRESULT hr = 0;
 
 	LPD3DXBUFFER pShader = NULL;
+	Cec_Release cec_Shader;
+
 	// Compile the texturing shader
 	hr = D3DXCompileShaderFromResource(
 		NULL,
@@ -554,24 +558,16 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL, // error messages 
 		&m_pTexture_ConstantTable );
-
-	if(FAILED(hr))
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pTexture_ConstantTable);
-		return hr;
+	cec_Shader = pShader;
+	if(FAILED(hr)) {
+		goto ERROR_END;
 	}
 	
 	// Create the vertex shader
 	hr = m_pd3dDevice->CreateVertexShader( 
 			   (DWORD*)pShader->GetBufferPointer(), &m_pVS_Texture );
-
-	if(FAILED(hr))
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pTexture_ConstantTable);
-		SAFE_RELEASE(m_pVS_Texture);
-		return hr;
+	if(FAILED(hr)) {
+		goto ERROR_END;
 	}
 
 	// Compile the glow shader
@@ -586,32 +582,24 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL, // error messages 
 		&m_pGlow_ConstantTable );
-
-	if(FAILED(hr))
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pGlow_ConstantTable);
-		return hr;
+	cec_Shader = pShader;
+	if(FAILED(hr)) {
+		goto ERROR_END;
 	}
 	
 	// Create the vertex shader
 	hr = m_pd3dDevice->CreateVertexShader( 
 			   (DWORD*)pShader->GetBufferPointer(), &m_pVS_Glow );
-	if(FAILED(hr))
-	{
-		SAFE_RELEASE(pShader);
-		SAFE_RELEASE(m_pGlow_ConstantTable);
-		SAFE_RELEASE(m_pVS_Glow);
-		return hr;
+	if(FAILED(hr)) {
+		goto ERROR_END;
 	}
 
 
    // Build background image vertex buffer
-	if ( FAILED( hr = m_pd3dDevice->CreateVertexBuffer( 6*sizeof(float)*4, 0,
-		D3DFVF_XYZRHW | D3DFVF_TEX1, D3DPOOL_MANAGED, &m_pVBBackground, NULL ) ) )
-	{
-		SAFE_RELEASE(m_pVBBackground);
-		return hr;
+	 hr = m_pd3dDevice->CreateVertexBuffer( 6*sizeof(float)*4, 0,
+		D3DFVF_XYZRHW | D3DFVF_TEX1, D3DPOOL_MANAGED, &m_pVBBackground, NULL );
+	if( FAILED(hr) ) {
+		goto ERROR_END;
 	}
 
 	// Set up a set of points which represents the screen
@@ -625,19 +613,22 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 
 	s_Verts[0].x = (float)m_d3dsdBackBuffer.Width - 0.5f;
 	s_Verts[1].x = (float)m_d3dsdBackBuffer.Width - 0.5f;
-	s_Verts[1].y = (float)m_d3dsdBackBuffer.Height - 0.5f; // s_Verts[1] ?
+	s_Verts[1].y = (float)m_d3dsdBackBuffer.Height - 0.5f; // why s_Verts[1] ?
 	s_Verts[3].y = (float)m_d3dsdBackBuffer.Height - 0.5f; 
  
 	// Copy them into the buffer
-	void *pVerts;
-	if ( FAILED(hr = m_pVBBackground->Lock( 0, sizeof(s_Verts), (void**)&pVerts, 0 )) )
-		return hr;
+	if(1)
+	{
+		void *pVerts = NULL;
+		hr = m_pVBBackground->Lock( 0, sizeof(s_Verts), (void**)&pVerts, 0 );
+		if ( FAILED(hr) )
+			goto ERROR_END;
 
-	memcpy( pVerts, s_Verts, sizeof(s_Verts) );
-	m_pVBBackground->Unlock();
+		memcpy( pVerts, s_Verts, sizeof(s_Verts) );
+		m_pVBBackground->Unlock();
+	}
 
 
-	
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();
 
@@ -651,8 +642,12 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pd3dDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
 	m_pd3dDevice->SetSamplerState( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
 
-
 	return S_OK;
+
+ERROR_END:
+
+	SafeReleaseDevice();
+	return hr;
 }
 
 
