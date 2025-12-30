@@ -609,12 +609,13 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	// Set up a set of points which represents the screen
 	const float fPend = 750.0; // pending to set, casual init-value
 	const float fHalf = 0.5;   // half-pixel/pixel-center tuning const
+	const float fNoUse = 0; // bcz SetRenderState( D3DRS_ZENABLE, FALSE )
 	static struct { float x,y,z,w; float u,v; } s_Verts[] =
 	{
-		{fPend,  -fHalf,   +fHalf, 1.0f,  1, 0}, // at (400, 0)
-		{fPend,   fPend,   +fHalf, 1.0f,  1, 1}, // at (400, 300)
-		{-fHalf, -fHalf,   +fHalf, 1.0f,  0, 0}, // at (0, 0)
-		{-fHalf,  fPend,   +fHalf, 1.0f,  0, 1}, // at (0, 300)
+		{fPend,  -fHalf,   fNoUse, 1.0f,  1, 0}, // at (400, 0)
+		{fPend,   fPend,   fNoUse, 1.0f,  1, 1}, // at (400, 300)
+		{-fHalf, -fHalf,   fNoUse, 1.0f,  0, 0}, // at (0, 0)
+		{-fHalf,  fPend,   fNoUse, 1.0f,  0, 1}, // at (0, 300)
 	};
 
 	s_Verts[0].x = (float)m_d3dsdBackBuffer.Width  - fHalf;
