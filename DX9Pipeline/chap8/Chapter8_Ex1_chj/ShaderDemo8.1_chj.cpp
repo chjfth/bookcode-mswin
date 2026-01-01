@@ -18,6 +18,7 @@
 #include "resource.h"
 
 #include "../BookCommon/chjshare.h"
+#include "../BookCommon/chj_d3d9_dump.h"
 
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
@@ -439,11 +440,12 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 {
 	// Chj: SafeReleaseMesh(); reveals what resources are allocated in InitDeviceObjects().
 
+	dumpSamplerState(m_pd3dDevice);
+
 	// Load the texture for the background image
 	if( FAILED( D3DUtil_CreateTexture( m_pd3dDevice, _T("Lake.bmp"),
 									   &m_pBackgroundTexture )))
 		return D3DAPPERR_MEDIANOTFOUND;
-
 
 	TCHAR        strMediaPath[512] = {};
 	LPD3DXBUFFER l_pD3DXMtrlBuffer = NULL;

@@ -13,3 +13,4 @@
 #include <DirectX\d3d9caps.itc.h>
 #include <DirectX\d3d9types.itc.h>
 
+#include "../BookCommon/chj_d3d9_dump.h"
