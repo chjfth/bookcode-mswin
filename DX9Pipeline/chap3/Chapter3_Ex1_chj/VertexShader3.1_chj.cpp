@@ -319,8 +319,6 @@ HRESULT CMyD3DApplication::FrameMove()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: Render()
 // Desc: Called once per frame, the call is the entry point for 3d
@@ -404,7 +402,6 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL 
 		);
-
 	Cec_Release cec_Shader = pShader; // ensure Release() on function exit
 
 	if( FAILED(hr) )
@@ -529,8 +526,8 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	// Set up post texturing fog render states
 	m_pd3dDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
 	m_pd3dDevice->SetRenderState(D3DRS_FOGCOLOR, D3DCOLOR_RGBA(255, 0, 255, 0));
-	// -- [2025-11-22] Chj: These two can be moved to RestoreDeviceObjects(),
-	//    so that they are called only once. Verified on Win10.22H2.
+	// -- [2025-11-22] Chj: I place these two in RestoreDeviceObjects() instead of
+	//    in Render(), so that they are called only once. Verified on Win10.22H2.
 
 	return S_OK;
 
