@@ -344,6 +344,7 @@ HRESULT CMyD3DApplication::Render()
 			// Set the textured vertex shader
 			m_pd3dDevice->SetVertexShader( m_pVS_Texture );
 
+
 			// Render the tiger with a mesh drawing loop 
 			DWORD i;
 			for( i=0; i < m_dwNumMaterials; i++ )
@@ -386,7 +387,7 @@ HRESULT CMyD3DApplication::Render()
 			{
 				// Set the material and texture for this subset
 				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] );
-				m_pd3dDevice->SetTexture( 0, m_arMeshTextures[i] );
+//				m_pd3dDevice->SetTexture( 0, m_arMeshTextures[i] ); // useless bcz VS_HLSL_Glow does NOT refer to texture
 			
 				// Draw the mesh subset
 				m_pMesh->DrawSubset(i);
@@ -397,7 +398,7 @@ HRESULT CMyD3DApplication::Render()
 
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_DISABLE );
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
-
+			// --[2026-01-01] Chj: Above two lines can be omitted, bcz we've done using texture 0.
 		}					
 
 		// Output statistics
