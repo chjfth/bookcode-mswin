@@ -98,7 +98,7 @@ if not exist "%ProjectDir%\tiger.bmp" (
 )
 if not exist "%ProjectDir%\tiger.x" (
 	call :Echos We need tiger.x alongside .vcxproj for direct F5/Ctrl+F5 local debug/run.
-	call :EchoAndExec copy "%fpData2%" "%ProjectDir%"
+	call :EchoAndExec copy "%fpData3%" "%ProjectDir%"
 )
 
 
