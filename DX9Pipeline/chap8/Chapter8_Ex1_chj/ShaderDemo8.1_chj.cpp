@@ -304,6 +304,7 @@ HRESULT CMyD3DApplication::Render()
 	// Begin the scene
 	if( SUCCEEDED( m_pd3dDevice->BeginScene() ) )
 	{
+#if 1
 		// Draw the background
 		if( m_pBackgroundTexture != NULL )
 		{
@@ -325,8 +326,11 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_DISABLE );
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 		}
+#endif
 
+		DWORD i;
 
+#if 2
 		// Draw the solid tiger and the glow
 
 		if(m_pTexture_ConstantTable)
@@ -347,7 +351,6 @@ HRESULT CMyD3DApplication::Render()
 
 
 			// Render the tiger with a mesh drawing loop 
-			DWORD i;
 			for( i=0; i < m_dwNumMaterials; i++ )
 			{
 				// Set the material and texture for this subset
@@ -362,15 +365,16 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_DISABLE );
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 			// Drawing solid tiger is done
+#endif
 
-
+#if 3
 			// Prepare to draw the glow
 
 			// Enable alpha blend between the frame buffer, and the glow color 
 			m_pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
 
 			// Set up the render states and texture blend states 
-			m_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+			m_pd3dDevice->SetRenderState( D3DRS_SRCBLEND,  D3DBLEND_ONE );
 			m_pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
 
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2 );
@@ -393,7 +397,7 @@ HRESULT CMyD3DApplication::Render()
 				// Draw the mesh subset
 				m_pMesh->DrawSubset(i);
 			}
-
+#endif
 			// Reset the render states on exit 
 			m_pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
 
