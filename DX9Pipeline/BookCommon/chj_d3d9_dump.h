@@ -9,6 +9,9 @@ void dumpRenderState(IDirect3DDevice9 *pd, const TCHAR *fmt_prolog=nullptr, ...)
 
 void dumpSamplerState(IDirect3DDevice9 *pd, int iSampler, const TCHAR *fmt_prolog=nullptr, ...);
 
+void dumpTextureStageState(IDirect3DDevice9 *pd, int iStage, const TCHAR *fmt_prolog, ...);
+
+
 
 /*
 ////////////////////////////////////////////////////////////////////////////
@@ -518,7 +521,96 @@ void dumpSamplerState(IDirect3DDevice9 *pd, int iSampler, const TCHAR *fmt_prolo
 }
 
 
+#define DUMP_TextureStageState_D3DTA(pd, iStage, which) dumpTextureStageState_D3DTA(pd, iStage, which, _T(#which))
 
+void dumpTextureStageState_D3DTA(IDirect3DDevice9 *pd, int iStage, 
+	D3DTEXTURESTAGESTATETYPE which, const TCHAR *whichname)
+{
+	DWORD val = -1;
+	HRESULT herr = pd->GetTextureStageState(iStage, which, &val);
+	if(!herr) {
+		vaDbgTs(_T("%s = %s"), whichname, ITCSvn(val, itc::D3DTA_xxx));
+	} else {
+		vaDbgTs_herr(herr, whichname);
+	}
+}
+
+#define DUMP_TextureStageState_float(pd, iStage, which) dumpTextureStageState_float(pd, iStage, which, _T(#which))
+
+void dumpTextureStageState_float(IDirect3DDevice9 *pd, int iStage, 
+	D3DTEXTURESTAGESTATETYPE which, const TCHAR *whichname)
+{
+	DWORD val = -1;
+	HRESULT herr = pd->GetTextureStageState(iStage, which, &val);
+	if(!herr) {
+		vaDbgTs(_T("%s = %.3f"), whichname, *(float*)&val);
+	} else {
+		vaDbgTs_herr(herr, whichname);
+	}
+}
+
+
+void dumpTextureStageState(IDirect3DDevice9 *pd, int iStage, const TCHAR *fmt_prolog, ...)
+{
+	if(fmt_prolog)
+	{
+		va_list args;
+		va_start(args, fmt_prolog);
+		vlDbgTs(fmt_prolog, args);
+		va_end(args);
+	}
+
+	HRESULT herr = 0;
+	DWORD val = 0;
+
+	herr = pd->GetTextureStageState(iStage, D3DTSS_COLOROP, &val);
+	if(!herr) {
+		vaDbgTs(_T("D3DTSS_COLOROP = %s"), ITCSvn(val, itc::D3DTEXTUREOP));
+	} else {
+		vaDbgTs_herr(herr, _T("D3DTSS_COLOROP"));
+	}
+
+	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_COLORARG1);
+	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_COLORARG2);
+
+	herr = pd->GetTextureStageState(iStage, D3DTSS_ALPHAOP, &val);
+	if(!herr) {
+		vaDbgTs(_T("D3DTSS_ALPHAOP = %s"), ITCSvn(val, itc::D3DTEXTUREOP));
+	} else {
+		vaDbgTs_herr(herr, _T("D3DTSS_ALPHAOP"));
+	}
+
+	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_ALPHAARG1);
+	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_ALPHAARG2);
+
+	// skip D3DTSS_BUMPENVMAT00, D3DTSS_BUMPENVMAT01, D3DTSS_BUMPENVMAT10, D3DTSS_BUMPENVMAT11
+
+	herr = pd->GetTextureStageState(iStage, D3DTSS_TEXCOORDINDEX, &val);
+	if(!herr) {
+		vaDbgTs(_T("D3DTSS_TEXCOORDINDEX = 0x%X"), val);
+		// todo: Need to further interpret into D3DTSS_TCI_xxx
+	} else {
+		vaDbgTs_herr(herr, _T("D3DTSS_TEXCOORDINDEX"));
+	}
+
+	DUMP_TextureStageState_float(pd, iStage, D3DTSS_BUMPENVLSCALE);
+	DUMP_TextureStageState_float(pd, iStage, D3DTSS_BUMPENVLOFFSET);
+
+	herr = pd->GetTextureStageState(iStage, D3DTSS_TEXTURETRANSFORMFLAGS, &val);
+	if(!herr) {
+		vaDbgTs(_T("D3DTSS_TEXTURETRANSFORMFLAGS = %s"), ITCSvn(val, itc::D3DTEXTURETRANSFORMFLAGS));
+	} else {
+		vaDbgTs_herr(herr, _T("D3DTSS_TEXTURETRANSFORMFLAGS "));
+	}
+
+	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_COLORARG0);
+	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_ALPHAARG0);
+
+	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_RESULTARG);
+	
+	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_CONSTANT);
+
+}
 
 
 

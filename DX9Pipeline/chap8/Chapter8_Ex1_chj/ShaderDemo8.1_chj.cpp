@@ -440,8 +440,9 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 {
 	// Chj: SafeReleaseMesh(); reveals what resources are allocated in InitDeviceObjects().
 
-	dumpRenderState(m_pd3dDevice,     _T("In InitDeviceObjects(), dumpRenderState:"));
-	dumpSamplerState(m_pd3dDevice, 0, _T("In InitDeviceObjects(), dumpSamplerState(idx=0):"));
+	dumpRenderState(m_pd3dDevice,          _T("In InitDeviceObjects(), dumpRenderState:"));
+	dumpSamplerState(m_pd3dDevice,      0, _T("In InitDeviceObjects(), dumpSamplerState(iSample=0):"));
+	dumpTextureStageState(m_pd3dDevice, 0, _T("In InitDeviceObjects(), dumpTextureStageState(iStage=0):"));
 
 	// Load the texture for the background image
 	if( FAILED( D3DUtil_CreateTexture( m_pd3dDevice, _T("Lake.bmp"),
