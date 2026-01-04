@@ -330,7 +330,6 @@ HRESULT CMyD3DApplication::Render()
 
 		DWORD i;
 
-#if 2
 		// Draw the solid tiger and the glow
 
 		if(m_pTexture_ConstantTable)
@@ -341,6 +340,7 @@ HRESULT CMyD3DApplication::Render()
 			m_pTexture_ConstantTable->SetMatrix(m_pd3dDevice, "WorldView", &matWorldView);
 			m_pTexture_ConstantTable->SetMatrix(m_pd3dDevice, "Projection", &m_matProj); 
 
+#if 2
 			// Dry up the texture and light blending
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_MODULATE );
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_DIFFUSE );
@@ -380,8 +380,9 @@ HRESULT CMyD3DApplication::Render()
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2 );
 			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
 
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2 );
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+			// Chj: this two lines are useless, bcz we used D3DBLEND_ONE for D3DRS_SRCBLEND and D3DRS_DESTBLEND.
+			//m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2 );
+			//m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
 
 			// Set the glow vertex shader
 			m_pd3dDevice->SetVertexShader( m_pVS_Glow );
