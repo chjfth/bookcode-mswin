@@ -384,6 +384,12 @@ HRESULT CMyD3DApplication::Render()
 			//m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2 );
 			//m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
 
+			// [2026-01-05] Chj: Note a trick here: We should code m_pGlow_ConstantTable->SetMatrix(...) assignment
+			// here, but the author omits it and the glow still works. 
+			// This is bcz m_pTexture_ConstantTable->SetMatrix(...) and m_pGlow_ConstantTable->SetMatrix(...)
+			// would assign to the same set of shader constant registers(c0, c1, c2 etc) and those register values
+			// preserve across switching shader.
+
 			// Set the glow vertex shader
 			m_pd3dDevice->SetVertexShader( m_pVS_Glow );
 
