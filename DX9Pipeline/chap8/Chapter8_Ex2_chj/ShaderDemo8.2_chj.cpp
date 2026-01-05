@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// File: VertexShader8.1_chj.cpp
+// File: VertexShader8.2_chj.cpp
 //
 //-----------------------------------------------------------------------------
 #define STRICT
@@ -29,14 +29,14 @@
 class CMyD3DApplication : public CD3DApplication
 {
 	// texture vertex shader
-	LPDIRECT3DVERTEXSHADER9        m_pVS_Texture;
-	LPD3DXCONSTANTTABLE            m_pTexture_ConstantTable;
-	LPDIRECT3DVERTEXSHADER9        m_pVS_Glow;
-	LPD3DXCONSTANTTABLE            m_pGlow_ConstantTable;
+	LPDIRECT3DVERTEXSHADER9        m_pVS;
+	LPD3DXCONSTANTTABLE            m_pVSConstantTable;
+	LPDIRECT3DPIXELSHADER9         m_pPS;
+	LPD3DXCONSTANTTABLE            m_pPSConstantTable;
 
-	// Scene background
-	LPDIRECT3DTEXTURE9 m_pBackgroundTexture;    
-	LPDIRECT3DVERTEXBUFFER9 m_pVBBackground;
+	// env & noise map
+	LPDIRECT3DCUBETEXTURE9	       m_pEnvironmentMap;    
+	LPDIRECT3DVOLUMETEXTURE9	   m_pNoiseMap;    
 
 	// mesh
 	LPD3DXMESH           m_pMesh;           // Our mesh object in sysmem	
@@ -82,17 +82,17 @@ public:
 protected:
 	void SafeReleaseDevice()
 	{
-		SAFE_RELEASE(m_pVS_Texture);
-		SAFE_RELEASE(m_pTexture_ConstantTable);
-		SAFE_RELEASE(m_pVS_Glow);
-		SAFE_RELEASE(m_pGlow_ConstantTable);
-		SAFE_RELEASE(m_pVBBackground);
+		SAFE_RELEASE(m_pVS);
+		SAFE_RELEASE(m_pVSConstantTable);
+		SAFE_RELEASE(m_pPS);
+		SAFE_RELEASE(m_pPSConstantTable);
+		
+		SAFE_RELEASE(m_pEnvironmentMap);
+		SAFE_RELEASE(m_pNoiseMap);
 	}
 
 	void SafeReleaseMesh()
 	{
-		SAFE_RELEASE(m_pBackgroundTexture);	// -
-
 		SAFE_RELEASE( m_pMesh );			// -
 
 		if( m_arMeshMaterials != NULL ) 
@@ -139,20 +139,20 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 //-----------------------------------------------------------------------------
 CMyD3DApplication::CMyD3DApplication()
 {
-	m_pVS_Texture  = NULL;
-	m_pVS_Glow 	   = NULL;
-	m_pTexture_ConstantTable  = NULL;
-	m_pGlow_ConstantTable	  = NULL;
+	m_pVS	           = NULL;
+	m_pPS	           = NULL;
+	m_pVSConstantTable = NULL;
+	m_pPSConstantTable = NULL;
 
-	m_pBackgroundTexture = NULL;
-	m_pVBBackground      = NULL;
+	m_pEnvironmentMap  = NULL;    
+	m_pNoiseMap        = NULL;    
 
 	m_pMesh          = NULL; // Our mesh object in sysmem	
 	m_arMeshMaterials = NULL; // Materials for our mesh
 	m_arMeshTextures  = NULL; // Textures for our mesh
 	m_dwNumMaterials = 0L;   // Number of mesh materials
 
-	m_strWindowTitle    = _T("Ex8-1 chj VertexShader");
+	m_strWindowTitle    = _T("Ex8-2 chj VertexShader");
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
@@ -192,7 +192,7 @@ void CMyD3DApplication::ChjRestoreSceneInit()
 	//
 	// Setup the view matrix
 	//
-	D3DXVECTOR3 vEye = D3DXVECTOR3( 2.5f, 0.5f, 0.0f ); 
+	D3DXVECTOR3 vEye = D3DXVECTOR3( 15.0f, 0, -10.0f ); 
 	D3DXVECTOR3 vAt  = D3DXVECTOR3( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vUp  = D3DXVECTOR3( 0.0f, 1.0f, 0.0f );
 	D3DXMatrixLookAtLH( &m_matView, &vEye, &vAt, &vUp );
@@ -299,114 +299,39 @@ HRESULT CMyD3DApplication::Render()
 	// Begin the scene
 	if( SUCCEEDED( m_pd3dDevice->BeginScene() ) )
 	{
-#if 1
-		// Draw the background
-		if( m_pBackgroundTexture != NULL )
+		// Initialize the uniform constants
+		m_pVSConstantTable->SetDefaults(m_pd3dDevice); 
+		m_pPSConstantTable->SetDefaults(m_pd3dDevice); 
+
+		// Initialize the shader matrices using application matrices
+		D3DXMATRIXA16 matWorldView;
+		D3DXMatrixMultiply(&matWorldView, &m_matWorld, &m_matView);
+		m_pVSConstantTable->SetMatrix(m_pd3dDevice, "WorldView", &matWorldView);
+		m_pVSConstantTable->SetMatrix(m_pd3dDevice, "Projection", &m_matProj); 
+
+		m_pd3dDevice->SetTexture(0, m_pNoiseMap);
+		m_pd3dDevice->SetTexture(1, m_pEnvironmentMap);
+
+		// Set the shaders
+		m_pd3dDevice->SetVertexShader( m_pVS );
+		m_pd3dDevice->SetPixelShader( m_pPS );
+
+		// Draw the mesh
+		for( DWORD i=0; i < m_dwNumMaterials; i++ )
 		{
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG1 );
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+			// Use mesh material colors to set the 
+			// shader ambient and diffuse material colors
+			m_pVSConstantTable->SetVector(m_pd3dDevice, "k_a", 
+				(D3DXVECTOR4 *)(FLOAT *)D3DXCOLOR(m_arMeshMaterials[i].Ambient));
+			m_pVSConstantTable->SetVector(m_pd3dDevice, "k_d", 
+				(D3DXVECTOR4 *)(FLOAT *)D3DXCOLOR(m_arMeshMaterials[i].Diffuse));
 
-			// Render background image
-			m_pd3dDevice->SetTexture(0, m_pBackgroundTexture);
-			m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE );
-			m_pd3dDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );
-
-			m_pd3dDevice->SetFVF( D3DFVF_XYZRHW | D3DFVF_TEX1);
-			m_pd3dDevice->SetStreamSource( 0, m_pVBBackground, 0, 6*sizeof(float) ); // 6 floats in s_Verts[]
-			m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2 );
-			
-			m_pd3dDevice->SetTexture(0, NULL);
-			m_pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
-
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_DISABLE );
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
+			// Draw the mesh subset
+			m_pMesh->DrawSubset( i );
 		}
-#endif
 
-		DWORD i;
-
-		// Draw the solid tiger and the glow
-
-		if(m_pTexture_ConstantTable)
-		{
-			// Initialize the texture constants
-			D3DXMATRIXA16 matWorldView;
-			D3DXMatrixMultiply(&matWorldView, &m_matWorld, &m_matView);
-			m_pTexture_ConstantTable->SetMatrix(m_pd3dDevice, "WorldView", &matWorldView);
-			m_pTexture_ConstantTable->SetMatrix(m_pd3dDevice, "Projection", &m_matProj); 
-
-#if 2
-			// Dry up the texture and light blending
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_MODULATE );
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_DIFFUSE );
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_TEXTURE );
-
-			// Set the textured vertex shader
-			m_pd3dDevice->SetVertexShader( m_pVS_Texture );
-
-
-			// Render the tiger with a mesh drawing loop 
-			for( i=0; i < m_dwNumMaterials; i++ )
-			{
-				// Set the material and texture for this subset
-				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] );
-				m_pd3dDevice->SetTexture( 0, m_arMeshTextures[i] );
-			
-				// Draw the mesh subset
-				m_pMesh->DrawSubset( i );
-			}
-
-			// Turn off the texture stage
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_DISABLE );
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
-			// Drawing solid tiger is done
-#endif
-
-#if 3
-			// Prepare to draw the glow
-
-			// Enable alpha blend between the frame buffer, and the glow color 
-			m_pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-
-			// Set up the render states and texture blend states 
-			m_pd3dDevice->SetRenderState( D3DRS_SRCBLEND,  D3DBLEND_ONE );
-			m_pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
-
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2 );
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
-
-			// Chj: this two lines are useless, bcz we used D3DBLEND_ONE for D3DRS_SRCBLEND and D3DRS_DESTBLEND.
-			//m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2 );
-			//m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
-
-			// [2026-01-05] Chj: Note a trick here: We should code m_pGlow_ConstantTable->SetMatrix(...) assignment
-			// here, but the author omits it and the glow still works. 
-			// This is bcz m_pTexture_ConstantTable->SetMatrix(...) and m_pGlow_ConstantTable->SetMatrix(...)
-			// would assign to the same set of shader constant registers(c0, c1, c2 etc) and those register values
-			// preserve across switching shader.
-
-			// Set the glow vertex shader
-			m_pd3dDevice->SetVertexShader( m_pVS_Glow );
-
-			// Meshes are divided into subsets, one for each material. Render them in
-			// a loop
-			for( i=0; i < m_dwNumMaterials; i++ )
-			{
-				// Set the material and texture for this subset
-				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] );
-//				m_pd3dDevice->SetTexture( 0, m_arMeshTextures[i] ); // useless bcz VS_HLSL_Glow does NOT refer to texture
-			
-				// Draw the mesh subset
-				m_pMesh->DrawSubset(i);
-			}
-#endif
-			// Reset the render states on exit 
-			m_pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
-
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_DISABLE );
-			m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
-			// --[2026-01-01] Chj: Above two lines can be omitted, bcz we've done using texture 0.
-		}					
+		m_pd3dDevice->SetTexture(0, NULL);
+		m_pd3dDevice->SetTexture(1, NULL);			
 
 		// Output statistics
 		m_pFont->DrawText( 2,  0, D3DCOLOR_ARGB(255,255,255,0), m_strFrameStats );
@@ -418,7 +343,7 @@ HRESULT CMyD3DApplication::Render()
 									_T("Keyboard controls:") );
 			m_pFontSmall->DrawText( 20, 60, D3DCOLOR_ARGB(255,255,255,255),
 									_T("Far,Near\nTurn\nPitch\nSlide\n")
-									_T("Rotate tiger\n") );
+									_T("Rotate spaceship\n") );
 			m_pFontSmall->DrawText( 210, 60, D3DCOLOR_ARGB(255,255,255,255),
 									_T("W,S\nE,Q\nA,Z\nArrow keys\n")
 									_T("1,2,Home,End,0\n") );
@@ -450,10 +375,6 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	dumpSamplerState(m_pd3dDevice,      0, _T("In InitDeviceObjects(), dumpSamplerState(iSample=0):"));
 	dumpTextureStageState(m_pd3dDevice, 0, _T("In InitDeviceObjects(), dumpTextureStageState(iStage=0):"));
 
-	// Load the texture for the background image
-	if( FAILED( D3DUtil_CreateTexture( m_pd3dDevice, _T("Lake.bmp"),
-									   &m_pBackgroundTexture )))
-		return D3DAPPERR_MEDIANOTFOUND;
 
 	TCHAR        strMediaPath[512] = {};
 	LPD3DXBUFFER l_pD3DXMtrlBuffer = NULL;
@@ -461,7 +382,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
    // Find the path to the mesh
 	hr = DXUtil_FindMediaFileCch( strMediaPath, ARRAYSIZE(strMediaPath), 
-		TEXT("Tiger.x") // Tiger.x refers to Tiger.bmp inside.
+		TEXT("bigship1.x")
 		);
 	if( FAILED(hr) )
 		return D3DAPPERR_MEDIANOTFOUND;
@@ -513,9 +434,10 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		}
 	}
 
+	LPD3DXMESH l_pTempMesh = NULL;
+
 	if ( !(m_pMesh->GetFVF() & D3DFVF_NORMAL) )
 	{
-		LPD3DXMESH   l_pTempMesh = NULL;
 
 		hr = m_pMesh->CloneMeshFVF( dw32BitFlag | D3DXMESH_MANAGED, 
 			m_pMesh->GetFVF() | D3DFVF_NORMAL, m_pd3dDevice, 
@@ -530,11 +452,45 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
 		m_pMesh->Release();
 		m_pMesh = l_pTempMesh;
+		l_pTempMesh = NULL;
 	}
+
+	//
+	// Expand the mesh to hold tangent data
+	//
+	
+	D3DVERTEXELEMENT9 decl[] =
+	{
+		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, 
+		{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },  
+		{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+		{ 0, 32, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0 }, 
+		D3DDECL_END()
+	};
+
+	assert(l_pTempMesh==NULL);
+
+	hr = m_pMesh->CloneMesh( dw32BitFlag | D3DXMESH_MANAGED, decl, m_pd3dDevice, 
+		&l_pTempMesh );
+	if (FAILED(hr)) {
+		goto ERROR_END;
+	}
+
+	hr = D3DXComputeTangent( l_pTempMesh, // input mesh 
+		0, // TexStageIndex 
+		0, // TangentIndex 
+		0, // BinormIndex 
+		0, // Wrap 
+		NULL // Adjacency 
+		);
+
+	// Let m_pMesh points to the cloned-mesh, release old one.
+	m_pMesh->Release();
+	m_pMesh = l_pTempMesh;
 
 	// used for debugging
 	//D3DVERTEXELEMENT9 meshDeclaration[MAX_FVF_DECL_SIZE];
-	//m_pMesh->GetDeclaration( meshDeclaration);
+	//m_pMesh->GetDeclaration( meshDeclaration );
 
 
 	m_pFont->InitDeviceObjects( m_pd3dDevice );
@@ -562,19 +518,19 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	LPD3DXBUFFER pShader = NULL;
 	Cec_Release cec_Shader;
 
-	const TCHAR *fxfile = _T("HLSL_Glow.fx");
+	const TCHAR *fxfile = _T("HLSL_MetallicFlakes.fx");
 	DWORD shader_flags = D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
 
-	// Compile the texturing shader
+	// Compile the vertex shader
 	hr = D3DXCompileShaderFromFile_dbg(fxfile,
 		NULL, // a NULL terminated array of D3DXMACROs
 		NULL, // a #include handler
-		"VS_HLSL_Texture",  
+		"VS_Sparkle",  
 		"vs_1_1",
 		shader_flags,
 		&pShader, 
 		NULL, // error messages 
-		&m_pTexture_ConstantTable );
+		&m_pVSConstantTable );
 	cec_Shader = pShader;
 	if(FAILED(hr)) {
 		goto ERROR_END;
@@ -582,69 +538,96 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	
 	// Create the vertex shader
 	hr = m_pd3dDevice->CreateVertexShader( 
-			   (DWORD*)pShader->GetBufferPointer(), &m_pVS_Texture );
+			   (DWORD*)pShader->GetBufferPointer(), &m_pVS );
 	if(FAILED(hr)) {
 		goto ERROR_END;
 	}
 
-	// Compile the glow shader
+	// Compile the pixel shader
 	hr = D3DXCompileShaderFromFile_dbg(fxfile,
 		NULL, // a NULL terminated array of D3DXMACROs
 		NULL, // a #include handler
-		"VS_HLSL_Glow",  
-		"vs_1_1",
+		"PS_Sparkle",  
+		"ps_1_1",
 		shader_flags,
 		&pShader, 
 		NULL, // error messages 
-		&m_pGlow_ConstantTable );
+		&m_pPSConstantTable );
 	cec_Shader = pShader;
 	if(FAILED(hr)) {
 		goto ERROR_END;
 	}
 	
-	// Create the vertex shader
-	hr = m_pd3dDevice->CreateVertexShader( 
-			   (DWORD*)pShader->GetBufferPointer(), &m_pVS_Glow );
+	// Create the pixel shader
+	hr = m_pd3dDevice->CreatePixelShader( 
+			   (DWORD*)pShader->GetBufferPointer(), &m_pPS );
 	if(FAILED(hr)) {
 		goto ERROR_END;
 	}
 
 
-   // Build background image vertex buffer
-	 hr = m_pd3dDevice->CreateVertexBuffer( 6*sizeof(float)*4, 0,
-		D3DFVF_XYZRHW | D3DFVF_TEX1, D3DPOOL_MANAGED, &m_pVBBackground, NULL );
+	//// ==== NEW from Ex8-2 >>>
+
+	// Create the noise map (procedural texture)
+	hr = D3DXCreateVolumeTexture(
+		m_pd3dDevice,
+		32, 32, 32,       // width, height, depth
+		1,                // mip levels
+		0,                // usage
+		D3DFMT_UNKNOWN,   // format
+		D3DPOOL_MANAGED,  // memory pool
+		&m_pNoiseMap);
+	if(FAILED(hr)) {
+		goto ERROR_END;
+	}
+
+	hr = D3DXCompileShaderFromFile_dbg(fxfile,
+		NULL, // a NULL terminated string of D3DXMACROs
+		NULL, // a #include handler
+		"GenerateSparkle",  
+		"tx_1_0", 
+		D3DXSHADER_DEBUG,
+		&pShader, 
+		NULL,    // error messages 
+		NULL );  // constant table pointer
+	cec_Shader = pShader;
+	if(FAILED(hr)) {
+		goto ERROR_END;
+	}
+
+	// Procedurally fill texture
+	hr = D3DXFillVolumeTextureTX(m_pNoiseMap, 
+		(CONST DWORD*)pShader->GetBufferPointer(), NULL, 0);
 	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
 
-	// Set up a set of points which represents the screen
-	const float fPend = 750.0; // pending to set, casual init-value
-	const float fHalf = 0.5;   // half-pixel/pixel-center tuning const
-	const float fNoUse = 0; // bcz SetRenderState( D3DRS_ZENABLE, FALSE )
-	static struct { float x,y,z,w; float u,v; } s_Verts[] =
-	{
-		{fPend,  -fHalf,   fNoUse, 1.0f,  1, 0}, // at (400, 0)
-		{fPend,   fPend,   fNoUse, 1.0f,  1, 1}, // at (400, 300)
-		{-fHalf, -fHalf,   fNoUse, 1.0f,  0, 0}, // at (0, 0)
-		{-fHalf,  fPend,   fNoUse, 1.0f,  0, 1}, // at (0, 300)
-	};
+	// Set the sampler state for the noise map
+	m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	m_pd3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	m_pd3dDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 
-	s_Verts[0].x = (float)m_d3dsdBackBuffer.Width  - fHalf;
-	s_Verts[1].x = (float)m_d3dsdBackBuffer.Width  - fHalf;
-	s_Verts[1].y = (float)m_d3dsdBackBuffer.Height - fHalf;
-	s_Verts[3].y = (float)m_d3dsdBackBuffer.Height - fHalf; 
- 
-	// Copy them into the buffer
-	if(1)
-	{
-		void *pVerts = NULL;
-		hr = m_pVBBackground->Lock( 0, sizeof(s_Verts), (void**)&pVerts, 0 );
-		if ( FAILED(hr) )
-			goto ERROR_END;
-
-		memcpy( pVerts, s_Verts, sizeof(s_Verts) );
-		m_pVBBackground->Unlock();
+	// Create the cubic environment map
+	TCHAR strMediaPath[512] = {};
+	hr = DXUtil_FindMediaFileCch( strMediaPath, ARRAYSIZE(strMediaPath), 
+		TEXT("lobbycube.dds") );
+	if( FAILED(hr) ) {
+		hr = D3DAPPERR_MEDIANOTFOUND;
+		goto ERROR_END;
 	}
+
+	hr = D3DXCreateCubeTextureFromFile( m_pd3dDevice, strMediaPath, 
+		&m_pEnvironmentMap);
+	if( FAILED(hr) ) {
+		goto ERROR_END;
+	}
+
+	// Set up the sampler state for the environment map
+	m_pd3dDevice->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	m_pd3dDevice->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	m_pd3dDevice->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+
+	//// ==== NEW from Ex8-2 <<<
 
 
 	m_pFont->RestoreDeviceObjects();
@@ -653,12 +636,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	// Setup render states
 	m_pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
 	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	m_pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
-
-	// smooth out the texture map transitions at high magnification
-	m_pd3dDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-	m_pd3dDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-	m_pd3dDevice->SetSamplerState( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+	// m_pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE ); // no this in Ex8-2
 
 	return S_OK;
 
@@ -726,6 +704,9 @@ HRESULT CMyD3DApplication::ConfirmDevice( D3DCAPS9* pCaps, DWORD dwBehavior,
 										  D3DFORMAT adapterFormat, D3DFORMAT backBufferFormat )
 {
 	if( dwBehavior & D3DCREATE_PUREDEVICE )
+		return E_FAIL;
+
+	if( pCaps->PixelShaderVersion < D3DPS_VERSION(1,1) ) // Ex8-2
 		return E_FAIL;
 
 	// If device doesn't support vs_1_1 in hardware, switch to 
