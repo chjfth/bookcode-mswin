@@ -344,12 +344,11 @@ HRESULT CMyD3DApplication::Render()
 			// Set the textured vertex shader
 			m_pd3dDevice->SetVertexShader( m_pVS_Texture );
 
-
 			// Render the tiger with a mesh drawing loop 
 			for( i=0; i < m_dwNumMaterials; i++ )
 			{
 				// Set the material and texture for this subset
-				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] );
+				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] ); // useless bcz we use custom shader
 				m_pd3dDevice->SetTexture( 0, m_arMeshTextures[i] );
 			
 				// Draw the mesh subset
@@ -393,7 +392,7 @@ HRESULT CMyD3DApplication::Render()
 			for( i=0; i < m_dwNumMaterials; i++ )
 			{
 				// Set the material and texture for this subset
-				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] );
+				m_pd3dDevice->SetMaterial( &m_arMeshMaterials[i] ); // useless bcz we use custom shader
 //				m_pd3dDevice->SetTexture( 0, m_arMeshTextures[i] ); // useless bcz VS_HLSL_Glow does NOT refer to texture
 			
 				// Draw the mesh subset
@@ -487,7 +486,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	memset(m_arMeshMaterials, 0, m_dwNumMaterials*sizeof(D3DMATERIAL9));
 	memset(m_arMeshTextures,  0, m_dwNumMaterials*sizeof(LPDIRECT3DTEXTURE9));
 
-	for( DWORD i=0; i < m_dwNumMaterials; i++ )
+	for( DWORD i=0; i < m_dwNumMaterials; i++ ) // only 1 Material{...} from tiger.x
 	{
 		sdring<TCHAR> tsTextureFilename = makeTsdring(d3dxMaterials[i].pTextureFilename);
 
@@ -495,6 +494,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		m_arMeshMaterials[i] = d3dxMaterials[i].MatD3D;
 
 		// Set the ambient color for the material (D3DX does not do this)
+		// Chj: I see .Diffuse = { .r=.g.=b=0.694118, .a=1.0 } from tiger.x
 		m_arMeshMaterials[i].Ambient = m_arMeshMaterials[i].Diffuse;
 
 		if( d3dxMaterials[i].pTextureFilename != NULL && 
@@ -650,10 +650,10 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	m_pFont->RestoreDeviceObjects();
 	m_pFontSmall->RestoreDeviceObjects();
 
-	// Setup render states
-	m_pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
-	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	m_pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
+	// Setup render states (Chj: NOT required for this demo)
+//	m_pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
+//	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+//	m_pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
 
 	// smooth out the texture map transitions at high magnification
 	m_pd3dDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
