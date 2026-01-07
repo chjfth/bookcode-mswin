@@ -34,9 +34,9 @@ REM (1) AGILE_COPY_PATTERNS
 REM
 
 call :GetAbsPath  fpData1  "%ProjectDir%\..\..\BookCommon\Media\bigship1.x"
-call :GetAbsPath  fpData1  "%ProjectDir%\..\..\BookCommon\Media\lobbycube.dds"
+call :GetAbsPath  fpData2  "%ProjectDir%\..\..\BookCommon\Media\lobbycube.dds"
 
-set AGILE_COPY_PATTERNS="%fpData1%" "%ProjectDir%\HLSL_MetallicFlakes.fx"
+set AGILE_COPY_PATTERNS="%fpData1%" "%fpData2%" "%ProjectDir%\HLSL_MetallicFlakes.fx"
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
 REM 
 REM		This sets what files (concrete filenames, separated by spaces) or 
@@ -94,7 +94,7 @@ if not exist "%ProjectDir%\bigship1.x" (
 )
 if not exist "%ProjectDir%\lobbycube.dds" (
 	call :Echos We need lobbycube.dds alongside .vcxproj for direct F5/Ctrl+F5 local debug/run.
-	call :EchoAndExec copy "%fpData1%" "%ProjectDir%"
+	call :EchoAndExec copy "%fpData2%" "%ProjectDir%"
 )
 
 

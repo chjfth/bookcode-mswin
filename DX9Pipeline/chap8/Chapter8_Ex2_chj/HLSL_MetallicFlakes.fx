@@ -58,18 +58,18 @@ VS_OUTPUT VS_Sparkle(
 
 	L = -L;
 
-	float3 P = mul(float4(Position, 1), (float4x3)WorldView);   // position (view space)
-	float3 N = normalize(mul(Normal, (float3x3)WorldView));     // normal (view space)
-	float3 T = normalize(mul(Tangent, (float3x3)WorldView));    // tangent (view space)
-	float3 B = cross(N, T);                                     // binormal (view space)
-	float3 R = normalize(2 * dot(N, L) * N - L);                // reflection vector (view space)
-	float3 V = -normalize(P);                                   // view direction (view space)
-	float3 G = normalize(2 * dot(N, V) * N - V);                // glance vector (view space)
-	float3 H = normalize(L + V);                                // half vector (view space)
-	float  f = 0.5 - dot(V, N); f = 1 - 4 * f * f;              // fresnel term
+	float3 P = mul(float4(Position, 1), (float4x3)WorldView); // position (view space)
+	float3 N = normalize(mul(Normal, (float3x3)WorldView));   // normal (view space)
+	float3 T = normalize(mul(Tangent, (float3x3)WorldView));  // tangent (view space)
+	float3 B = cross(N, T);                          // binormal (view space)
+	float3 R = normalize(2 * dot(N, L) * N - L);     // reflection vector (view space)
+	float3 V = -normalize(P);                        // view direction (view space)
+	float3 G = normalize(2 * dot(N, V) * N - V);     // glance vector (view space)
+	float3 H = normalize(L + V);                     // half vector (view space)
+	float  f = 0.5 - dot(V, N); f = 1 - 4 * f * f;   // fresnel term
 
 	// Position (projected)
-	Out.Position = mul(float4(P, 1), Projection);             
+	Out.Position = mul(float4(P, 1), Projection);
 
 	// Diffuse + ambient (metal)
 	//Out.Diffuse = I_a * k_a + I_d * k_d * max(0, dot(N, L)); 
