@@ -276,7 +276,7 @@ HRESULT CMyD3DApplication::FrameMove()
 	}
 	else if (m_bKey['0'])
 	{
-		D3DXMatrixIdentity(&m_matWorld);
+		ChjRestoreSceneInit();
 	}
 	// Chj test code <<<
 
