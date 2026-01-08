@@ -8,7 +8,7 @@
 // The metallic surface consists of 2 layers.
 // 1. a polished layer of wax on top (contributes a smooth specular reflection and 
 //    an environment mapped reflection with a Fresnel term), and 
-// 2. a blue metallic layer with a sprinkling of gold metallic flakes underneath
+// 2. a bronze metallic layer with a sprinkling of gold metallic flakes underneath
 
 // Sparkle parameters
 #define SPRINKLE    0.3
@@ -21,7 +21,7 @@ float4x3 WorldView  : WORLDVIEW;
 float4x4 Projection : PROJECTION;
 
 // Light direction (view space)
-float3 L < string UIDirectional = "Light Direction"; > = 
+float3 L <string UIDirectional="Light Direction";> = 
 //	normalize(float3(-0.397f, -0.397f, 0.827f));
 	normalize(float3(1, 0, 1));
 
@@ -31,8 +31,8 @@ float4 I_d = { 1.0f, 1.0f, 1.0f, 1.0f };    // diffuse
 float4 I_s = { 0.7f, 0.7f, 0.7f, 1.0f };    // specular
 
 // Material reflectivity
-float4 k_a : MATERIALAMBIENT = { 0.2f, 0.2f, 0.2f, 1.0f };  // ambient  (metal)
-float4 k_d : MATERIALDIFFUSE = { 0.1f, 0.1f, 0.9f, 1.0f };  // diffuse  (metal)
+float4 k_a : MATERIAL_AMBIENT = { 0.2f, 0.2f, 0.2f, 1.0f };  // ambient  (metal, grey)
+float4 k_d : MATERIAL_DIFFUSE = { 0.7f, 0.7f, 0.1f, 1.0f };  // diffuse  (metal, bronze)
 float4 k_s = { 0.4f, 0.3f, 0.1f, 1.0f };    // specular (metal)
 float4 k_r = { 0.7f, 0.7f, 0.7f, 1.0f };    // specular (wax)
 
@@ -66,7 +66,10 @@ VS_OUTPUT VS_Sparkle(
 	float3 V = -normalize(P);                        // view direction (view space)
 	float3 G = normalize(2 * dot(N, V) * N - V);     // glance vector (view space)
 	float3 H = normalize(L + V);                     // half vector (view space)
-	float  f = 0.5 - dot(V, N); f = 1 - 4 * f * f;   // fresnel term
+	
+	float f;
+	f = 0.5 - dot(V, N); 
+	f = 1 - 4 * f * f;   // fresnel term
 
 	// Position (projected)
 	Out.Position = mul(float4(P, 1), Projection);

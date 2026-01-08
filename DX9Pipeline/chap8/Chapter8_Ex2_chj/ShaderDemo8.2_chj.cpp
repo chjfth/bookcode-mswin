@@ -317,12 +317,14 @@ HRESULT CMyD3DApplication::Render()
 		m_pd3dDevice->SetPixelShader( m_pPS );
 
 		// Draw the mesh
-		for( DWORD i=0; i < m_dwNumMaterials; i++ )
+		for( DWORD i=0; i < m_dwNumMaterials; i++ ) // We see 5 materials from bigship1.x
 		{
 			// Use mesh material colors to set the 
 			// shader ambient and diffuse material colors
+			
 			m_pVSConstantTable->SetVector(m_pd3dDevice, "k_a", 
 				(D3DXVECTOR4 *)(FLOAT *)D3DXCOLOR(m_arMeshMaterials[i].Ambient));
+
 			m_pVSConstantTable->SetVector(m_pd3dDevice, "k_d", 
 				(D3DXVECTOR4 *)(FLOAT *)D3DXCOLOR(m_arMeshMaterials[i].Diffuse));
 
@@ -553,7 +555,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL, // error messages 
 		&m_pPSConstantTable );
-	cec_Shader = pShader;
+	cec_Shader = pShader; // would Release() old shader-code
 	if(FAILED(hr)) {
 		goto ERROR_END;
 	}
@@ -590,12 +592,13 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 		&pShader, 
 		NULL,    // error messages 
 		NULL );  // constant table pointer
-	cec_Shader = pShader;
+	cec_Shader = pShader; // would Release() old shader-code
 	if(FAILED(hr)) {
 		goto ERROR_END;
 	}
 
 	// Procedurally fill texture
+	// Chj memo: Run GenerateSparkle() code to fill texture into m_pNoiseMap.
 	hr = D3DXFillVolumeTextureTX(m_pNoiseMap, 
 		(CONST DWORD*)pShader->GetBufferPointer(), NULL, 0);
 	if( FAILED(hr) ) {
