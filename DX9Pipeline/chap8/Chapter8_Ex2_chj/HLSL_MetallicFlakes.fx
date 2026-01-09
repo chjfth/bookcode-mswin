@@ -22,8 +22,7 @@ float4x4 Projection : PROJECTION;
 
 // Light direction (view space)
 float3 L <string UIDirectional="Light Direction";> = 
-//	normalize(float3(-0.397f, -0.397f, 0.827f));
-	normalize(float3(1, 0, 1));
+	normalize(float3(1, 0, 1));  // chj: light-to direction (view space)
 
 // Light intensity
 float4 I_a = { 0.3f, 0.3f, 0.3f, 1.0f };    // ambient
@@ -31,8 +30,8 @@ float4 I_d = { 1.0f, 1.0f, 1.0f, 1.0f };    // diffuse
 float4 I_s = { 0.7f, 0.7f, 0.7f, 1.0f };    // specular
 
 // Material reflectivity
-float4 k_a : MATERIAL_AMBIENT = { 0.2f, 0.2f, 0.2f, 1.0f };  // ambient  (metal, grey)
-float4 k_d : MATERIAL_DIFFUSE = { 0.7f, 0.7f, 0.1f, 1.0f };  // diffuse  (metal, bronze)
+float4 k_a : MATERIAL_AMBIENT = { 0.2f, 0.2f, 0.2f, 1.0f };  // ambient (metal, grey)
+float4 k_d : MATERIAL_DIFFUSE = { 0.7f, 0.7f, 0.1f, 1.0f };  // diffuse (metal, bronze)
 float4 k_s = { 0.4f, 0.3f, 0.1f, 1.0f };    // specular (metal)
 float4 k_r = { 0.7f, 0.7f, 0.7f, 1.0f };    // specular (wax)
 
@@ -67,10 +66,6 @@ VS_OUTPUT VS_Sparkle(
 	float3 G = normalize(2 * dot(N, V) * N - V);     // glance vector (view space)
 	float3 H = normalize(L + V);                     // half vector (view space)
 	
-	float f;
-	f = 0.5 - dot(V, N); 
-	f = 1 - 4 * f * f;   // fresnel term
-
 	// Position (projected)
 	Out.Position = mul(float4(P, 1), Projection);
 
@@ -79,7 +74,7 @@ VS_OUTPUT VS_Sparkle(
 	Out.Diffuse = I_a * k_a + I_d * k_d * max(0, dot(N, L)); 
 
 	// Specular (wax)
-	Out.Specular  = saturate(dot(H, N));
+	Out.Specular  = saturate(dot(H, N)); // clamp `dot(H, N)` to [0, 1]
 	Out.Specular *= Out.Specular;
 	Out.Specular *= Out.Specular;
 	Out.Specular *= Out.Specular;
@@ -88,6 +83,9 @@ VS_OUTPUT VS_Sparkle(
 	Out.Specular *= k_r;
 
 	 // Glossiness (wax)
+	float f;
+	f = 0.5 - dot(V, N); 
+	f = 1 - 4 * f * f;   // fresnel term
 	Out.Glossiness = f * k_r;
 
 	// Transform half vector into vertex space
