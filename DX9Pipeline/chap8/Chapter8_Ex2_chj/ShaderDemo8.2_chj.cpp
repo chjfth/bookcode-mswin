@@ -438,6 +438,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
 	LPD3DXMESH l_pTempMesh = NULL;
 
+#if 11
 	if ( !(m_pMesh->GetFVF() & D3DFVF_NORMAL) )
 	{
 
@@ -456,6 +457,10 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		m_pMesh = l_pTempMesh;
 		l_pTempMesh = NULL;
 	}
+#endif
+
+
+#if 12
 
 	//
 	// Expand the mesh to hold tangent data
@@ -466,7 +471,10 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }, 
 		{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },  
 		{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+		
 		{ 0, 32, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0 }, 
+		// -- Tangent is new in Ex8-2.
+
 		D3DDECL_END()
 	};
 
@@ -489,6 +497,8 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	// Let m_pMesh points to the cloned-mesh, release old one.
 	m_pMesh->Release();
 	m_pMesh = l_pTempMesh;
+
+#endif
 
 	// used for debugging
 	//D3DVERTEXELEMENT9 meshDeclaration[MAX_FVF_DECL_SIZE];
