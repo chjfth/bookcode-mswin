@@ -4,6 +4,40 @@
 
 #include <d3d9.h>
 
+#include <stdarg.h>
+#include <fsapi.h>
+#include <mmlogfile.h>
+
+#include "chjshare.h"
+
+
+class IDbgDump
+{
+public:
+	virtual void vaDbg(const TCHAR *fmt, ...) = 0;
+};
+
+class FileDbgDump : public IDbgDump
+{
+public:
+	FileDbgDump(const TCHAR *logfile, bool isAppend=true, int bufmax=8192) :
+		m_mmlogfile(logfile, isAppend, bufmax)
+	{}
+
+	virtual void vaDbg(const TCHAR *fmt, ...)
+	{
+		va_list args;
+		va_start(args, fmt);
+		m_mmlogfile.mmlog(_T("%w"), MM_WPAIR_PARAM(fmt, args));
+		va_end(args);
+	}
+
+private:
+	CMmLogfile m_mmlogfile;
+};
+
+
+/////////////////
 
 void dumpRenderState(IDirect3DDevice9 *pd, const TCHAR *fmt_prolog=nullptr, ...);
 
@@ -11,6 +45,9 @@ void dumpSamplerState(IDirect3DDevice9 *pd, int iSampler, const TCHAR *fmt_prolo
 
 void dumpTextureStageState(IDirect3DDevice9 *pd, int iStage, const TCHAR *fmt_prolog, ...);
 
+// Ex8-2
+void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh);
+void dumpMeshVertex_Ex8_2_tangent(IDbgDump *dump, ID3DXMesh *pMesh);
 
 
 /*
@@ -610,6 +647,86 @@ void dumpTextureStageState(IDirect3DDevice9 *pd, int iStage, const TCHAR *fmt_pr
 	
 	DUMP_TextureStageState_D3DTA(pd, iStage, D3DTSS_CONSTANT);
 
+}
+
+
+// For Ex8-2
+
+struct VertexFVF_0x112
+{
+	float x, y, z;     // D3DFVF_XYZ
+	float nx, ny, nz;  // D3DFVF_NORMAL
+	float u, v;        // D3DFVF_TEX1 (TEXCOORD0)
+};
+
+void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh)
+{
+	int nVertex = pMesh->GetNumVertices();
+	int nStride = pMesh->GetNumBytesPerVertex();
+
+	dump->vaDbg(_T("Vertex count: %d"), nVertex);
+
+	IDirect3DVertexBuffer9 *pVB = NULL;
+	pMesh->GetVertexBuffer(&pVB);
+	Cec_Release cec_vb = pVB;
+
+	VertexFVF_0x112 *varray = nullptr;
+	pVB->Lock(0, 0, (void**)&varray, D3DLOCK_READONLY);
+
+	for(int i=0; i<nVertex; i++)
+	{
+		VertexFVF_0x112 &vt = varray[i];
+		dump->vaDbg(
+			_T("[v#%d] Pos:(% .-3f,% .-3f,% .-3f) Normal:(% .-3f,% .-3f,% .-3f) Texture@(% .-3f,% .-3f)")
+			, 
+			i,
+			vt.x, vt.y, vt.z,
+			vt.nx, vt.ny, vt.nz,
+			vt.u, vt.v
+			);
+	}
+
+	pVB->Unlock();
+}
+
+
+struct Vertex_Ex8_2_tangent
+{
+	float x, y, z;     // D3DFVF_XYZ
+	float nx, ny, nz;  // D3DFVF_NORMAL
+	float u, v;        // D3DFVF_TEX1 (TEXCOORD0)
+	float tx, ty, tz;  // tangent
+};
+
+void dumpMeshVertex_Ex8_2_tangent(IDbgDump *dump, ID3DXMesh *pMesh)
+{
+	int nVertex = pMesh->GetNumVertices();
+	int nStride = pMesh->GetNumBytesPerVertex();
+
+	dump->vaDbg(_T("Vertex count: %d"), nVertex);
+
+	IDirect3DVertexBuffer9 *pVB = NULL;
+	pMesh->GetVertexBuffer(&pVB);
+	Cec_Release cec_vb = pVB;
+
+	Vertex_Ex8_2_tangent *varray = nullptr;
+	pVB->Lock(0, 0, (void**)&varray, D3DLOCK_READONLY);
+
+	for(int i=0; i<nVertex; i++)
+	{
+		Vertex_Ex8_2_tangent &vt = varray[i];
+		dump->vaDbg(
+			_T("[v#%d] Pos:(% .-3f,% .-3f,% .-3f) Normal:(% .-3f,% .-3f,% .-3f) Texture@(% .-3f,% .-3f) Tangent:(% .-3f,% .-3f,% .-3f)")
+			, 
+			i,
+			vt.x, vt.y, vt.z,
+			vt.nx, vt.ny, vt.nz,
+			vt.u, vt.v,
+			vt.tx, vt.ty, vt.tz
+			);
+	}
+
+	pVB->Unlock();
 }
 
 

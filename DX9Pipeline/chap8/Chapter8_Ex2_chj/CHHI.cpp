@@ -13,4 +13,8 @@
 #include <DirectX\d3d9caps.itc.h>
 #include <DirectX\d3d9types.itc.h>
 
+#include <fsapi.h>
+#include <mmlogfile.h>
+#include <utf8wchar.h>
+
 #include "../BookCommon/chj_d3d9_dump.h"

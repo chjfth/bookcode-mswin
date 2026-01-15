@@ -17,8 +17,18 @@
 #include "D3DUtil.h"
 #include "resource.h"
 
+//#include <fsapi.h>
+//#include <mmlogfile.h>
+//#include <utf8wchar.h>
+
 #include "../BookCommon/chjshare.h"
 #include "../BookCommon/chj_d3d9_dump.h"
+
+
+
+
+FileDbgDump gfdump(_T("DXP9-Ex8-2.log"), false, 8192);
+
 
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
@@ -116,6 +126,12 @@ protected:
 };
 
 
+static void ChjInit()
+{
+//	gfdump.vaDbg(_T("Chj test %d"), 11);
+//	gfdump.vaDbg(_T("Chj test %d"), 22);
+}
+
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: Entry point to the program. Initializes everything, and goes into a
@@ -123,6 +139,8 @@ protected:
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 {
+	ChjInit();
+
 	CMyD3DApplication d3dApp;
 
 	InitCommonControls();
@@ -437,13 +455,16 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	}
 
 	LPD3DXMESH l_pTempMesh = NULL;
+	DWORD fvf = 0;
 
 #if 11
-	if ( !(m_pMesh->GetFVF() & D3DFVF_NORMAL) )
+	fvf = m_pMesh->GetFVF();
+	if ( !(fvf & D3DFVF_NORMAL) )
 	{
 
 		hr = m_pMesh->CloneMeshFVF( dw32BitFlag | D3DXMESH_MANAGED, 
-			m_pMesh->GetFVF() | D3DFVF_NORMAL, m_pd3dDevice, 
+			fvf | D3DFVF_NORMAL, 
+			m_pd3dDevice, 
 			&l_pTempMesh );
 		
 		if (FAILED(hr))	{
@@ -457,14 +478,27 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		m_pMesh = l_pTempMesh;
 		l_pTempMesh = NULL;
 	}
+
+	// Chj debug code >>>
+
+	fvf = m_pMesh->GetFVF();
+	assert(fvf == (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1)); // 0x112, bigship1.x should have these
+
+	gfdump.vaDbg(_T("In CMyD3DApplication::InitDeviceObjects(), Dump Mesh with Normal elements."));
+	dumpMeshVertex_with_Format_0x112(&gfdump, m_pMesh);
+
+	// Chj debug code <<<
 #endif
 
 
 #if 12
-
 	//
 	// Expand the mesh to hold tangent data
 	//
+
+	// [2026-01-15] Chj memo: Bcz Tangent element is not supported in FVF (Flexible Vertex Format),
+	// so in order to add Tangent data, we need to declare a new set of vertex format, and
+	// call CloneMesh().  CloneMeshFVF() does NOT help here.
 	
 	D3DVERTEXELEMENT9 decl[] =
 	{
@@ -498,12 +532,16 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	m_pMesh->Release();
 	m_pMesh = l_pTempMesh;
 
+	// Chj debug code >>>
+	gfdump.vaDbg(_T("In CMyD3DApplication::InitDeviceObjects(), Dump Mesh with Tangent elements."));
+	dumpMeshVertex_Ex8_2_tangent(&gfdump, m_pMesh);
+	// Chj debug code <<<
+
 #endif
 
 	// used for debugging
 	//D3DVERTEXELEMENT9 meshDeclaration[MAX_FVF_DECL_SIZE];
 	//m_pMesh->GetDeclaration( meshDeclaration );
-
 
 	m_pFont->InitDeviceObjects( m_pd3dDevice );
 	m_pFontSmall->InitDeviceObjects( m_pd3dDevice );

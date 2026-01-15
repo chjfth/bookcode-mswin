@@ -35,7 +35,7 @@ inline int my_mm_vsnprintf(TCHAR *buf, size_t bufchars, const TCHAR *fmt, va_lis
 }
 
 
-void mm_DebugProgress(void *ctx_user, const TCHAR *psz_dbginfo)
+inline void mm_DebugProgress(void *ctx_user, const TCHAR *psz_dbginfo)
 {
 	static int si = 0;
 	if(si==0)
@@ -53,7 +53,7 @@ void mm_DebugProgress(void *ctx_user, const TCHAR *psz_dbginfo)
 	_tprintf(_T("%s"), psz_dbginfo);
 }
 
-HRESULT D3DXCompileShaderFromFile_dbg(
+inline HRESULT D3DXCompileShaderFromFile_dbg(
 	const TCHAR*                    pSrcFile,
 	CONST D3DXMACRO*                pDefines,
 	LPD3DXINCLUDE                   pInclude,
