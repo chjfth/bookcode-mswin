@@ -472,6 +472,8 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 			goto ERROR_END;
 		}
 
+		gfdump.vaDbg(_T("In CMyD3DApplication::InitDeviceObjects(), call D3DXComputeNormals()."));
+
 		D3DXComputeNormals( l_pTempMesh, NULL );
 
 		m_pMesh->Release();

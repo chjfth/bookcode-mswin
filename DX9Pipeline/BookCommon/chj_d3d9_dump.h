@@ -687,6 +687,9 @@ void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh)
 	}
 
 	pVB->Unlock();
+
+	D3DVERTEXBUFFER_DESC desc = {};
+	pVB->GetDesc(&desc);
 }
 
 
