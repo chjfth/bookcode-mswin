@@ -676,6 +676,7 @@ void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh)
 	for(int i=0; i<nVertex; i++)
 	{
 		VertexFVF_0x112 &vt = varray[i];
+#if 1
 		dump->vaDbg(
 			_T("[v#%d] Pos:(% .-3f,% .-3f,% .-3f) Normal:(% .-3f,% .-3f,% .-3f) Texture@(% .-3f,% .-3f)")
 			, 
@@ -684,6 +685,11 @@ void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh)
 			vt.nx, vt.ny, vt.nz,
 			vt.u, vt.v
 			);
+#else
+		// This outputs pure coords for Ex8-2-NormalTangent.py's use.
+		dump->vaDbg(_T("\t(% .-6f,% .-6f,% .-6f), #%d"), 
+			vt.x, vt.y, vt.z , i);
+#endif
 	}
 
 	pVB->Unlock();
