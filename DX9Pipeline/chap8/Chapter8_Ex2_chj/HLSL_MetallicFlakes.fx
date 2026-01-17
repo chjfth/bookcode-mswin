@@ -90,9 +90,9 @@ VS_OUTPUT VS_Sparkle(
 	f = 1 - 4 * f * f;   // fresnel term
 	Out.Glossiness = f * k_r;
 
-	// Transform half vector into vertex space
+	// Transform half vector into tangent-space
 	Out.HalfVector = float3(dot(H, N), dot(H, B), dot(H, T));
-	Out.HalfVector = (1 + Out.HalfVector) / 2;  // bias
+	Out.HalfVector = (1 + Out.HalfVector) / 2;  // bias, clamp from [-1, 1] to [0, 1]
 
 	// Environment cube map coordinates
 	Out.Reflection = float3(-G.x, G.y, -G.z);
@@ -113,7 +113,7 @@ float4 GenerateSparkle(float3 Pos : POSITION) : COLOR
 {
 	float4 Noise = (float4)0;
 
-	// Scatter the normal (in vertex space) based on SCATTER
+	// Scatter the normal (in tangent-space) based on SCATTER
 	Noise.rgb = float3(1 - SCATTER * abs(noise(Pos * 500)), 
 					   SCATTER * noise((Pos + 1) * 500), 
 					   SCATTER * noise((Pos + 2) * 500));
