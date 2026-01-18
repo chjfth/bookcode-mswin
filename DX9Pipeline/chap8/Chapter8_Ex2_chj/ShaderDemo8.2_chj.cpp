@@ -455,12 +455,17 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	}
 
 	LPD3DXMESH l_pTempMesh = NULL;
-	DWORD fvf = 0;
+	bool force_recalculate_Normals = false; // fiddle-debug-purpose
+	
+	DWORD fvf = m_pMesh->GetFVF();
 
 #if 11
-	fvf = m_pMesh->GetFVF();
+	
 	if ( !(fvf & D3DFVF_NORMAL) )
 	{
+		// Chj memo: The default bigship1.x has MeshNormals{...} data block, 
+		// so this if-block will not be executed.
+		// You can delete MeshNormals{...} from bigship1.x to activate this if-block.
 
 		hr = m_pMesh->CloneMeshFVF( dw32BitFlag | D3DXMESH_MANAGED, 
 			fvf | D3DFVF_NORMAL, 
@@ -480,6 +485,16 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		m_pMesh = l_pTempMesh;
 		l_pTempMesh = NULL;
 	}
+	else if(force_recalculate_Normals)
+	{
+		// Overwrite MeshNormals{...} data from bigship1.x, but re-calculate Vertex-Normals
+		// for each vertex, via triangle faces from bigship1.x .
+
+		gfdump.vaDbg(_T("In CMyD3DApplication::InitDeviceObjects(), force call D3DXComputeNormals()."));
+
+		D3DXComputeNormals(m_pMesh, NULL);
+	}
+
 
 	// Chj debug code >>>
 
