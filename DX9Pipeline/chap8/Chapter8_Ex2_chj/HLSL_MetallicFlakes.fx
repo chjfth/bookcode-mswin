@@ -106,8 +106,6 @@ VS_OUTPUT VS_Sparkle(
 
 /////////// Procedural Texture /////////////////////
 
-sampler SparkleNoise : register(s0);
-
 // Function used to fill the volume noise texture
 float4 GenerateSparkle(float3 Pos : POSITION) : COLOR
 {
@@ -135,7 +133,9 @@ float4 GenerateSparkle(float3 Pos : POSITION) : COLOR
 
 /////////// PS ////////////
 
-sampler Environment : register(s1);
+sampler SparkleNoise : register(s0);  // ass: m_pd3dDevice->SetTexture(0, m_pNoiseMap);
+
+sampler Environment : register(s1);   // ass: m_pd3dDevice->SetTexture(1, m_pEnvironmentMap);
 
 
 // Pixel shader
@@ -159,7 +159,10 @@ float4 PS_Sparkle(VS_OUTPUT In) : COLOR
 	Gloss = texCUBE(Environment, In.Reflection) * saturate(In.Glossiness);
 
 	// Specular sparkle of flakes
-	Sparkle  = saturate(dot((saturate(In.HalfVector) - 0.5) * 2, (Noise.rgb - 0.5) * 2));
+	Sparkle  = saturate(dot(
+		(saturate(In.HalfVector) - 0.5) * 2, 
+		(Noise.rgb - 0.5) * 2)
+		);
 	Sparkle *= Sparkle;
 	Sparkle *= Sparkle;
 	Sparkle *= Sparkle;

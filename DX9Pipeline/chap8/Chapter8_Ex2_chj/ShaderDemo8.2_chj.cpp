@@ -636,9 +636,10 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	//// ==== NEW from Ex8-2 >>>
 
 	// Create the noise map (procedural texture)
+	const int noisepx = 32;
 	hr = D3DXCreateVolumeTexture(
 		m_pd3dDevice,
-		32, 32, 32,       // width, height, depth
+		noisepx, noisepx, noisepx,       // width, height, depth
 		1,                // mip levels
 		0,                // usage
 		D3DFMT_UNKNOWN,   // format
