@@ -124,9 +124,6 @@ float4 GenerateSparkle(float3 Pos : POSITION) : COLOR
 	// Bias the normal
 	Noise.rgb = (Noise.rgb + 1)/2;
 
-	// Diffuse noise
-	Noise.w = abs(noise(Pos * 500)) * 0.0 + 1.0;
-
 	return Noise;
 }
 
@@ -142,13 +139,11 @@ sampler Environment : register(s1);   // ass: m_pd3dDevice->SetTexture(1, m_pEnv
 float4 PS_Sparkle(VS_OUTPUT In) : COLOR
 {   
 	float4 Color = (float4)0;
-	float3 Diffuse, Specular, Gloss, Sparkle;
+	float3 Diffuse = In.Diffuse;     // Chj: even 0, the bigship still has some color
+	float3 Specular, Gloss, Sparkle;
 
 	// Volume noise
 	float4 Noise = tex3D(SparkleNoise, In.NoiseCoord);
-	
-	// Noisy diffuse of metal
-	Diffuse = In.Diffuse * Noise.a;
 	
 	// Glossy specular of wax
 	Specular  = In.Specular;
