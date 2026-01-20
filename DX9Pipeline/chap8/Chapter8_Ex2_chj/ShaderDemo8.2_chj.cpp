@@ -636,7 +636,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	//// ==== NEW from Ex8-2 >>>
 
 	// Create the noise map (procedural texture)
-	const int noisepx = 32;
+	const int noisepx = 16;
 	hr = D3DXCreateVolumeTexture(
 		m_pd3dDevice,
 		noisepx, noisepx, noisepx,       // width, height, depth
@@ -670,6 +670,9 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	if( FAILED(hr) ) {
 		goto ERROR_END;
 	}
+
+	dumpVolumeTexture(&gfdump, m_pNoiseMap); // Chj test code
+
 
 	// Set the sampler state for the noise map
 	m_pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);

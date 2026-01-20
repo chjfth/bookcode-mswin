@@ -48,6 +48,7 @@ void dumpTextureStageState(IDirect3DDevice9 *pd, int iStage, const TCHAR *fmt_pr
 // Ex8-2
 void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh);
 void dumpMeshVertex_Ex8_2_tangent(IDbgDump *dump, ID3DXMesh *pMesh);
+void dumpVolumeTexture(IDbgDump *dump, IDirect3DVolumeTexture9 *pVolMap);
 
 
 /*
@@ -738,6 +739,56 @@ void dumpMeshVertex_Ex8_2_tangent(IDbgDump *dump, ID3DXMesh *pMesh)
 	pVB->Unlock();
 }
 
+
+void dumpVolumeTexture(IDbgDump *dump, IDirect3DVolumeTexture9 *pVolMap)
+{
+	// [2026-01-20] Code suggested by ChatGPT
+
+	D3DVOLUME_DESC desc;
+	HRESULT hr = pVolMap->GetLevelDesc(0, &desc);
+	assert(hr==0);
+
+	dump->vaDbg(_T("dumpVolumeTexture() width=%d, height=%d, depth=%d"), 
+		desc.Width, desc.Height, desc.Depth);
+
+	IDirect3DVolume9* pVolume = nullptr;
+	pVolMap->GetVolumeLevel(0, &pVolume);
+	Cec_Release cecVol = pVolume;
+
+	D3DLOCKED_BOX lockedBox;
+	pVolume->LockBox(&lockedBox, nullptr, D3DLOCK_READONLY);
+
+	BYTE* base = (BYTE*)lockedBox.pBits;
+
+	int voxel = 0;
+	for (int z = 0; z < (int)desc.Depth; ++z)
+	{
+		BYTE* slice = base + z * lockedBox.SlicePitch;
+
+		for (int y = 0; y < (int)desc.Height; ++y)
+		{
+			BYTE* row = slice + y * lockedBox.RowPitch;
+
+			for (int x = 0; x < (int)desc.Width; ++x)
+			{
+				// ChatGPT says: a float4 returned from GenerateSparkle()
+				// is actually store in a DWORD. Value conversion is done by system.
+				// (maybe) A8R8G8B8 packed color
+				DWORD pixel = *(DWORD*)(row + x * 4);
+				
+				dump->vaDbg(
+					_T("[vx#%d] W,H,D: (%2d,%2d,%2d) DWORD: 0x%08X")
+					,
+					voxel++,
+					x, y, z,
+					pixel
+					);
+			}
+		}
+	}
+
+	pVolume->UnlockBox();
+}
 
 
 #endif // [IMPL]
