@@ -1,6 +1,10 @@
 //-----------------------------------------------------------------------------
 // File: VertexShader8.2_chj.cpp
-//
+// Updates:
+// * Input parameter to tell which .fx file to use, instead of default HLSL_MetallicFlakes.fx .
+// * Some error messages dumps to DbgView .
+// * Verbose debugging data dumps into DXP9-Ex8-2.log, always.
+// * For D3DXCreateVolumeTexture(), noisepx is reduce to 16 (was 32).
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -25,9 +29,9 @@
 #include "../BookCommon/chj_d3d9_dump.h"
 
 
-
-
 FileDbgDump gfdump(_T("DXP9-Ex8-2.log"), false, 8192);
+
+const TCHAR *g_filepath_fx = _T("HLSL_MetallicFlakes.fx");
 
 
 //-----------------------------------------------------------------------------
@@ -128,8 +132,31 @@ protected:
 
 static void ChjInit()
 {
+	int argc = __argc;
+
+#ifdef UNICODE
+	PCTSTR* argv = (PCTSTR*) CommandLineToArgvW(GetCommandLine(), &argc);
+#else
+	PCTSTR* argv = (PCTSTR*) __argv;
+#endif
+
+	// 	if(argc>1)
+	// 		g_rings = _MAX_(3, _ttoi(argv[1]));
+	// 
+	// 	if(argc>2)
+	// 		g_segments = _MAX_(3, _ttoi(argv[2]));
+
+	vaDbg_set_vsnprintf(my_mm_vsnprintf); // Chj
+
+	if(argc>1)
+	{
+		g_filepath_fx = argv[1];
+		vaDbgTs(_T("Will use custom HLSL .fx file '%s'"), g_filepath_fx);
+	}
+
 //	gfdump.vaDbg(_T("Chj test %d"), 11);
 //	gfdump.vaDbg(_T("Chj test %d"), 22);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -585,7 +612,7 @@ HRESULT CMyD3DApplication::RestoreDeviceObjects()
 	LPD3DXBUFFER pShader = NULL;
 	Cec_Release cec_Shader;
 
-	const TCHAR *fxfile = _T("HLSL_MetallicFlakes.fx");
+	const TCHAR *fxfile = g_filepath_fx;
 	DWORD shader_flags = D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
 
 	// Compile the vertex shader
