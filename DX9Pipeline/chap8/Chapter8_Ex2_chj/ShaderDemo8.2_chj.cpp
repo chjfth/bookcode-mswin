@@ -197,7 +197,9 @@ CMyD3DApplication::CMyD3DApplication()
 	m_arMeshTextures  = NULL; // Textures for our mesh
 	m_dwNumMaterials = 0L;   // Number of mesh materials
 
-	m_strWindowTitle    = _T("Ex8-2 chj VertexShader");
+	static TCHAR szTitle[MAX_PATH];
+	_sntprintf_s(szTitle, _TRUNCATE, _T("Ex8-2 \"%s\""), g_filepath_fx);
+	m_strWindowTitle    = szTitle;
 	m_d3dEnumeration.AppUsesDepthBuffer   = TRUE;
 
 	m_pFont            = new CD3DFont( _T("Arial"), 12, D3DFONT_BOLD );
