@@ -156,8 +156,8 @@ float4 PS_Sparkle(VS_OUTPUT In) : COLOR
 	// Specular sparkle of flakes
 	Sparkle  = saturate(dot(
 		(saturate(In.HalfVector) - 0.5) * 2, 
-		(Noise.rgb - 0.5) * 2)
-		);
+		(Noise.rgb - 0.5) * 2
+		));
 	Sparkle *= Sparkle;
 	Sparkle *= Sparkle;
 	Sparkle *= Sparkle;
