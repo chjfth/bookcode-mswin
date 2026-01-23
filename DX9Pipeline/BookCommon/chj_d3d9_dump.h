@@ -46,8 +46,11 @@ void dumpSamplerState(IDirect3DDevice9 *pd, int iSampler, const TCHAR *fmt_prolo
 void dumpTextureStageState(IDirect3DDevice9 *pd, int iStage, const TCHAR *fmt_prolog, ...);
 
 // Ex8-2
-void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh);
-void dumpMeshVertex_Ex8_2_tangent(IDbgDump *dump, ID3DXMesh *pMesh);
+void dumpMeshVertex_with_Normal(IDbgDump *dump, ID3DXMesh *pMesh);
+void dumpMeshVertex_with_Tangent(IDbgDump *dump, ID3DXMesh *pMesh);
+
+void FillZeroTangents_into_Mesh(ID3DXMesh *pMesh);
+
 void dumpVolumeTexture(IDbgDump *dump, IDirect3DVolumeTexture9 *pVolMap);
 
 
@@ -653,6 +656,12 @@ void dumpTextureStageState(IDirect3DDevice9 *pd, int iStage, const TCHAR *fmt_pr
 
 // For Ex8-2
 
+struct VertexFVF_0x12
+{
+	float x, y, z;     // D3DFVF_XYZ
+	float nx, ny, nz;  // D3DFVF_NORMAL
+};
+
 struct VertexFVF_0x112
 {
 	float x, y, z;     // D3DFVF_XYZ
@@ -660,8 +669,10 @@ struct VertexFVF_0x112
 	float u, v;        // D3DFVF_TEX1 (TEXCOORD0)
 };
 
-void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh)
+void dumpMeshVertex_with_Normal(IDbgDump *dump, ID3DXMesh *pMesh)
 {
+//	DWORD fvf = m_pMesh->GetFVF();
+
 	int nVertex = pMesh->GetNumVertices();
 	int nStride = pMesh->GetNumBytesPerVertex();
 
@@ -671,25 +682,26 @@ void dumpMeshVertex_with_Format_0x112(IDbgDump *dump, ID3DXMesh *pMesh)
 	pMesh->GetVertexBuffer(&pVB);
 	Cec_Release cec_vb = pVB;
 
-	VertexFVF_0x112 *varray = nullptr;
-	pVB->Lock(0, 0, (void**)&varray, D3DLOCK_READONLY);
+	char *vtxbuf = nullptr;
+	pVB->Lock(0, 0, (void**)&vtxbuf, D3DLOCK_READONLY);
+	// -- vtxbuf can be array of VertexFVF_0x112 or VertexFVF_0x12
 
 	for(int i=0; i<nVertex; i++)
 	{
-		VertexFVF_0x112 &vt = varray[i];
+		VertexFVF_0x12 &vt = *(VertexFVF_0x12*)(vtxbuf + nStride);
 #if 1
 		dump->vaDbg(
-			_T("[v#%d] Pos:(% .-3f,% .-3f,% .-3f) Normal:(% .-3f,% .-3f,% .-3f) Texture@(% .-3f,% .-3f)")
+			_T("[v#%d] Pos:(% .-3f,% .-3f,% .-3f) Normal:(% .-3f,% .-3f,% .-3f)")
 			, 
 			i,
 			vt.x, vt.y, vt.z,
-			vt.nx, vt.ny, vt.nz,
-			vt.u, vt.v
+			vt.nx, vt.ny, vt.nz
 			);
 #else
 		// This outputs pure coords for Ex8-2-NormalTangent.py's use.
 		dump->vaDbg(_T("\t(% .-6f,% .-6f,% .-6f), #%d"), 
-			vt.x, vt.y, vt.z , i);
+			vt.x, vt.y, vt.z , 
+			i);
 #endif
 	}
 
@@ -708,7 +720,7 @@ struct Vertex_Ex8_2_tangent
 	float tx, ty, tz;  // tangent
 };
 
-void dumpMeshVertex_Ex8_2_tangent(IDbgDump *dump, ID3DXMesh *pMesh)
+void dumpMeshVertex_with_Tangent(IDbgDump *dump, ID3DXMesh *pMesh)
 {
 	int nVertex = pMesh->GetNumVertices();
 	int nStride = pMesh->GetNumBytesPerVertex();
@@ -734,6 +746,27 @@ void dumpMeshVertex_Ex8_2_tangent(IDbgDump *dump, ID3DXMesh *pMesh)
 			vt.u, vt.v,
 			vt.tx, vt.ty, vt.tz
 			);
+	}
+
+	pVB->Unlock();
+}
+
+void FillZeroTangents_into_Mesh(ID3DXMesh *pMesh)
+{
+	int nVertex = pMesh->GetNumVertices();
+	int nStride = pMesh->GetNumBytesPerVertex();
+
+	IDirect3DVertexBuffer9 *pVB = NULL;
+	pMesh->GetVertexBuffer(&pVB);
+	Cec_Release cec_vb = pVB;
+
+	Vertex_Ex8_2_tangent *varray = nullptr;
+	pVB->Lock(0, 0, (void**)&varray, D3DLOCK_READONLY);
+
+	for(int i=0; i<nVertex; i++)
+	{
+		Vertex_Ex8_2_tangent &vt = varray[i];
+		vt.tx = vt.ty = vt.tz = 0.0f;
 	}
 
 	pVB->Unlock();
@@ -789,6 +822,7 @@ void dumpVolumeTexture(IDbgDump *dump, IDirect3DVolumeTexture9 *pVolMap)
 
 	pVolume->UnlockBox();
 }
+
 
 
 #endif // [IMPL]

@@ -5,6 +5,7 @@
 // * Some error messages dumps to DbgView .
 // * Verbose debugging data dumps into DXP9-Ex8-2.log, always.
 // * For D3DXCreateVolumeTexture(), noisepx is reduce to 16 (was 32).
+// * Allow user to delete MeshTextureCoords{...} from bigship1.x and produce roughly the same effect.
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>
@@ -528,10 +529,11 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	// Chj debug code >>>
 
 	fvf = m_pMesh->GetFVF();
-	assert(fvf == (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1)); // 0x112, bigship1.x should have these
+	// -- fvf may be (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1) =0x112, frome default bigship1.x 
+	// or, user can remove MeshTextureCoords{...} from bigship1.x, so that D3DFVF_TEX1 is absent.
 
 	gfdump.vaDbg(_T("In CMyD3DApplication::InitDeviceObjects(), Dump Mesh with Normal elements."));
-	dumpMeshVertex_with_Format_0x112(&gfdump, m_pMesh);
+	dumpMeshVertex_with_Normal(&gfdump, m_pMesh);
 
 	// Chj debug code <<<
 #endif
@@ -566,13 +568,25 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 		goto ERROR_END;
 	}
 
-	hr = D3DXComputeTangent( l_pTempMesh, // input mesh 
-		0, // TexStageIndex 
-		0, // TangentIndex 
-		0, // BinormIndex 
-		0, // Wrap 
-		NULL // Adjacency 
-		);
+	if(fvf & D3DFVF_TEX1)
+	{
+		// D3DXComputeTangent requires the mesh object to have texture UV data.
+
+		hr = D3DXComputeTangent( l_pTempMesh, // input mesh 
+			0, // TexStageIndex 
+			0, // TangentIndex 
+			0, // BinormIndex 
+			0, // Wrap 
+			NULL // Adjacency 
+			);
+	}
+	else
+	{	
+		// [2026-01-23] Chj: Just clear each tangent data to be zero vector.
+		// OK for HLSL VS_Sparkle() to work.
+		
+		FillZeroTangents_into_Mesh(l_pTempMesh);
+	}
 
 	// Let m_pMesh points to the cloned-mesh, release old one.
 	m_pMesh->Release();
@@ -580,7 +594,7 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 
 	// Chj debug code >>>
 	gfdump.vaDbg(_T("In CMyD3DApplication::InitDeviceObjects(), Dump Mesh with Tangent elements."));
-	dumpMeshVertex_Ex8_2_tangent(&gfdump, m_pMesh);
+	dumpMeshVertex_with_Tangent(&gfdump, m_pMesh);
 	// Chj debug code <<<
 
 #endif
