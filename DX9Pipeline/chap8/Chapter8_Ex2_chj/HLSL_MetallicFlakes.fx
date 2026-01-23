@@ -86,7 +86,7 @@ VS_OUTPUT VS_Sparkle(
 
 	 // Glossiness (wax)
 	float f;
-	f = 0.5 - dot(V, N); 
+	f = 0.5 - dot(N, V); 
 	f = 1 - 4 * f * f;   // fresnel term
 	Out.Glossiness = f * k_r;
 
