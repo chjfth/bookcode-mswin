@@ -84,7 +84,7 @@ VS_OUTPUT VS_Sparkle(
 	Out.Specular *= Out.Specular;
 	Out.Specular *= k_r;
 
-	 // Glossiness (wax)
+	 // Glossiness (wax), here simulate a *cheap* Fresnel (Evclip 20260124.c0)
 	float f;
 	f = 0.5 - dot(N, V); 
 	f = 1 - 4 * f * f;   // fresnel term

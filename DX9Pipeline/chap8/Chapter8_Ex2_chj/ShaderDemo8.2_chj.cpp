@@ -1,11 +1,13 @@
 //-----------------------------------------------------------------------------
 // File: VertexShader8.2_chj.cpp
-// Updates:
+// Updates to original book code:
+// * In FrameMove(), use 1/2/Home/End/0 to rotate the bigship. 
 // * Input parameter to tell which .fx file to use, instead of default HLSL_MetallicFlakes.fx .
-// * Some error messages dumps to DbgView .
+// * Some info/error messages dumps to DbgView .
 // * Verbose debugging data dumps into DXP9-Ex8-2.log, always.
 // * For D3DXCreateVolumeTexture(), noisepx is reduce to 16 (was 32).
-// * Allow user to delete MeshTextureCoords{...} from bigship1.x and produce roughly the same effect.
+// * Allow user to delete MeshTextureCoords{...} from bigship1.x and produce roughly 
+//   the same effect. Try it with bigship1-skinny.x .
 //-----------------------------------------------------------------------------
 #define STRICT
 #include <Windows.h>

@@ -1,5 +1,8 @@
 //-----------------------------------------------------------------------------
 // File: VertexShader8.1_chj.cpp
+// Updates to original book code:
+// * In FrameMove(), use 1/2/Home/End/0 to rotate the bigship. 
+// * Some info/error messages dumps to DbgView .
 //
 //-----------------------------------------------------------------------------
 #define STRICT
