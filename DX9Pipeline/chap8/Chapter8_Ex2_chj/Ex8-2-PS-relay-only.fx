@@ -138,34 +138,5 @@ sampler Environment : register(s1);   // ass: m_pd3dDevice->SetTexture(1, m_pEnv
 // Pixel shader
 float4 PS_Sparkle(VS_OUTPUT In) : COLOR
 {   
-	float4 Color = (float4)0;
-	float3 Diffuse = In.Diffuse;     // Chj: even 0, the bigship still has some color
-	float3 Specular, Gloss, Sparkle;
-
-	// Volume noise
-	float4 Noise = tex3D(SparkleNoise, In.NoiseCoord);
-	
-	// Glossy specular of wax
-	Specular  = In.Specular;
-	Specular *= Specular;
-	Specular *= Specular;
-	
-	// Glossy reflection of wax 
-	Gloss = texCUBE(Environment, In.Reflection) * saturate(In.Glossiness);
-
-	// Specular sparkle of flakes
-	Sparkle  = saturate(dot(
-		(saturate(In.HalfVector) - 0.5) * 2, 
-		(Noise.rgb - 0.5) * 2
-		));
-	Sparkle *= Sparkle;
-	Sparkle *= Sparkle;
-	Sparkle *= Sparkle;
-	Sparkle *= k_s;
-
-	// Combine the contributions
-	Color.rgb = Diffuse + Specular + Gloss + Sparkle;
-	Color.w   = 1;
-
-	return Color;
+	return float4(In.Diffuse, 1);
 }  

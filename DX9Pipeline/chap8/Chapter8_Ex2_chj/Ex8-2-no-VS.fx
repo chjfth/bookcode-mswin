@@ -164,7 +164,7 @@ float4 PS_Sparkle(VS_OUTPUT In) : COLOR
 	Sparkle *= k_s;
 
 	// Combine the contributions
-	Color.rgb = Diffuse + Specular + Gloss + Sparkle;
+	Color.rgb = 0 + Specular + Gloss + Sparkle;
 	Color.w   = 1;
 
 	return Color;
