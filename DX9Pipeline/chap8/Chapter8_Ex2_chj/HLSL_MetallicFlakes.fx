@@ -27,13 +27,13 @@ float3 L <string UIDirectional="Light Direction";> =
 // Light intensity
 float4 I_a = { 0.3f, 0.3f, 0.3f, 1.0f };    // ambient
 float4 I_d = { 1.0f, 1.0f, 1.0f, 1.0f };    // diffuse
-float4 I_s = { 0.7f, 0.7f, 0.7f, 1.0f };    // specular
+float4 I_s = { 0.7f, 0.7f, 0.7f, 1.0f };    // specular(not used), actual meaning: dot(R, V)
 
 // Material reflectivity
 float4 k_a : MATERIAL_AMBIENT = { 0.2f, 0.2f, 0.2f, 1.0f };  // ambient (metal, grey)
 float4 k_d : MATERIAL_DIFFUSE = { 0.7f, 0.7f, 0.1f, 1.0f };  // diffuse (metal, bronze)
-float4 k_s = { 0.4f, 0.3f, 0.1f, 1.0f };    // specular (metal)
-float4 k_r = { 0.7f, 0.7f, 0.7f, 1.0f };    // specular (wax)
+float4 k_s = { 0.4f, 0.3f, 0.1f, 1.0f };    // Chj: metal sparkle 
+float4 k_r = { 0.7f, 0.7f, 0.7f, 1.0f };    // Chj: specular & wax (mirror/reflecting)
 
 
 struct VS_OUTPUT
@@ -75,7 +75,7 @@ VS_OUTPUT VS_Sparkle(
 	// Diffuse + ambient (metal)
 	Out.Diffuse = I_a * k_a + I_d * k_d * max(0, dot(N, L)); 
 
-	// Specular (wax)
+	// Specular & wax (mirror/reflecting)
 	Out.Specular  = saturate(dot(H, N)); // clamp `dot(H, N)` to [0, 1]
 	Out.Specular *= Out.Specular;
 	Out.Specular *= Out.Specular;
