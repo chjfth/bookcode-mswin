@@ -64,8 +64,8 @@ VS_OUTPUT VS_Sparkle(
 	float3 T = normalize(mul(Tangent, (float3x3)WorldView));  // tangent (view space)
 	float3 B = cross(N, T);                                   // binormal (view space)
 	
-//	float3 R = normalize(2 * dot(N, L) * N - L);  // reflection vector (view space)
-	float3 G = normalize(2 * dot(N, V) * N - V);  // glance vector (view space)
+//	float3 R = normalize(2 * dot(N, L) * N - L);  // reflection vector of L (view space)
+	float3 G = normalize(2 * dot(N, V) * N - V);  // reflection vector of V (view space)
 	
 	float3 H = normalize(L + V);                  // half vector (view space)
 	
