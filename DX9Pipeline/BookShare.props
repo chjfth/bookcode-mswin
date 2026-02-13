@@ -5,7 +5,7 @@
     This project needs VC2010 and DirectX SDK 9.0b(2003), DXSDK version Oct 2004 is not compatible 
     due to D3DXLoadMeshFromXof() parameter type change.
     
-    Using VC2015 is also OK, at least on Chap1 code. 
+    Using VC2015 is also OK. 
   	
   	User should have:
   		d:\DXSDK9\Lib\d3dx9.lib
