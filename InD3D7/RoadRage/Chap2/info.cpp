@@ -5,6 +5,7 @@
 //
 // Copyright (c) 1999 William Chin and Peter Kovach. All rights reserved.
 //-----------------------------------------------------------------------------
+#include <tchar.h>
 #include "resource.h"
 #include "D3DApp.h"
 #include "roadrage.hpp"
@@ -16,7 +17,7 @@ void CMyD3DApplication::DisplayCredits(HWND hwnd)
 	HDC hdc;
 	int sx1 = 15, sx2 = 200, sy = 70;
 	int nIndex;
-	char  buffer[255];
+	TCHAR  buffer[255];
 	HBRUSH holdbrush_color;
 	
 	hdc=GetDC(hwnd);
@@ -27,72 +28,72 @@ void CMyD3DApplication::DisplayCredits(HWND hwnd)
 
 	SetBkMode(hdc, TRANSPARENT);
 				
-	strcpy(buffer, "Credits for Road Rage :");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Credits for Road Rage :"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
 	sy +=40;
 
-	strcpy(buffer, "William Chin");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "Project Leader / C++ Programmer");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("William Chin"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("Project Leader / C++ Programmer"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 	
-	strcpy(buffer, "Peter Kovach");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "C++ Programmer");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Peter Kovach"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("C++ Programmer"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
-	strcpy(buffer, "Mark Bracey");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "3DS Modeller / Mapper ");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Mark Bracey"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("3DS Modeller / Mapper "));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
-	strcpy(buffer, "NEO XS");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "MD2 Modeller");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("NEO XS"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("MD2 Modeller"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
-	strcpy(buffer, "James Glendenning");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "3DS Modeller");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("James Glendenning"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("3DS Modeller"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
-	strcpy(buffer, "Adam Bardsley");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "Artist / 3DS Modeller");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Adam Bardsley"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("Artist / 3DS Modeller"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
-	strcpy(buffer, "Corréia Emmanuel");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "Artist - textures, website :");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Correia Emmanuel"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("Artist - textures, website :"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
-	strcpy(buffer, "    Axem Textues");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "http://axem2.simplenet.com");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Axem Textues"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("http://axem2.simplenet.com"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=40;
 
-	strcpy(buffer, "Further Info on Road Rage :");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Further Info on Road Rage :"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
-	strcpy(buffer, "Head Tapper Software");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "http://www.headtappersoftware.com");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Head Tapper Software"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("http://www.headtappersoftware.com"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
-	strcpy(buffer, "Email us at:");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
-	strcpy(buffer, "roadrage@headtappersoftware.com");
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Email us at:"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
+	_tcscpy_s(buffer, _T("roadrage@headtappersoftware.com"));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
 	SetBkMode(hdc, OPAQUE);
@@ -107,8 +108,8 @@ void CMyD3DApplication::DisplayRRStats(HWND hwnd)
 	int mem;	
 	int sx1 = 15, sx2 = 320, sy = 70;
 	int nIndex;
-	char  buffer[255];
-	char  buf2[255];
+	TCHAR  buffer[255];
+	TCHAR  buf2[255];
 	LPTSTR buffer2;
 	MEMORYSTATUS memStatus;
 	HBRUSH holdbrush_color;
@@ -125,20 +126,20 @@ void CMyD3DApplication::DisplayRRStats(HWND hwnd)
 	GlobalMemoryStatus(&memStatus);
 		
 	mem=(int)memStatus.dwMemoryLoad;
-	itoa(mem,buffer,10);
-	buffer2 = lstrcat(buffer, " %");
-	strcpy(buf2, "System memory in use :");
-	TextOut(hdc, sx1, sy, buf2,    strlen(buf2));
-	TextOut(hdc, sx2, sy, buffer2, strlen(buffer2));
+	_itot_s(mem,buffer,10);
+	buffer2 = lstrcat(buffer, _T(" %"));
+	_tcscpy_s(buf2, _T("System memory in use :"));
+	TextOut(hdc, sx1, sy, buf2,    _tcslen(buf2));
+	TextOut(hdc, sx2, sy, buffer2, _tcslen(buffer2));
 	sy +=20;
 
 	mem=(int)memStatus.dwTotalPhys;
 	mem = mem /1024;
-	itoa(mem, buffer,10);
-	strcat(buffer, " KB");
-	strcpy(buf2, "Total system memory :");
-	TextOut(hdc, sx1, sy, buf2,   strlen(buf2));  
-	TextOut(hdc, sx2, sy, buffer, strlen(buffer));
+	_itot_s(mem, buffer,10);
+	_tcscat_s(buffer, _T(" KB"));
+	_tcscpy_s(buf2, _T("Total system memory :"));
+	TextOut(hdc, sx1, sy, buf2,   _tcslen(buf2));  
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
 	sy +=20;
 						
 	SetBkMode(hdc, OPAQUE);
@@ -151,7 +152,7 @@ void CMyD3DApplication::DisplayLegalInfo(HWND hwnd)
 	HDC hdc;
 	int sx1 = 15, sx2 = 200, sy = 70;
 	int nIndex;
-	char  buffer[255];
+	TCHAR  buffer[255];
 	HBRUSH holdbrush_color;
 	
 	hdc=GetDC(hwnd);
@@ -163,26 +164,26 @@ void CMyD3DApplication::DisplayLegalInfo(HWND hwnd)
 	SetBkMode(hdc, TRANSPARENT);
 			
 	
-	strcpy(buffer, "Legal info for Road Rage :");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Legal info for Road Rage :"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
 	sy +=40;
 
-	strcpy(buffer, "The code, 3D models, artwork and sounds in Road Rage,");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("The code, 3D models, artwork and sounds in Road Rage,"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
 	sy +=20;
-	strcpy(buffer, "are to be used for your own personal use only.");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("are to be used for your own personal use only."));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
 	sy +=40;
 
-	strcpy(buffer, "Anyone wishing to use any part of Road Rage for commercial purposes");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Anyone wishing to use any part of Road Rage for commercial purposes"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
 	sy +=20;
-	strcpy(buffer, "must have the writers / artists written permission first.");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("must have the writers / artists written permission first."));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
 	sy +=40;
 
-	strcpy(buffer, "Copyright (C) 1999");
-	TextOut(hdc, sx1, sy, buffer, strlen(buffer));
+	_tcscpy_s(buffer, _T("Copyright (C) 1999"));
+	TextOut(hdc, sx1, sy, buffer, _tcslen(buffer));
 	sy +=20;
 
 	SetBkMode(hdc, OPAQUE);

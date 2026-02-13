@@ -12,6 +12,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdio.h>
+#include <tchar.h>
 #include "D3DApp.h"
 #include "RoadRage.hpp"
 
@@ -124,7 +125,7 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 // Desc: Entry point to the program. Initializes everything, and goes into a
 //       message-processing loop. Idle time is used to render the scene.
 //-----------------------------------------------------------------------------
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI _tWinMain( HINSTANCE hInst, HINSTANCE, LPTSTR strCmdLine, INT )
 {
 	
 	CMyD3DApplication d3dApp;

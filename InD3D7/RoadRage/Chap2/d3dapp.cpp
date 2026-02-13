@@ -79,7 +79,7 @@ HRESULT CD3DApplication::Create( HINSTANCE hInst, TCHAR* strCmdLine )
 		// ...
 		// Display the string.
 		//
-		MessageBox( NULL, (LPCTSTR)lpMsgBuf, "Error", MB_OK | MB_ICONINFORMATION );
+		MessageBox( NULL, (LPCTSTR)lpMsgBuf, _T("Error"), MB_OK | MB_ICONINFORMATION );
 		// Free the buffer.
 		LocalFree( lpMsgBuf );
 	}
