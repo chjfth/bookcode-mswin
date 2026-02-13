@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- 
+    This project needs VC2010 and DirectX SDK 9.0b(2003) to compile.
+    The bookcode is for DX7, and luckily it can be built using DX9SDK.
+    
+    Using VC2015 is also OK. (pending confirm) 
+  	
+  	User should have:
+  		d:\DXSDK9\Lib\d3dx9.lib
+  
+  	Note: DirectX SDK 9.0b provides only x86 static-libs, no x64 variants. So we will [ALERT] on non-x86 Platform.
+  	I just can't turn to newer DXSDK Jun 2010 for x64 libs shortly, bcz the book authoer use d3dapp.h framework code
+  	that refers to LPDIRECTXFILEDATA. That D3DApp framework code and LPDIRECTXFILEDATA are removed from newer DXSDKs.
+  	.
+  	To confirm: Can InD3D7 book code compilable using DXSDK version Oct 2004?
+  -->
+  
+  <PropertyGroup>
+    <dirDxsdk9>d:\DXSDK9</dirDxsdk9>
+    
+    <IsUsingVc2010 Condition="'$(PlatformToolset)'=='v100'">true</IsUsingVc2010>
+    
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Note: We should place $(dirDxsdk9)\Include *behind* VC2010's Win7SDK include, 
+         bcz DXSDK carries outdated basetsd.h which is not compatible with Win7SDK's other headers. 
+    -->
+    <IncludePath>$([System.String]::Concat(
+      '$(dirThisBook)\BookCommon\Include;',
+      '$(dirThisBook)\..\__chjcxx\common-include\include\mswin;',
+      '$(dirThisBook)\..\__chjcxx\common-include\include;',
+      '$(dirThisBook)\..\__chjcxx\mm_snprintf\libsrc\include;',
+      '$(dirThisBook)\..\__WinConst\mswin;',
+      '$(IncludePath);',
+      '$(dirDxsdk9)\Include;'
+      ))
+    </IncludePath>
+    
+    <LibraryPath>$(dirDxsdk9)\Lib;$(LibraryPath)</LibraryPath>
+    
+    <PathD3dxLib>$(dirDxsdk9)\Lib\d3dx9.lib</PathD3dxLib>
+    <NeedDxsdkAlert Condition="!exists('$(PathD3dxLib)')">true</NeedDxsdkAlert>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>;;DIRECTINPUT_VERSION=0x700;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>d3d9.lib;d3dx9.lib;d3dxof.lib;dxguid.lib;winmm.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+
+	  <!-- Add legacy_stdio_definitions.lib for VC2015+ (bcz d3dx9.lib refers to _snprintf etc). -->
+      <AdditionalDependencies Condition="'$(IsUsingVc2010)'!='true'">legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       
+    </Link>
+  </ItemDefinitionGroup>
+
+  <Target Name="SDK_Checking_ChjAlert" BeforeTargets="InitializeBuildStatus">
+	<Error Condition="'$(dirThisBook)'==''" Text="The MSBuild property 'dirThisBook' must be defined in your .vcxproj file." />
+
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX 9.0b] to provide d3dx9.lib etc." Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathD3dxLib)', most code samples will not compile." Importance="high" />
+    
+    <Message Condition="'$(PlatformX)'!='x86'" Text="[ALERT] DirectX 9.0b supports only 32bit Windodws, your 64bit EXE linking will fail." Importance="high" />
+
+    <Message Condition="'$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk9) ." Importance="high" />
+  </Target>
+
+</Project>
