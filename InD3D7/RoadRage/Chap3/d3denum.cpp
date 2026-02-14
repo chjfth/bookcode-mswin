@@ -25,7 +25,7 @@ static HRESULT (*g_fnAppConfirmFn)(DDCAPS*, D3DDEVICEDESC7*) = NULL;
 
 static D3DEnum_DeviceInfo g_pDeviceList[20];
 static DWORD g_dwNumDevicesEnumerated = 0L;
-static DWORD g_dwNumDevices           = 0L;
+static DWORD g_dwNumDevices = 0L; // This counts Direct3D devices, NOT DirectDraw devices.
 
 
 
@@ -83,14 +83,14 @@ static HRESULT WINAPI ModeEnumCallback( DDSURFACEDESC2* pddsd,
 }
 
 
-
-
 //-----------------------------------------------------------------------------
-// Name: DeviceEnumCallback()
+// Name: D3DDevice_EnumCallback() // foolish oldname: DeviceEnumCallback()
 // Desc: Callback function for enumerating devices
+//
 // chj: DX7's enum-callback only supports narrow chars.
+//      This enums Direct3D devices, not DirectDraw devices.
 //-----------------------------------------------------------------------------
-static HRESULT WINAPI DeviceEnumCallback( char* strDesc, char* strName,
+static HRESULT WINAPI D3DDevice_EnumCallback( char* strDesc, char* strName,
                                           D3DDEVICEDESC7* pDesc,
                                           VOID* pParentInfo )
 {
@@ -123,19 +123,17 @@ static HRESULT WINAPI DeviceEnumCallback( char* strDesc, char* strName,
     else
     {
         pDeviceInfo->pDriverGUID = NULL;
-        lstrcpyn( pDeviceInfo->strDesc, makeTsdring(strName), 
-			ARRAYSIZE(pDeviceInfo->strDesc));
-    }
+        lstrcpyn( pDeviceInfo->strDesc, makeTsdring(strName), ARRAYSIZE(pDeviceInfo->strDesc) );
+	}
 
     // Avoid duplicates: only enum HW devices for secondary DDraw drivers.
-    if( NULL != pDeviceInfo->pDriverGUID && FALSE == pDeviceInfo->bHardware )
+    if( NULL!=pDeviceInfo->pDriverGUID && FALSE==pDeviceInfo->bHardware )
             return D3DENUMRET_OK;
 
     // Give the app a chance to accept or reject this device.
     if( g_fnAppConfirmFn )
 	{
-		if( FAILED( g_fnAppConfirmFn( &pDeviceInfo->ddDriverCaps,
-			&pDeviceInfo->ddDeviceDesc ) ) )
+		if( FAILED( g_fnAppConfirmFn( &pDeviceInfo->ddDriverCaps, &pDeviceInfo->ddDeviceDesc ) ) )
 		{
 			return D3DENUMRET_OK;
 		}
@@ -150,7 +148,7 @@ static HRESULT WINAPI DeviceEnumCallback( char* strDesc, char* strName,
         DWORD dwRenderDepths    = pDeviceInfo->ddDeviceDesc.dwDeviceRenderBitDepth;
         DWORD dwDepth           = ddsdMode.ddpfPixelFormat.dwRGBBitCount;
 
-        // Accept modes that are compatable with the device
+        // Accept modes that are compatible with the device
         if( ( ( dwDepth == 32 ) && ( dwRenderDepths & DDBD_32 ) ) ||
             ( ( dwDepth == 24 ) && ( dwRenderDepths & DDBD_24 ) ) ||
             ( ( dwDepth == 16 ) && ( dwRenderDepths & DDBD_16 ) ) )
@@ -190,8 +188,6 @@ static HRESULT WINAPI DeviceEnumCallback( char* strDesc, char* strName,
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: DriverEnumCallback()
 // Desc: Callback function for enumerating drivers.
@@ -199,10 +195,10 @@ static HRESULT WINAPI DeviceEnumCallback( char* strDesc, char* strName,
 static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
                                        char* strName, VOID*, HMONITOR )
 {
-    D3DEnum_DeviceInfo d3dDeviceInfo;
-    LPDIRECTDRAW7      pDD;
-    LPDIRECT3D7        pD3D;
-    HRESULT            hr;
+	D3DEnum_DeviceInfo d3dDeviceInfo = {};
+    LPDIRECTDRAW7      pDD = NULL;
+    LPDIRECT3D7        pD3D = NULL;
+    HRESULT            hr = 0;
     
     // Use the GUID to create the DirectDraw object
     hr = DirectDrawCreateEx( pGUID, (VOID**)&pDD, IID_IDirectDraw7, NULL );
@@ -223,8 +219,7 @@ static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
 
     // Copy data to a device info structure
     ZeroMemory( &d3dDeviceInfo, sizeof(d3dDeviceInfo) );
-    lstrcpyn( d3dDeviceInfo.strDesc, makeTsdring(strDesc), 
-		ARRAYSIZE(d3dDeviceInfo.strDesc) );
+    lstrcpyn( d3dDeviceInfo.strDesc, makeTsdring(strDesc), ARRAYSIZE(d3dDeviceInfo.strDesc) );
     d3dDeviceInfo.ddDriverCaps.dwSize = sizeof(DDCAPS);
     d3dDeviceInfo.ddHELCaps.dwSize    = sizeof(DDCAPS);
     pDD->GetCaps( &d3dDeviceInfo.ddDriverCaps, &d3dDeviceInfo.ddHELCaps );
@@ -238,8 +233,10 @@ static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
 
 	// Record whether the device can render into a desktop window
     if( d3dDeviceInfo.ddDriverCaps.dwCaps2 & DDCAPS2_CANRENDERWINDOWED )
-        if( NULL == d3dDeviceInfo.pDriverGUID )
-            d3dDeviceInfo.bDesktopCompatible = TRUE;
+	{
+		if( NULL == d3dDeviceInfo.pDriverGUID )
+			d3dDeviceInfo.bDesktopCompatible = TRUE;
+	}
 
     // Enumerate the fullscreen display modes.
     pDD->EnumDisplayModes( 0, NULL, &d3dDeviceInfo, ModeEnumCallback );
@@ -249,7 +246,7 @@ static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
            sizeof(DDSURFACEDESC2), SortModesCallback );
 
     // Now, enumerate all the 3D devices
-    pD3D->EnumDevices( DeviceEnumCallback, &d3dDeviceInfo );
+    pD3D->EnumDevices( D3DDevice_EnumCallback, &d3dDeviceInfo );
 
     // Clean up and return
     SAFE_DELETE( d3dDeviceInfo.pddsdModes );
@@ -258,8 +255,6 @@ static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
 
     return DDENUMRET_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -278,7 +273,7 @@ HRESULT D3DEnum_EnumerateDevices( HRESULT (*AppConfirmFn)(DDCAPS*, D3DDEVICEDESC
                            DDENUM_ATTACHEDSECONDARYDEVICES |
                            DDENUM_DETACHEDSECONDARYDEVICES |
                            DDENUM_NONDISPLAYDEVICES );
-	// -- [2026-02-14] Chj note: Microsft never implemented DirectDrawEnumerateExW, 
+	// -- [2026-02-14] Chj note: Microsoft never implemented DirectDrawEnumerateExW, 
 	// would return E_NOTIMPL. So we need to call the ~A variant explicitly.
 
     // Make sure devices were actually enumerated
@@ -298,8 +293,6 @@ HRESULT D3DEnum_EnumerateDevices( HRESULT (*AppConfirmFn)(DDCAPS*, D3DDEVICEDESC
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: D3DEnum_FreeResources()
 // Desc: Cleans up any memory allocated during device enumeration
@@ -313,8 +306,6 @@ VOID D3DEnum_FreeResources()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: D3DEnum_GetDevices()
 // Desc: Returns a ptr to the array of D3DEnum_DeviceInfo structures.
@@ -326,8 +317,6 @@ VOID D3DEnum_GetDevices( D3DEnum_DeviceInfo** ppDevices, DWORD* pdwCount )
     if( pdwCount )
         (*pdwCount)  = g_dwNumDevices;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -424,8 +413,6 @@ static VOID UpdateDialogControls( HWND hDlg, D3DEnum_DeviceInfo* pCurrentDevice,
         }
     }
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -546,8 +533,6 @@ HRESULT D3DEnum_UserChangeDevice( D3DEnum_DeviceInfo** ppDevice )
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: D3DEnum_SelectDefaultDevice()
 // Desc: Pick a default device, preferably hardware and desktop compatible.
@@ -609,8 +594,4 @@ HRESULT D3DEnum_SelectDefaultDevice( D3DEnum_DeviceInfo** ppDevice,
 
     return S_OK;
 }
-
-
-
-
 

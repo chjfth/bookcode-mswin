@@ -45,7 +45,8 @@ public:
 	BOOL				 GetbReady()			{ return m_bReady; };
 	VOID				 SetbReady(BOOL val)	{ m_bReady = val; };
 	VOID				 SetbActive(BOOL val)	{ m_bActive = val; };
-    // Class constructor
+    
+	// Class constructor
     CD3DApplication();
 };
 

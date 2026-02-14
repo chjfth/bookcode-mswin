@@ -104,8 +104,9 @@ public:
     VOID				 DeleteFramework()		{ SAFE_DELETE( m_pFramework ); };
 	BOOL				 GetSingleStep()		{ return m_bSingleStep; };
 	VOID				 SetSingleStep(BOOL val) { m_bSingleStep = val; };
-    // Class constructor
-    CD3DApplication();
+    
+	// Class constructor
+	CD3DApplication();
 };
 
 
