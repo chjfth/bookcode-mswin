@@ -29,7 +29,6 @@
          bcz DXSDK carries outdated basetsd.h which is not compatible with Win7SDK's other headers. 
     -->
     <IncludePath>$([System.String]::Concat(
-      '$(dirThisBook)\BookCommon\Include;',
       '$(dirThisBook)\..\__chjcxx\common-include\include\mswin;',
       '$(dirThisBook)\..\__chjcxx\common-include\include;',
       '$(dirThisBook)\..\__chjcxx\mm_snprintf\libsrc\include;',
@@ -50,7 +49,7 @@
       <PreprocessorDefinitions>;;DIRECTINPUT_VERSION=0x700;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>d3d9.lib;d3dx9.lib;d3dxof.lib;dxguid.lib;winmm.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ddraw.lib;dxguid.lib;winmm.lib;;%(AdditionalDependencies)</AdditionalDependencies>
 
 	  <!-- Add legacy_stdio_definitions.lib for VC2015+ (bcz d3dx9.lib refers to _snprintf etc). -->
       <AdditionalDependencies Condition="'$(IsUsingVc2010)'!='true'">legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>

@@ -13,6 +13,8 @@
 #include "D3DUtil.h" // For DEBUG_MSG
 #include "resource.h"  // For dialog controls
 
+#include <makeTsdring.h>
+
 TCHAR D3Ddevicename[256];
 
 
@@ -86,8 +88,9 @@ static HRESULT WINAPI ModeEnumCallback( DDSURFACEDESC2* pddsd,
 //-----------------------------------------------------------------------------
 // Name: DeviceEnumCallback()
 // Desc: Callback function for enumerating devices
+// chj: DX7's enum-callback only supports narrow chars.
 //-----------------------------------------------------------------------------
-static HRESULT WINAPI DeviceEnumCallback( TCHAR* strDesc, TCHAR* strName,
+static HRESULT WINAPI DeviceEnumCallback( char* strDesc, char* strName,
                                           D3DDEVICEDESC7* pDesc,
                                           VOID* pParentInfo )
 {
@@ -120,7 +123,8 @@ static HRESULT WINAPI DeviceEnumCallback( TCHAR* strDesc, TCHAR* strName,
     else
     {
         pDeviceInfo->pDriverGUID = NULL;
-        lstrcpyn( pDeviceInfo->strDesc, strName, 39 );
+        lstrcpyn( pDeviceInfo->strDesc, makeTsdring(strName), 
+			ARRAYSIZE(pDeviceInfo->strDesc));
     }
 
     // Avoid duplicates: only enum HW devices for secondary DDraw drivers.
@@ -192,8 +196,8 @@ static HRESULT WINAPI DeviceEnumCallback( TCHAR* strDesc, TCHAR* strName,
 // Name: DriverEnumCallback()
 // Desc: Callback function for enumerating drivers.
 //-----------------------------------------------------------------------------
-static BOOL WINAPI DriverEnumCallback( GUID* pGUID, TCHAR* strDesc,
-                                       TCHAR* strName, VOID*, HMONITOR )
+static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
+                                       char* strName, VOID*, HMONITOR )
 {
     D3DEnum_DeviceInfo d3dDeviceInfo;
     LPDIRECTDRAW7      pDD;
@@ -219,7 +223,8 @@ static BOOL WINAPI DriverEnumCallback( GUID* pGUID, TCHAR* strDesc,
 
     // Copy data to a device info structure
     ZeroMemory( &d3dDeviceInfo, sizeof(d3dDeviceInfo) );
-    lstrcpyn( d3dDeviceInfo.strDesc, strDesc, 39 );
+    lstrcpyn( d3dDeviceInfo.strDesc, makeTsdring(strDesc), 
+		ARRAYSIZE(d3dDeviceInfo.strDesc) );
     d3dDeviceInfo.ddDriverCaps.dwSize = sizeof(DDCAPS);
     d3dDeviceInfo.ddHELCaps.dwSize    = sizeof(DDCAPS);
     pDD->GetCaps( &d3dDeviceInfo.ddDriverCaps, &d3dDeviceInfo.ddHELCaps );
@@ -269,10 +274,12 @@ HRESULT D3DEnum_EnumerateDevices( HRESULT (*AppConfirmFn)(DDCAPS*, D3DDEVICEDESC
     g_fnAppConfirmFn = AppConfirmFn;
 
     // Enumerate drivers, devices, and modes
-    DirectDrawEnumerateEx( DriverEnumCallback, NULL, 
+    HRESULT hr = DirectDrawEnumerateExA( DriverEnumCallback, NULL, 
                            DDENUM_ATTACHEDSECONDARYDEVICES |
                            DDENUM_DETACHEDSECONDARYDEVICES |
                            DDENUM_NONDISPLAYDEVICES );
+	// -- [2026-02-14] Chj note: Microsft never implemented DirectDrawEnumerateExW, 
+	// would return E_NOTIMPL. So we need to call the ~A variant explicitly.
 
     // Make sure devices were actually enumerated
     if( 0 == g_dwNumDevicesEnumerated )

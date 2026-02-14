@@ -56,7 +56,7 @@ CD3DApplication::CD3DApplication()
 //-----------------------------------------------------------------------------
 HRESULT CD3DApplication::Create( HINSTANCE hInst, TCHAR* strCmdLine )
 {
-    HRESULT hr;
+    HRESULT hr = 0;
 
     // Enumerate available D3D devices. The callback is used so the app can
     // confirm/reject each enumerated device depending on its capabilities.
@@ -778,8 +778,8 @@ VOID CD3DApplication::DisplayFrameworkError( HRESULT hr, DWORD dwType )
                      _T("unstable state and need to be rebooted") );
             break;
         case D3DFWERR_INITIALIZATIONFAILED:
-            lstrcpy( strMsg, _T("Generic initialization error.\n\nEnable ")
-                     _T("debug output for detailed information.") );
+            lstrcpy( strMsg, _T("Generic initialization error.\n\n")
+                     _T("Enable debug output for detailed information.") );
             break;
         case D3DFWERR_NODIRECTDRAW:
             lstrcpy( strMsg, _T("No DirectDraw") );
