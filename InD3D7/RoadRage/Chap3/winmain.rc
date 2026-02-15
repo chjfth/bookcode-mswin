@@ -147,8 +147,8 @@ IDR_MENU MENU DISCARDABLE
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "About...",                    MENU_ABOUT
-        MENUITEM "Change Device /  Mode...",    IDM_CHANGEDEVICE
+        MENUITEM "About...\tF1",                    MENU_ABOUT
+        MENUITEM "Change Device /  Mode...\tF2",    IDM_CHANGEDEVICE
         MENUITEM SEPARATOR
         MENUITEM "E&xit\tESC",                  IDM_EXIT
     END

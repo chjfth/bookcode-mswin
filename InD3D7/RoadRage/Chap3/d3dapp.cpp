@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <tchar.h>
 #include "D3DApp.h"
+#include "info.hpp"
 
 //-----------------------------------------------------------------------------
 // Internal function prototypes and variables
@@ -399,7 +400,7 @@ LRESULT CD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                     // Display the About box
                     Pause(TRUE);
                     DialogBox( (HINSTANCE)GetWindowLong( hWnd, GWL_HINSTANCE ),
-                               MAKEINTRESOURCE(IDD_ABOUT), hWnd, AboutProc );
+                               MAKEINTRESOURCE(IDD_ABOUT), hWnd, AppAbout );
                     Pause(FALSE);
                     return 0;
 
