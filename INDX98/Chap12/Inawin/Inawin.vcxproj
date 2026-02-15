@@ -220,7 +220,23 @@
     <ClInclude Include="..\..\share\ddutil.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
+
   
+  <PropertyGroup>
+    <VSPG_ExeDataFiles>donut.bmp
+    </VSPG_ExeDataFiles>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <CustomBuild Include="$(VSPG_ExeDataFiles)">
+      <FileType>Document</FileType>
+      <Message>#### VSPG_ExeDataFiles: %(FullPath)</Message>
+      <Command>if not exist "%(FullPath)" echo .  -- [NOTE] Above file does NOT exist, CustomBuild will be triggered everytime.</Command>
+      <Outputs>$(TargetPath)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+
+
   <!-- Import shared project properties used by this book. -->
   <ImportGroup Label="PropertySheets">
     <Import Project="..\..\INDX98.props" />
