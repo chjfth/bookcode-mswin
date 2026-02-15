@@ -14,6 +14,7 @@
 // Flag and error definitions
 //-----------------------------------------------------------------------------
 #define D3DENUM_SOFTWAREONLY           0x00000001 // Software-devices only flag
+                                      // only for D3DEnum_SelectDefaultDevice()
 
 #define D3DENUMERR_NODIRECTDRAW        0x81000001 // Could not create DDraw
 #define D3DENUMERR_ENUMERATIONFAILED   0x81000002 // Enumeration failed
@@ -56,9 +57,6 @@ struct D3DEnum_DeviceInfo
 };
 
 
-
-
-
 //-----------------------------------------------------------------------------
 // Name: D3DEnum_EnumerateDevices()
 // Desc: Enumerates all drivers, devices, and modes. The callback function is
@@ -68,8 +66,6 @@ struct D3DEnum_DeviceInfo
 HRESULT D3DEnum_EnumerateDevices( HRESULT (*fn)(DDCAPS*, D3DDEVICEDESC7*) );
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: D3DEnum_FreeResources()
 // Desc: Cleans up any memory allocated during device enumeration
@@ -77,15 +73,11 @@ HRESULT D3DEnum_EnumerateDevices( HRESULT (*fn)(DDCAPS*, D3DDEVICEDESC7*) );
 VOID D3DEnum_FreeResources();
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: D3DEnum_GetDevices()
 // Desc: Returns a ptr to the array of enumerated D3DDEVICEINFO structures.
 //-----------------------------------------------------------------------------
 VOID D3DEnum_GetDevices( D3DEnum_DeviceInfo** ppDevices, DWORD* pdwCount );
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -97,8 +89,6 @@ HRESULT D3DEnum_SelectDefaultDevice( D3DEnum_DeviceInfo** pDevice,
                                      DWORD dwFlags = 0L );
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: D3DEnum_UserChangeDevice()
 // Desc: Pops up a dialog which allows the user to select a new device.
@@ -106,9 +96,4 @@ HRESULT D3DEnum_SelectDefaultDevice( D3DEnum_DeviceInfo** pDevice,
 HRESULT D3DEnum_UserChangeDevice( D3DEnum_DeviceInfo** ppDevice );
 
 
-
-
 #endif // D3DENUM_H
-
-
-

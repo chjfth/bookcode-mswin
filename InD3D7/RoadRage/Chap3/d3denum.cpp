@@ -578,9 +578,9 @@ HRESULT D3DEnum_SelectDefaultDevice( D3DEnum_DeviceInfo** ppDevice,
 
     // Prefer a hardware TnL device first, then a non-TnL hardware device, and
     // finally, a software device.
-    if( 0 == ( dwFlags & D3DENUM_SOFTWAREONLY ) && pHardwareTnLDevice )
+    if( !( dwFlags & D3DENUM_SOFTWAREONLY ) && pHardwareTnLDevice )
         (*ppDevice) = pHardwareTnLDevice;
-    else if( 0 == ( dwFlags & D3DENUM_SOFTWAREONLY ) && pHardwareDevice )
+    else if( !( dwFlags & D3DENUM_SOFTWAREONLY ) && pHardwareDevice )
         (*ppDevice) = pHardwareDevice;
     else if( pSoftwareDevice )
         (*ppDevice) = pSoftwareDevice;

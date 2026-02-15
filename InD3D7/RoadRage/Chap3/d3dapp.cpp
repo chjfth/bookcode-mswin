@@ -213,8 +213,10 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 BOOL CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM )
 {
     if( WM_COMMAND == uMsg )
-        if( IDOK == LOWORD(wParam) || IDCANCEL == LOWORD(wParam) )
-            EndDialog( hWnd, TRUE );
+	{
+		if( IDOK == LOWORD(wParam) || IDCANCEL == LOWORD(wParam) )
+			EndDialog( hWnd, TRUE );
+	}
 
     return WM_INITDIALOG == uMsg ? TRUE : FALSE;
 }

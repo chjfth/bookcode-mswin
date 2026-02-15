@@ -172,7 +172,7 @@ HRESULT CD3DFramework7::CreateDirectDraw( GUID* pDriverGUID, DWORD dwFlags )
     if( m_bIsFullscreen )
         dwCoopFlags = DDSCL_ALLOWREBOOT|DDSCL_EXCLUSIVE|DDSCL_FULLSCREEN;
 
-    // By defualt, set the flag to allow D3D to optimize floating point calcs
+    // By default, set the flag to allow D3D to optimize floating point calcs
     if( 0L == ( dwFlags & D3DFW_NO_FPUSETUP ) )
         dwCoopFlags |= DDSCL_FPUSETUP;
 
