@@ -2,20 +2,29 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- 
-  	For VC2010 (v100), we need DirectX SDK June 2007 to have ddraw.lib etc. 
+  	For VC2010 (v100), we need DirectX SDK 9 or above to have ddraw.lib etc. 
   	User should have:
-  		d:\DXSDK-for-INDX98\Lib\x86\ddraw.lib
+  	    d:\DXSDK-for-INDX98\Lib\ddraw.lib
+  	    (DirectX 9 SDK, 2002.12)
+  	  or
   		d:\DXSDK-for-INDX98\Lib\x64\ddraw.lib
+  		(DirectX SDK 2004.10 ~ 2007.06)
   -->
   
   <PropertyGroup>
-    <dirDxsdk2007>d:\DXSDK-for-INDX98</dirDxsdk2007>
+    <dirDxsdk>d:\DXSDK-for-INDX98</dirDxsdk>
+
+    <!-- Asssume DX9b -->
+    <dirDxsdkLib>$(dirDxsdk)\Lib</dirDxsdkLib>
+    <!-- Override it if there is a in-subdir $(PlatformX)\ddraw.lib -->
+    <dirDxsdkLib Condition="exists('$(dirDxsdk)\Lib\$(PlatformX)\ddraw.lib')">$(dirDxsdk)\Lib\$(PlatformX)</dirDxsdkLib>
+
     <IsUsingVc2010 Condition="'$(PlatformToolset)'=='v100'">true</IsUsingVc2010>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(IsUsingVc2010)'=='true'">
-    <LibraryPath>$(dirDxsdk2007)\Lib\$(PlatformX);$(LibraryPath)</LibraryPath>
-    <PathDdrawLib>$(dirDxsdk2007)\Lib\$(PlatformX)\ddraw.lib</PathDdrawLib>
+    <LibraryPath>$(dirDxsdkLib);$(LibraryPath)</LibraryPath>
+    <PathDdrawLib>$(dirDxsdkLib)\ddraw.lib</PathDdrawLib>
     <NeedDxsdkAlert Condition="'$(IsUsingVc2010)'=='true' and !exists('$(PathDdrawLib)')">true</NeedDxsdkAlert>
   </PropertyGroup>
 
@@ -30,7 +39,7 @@
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathDdrawLib)', so EXE linking will fail." Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] Suggested: DirectX SDK June 2007 version." Importance="high" />
     
-    <Message Condition="'$(IsUsingVc2010)'=='true' and '$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk2007) ." Importance="high" />
+    <Message Condition="'$(IsUsingVc2010)'=='true' and '$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk) ." Importance="high" />
   </Target>
 
 </Project>
