@@ -89,7 +89,7 @@ HRESULT CD3DFramework7::DestroyObjects()
 // Desc: Creates the internal objects for the framework
 //-----------------------------------------------------------------------------
 HRESULT CD3DFramework7::Initialize( HWND hWnd, GUID* pDriverGUID,
-                                    GUID* pDeviceGUID, DDSURFACEDESC2* pMode,
+                                    GUID* pDeviceGUID, const DDSURFACEDESC2* pMode,
                                     DWORD dwFlags )
 {
     HRESULT hr;
@@ -122,7 +122,7 @@ HRESULT CD3DFramework7::Initialize( HWND hWnd, GUID* pDriverGUID,
 // Desc: Creates the internal objects for the framework
 //-----------------------------------------------------------------------------
 HRESULT CD3DFramework7::CreateEnvironment( GUID* pDriverGUID, GUID* pDeviceGUID,
-                                           DDSURFACEDESC2* pMode, DWORD dwFlags )
+                                           const DDSURFACEDESC2* pMode, DWORD dwFlags )
 {
     HRESULT hr;
 
@@ -201,7 +201,7 @@ HRESULT CD3DFramework7::CreateDirectDraw( GUID* pDriverGUID, DWORD dwFlags )
 // Desc: Creates the primary and (optional) backbuffer for rendering.
 //       Windowed mode and fullscreen mode are handled differently.
 //-----------------------------------------------------------------------------
-HRESULT CD3DFramework7::CreateFullscreenBuffers( DDSURFACEDESC2* pddsd )
+HRESULT CD3DFramework7::CreateFullscreenBuffers( const DDSURFACEDESC2* pddsd )
 {
     HRESULT hr;
 

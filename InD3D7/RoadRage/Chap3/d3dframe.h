@@ -49,10 +49,10 @@ class CD3DFramework7
 	DDPIXELFORMAT		 m_ddpfBackBufferPixelFormat;
 
     // Internal functions for the framework class
-    HRESULT CreateFullscreenBuffers( DDSURFACEDESC2* );
+    HRESULT CreateFullscreenBuffers( const DDSURFACEDESC2* );
     HRESULT CreateWindowedBuffers();
     HRESULT CreateDirectDraw( GUID*, DWORD );
-    HRESULT CreateEnvironment( GUID*, GUID*, DDSURFACEDESC2*, DWORD );
+    HRESULT CreateEnvironment( GUID*, GUID*, const DDSURFACEDESC2*, DWORD );
 
 public:
     // Access functions for DirectX objects
@@ -62,7 +62,7 @@ public:
     LPDIRECTDRAWSURFACE7 GetRenderSurface()     { return m_pddsBackBuffer; }
     LPDIRECTDRAWSURFACE7 GetRenderSurfaceLeft() { return m_pddsBackBufferLeft; }
     DWORD                GetRenderWidth()		{ return m_dwRenderWidth; }      // Dimensions of the render target
-    DWORD                GetRenderHeight()		{ return m_dwRenderHeight; }      // Dimensions of the render target
+    DWORD                GetRenderHeight()		{ return m_dwRenderHeight; }     // Dimensions of the render target
     // Functions to aid rendering
     HRESULT RestoreSurfaces();
     HRESULT ShowFrame();
@@ -75,7 +75,7 @@ public:
 
     // Creates the Framework
     HRESULT Initialize( HWND hWnd, GUID* pDriverGUID, GUID* pDeviceGUID,
-                        DDSURFACEDESC2* pddsd, DWORD dwFlags );
+                        const DDSURFACEDESC2* pddsd, DWORD dwFlags );
     HRESULT DestroyObjects();
 
             CD3DFramework7();

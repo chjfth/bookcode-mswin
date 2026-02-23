@@ -156,7 +156,7 @@ INT CD3DApplication::Run()
     // Load keyboard accelerators
     HACCEL hAccel = LoadAccelerators( NULL, MAKEINTRESOURCE(IDR_MAIN_ACCEL) );
 
-    // Now we're ready to recieve and process Windows messages.
+    // Now we're ready to receive and process Windows messages.
     BOOL bGotMsg;
     MSG  msg;
     PeekMessage( &msg, NULL, 0U, 0U, PM_NOREMOVE );
