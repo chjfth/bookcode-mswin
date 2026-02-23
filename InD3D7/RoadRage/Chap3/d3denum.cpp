@@ -468,7 +468,10 @@ static BOOL CALLBACK ChangeDeviceProc( HWND hDlg, UINT uiMsg, WPARAM wParam,
 
         D3DEnum_DeviceInfo* pDevice = &pDeviceList[dwDevice];
         
-        if( IDOK == LOWORD(wParam) )
+		int uic = LOWORD(wParam);
+		int codeNotify = HIWORD(wParam);
+
+        if( IDOK == uic )
         {
             // Handle the case when the user hits the OK button. Check if any
             // of the options were changed
@@ -489,13 +492,13 @@ static BOOL CALLBACK ChangeDeviceProc( HWND hDlg, UINT uiMsg, WPARAM wParam,
 
             return TRUE;
         }
-        else if( IDCANCEL == LOWORD(wParam) )
+        else if( IDCANCEL == uic )
         {
             // Handle the case when the user hits the Cancel button
             EndDialog( hDlg, IDCANCEL );
             return TRUE;
         }
-        else if( CBN_SELENDOK == HIWORD(wParam) )
+        else if( CBN_SELCHANGE == codeNotify )
         {
             if( LOWORD(wParam) == IDC_DEVICE_COMBO )
             {
@@ -505,9 +508,21 @@ static BOOL CALLBACK ChangeDeviceProc( HWND hDlg, UINT uiMsg, WPARAM wParam,
                 bStereo   = pDeviceList[dwDevice].bStereo;
             }
         }
+		
+		if( ( 
+			(uic==IDC_DEVICE_COMBO || uic==IDC_MODE_COMBO) && CBN_DROPDOWN==codeNotify )
+			||
+			(uic==IDC_WINDOWED_CHECKBOX)
+			)
+		{
+			// Keep the UI current
+			UpdateDialogControls( hDlg, &pDeviceList[dwDevice], dwMode, bWindowed, bStereo );
 
-        // Keep the UI current
-        UpdateDialogControls( hDlg, &pDeviceList[dwDevice], dwMode, bWindowed, bStereo );
+			// [2026-02-23] Chj note:
+			// Do NOT blindly call UpdateDialogControls() when a combobox notify us with CBN_xxx.
+			// If on CBN_CLOSEUP, dwDevice will always be 0, and it will ruin user's combobox
+			// item selection inside UpdateDialogControls().
+		}
         return TRUE;
     }
 
