@@ -15,7 +15,6 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "../chjutils/chjutils.h"
 
-#define SERVICESTATUS_IMPL
 #include "ServiceStatus.h"
 
 
