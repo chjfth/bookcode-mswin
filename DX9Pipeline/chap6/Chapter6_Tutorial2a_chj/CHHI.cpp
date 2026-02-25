@@ -1,6 +1,9 @@
 
 #define CHHI_ALL_IMPL
 
+#include <D3DX9.h>
+// -- Chj: This ensures we get "D3D9.h" from DX9SDK, not from VC2010+.
+
 #include <vaDbgTs.h>
 
 #include <CHHI_vaDBG_is_vaDbgTs.h> // optional

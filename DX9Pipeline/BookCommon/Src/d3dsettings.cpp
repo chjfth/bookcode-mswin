@@ -11,7 +11,7 @@
 #include <windowsx.h>
 #include <tchar.h>
 #include <stdio.h>
-#include <D3D9.h>
+#include <D3DX9.h>
 #include "DXUtil.h"
 #include "D3DUtil.h"
 #include "D3DEnumeration.h"
