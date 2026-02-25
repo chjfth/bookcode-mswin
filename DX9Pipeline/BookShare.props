@@ -44,6 +44,12 @@
   </PropertyGroup>
 
   <ItemDefinitionGroup>
+  
+    <ClCompile>
+      <!--This makes DX9pipeline code compatible with my d3d9types.it.h (avoid seeing new symbol D3DTEXF_CONVOLUTIONMONO etc) -->
+      <PreprocessorDefinitions>D3D_DISABLE_9EX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  
     <Link>
       <AdditionalDependencies>d3d9.lib;d3dx9.lib;d3dxof.lib;dxguid.lib;winmm.lib;;%(AdditionalDependencies)</AdditionalDependencies>
 
