@@ -12,6 +12,8 @@
 #include "D3DFrame.h"
 #include "D3DUtil.h"
 
+#include <mswin/utils_env.h> // for com_GetRefCount()
+
 extern LPDIRECTDRAWSURFACE7 g_pddsBackBuffer;
 
 
@@ -65,9 +67,26 @@ HRESULT CD3DFramework7::DestroyObjects()
         m_pDD->SetCooperativeLevel( m_hWnd, DDSCL_NORMAL );
     }
 
-    SAFE_RELEASE( m_pddsBackBuffer );
+	int refc1 = com_GetRefCount(m_pddsFrontBuffer);
+	int refc2 = com_GetRefCount(m_pddsBackBuffer);
+	int refc3 = com_GetRefCount(m_pddsBackBufferLeft);
+
+#if 1
+	// Chj memo: We MUST Release m_pddsBackBuffer before m_pddsFrontBuffer
+	SAFE_RELEASE( m_pddsBackBuffer );
+	SAFE_RELEASE( m_pddsBackBufferLeft );
+	SAFE_RELEASE( m_pddsFrontBuffer );
+
+#else 
+	// Experiment of 20260225.k1.
+	// If we Release m_pddsBackBuffer AFTER m_pddsFrontBuffer the `int refc2b =` line will crash.
+	SAFE_RELEASE( m_pddsFrontBuffer );
+
+	int refc2b = com_GetRefCount(m_pddsBackBuffer);
+
+	SAFE_RELEASE( m_pddsBackBuffer );
     SAFE_RELEASE( m_pddsBackBufferLeft );
-    SAFE_RELEASE( m_pddsFrontBuffer );
+#endif
 
     if( m_pDD )
     {
@@ -228,9 +247,7 @@ HRESULT CD3DFramework7::CreateFullscreenBuffers( const DDSURFACEDESC2* pddsd )
     }
 
     // Setup to create the primary surface w/backbuffer
-    DDSURFACEDESC2 ddsd;
-    ZeroMemory( &ddsd, sizeof(ddsd) );
-    ddsd.dwSize            = sizeof(ddsd);
+	DDSURFACEDESC2 ddsd = {sizeof(ddsd)};
     ddsd.dwFlags           = DDSD_CAPS|DDSD_BACKBUFFERCOUNT;
     ddsd.ddsCaps.dwCaps    = DDSCAPS_PRIMARYSURFACE | DDSCAPS_3DDEVICE |
                              DDSCAPS_FLIP | DDSCAPS_COMPLEX;
@@ -244,7 +261,8 @@ HRESULT CD3DFramework7::CreateFullscreenBuffers( const DDSURFACEDESC2* pddsd )
     }
 
     // Create the primary surface
-    if( FAILED( hr = m_pDD->CreateSurface( &ddsd, &m_pddsFrontBuffer, NULL ) ) )
+	hr = m_pDD->CreateSurface( &ddsd, &m_pddsFrontBuffer, NULL );
+    if( FAILED(hr) )
     {
         DEBUG_MSG( _T("Error: Can't create primary surface") );
         if( hr != DDERR_OUTOFVIDEOMEMORY )
@@ -253,25 +271,30 @@ HRESULT CD3DFramework7::CreateFullscreenBuffers( const DDSURFACEDESC2* pddsd )
         return DDERR_OUTOFVIDEOMEMORY;
     }
 
+	int refc1 = com_GetRefCount(m_pddsFrontBuffer); // We see refc1==1
+
     // Get the backbuffer, which was created along with the primary.
     DDSCAPS2 ddscaps = { DDSCAPS_BACKBUFFER, 0, 0, 0 };
-    if( FAILED( hr = m_pddsFrontBuffer->GetAttachedSurface( &ddscaps,
-                                                &m_pddsBackBuffer ) ) )
+	hr = m_pddsFrontBuffer->GetAttachedSurface( &ddscaps, &m_pddsBackBuffer );
+    if( FAILED(hr) )
     {
         DEBUG_ERR( hr, _T("Error: Can't get the backbuffer") );
         return D3DFWERR_NOBACKBUFFER;
     }
 
-    // Increment the backbuffer count (for consistency with windowed mode)
-    m_pddsBackBuffer->AddRef();
+	int refc2 = com_GetRefCount(m_pddsBackBuffer); // [2026-02-25] Chj memo: We see refc2==2
+
+    // Decrease the backbuffer count (for consistency with windowed mode)
+	// Chj memo: Refcount 2 -> 1
+//	m_pddsBackBuffer->Release(); // Chj: We should delete this, bcz the consistency is meaningless.
 
     // Support for stereoscopic viewing
     if( m_bIsStereo )
     {
         // Get the left back buffer, which was created along with the primary.
         DDSCAPS2 ddscaps = { 0, DDSCAPS2_STEREOSURFACELEFT, 0, 0 };
-        if( FAILED( hr = m_pddsBackBuffer->GetAttachedSurface( &ddscaps,
-                                                    &m_pddsBackBufferLeft ) ) )
+		hr = m_pddsBackBuffer->GetAttachedSurface( &ddscaps, &m_pddsBackBufferLeft );
+        if( FAILED(hr) )
         {
             DEBUG_ERR( hr, _T("Error: Can't get the left back buffer") );
             return D3DFWERR_NOBACKBUFFER;
@@ -279,7 +302,8 @@ HRESULT CD3DFramework7::CreateFullscreenBuffers( const DDSURFACEDESC2* pddsd )
         m_pddsBackBufferLeft->AddRef();
     }
 
-	FILE *fplog = fopen("rrlogfile.txt","a");
+	FILE *fplog = NULL;
+	fopen_s(&fplog, "rrlogfile.txt","a");
 
 	ZeroMemory(&m_ddpfBackBufferPixelFormat, sizeof(DDPIXELFORMAT));
 	m_ddpfBackBufferPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
@@ -327,9 +351,7 @@ HRESULT CD3DFramework7::CreateWindowedBuffers()
     m_dwRenderHeight = m_rcScreenRect.bottom - m_rcScreenRect.top;
 
     // Create the primary surface
-    DDSURFACEDESC2 ddsd;
-    ZeroMemory( &ddsd, sizeof(ddsd) );
-    ddsd.dwSize         = sizeof(ddsd);
+	DDSURFACEDESC2 ddsd = {sizeof(ddsd)};
     ddsd.dwFlags        = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
 
