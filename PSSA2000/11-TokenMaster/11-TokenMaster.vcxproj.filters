@@ -11,16 +11,7 @@
     <ClCompile Include="..\..\share\vaDbg.cpp">
       <Filter>chjutils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp">
-      <Filter>chjutils</Filter>
-    </ClCompile>
     <ClCompile Include="..\chjutils\ch10-DumpSD.cpp">
-      <Filter>chjutils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\__WinConst\mswin\WinError.itc.cpp">
-      <Filter>chjutils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\__WinConst\mswin\winnt.itc.cpp">
       <Filter>chjutils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,9 +24,6 @@
       <Filter>chjutils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\share\vaDbg.h">
-      <Filter>chjutils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\__WinConst\itc\InterpretConst.h">
       <Filter>chjutils</Filter>
     </ClInclude>
     <ClInclude Include="..\chjutils\ch10-DumpSD.h">

@@ -105,7 +105,6 @@ const TCHAR* format_wetime_as_localtime(LARGE_INTEGER twe, TCHAR output[], int o
 
 //////////////////////////////////////////////////////////////////////////
 
-#include <itc/InterpretConst.h>
 #include <mswin/winuser.itc.h>
 #include <mswin/commctrl.itc.h>
 #include <mswin/winnt.itc.h>
