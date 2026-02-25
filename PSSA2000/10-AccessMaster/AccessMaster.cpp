@@ -15,14 +15,11 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 // Force linking against the ACLUI library
 #pragma comment(lib, "ACLUI.lib")   
 
-#define PRINTBUF_IMPL
 #include "..\ClassLib\PrintBuf.h"
 
-#define  JULAYOUT_IMPL
 #include <mswin/JULayout2.h>
 
 #include <vaDbg.h>
-#include <itc/InterpretConst.h>
 
 #include "../chjutils/chjutils.h"
 #include "../chjutils/ch10-DumpSD.h"
@@ -617,6 +614,8 @@ HRESULT CSecurityInformation::PropertySheetPageCallback(HWND hwnd, UINT uMsg,
 		assert(hwnd);
 		HWND hwndPrsht = GetParent(hwnd); // Yes, we should operate on its parent-window
 		
+#define PSCB_INITIALIZED_1  1
+
 		bool succ = JULayout::PropSheetProc(hwndPrsht, PSCB_INITIALIZED_1, 0); // [2025-01-23] Pending: should pass in uMsg as 2nd param
 		
 		vaDbgS(L"JULayout::PropSheetProc()=%s", succ?L"success":L"fail");

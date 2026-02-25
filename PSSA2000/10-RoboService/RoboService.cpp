@@ -14,10 +14,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "..\chjutils\ch10-DumpSD.h"
 
-#define SERVICESTATUS_IMPL
 #include "..\03-TimeService\ServiceStatus.h"
 
-#define AUTOBUF_IMPL
 #include "..\ClassLib\AutoBuf.h"
 
 // Control the services behavior

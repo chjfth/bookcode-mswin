@@ -150,7 +150,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\..\share;..\..\__chjcxx\common-include\include;..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\share;..\..\__chjcxx\common-include\include\mswin;..\..\__chjcxx\common-include\include;..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -203,7 +203,6 @@
     <ClCompile Include="RoboClient.cpp" />
     <ClCompile Include="..\chjutils\chjutils.cpp" />
     <ClCompile Include="..\..\share\vaDbg.cpp" />
-    <ClCompile Include="..\..\__WinConst\itc\InterpretConst.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RoboClient.rc" />
