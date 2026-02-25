@@ -227,9 +227,6 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="HLSL_Glow.fx" />
-  </ItemGroup>
 
 
   <PropertyGroup>

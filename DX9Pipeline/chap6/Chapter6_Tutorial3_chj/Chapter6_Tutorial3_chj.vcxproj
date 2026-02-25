@@ -228,9 +228,6 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Ex6-3-chj.fx" />
-  </ItemGroup>
 
 
   <PropertyGroup>

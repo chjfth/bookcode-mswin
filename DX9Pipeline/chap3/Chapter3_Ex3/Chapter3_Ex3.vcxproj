@@ -227,9 +227,6 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Blend_2_0.vsh" />
-  </ItemGroup>
 
 
   <PropertyGroup>
