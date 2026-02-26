@@ -205,24 +205,25 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
     // FrameMove (animate) the scene
 
     // Render the scene as normal
-    if( FAILED( hr = Render() ) )
-        return hr;
+	hr = Render();
+	if( FAILED(hr) && DDERR_SURFACELOST!=hr )
+		return hr;
+
+	CD3DFramework7 *pf = GetFramework();
+	hr = pf->RestoreSurfaces();
+	hr = RestoreSurfaces();
+
+	if( FAILED(hr) )
+		return hr;
 
     // Show the frame rate, etc.
     if( m_bShowStats )
         ShowStats();
 
     // Show the frame on the primary surface.
-    if( FAILED( hr = (GetFramework())->ShowFrame() ) )
-    {
-        if( DDERR_SURFACELOST != hr )
-            return hr;
+    hr = pf->ShowFrame();
 
-        (GetFramework())->RestoreSurfaces();
-        RestoreSurfaces();
-    }
-
-    return S_OK;
+    return hr;
 }
 
 
