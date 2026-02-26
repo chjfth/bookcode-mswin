@@ -372,9 +372,17 @@ HRESULT CD3DFramework7::CreateWindowedBuffers()
         return D3DFWERR_NOCLIPPER;
     }
 
+	//
     // Associate the clipper with the window
-    pcClipper->SetHWnd( 0, m_hWnd );
+    //
+	pcClipper->SetHWnd( 0, m_hWnd );
+
+	int refc1 = com_GetRefCount(pcClipper);
+	//
     m_pddsFrontBuffer->SetClipper( pcClipper );
+	//
+	int refc2 = com_GetRefCount(pcClipper);
+
     SAFE_RELEASE( pcClipper );
 
     // Create a backbuffer
