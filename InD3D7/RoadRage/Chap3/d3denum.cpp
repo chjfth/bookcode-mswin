@@ -119,16 +119,25 @@ static HRESULT WINAPI D3DDevice_EnumCallback( char* strDesc, char* strName,
         pDeviceInfo->guidDriver  = pDriverInfo->guidDriver;
         pDeviceInfo->pDriverGUID = &pDeviceInfo->guidDriver;
         lstrcpyn( pDeviceInfo->strDesc, pDriverInfo->strDesc, 39 );
+
+		// Chj memo: pDriverInfo->strDesc can be:
+		// "VMwware SVGA II"
+		// "NVIDIA GeForce RTX 3050"
+		// etc
     }
     else
     {
+		// Chj memo: pDriverInfo->strDesc will always be "Primary Display Driver" here.
+		// We don't want pDeviceInfo->strDesc to be that dumb "Primary Display Driver", we use
+		// `strName` instead, it looks like "RGB Emulation", "Direct3D HAL", "Direct3D T&L HAL" etc.
         pDeviceInfo->pDriverGUID = NULL;
         lstrcpyn( pDeviceInfo->strDesc, makeTsdring(strName), ARRAYSIZE(pDeviceInfo->strDesc) );
 	}
 
     // Avoid duplicates: only enum HW devices for secondary DDraw drivers.
-    if( NULL!=pDeviceInfo->pDriverGUID && FALSE==pDeviceInfo->bHardware )
-            return D3DENUMRET_OK;
+	// (Chj comments out this stupid check, very stupid!)
+//	if( NULL!=pDeviceInfo->pDriverGUID && FALSE==pDeviceInfo->bHardware )
+//		return D3DENUMRET_OK;
 
     // Give the app a chance to accept or reject this device.
     if( g_fnAppConfirmFn )
@@ -193,8 +202,9 @@ static HRESULT WINAPI D3DDevice_EnumCallback( char* strDesc, char* strName,
 // Desc: Callback function for enumerating drivers.
 //-----------------------------------------------------------------------------
 static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
-                                       char* strName, VOID*, HMONITOR )
+                                       char* strName, VOID*, HMONITOR hMonitor)
 {
+	(void)hMonitor;
 	D3DEnum_DeviceInfo d3dDeviceInfo = {};
     LPDIRECTDRAW7      pDD = NULL;
     LPDIRECT3D7        pD3D = NULL;
