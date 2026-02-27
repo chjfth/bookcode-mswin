@@ -18,14 +18,21 @@
   -->
   
   <PropertyGroup>
-    <dirDxsdk9>d:\DXSDK9</dirDxsdk9>
+    <dirDxsdk>d:\DXSDK-InD3D7</dirDxsdk>
+    
+    <!-- Asssume DX9b -->
+    <dirDxsdkLib>$(dirDxsdk)\Lib</dirDxsdkLib>
+    <!-- Override it if there is a in-subdir $(PlatformX)\ddraw.lib 
+    	d:\DXSDK-InD3D7\Lib\x86\ddraw.lib
+    	d:\DXSDK-InD3D7\Lib\x64\ddraw.lib
+    -->
+    <dirDxsdkLib Condition="exists('$(dirDxsdk)\Lib\$(PlatformX)\ddraw.lib')">$(dirDxsdk)\Lib\$(PlatformX)</dirDxsdkLib>
     
     <IsUsingVc2010 Condition="'$(PlatformToolset)'=='v100'">true</IsUsingVc2010>
-    
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Note: We should place $(dirDxsdk9)\Include *behind* VC2010's Win7SDK include, 
+    <!-- Note: We should place $(dirDxsdk)\Include *behind* VC2010's Win7SDK include, 
          bcz DXSDK carries outdated basetsd.h which is not compatible with Win7SDK's other headers. 
     -->
     <IncludePath>$([System.String]::Concat(
@@ -34,13 +41,13 @@
       '$(dirThisBook)\..\__chjcxx\mm_snprintf\libsrc\include;',
       '$(dirThisBook)\..\__WinConst\mswin;',
       '$(IncludePath);',
-      '$(dirDxsdk9)\Include;'
+      '$(dirDxsdk)\Include;'
       ))
     </IncludePath>
     
-    <LibraryPath>$(dirDxsdk9)\Lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(dirDxsdkLib);$(LibraryPath)</LibraryPath>
     
-    <PathD3dxLib>$(dirDxsdk9)\Lib\d3dx9.lib</PathD3dxLib>
+    <PathD3dxLib>$(dirDxsdkLib)\d3dx9.lib</PathD3dxLib>
     <NeedDxsdkAlert Condition="!exists('$(PathD3dxLib)')">true</NeedDxsdkAlert>
   </PropertyGroup>
 
@@ -60,12 +67,12 @@
   <Target Name="SDK_Checking_ChjAlert" BeforeTargets="InitializeBuildStatus">
 	<Error Condition="'$(dirThisBook)'==''" Text="The MSBuild property 'dirThisBook' must be defined in your .vcxproj file." />
 
-    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX 9.0b] to provide d3dx9.lib etc." Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs [DirectX9 ~ 2007.06] to provide d3dx9.lib etc." Importance="high" />
     <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathD3dxLib)', most code samples will not compile." Importance="high" />
     
-    <Message Condition="'$(PlatformX)'!='x86'" Text="[ALERT] DirectX 9.0b supports only 32bit Windodws, your 64bit EXE linking will fail." Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk) ." Importance="high" />
 
-    <Message Condition="'$(NeedDxsdkAlert)'!='true'" Text="[INFO] Using DirectX SDK from $(dirDxsdk9) ." Importance="high" />
+    <Message Condition="'$(PlatformX)'!='x86'" Text="[ALERT] Direct3D 7 supports only 32bit Windodws, your 64bit EXE compiles but IID_IDirect3D7 will fail with E_NOINTERFACE." Importance="high" />
   </Target>
 
 </Project>

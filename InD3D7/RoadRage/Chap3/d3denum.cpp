@@ -209,6 +209,7 @@ static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
     LPDIRECTDRAW7      pDD = NULL;
     LPDIRECT3D7        pD3D = NULL;
     HRESULT            hr = 0;
+	TCHAR errmsg[200] = {};
     
     // Use the GUID to create the DirectDraw object
     hr = DirectDrawCreateEx( pGUID, (VOID**)&pDD, IID_IDirectDraw7, NULL );
@@ -223,7 +224,8 @@ static BOOL WINAPI DriverEnumCallback( GUID* pGUID, char* strDesc,
     if( FAILED(hr) )
     {
         pDD->Release();
-        DEBUG_MSG( _T("Can't query IDirect3D7 during enumeration!") );
+		_sntprintf_s(errmsg, _TRUNCATE, _T("pDD->QueryInterface(IID_IDirect3D7) fail with hr=0x%X !"), hr);
+        DEBUG_MSG( errmsg );
         return D3DENUMRET_OK;
     }
 
@@ -429,7 +431,7 @@ static VOID UpdateDialogControls( HWND hDlg, D3DEnum_DeviceInfo* pCurrentDevice,
 // Name: ChangeDeviceProc()
 // Desc: Windows message handling function for the device select dialog
 //-----------------------------------------------------------------------------
-static BOOL CALLBACK ChangeDeviceProc( HWND hDlg, UINT uiMsg, WPARAM wParam, 
+static INT_PTR CALLBACK ChangeDeviceProc( HWND hDlg, UINT uiMsg, WPARAM wParam, 
                                        LPARAM lParam )
 {
     static D3DEnum_DeviceInfo** ppDeviceArg;
@@ -472,7 +474,7 @@ static BOOL CALLBACK ChangeDeviceProc( HWND hDlg, UINT uiMsg, WPARAM wParam,
         // Get current UI state
         DWORD dwDevice   = ComboBox_GetCurSel( hwndDevice );
         DWORD dwModeItem = ComboBox_GetCurSel( hwndMode );
-        DWORD dwMode     = ComboBox_GetItemData( hwndMode, dwModeItem );
+        DWORD dwMode     = (DWORD)ComboBox_GetItemData( hwndMode, dwModeItem );
         BOOL  bWindowed  = hwndWindowed ? Button_GetCheck( hwndWindowed ) : 0;
         BOOL  bStereo    = hwndStereo   ? Button_GetCheck( hwndStereo )   : 0;
 

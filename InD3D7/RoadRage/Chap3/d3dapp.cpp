@@ -20,7 +20,7 @@
 //-----------------------------------------------------------------------------
 enum APPMSGTYPE { MSG_NONE, MSGERR_APPMUSTEXIT, MSGWARN_SWITCHEDTOSOFTWARE };
 
-static INT     CALLBACK AboutProc( HWND, UINT, WPARAM, LPARAM );
+static INT_PTR CALLBACK AboutProc( HWND, UINT, WPARAM, LPARAM );
 static LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
 
 CD3DApplication* g_pD3DApp;
@@ -190,7 +190,7 @@ INT CD3DApplication::Run()
         }
     }
 
-    return msg.wParam;
+    return (INT)msg.wParam;
 }
 
 
@@ -211,7 +211,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 // Name: AboutProc()
 // Desc: Minimal message proc function for the about box
 //-----------------------------------------------------------------------------
-BOOL CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM )
+INT_PTR CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM )
 {
     if( WM_COMMAND == uMsg )
 	{
@@ -399,7 +399,7 @@ LRESULT CD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                 case IDM_ABOUT:
                     // Display the About box
                     Pause(TRUE);
-                    DialogBox( (HINSTANCE)GetWindowLong( hWnd, GWL_HINSTANCE ),
+                    DialogBox( (HINSTANCE)GetWindowLong( hWnd, GWLP_HINSTANCE ),
                                MAKEINTRESOURCE(IDD_ABOUT), hWnd, AppAbout );
                     Pause(FALSE);
                     return 0;

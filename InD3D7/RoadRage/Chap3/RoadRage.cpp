@@ -35,8 +35,8 @@
 #define EXITCODE_ERROR       4  // Dialog error, terminate app
 
 
-extern BOOL FAR PASCAL AppAbout(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM );
+extern INT_PTR CALLBACK AppAbout(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM );
 
 FLOAT                g_fCurrentTime;
 extern GUID                 g_AppGUID; 
@@ -61,7 +61,7 @@ VOID DisplayError( CHAR* strMessage );
 // Name: AboutProc()
 // Desc: Minimal message proc function for the about box
 //-----------------------------------------------------------------------------
-BOOL CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM )
+INT_PTR CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM )
 {
     if( WM_COMMAND == uMsg )
         if( IDOK == LOWORD(wParam) || IDCANCEL == LOWORD(wParam) )

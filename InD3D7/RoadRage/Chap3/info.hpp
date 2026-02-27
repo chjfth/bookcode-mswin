@@ -1,7 +1,7 @@
 
 #include <windows.h>
 
-BOOL FAR PASCAL AppAbout(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+INT_PTR FAR PASCAL AppAbout(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
 
