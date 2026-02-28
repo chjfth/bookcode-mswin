@@ -46,12 +46,16 @@ protected:
     HWND                 m_hWnd;
     D3DEnum_DeviceInfo*  m_pDeviceInfo;
     LPDIRECTDRAW7        m_pDD;
+	LPDIRECT3D7          m_pD3D;       // Chap4
+	LPDIRECT3DDEVICE7    m_pd3dDevice; // Chap4
+
     LPDIRECTDRAWSURFACE7 m_pddsRenderTarget;
     LPDIRECTDRAWSURFACE7 m_pddsRenderTargetLeft; // For stereo modes
     DDSURFACEDESC2       m_ddsdRenderTarget;
 
     // Overridable variables for the app
     TCHAR*               m_strWindowTitle;
+	BOOL                 m_bAppUseZBuffer; // Chap4
     BOOL                 m_bAppUseStereo;
     BOOL                 m_bShowStats;
     HRESULT              (*m_fnConfirmDevice)(DDCAPS*, D3DDEVICEDESC7*);
@@ -77,6 +81,9 @@ protected:
     VOID    SetAppRightViewMatrix( D3DMATRIX mat ) { m_matRightView = mat; }
     VOID    SetAppViewMatrix( D3DMATRIX mat )      { m_matView      = mat; }
 
+	VOID    SetViewParams( D3DVECTOR* vEyePt, D3DVECTOR* vLookatPt,
+		D3DVECTOR* vUpVec, FLOAT fEyeDistance ); // Chap4
+
     // Miscellaneous functions
     VOID    ShowStats();
     VOID    OutputText( DWORD x, DWORD y, TCHAR* str );
@@ -97,6 +104,7 @@ public:
 	VOID				 SetbActive(BOOL val)	{ m_bActive = val; };
 	VOID				 SetbFrameMoving(BOOL val)	{ m_bFrameMoving = val; };
     BOOL				 GetbFrameMoving()		{ return m_bFrameMoving; };
+	LPDIRECT3DDEVICE7    GetDevice()			{ return m_pd3dDevice; }; // Chap4
     DWORD				 GetBaseTime()			{ return m_dwBaseTime; };
     DWORD				 GetStopTime()			{ return m_dwStopTime; };
 	VOID				 SetBaseTime(DWORD val)	{ m_dwBaseTime = val; };

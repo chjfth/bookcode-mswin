@@ -34,6 +34,8 @@ CD3DApplication::CD3DApplication()
     m_pFramework   = NULL;
     m_hWnd         = NULL;
     m_pDD          = NULL;
+	m_pD3D         = NULL;
+	m_pd3dDevice   = NULL;
 
     m_pddsRenderTarget     = NULL;
     m_pddsRenderTargetLeft = NULL;
@@ -41,7 +43,11 @@ CD3DApplication::CD3DApplication()
     m_bActive         = FALSE;
     m_bReady          = FALSE;
 
+	m_bFrameMoving    = TRUE;
+	m_bSingleStep     = FALSE;
+
     m_strWindowTitle  = _T("Direct3D Application");
+	m_bAppUseZBuffer  = FALSE; // Chap4
     m_bAppUseStereo   = FALSE;
     m_bShowStats      = FALSE;
     m_fnConfirmDevice = NULL;
@@ -456,6 +462,8 @@ HRESULT CD3DApplication::Initialize3DEnvironment()
     HRESULT hr;
     DWORD   dwFrameworkFlags = 0L;
     dwFrameworkFlags |= ( !m_pDeviceInfo->bWindowed ? D3DFW_FULLSCREEN : 0L );
+	dwFrameworkFlags |= (  m_pDeviceInfo->bStereo   ? D3DFW_STEREO     : 0L );
+	dwFrameworkFlags |= (  m_bAppUseZBuffer         ? D3DFW_ZBUFFER    : 0L );
 
     // Initialize the Direct3D framework
     if( SUCCEEDED( hr = m_pFramework->Initialize( m_hWnd,
@@ -463,6 +471,8 @@ HRESULT CD3DApplication::Initialize3DEnvironment()
                      &m_pDeviceInfo->ddsdFullscreenMode, dwFrameworkFlags ) ) )
     {
         m_pDD        = m_pFramework->GetDirectDraw();
+		m_pD3D       = m_pFramework->GetDirect3D();
+		m_pd3dDevice = m_pFramework->GetD3DDevice();
 
         m_pddsRenderTarget     = m_pFramework->GetRenderSurface();
         m_pddsRenderTargetLeft = m_pFramework->GetRenderSurfaceLeft();
@@ -586,6 +596,50 @@ HRESULT CD3DApplication::Render3DEnvironment()
         return hr;
     }
 
+	// Chap4 >>>
+
+	// Get the relative time, in seconds
+	FLOAT fTime = ( timeGetTime() - m_dwBaseTime ) * 0.001f;
+
+	// FrameMove (animate) the scene
+	if( m_bFrameMoving || m_bSingleStep )
+	{
+		if( FAILED( hr = FrameMove( fTime ) ) )
+			return hr;
+
+		m_bSingleStep = FALSE;
+	}
+
+	// If the display is in a stereo mode, render the scene from the left eye
+	// first, then the right eye.
+	if( m_bAppUseStereo && m_pDeviceInfo->bStereo && !m_pDeviceInfo->bWindowed )
+	{
+		// Render the scene from the left eye
+		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matLeftView );
+		if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTargetLeft, 0 ) ) )
+			return hr;
+		if( FAILED( hr = Render() ) )
+			return hr;
+
+		//Render the scene from the right eye
+		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matRightView );
+		if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTarget, 0 ) ) )
+			return hr;
+		if( FAILED( hr = Render() ) )
+			return hr;
+	} 
+	else 
+	{
+		// Set center viewing matrix if app is stereo-enabled
+		if( m_bAppUseStereo )
+			m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matView );
+
+		// Render the scene as normal
+		if( FAILED( hr = Render() ) )
+			return hr;
+	}
+
+	// Chap4 <<<
 
     // Show the frame rate, etc.
     if( m_bShowStats )
@@ -754,6 +808,30 @@ VOID CD3DApplication::OutputText( DWORD x, DWORD y, TCHAR* str )
     }
 }
 
+//-----------------------------------------------------------------------------
+// Name: SetViewParams()
+// Desc: Sets the parameters to be used by the SetViewMatrix() function.  You
+//       must call this function rather than setting the D3D view matrix 
+//       yourself in order for stereo modes to work properly.
+//-----------------------------------------------------------------------------
+VOID CD3DApplication::SetViewParams( D3DVECTOR* vEyePt, D3DVECTOR* vLookatPt,
+	D3DVECTOR* vUpVec, FLOAT fEyeDistance )
+{
+	// Adjust camera position for left or right eye along the axis
+	// perpendicular to the view direction vector and the up vector.
+	D3DVECTOR vView = (*vLookatPt) - (*vEyePt);
+	vView = CrossProduct( vView, (*vUpVec) );
+	vView = Normalize( vView ) * fEyeDistance;
+
+	D3DVECTOR vLeftEyePt  = (*vEyePt) + vView;
+	D3DVECTOR vRightEyePt = (*vEyePt) - vView;
+
+	// Set the view matrices
+	D3DUtil_SetViewMatrix( m_matLeftView,  vLeftEyePt,  *vLookatPt, *vUpVec );
+	D3DUtil_SetViewMatrix( m_matRightView, vRightEyePt, *vLookatPt, *vUpVec );
+	D3DUtil_SetViewMatrix( m_matView,      *vEyePt,     *vLookatPt, *vUpVec );
+}
+
 
 //-----------------------------------------------------------------------------
 // Name: DisplayFrameworkError()
@@ -787,7 +865,12 @@ VOID CD3DApplication::DisplayFrameworkError( HRESULT hr, DWORD dwType )
         case D3DFWERR_NODIRECTDRAW:
             lstrcpy( strMsg, _T("No DirectDraw") );
             break;
-        case D3DFWERR_INVALIDMODE:
+
+		case D3DFWERR_NODIRECT3D: // Chap4
+			lstrcpy( strMsg, _T("No Direct3D") );
+			break;
+
+		case D3DFWERR_INVALIDMODE:
             lstrcpy( strMsg, _T("This sample requires a 16-bit (or higher) ")
                                 _T("display mode\nto run in a window.\n\nPlease ")
                                 _T("switch your desktop settings accordingly.") );
@@ -795,6 +878,25 @@ VOID CD3DApplication::DisplayFrameworkError( HRESULT hr, DWORD dwType )
         case D3DFWERR_COULDNTSETCOOPLEVEL:
             lstrcpy( strMsg, _T("Could not set Cooperative Level") );
             break;
+
+		case D3DFWERR_NO3DDEVICE: // Chap4
+			lstrcpy( strMsg, _T("Could not create the Direct3DDevice object.") );
+
+			if( MSGWARN_SWITCHEDTOSOFTWARE == dwType )
+				lstrcat( strMsg, _T("\nThe 3D hardware chipset may not support")
+					_T("\nrendering in the current display mode.") );
+			break;
+		case D3DFWERR_NOZBUFFER:
+			lstrcpy( strMsg, _T("No ZBuffer") );
+			break;
+		case D3DFWERR_INVALIDZBUFFERDEPTH:
+			lstrcpy( strMsg, _T("Invalid Z-buffer depth. Try switching modes\n")
+				_T("from 16- to 32-bit (or vice versa)") );
+			break;
+		case D3DFWERR_NOVIEWPORT:
+			lstrcpy( strMsg, _T("No Viewport") );
+			break;
+
         case D3DFWERR_NOPRIMARY:
             lstrcpy( strMsg, _T("No primary") );
             break;

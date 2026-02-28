@@ -183,6 +183,13 @@ void CMyD3DApplication::DisplayRRStats(HWND hwnd)
 	TextOut(hdc, sx1, sy, _T("D3D Device Name :"),17);
 	TextOut(hdc, sx2, sy, D3Ddevicename, _tcslen(D3Ddevicename));
 	sy +=20;
+
+	_itot_s(num_dp_commands_in_scene, buffer,10);
+	_tcscpy_s(buf2, _T("Number of DP commands in scene  :"));
+	TextOut(hdc, sx1, sy, buf2,   _tcslen(buf2));
+	TextOut(hdc, sx2, sy, buffer, _tcslen(buffer));
+	sy +=20;
+
 	SetBkMode(hdc, OPAQUE);
 	ReleaseDC(hwnd,hdc);  
 }

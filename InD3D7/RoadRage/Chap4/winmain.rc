@@ -152,6 +152,15 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "E&xit\tESC",                  IDM_EXIT
     END
+    POPUP "&Render"
+    BEGIN
+        MENUITEM "Flat Shading",                MENU_FLAT_SHADING
+        MENUITEM "Gouraud Shading",             MENU_GOURAUD_SHADING
+    END
+    POPUP "&Lighting"
+    BEGIN
+        MENUITEM "Light Sources",               MENU_LIGHT_SOURCES
+    END
 END
 
 #endif    // English (U.S.) resources

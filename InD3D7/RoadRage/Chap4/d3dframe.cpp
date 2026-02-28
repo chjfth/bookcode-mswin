@@ -35,6 +35,10 @@ CD3DFramework7::CD3DFramework7()
      
      m_pDD             = NULL;
      m_dwDeviceMemType = NULL;
+
+	 m_pddsZBuffer     = NULL;
+	 m_pd3dDevice      = NULL;
+	 m_pD3D            = NULL;
 }
 
 
@@ -67,26 +71,19 @@ HRESULT CD3DFramework7::DestroyObjects()
         m_pDD->SetCooperativeLevel( m_hWnd, DDSCL_NORMAL );
     }
 
-	int refc1 = com_GetRefCount(m_pddsFrontBuffer);
-	int refc2 = com_GetRefCount(m_pddsBackBuffer);
-	int refc3 = com_GetRefCount(m_pddsBackBufferLeft);
+	// Do a safe check for releasing the D3DDEVICE. RefCount must be zero.
+	if( m_pd3dDevice )
+	{
+		if( 0 < ( nD3D = m_pd3dDevice->Release() ) )
+			DEBUG_MSG( _T("Error: D3DDevice object is still referenced!") );
+	}
+	m_pd3dDevice = NULL;
 
-#if 1
-	// Chj memo: We MUST Release m_pddsBackBuffer before m_pddsFrontBuffer
 	SAFE_RELEASE( m_pddsBackBuffer );
 	SAFE_RELEASE( m_pddsBackBufferLeft );
+	SAFE_RELEASE( m_pddsZBuffer );
 	SAFE_RELEASE( m_pddsFrontBuffer );
-
-#else 
-	// Experiment of 20260225.k1.
-	// If we Release m_pddsBackBuffer AFTER m_pddsFrontBuffer the `int refc2b =` line will crash.
-	SAFE_RELEASE( m_pddsFrontBuffer );
-
-	int refc2b = com_GetRefCount(m_pddsBackBuffer);
-
-	SAFE_RELEASE( m_pddsBackBuffer );
-    SAFE_RELEASE( m_pddsBackBufferLeft );
-#endif
+	SAFE_RELEASE( m_pD3D );
 
     if( m_pDD )
     {
@@ -120,7 +117,15 @@ HRESULT CD3DFramework7::Initialize( HWND hWnd, GUID* pDriverGUID,
 
     // Setup state for windowed/fullscreen mode
     m_hWnd          = hWnd;
+	m_bIsStereo     = FALSE;
     m_bIsFullscreen = ( dwFlags & D3DFW_FULLSCREEN ) ? TRUE : FALSE;
+
+	// Support stereoscopic viewing for fullscreen modes which support it
+	if( ( dwFlags & D3DFW_STEREO ) && ( dwFlags & D3DFW_FULLSCREEN ) )
+	{
+		if( pMode->ddsCaps.dwCaps2 & DDSCAPS2_STEREOSURFACELEFT )
+			m_bIsStereo = TRUE;
+	}
 
     // Create the D3D rendering environment (surfaces, device, viewport, and so forth.)
     if( FAILED( hr = CreateEnvironment( pDriverGUID, pDeviceGUID, pMode,
@@ -166,7 +171,37 @@ HRESULT CD3DFramework7::CreateEnvironment( GUID* pDriverGUID, GUID* pDeviceGUID,
     if( FAILED( hr ) )
         return hr;
 
+	// Create the Direct3D object and the Direct3DDevice object
+	hr = CreateDirect3D( pDeviceGUID );
+	if( FAILED( hr ) )
+		return hr;
+
+	// Create and attach the zbuffer
+	if( dwFlags & D3DFW_ZBUFFER )
+		hr = CreateZBuffer( pDeviceGUID );
+	if( FAILED( hr ) )
+		return hr;
+
+
     return S_OK;
+}
+
+//-----------------------------------------------------------------------------
+// Name: EnumZBufferFormatsCallback()
+// Desc: Simply returns the first matching enumerated z-buffer format
+//-----------------------------------------------------------------------------
+static HRESULT WINAPI EnumZBufferFormatsCallback( DDPIXELFORMAT* pddpf,
+	VOID* pContext )
+{
+	DDPIXELFORMAT* pddpfOut = (DDPIXELFORMAT*)pContext;
+
+	if( pddpfOut->dwRGBBitCount == pddpf->dwRGBBitCount )
+	{
+		(*pddpfOut) = (*pddpf);
+		return D3DENUMRET_CANCEL;
+	}
+
+	return D3DENUMRET_OK;
 }
 
 
@@ -407,6 +442,124 @@ HRESULT CD3DFramework7::CreateWindowedBuffers()
 
     return S_OK;
 }
+
+
+// Chap4
+//-----------------------------------------------------------------------------
+// Name: CreateDirect3D()
+// Desc: Create the Direct3D interface
+//-----------------------------------------------------------------------------
+HRESULT CD3DFramework7::CreateDirect3D( GUID* pDeviceGUID )
+{
+	// Query DirectDraw for access to Direct3D.
+	if( FAILED( m_pDD->QueryInterface( IID_IDirect3D7, (VOID**)&m_pD3D ) ) )
+	{
+		DEBUG_MSG( _T("Couldn't get the Direct3D interface") );
+		return D3DFWERR_NODIRECT3D;
+	}
+
+	// Create the device
+	if( FAILED( m_pD3D->CreateDevice( *pDeviceGUID, m_pddsBackBuffer,
+		&m_pd3dDevice) ) )
+	{
+		DEBUG_MSG( _T("Couldn't create the D3DDevice") );
+		return D3DFWERR_NO3DDEVICE;
+	}
+
+	// Finally, set the viewport for the newly created device
+	D3DVIEWPORT7 vp = { 0, 0, m_dwRenderWidth, m_dwRenderHeight, 0.0f, 1.0f };
+
+	if( FAILED( m_pd3dDevice->SetViewport( &vp ) ) )
+	{
+		DEBUG_MSG( _T("Error: Couldn't set current viewport to device") );
+		return D3DFWERR_NOVIEWPORT;
+	}
+
+	return S_OK;
+}
+
+
+// Chap4
+//-----------------------------------------------------------------------------
+// Name: CreateZBuffer()
+// Desc: Internal function called by Create() to make and attach a zbuffer
+//       to the renderer
+//-----------------------------------------------------------------------------
+HRESULT CD3DFramework7::CreateZBuffer( GUID* pDeviceGUID )
+{
+	HRESULT hr = 0;
+
+	// Check if the device supports z-bufferless hidden surface removal. If so,
+	// we don't really need a z-buffer
+	D3DDEVICEDESC7 ddDesc = {};
+	m_pd3dDevice->GetCaps( &ddDesc );
+	if( ddDesc.dpcTriCaps.dwRasterCaps & D3DPRASTERCAPS_ZBUFFERLESSHSR )
+		return S_OK;
+
+	// Get z-buffer dimensions from the render target
+	DDSURFACEDESC2 ddsd = {sizeof(ddsd)};
+	m_pddsBackBuffer->GetSurfaceDesc( &ddsd );
+
+	// Setup the surface desc for the z-buffer.
+	ddsd.dwFlags        = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS | DDSD_PIXELFORMAT;
+	ddsd.ddsCaps.dwCaps = DDSCAPS_ZBUFFER | m_dwDeviceMemType;
+	ddsd.ddpfPixelFormat.dwSize = 0;  // Tag the pixel format as uninitialized.
+
+	// Get an appropriate pixel format from enumeration of the formats. On the
+	// first pass, we look for a zbuffer depth which is equal to the frame
+	// buffer depth (as some cards unfortunately require this).
+	m_pD3D->EnumZBufferFormats( *pDeviceGUID, EnumZBufferFormatsCallback,
+		(VOID*)&ddsd.ddpfPixelFormat );
+	if( 0 == ddsd.ddpfPixelFormat.dwSize )
+	{
+		// Try again, just accepting any 16-bit zbuffer
+		ddsd.ddpfPixelFormat.dwRGBBitCount = 16;
+		m_pD3D->EnumZBufferFormats( *pDeviceGUID, EnumZBufferFormatsCallback,
+			(VOID*)&ddsd.ddpfPixelFormat );
+
+		if( 0 == ddsd.ddpfPixelFormat.dwSize )
+		{
+			DEBUG_MSG( _T("Device doesn't support requested zbuffer format") );
+			return D3DFWERR_NOZBUFFER;
+		}
+	}
+
+	// Create and attach a z-buffer
+	if( FAILED( hr = m_pDD->CreateSurface( &ddsd, &m_pddsZBuffer, NULL ) ) )
+	{
+		DEBUG_MSG( _T("Error: Couldn't create a ZBuffer surface") );
+		if( hr != DDERR_OUTOFVIDEOMEMORY )
+			return D3DFWERR_NOZBUFFER;
+		DEBUG_MSG( _T("Error: Out of video memory") );
+		return DDERR_OUTOFVIDEOMEMORY;
+	}
+
+	if( FAILED( m_pddsBackBuffer->AddAttachedSurface( m_pddsZBuffer ) ) )
+	{
+		DEBUG_MSG( _T("Error: Couldn't attach zbuffer to render surface") );
+		return D3DFWERR_NOZBUFFER;
+	}
+
+	// For stereoscopic viewing, attach zbuffer to left surface as well
+	if( m_bIsStereo )
+	{
+		if( FAILED( m_pddsBackBufferLeft->AddAttachedSurface( m_pddsZBuffer ) ) )
+		{
+			DEBUG_MSG( _T("Error: Couldn't attach zbuffer to left render surface") );
+			return D3DFWERR_NOZBUFFER;
+		}
+	}
+
+	// Finally, this call rebuilds internal structures
+	if( FAILED( m_pd3dDevice->SetRenderTarget( m_pddsBackBuffer, 0L ) ) )
+	{
+		DEBUG_MSG( _T("Error: SetRenderTarget() failed after attaching zbuffer!") );
+		return D3DFWERR_NOZBUFFER;
+	}
+
+	return S_OK;
+}
+
 
 
 //-----------------------------------------------------------------------------

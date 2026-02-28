@@ -48,11 +48,24 @@ class CD3DFramework7
     DWORD                m_dwDeviceMemType;
 	DDPIXELFORMAT		 m_ddpfBackBufferPixelFormat;
 
+	// Chap4
+	LPDIRECT3D7          m_pD3D;               // The Direct3D object
+	LPDIRECT3DDEVICE7    m_pd3dDevice;         // The D3D device
+	LPDIRECTDRAWSURFACE7 m_pddsZBuffer;        // The zbuffer surface
+
     // Internal functions for the framework class
     HRESULT CreateFullscreenBuffers( const DDSURFACEDESC2* );
     HRESULT CreateWindowedBuffers();
     HRESULT CreateDirectDraw( GUID*, DWORD );
     HRESULT CreateEnvironment( GUID*, GUID*, const DDSURFACEDESC2*, DWORD );
+
+	// Chap4
+	HRESULT CreateZBuffer( GUID* );
+	HRESULT CreateDirect3D( GUID* );
+
+public:
+	LPDIRECT3D7          GetDirect3D()          { return m_pD3D; }
+	LPDIRECT3DDEVICE7    GetD3DDevice()         { return m_pd3dDevice; }
 
 public:
     // Access functions for DirectX objects
@@ -89,6 +102,8 @@ public:
 // Flags used for the Initialize() method of a CD3DFramework object
 //-----------------------------------------------------------------------------
 #define D3DFW_FULLSCREEN    0x00000001 // Use fullscreen mode
+#define D3DFW_STEREO        0x00000002 // Use stereo-scopic viewing
+#define D3DFW_ZBUFFER       0x00000004 // Create and use a zbuffer
 #define D3DFW_NO_FPUSETUP   0x00000008 // Don't use default DDSCL_FPUSETUP flag
 
 
@@ -100,6 +115,10 @@ public:
 #define D3DFWERR_INITIALIZATIONFAILED 0x82000000
 #define D3DFWERR_NODIRECTDRAW         0x82000001
 #define D3DFWERR_COULDNTSETCOOPLEVEL  0x82000002
+#define D3DFWERR_NODIRECT3D           0x82000003
+#define D3DFWERR_NO3DDEVICE           0x82000004
+#define D3DFWERR_NOZBUFFER            0x82000005
+#define D3DFWERR_INVALIDZBUFFERDEPTH  0x82000006
 #define D3DFWERR_NOVIEWPORT           0x82000007
 #define D3DFWERR_NOPRIMARY            0x82000008
 #define D3DFWERR_NOCLIPPER            0x82000009
