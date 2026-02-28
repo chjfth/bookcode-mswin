@@ -134,8 +134,7 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
                     exit(0);
 
     			default:
-					return CD3DApplication::MsgProc( hWnd, uMsg, wParam,
-													 lParam );           
+					return CD3DApplication::MsgProc( hWnd, uMsg, wParam, lParam );           
 			}
             break;
 
@@ -205,13 +204,17 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
     // FrameMove (animate) the scene
 
     // Render the scene as normal
-	hr = Render();
-	if( FAILED(hr) && DDERR_SURFACELOST!=hr )
-		return hr;
-
 	CD3DFramework7 *pf = GetFramework();
-	hr = pf->RestoreSurfaces();
-	hr = RestoreSurfaces();
+	hr = Render();
+	if( FAILED(hr) )
+	{
+		if( DDERR_SURFACELOST!=hr )
+			return hr; // true fail
+
+		// try to restore surface
+		hr = pf->RestoreSurfaces();
+		hr = RestoreSurfaces();
+	}
 
 	if( FAILED(hr) )
 		return hr;
