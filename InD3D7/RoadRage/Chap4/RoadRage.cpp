@@ -208,17 +208,23 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 HRESULT CMyD3DApplication::Render()
 {
 	// Clear the viewport
-	m_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L );
+	HRESULT hr = m_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L );
+	if( FAILED(hr) )
+		return hr;
 
 	// Begin the scene
-	if( SUCCEEDED( m_pd3dDevice->BeginScene() ) )
+	hr = m_pd3dDevice->BeginScene();
+	if( FAILED(hr) )
+		return hr; // may get DDERR_SURFACELOST(0x887601c2)
+
 	{
+		// ... do 3D drawing ...
 	}
 
 	// End the scene.
-	m_pd3dDevice->EndScene();
+	hr = m_pd3dDevice->EndScene();
 
-	return S_OK;
+	return hr;
 }
 
 
@@ -265,19 +271,22 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 	// first, then the right eye.
 	if( m_bAppUseStereo && m_pDeviceInfo->bStereo && !m_pDeviceInfo->bWindowed )
 	{
-		// Render the scene from the left eye
-		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matLeftView );
-		if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTargetLeft, 0 ) ) )
-			return hr;
-		if( FAILED( hr = Render() ) )
-			return hr;
+		do
+		{
+			// Render the scene from the left eye
+			m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matLeftView );
+			if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTargetLeft, 0 ) ) )
+				break;
+			if( FAILED( hr = Render() ) )
+				break;
 
-		//Render the scene from the right eye
-		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matRightView );
-		if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTarget, 0 ) ) )
-			return hr;
-		if( FAILED( hr = Render() ) )
-			return hr;
+			//Render the scene from the right eye
+			m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matRightView );
+			if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTarget, 0 ) ) )
+				break;
+			if( FAILED( hr = Render() ) )
+				break;
+		} while(0);
 	} 
 	else 
 	{
