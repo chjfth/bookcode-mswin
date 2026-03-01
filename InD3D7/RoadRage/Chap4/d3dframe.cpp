@@ -186,24 +186,6 @@ HRESULT CD3DFramework7::CreateEnvironment( GUID* pDriverGUID, GUID* pDeviceGUID,
     return S_OK;
 }
 
-//-----------------------------------------------------------------------------
-// Name: EnumZBufferFormatsCallback()
-// Desc: Simply returns the first matching enumerated z-buffer format
-//-----------------------------------------------------------------------------
-static HRESULT WINAPI EnumZBufferFormatsCallback( DDPIXELFORMAT* pddpf,
-	VOID* pContext )
-{
-	DDPIXELFORMAT* pddpfOut = (DDPIXELFORMAT*)pContext;
-
-	if( pddpfOut->dwRGBBitCount == pddpf->dwRGBBitCount )
-	{
-		(*pddpfOut) = (*pddpf);
-		return D3DENUMRET_CANCEL;
-	}
-
-	return D3DENUMRET_OK;
-}
-
 
 
 
@@ -476,6 +458,25 @@ HRESULT CD3DFramework7::CreateDirect3D( GUID* pDeviceGUID )
 	}
 
 	return S_OK;
+}
+
+
+//-----------------------------------------------------------------------------
+// Name: EnumZBufferFormatsCallback()
+// Desc: Simply returns the first matching enumerated z-buffer format
+//-----------------------------------------------------------------------------
+static HRESULT WINAPI 
+	EnumZBufferFormatsCallback( DDPIXELFORMAT* pddpf, VOID* pContext )
+{
+	DDPIXELFORMAT* pddpfOut = (DDPIXELFORMAT*)pContext;
+
+	if( pddpfOut->dwRGBBitCount == pddpf->dwRGBBitCount )
+	{
+		(*pddpfOut) = (*pddpf);
+		return D3DENUMRET_CANCEL;
+	}
+
+	return D3DENUMRET_OK;
 }
 
 
