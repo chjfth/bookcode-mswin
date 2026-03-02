@@ -310,6 +310,15 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 
     // Show the frame on the primary surface.
     hr = pf->ShowFrame();
+	if( FAILED(hr) )
+	{
+		if( DDERR_SURFACELOST!=hr )
+			return hr; // true fail
+
+		// try to restore surface
+		hr = pf->RestoreSurfaces();
+		hr = RestoreSurfaces();
+	}
 
     return hr;
 }
