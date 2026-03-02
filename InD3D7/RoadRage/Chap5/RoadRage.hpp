@@ -7,11 +7,27 @@
 #include "D3DUtil.h"
 #include "D3DRes.h"
 
+#include "world.hpp" // in parent dir
 
 //-----------------------------------------------------------------------------
 // Defines, constants, and global variables
 //-----------------------------------------------------------------------------
  
+#define WALL_MESH_SIZE      12
+#define NUM_WALL_VERTICES   (WALL_MESH_SIZE*WALL_MESH_SIZE)
+#define NUM_WALL_INDICES    ((WALL_MESH_SIZE-1)*(WALL_MESH_SIZE-1)*6)
+
+#define SPHERE_MESH_SIZE    4
+#define NUM_SPHERE_VERTICES (2+SPHERE_MESH_SIZE*SPHERE_MESH_SIZE*2)
+#define NUM_SPHERE_INDICES  ( (SPHERE_MESH_SIZE*4 + SPHERE_MESH_SIZE*4* \
+	(SPHERE_MESH_SIZE-1) ) * 3 )
+
+#define rnd() ( ( ((FLOAT)rand())-((FLOAT)rand()) ) / RAND_MAX )
+#define MAX_NUM_QUADS			20000
+#define MAX_NUM_TRIANGLES		20000
+#define MAX_NUM_FACE_INDICES	20000 
+#define MAX_NUM_VERTICES		40000
+
 
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
@@ -27,9 +43,11 @@ class CMyD3DApplication : public CD3DApplication
     VOID    Cleanup3DEnvironment();
 
 protected:
+	HRESULT OneTimeSceneInit();  // Chap5
 	HRESULT InitDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 	HRESULT Render();
+	HRESULT FrameMove( FLOAT fTimeKey ); // Chap5
 	HRESULT FinalCleanup();
 
 public:
@@ -47,8 +65,18 @@ public:
 //    VOID    OutputText( DWORD x, DWORD y, TCHAR* str );
 	HRESULT Render3DEnvironment();
 
-	LRESULT MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
-                                  LPARAM lParam );
+	LRESULT MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+
+	// Chap5 >>>
+	D3DVERTEX    m_WallVertices[NUM_WALL_VERTICES];
+	WORD         m_WallIndices[NUM_WALL_INDICES];
+	D3DVERTEX    m_SphereVertices[NUM_SPHERE_VERTICES];
+	WORD         m_SphereIndices[NUM_SPHERE_INDICES];
+
+	setupinfo_ptr setupinfo;
+
+	BOOL RRAppActive;
+	// Chap5 <<<
 
 	static HRESULT hr;
 

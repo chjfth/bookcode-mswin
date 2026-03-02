@@ -384,8 +384,3 @@ INT WINAPI _tWinMain( HINSTANCE hInst, HINSTANCE, LPTSTR strCmdLine, INT )
 	CoUninitialize();
 	return TRUE;
 }
-
-
-//-----------------------------------------------------------------------------
-// Defines, constants, and global variables
-//-----------------------------------------------------------------------------

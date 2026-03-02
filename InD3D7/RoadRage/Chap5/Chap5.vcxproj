@@ -219,6 +219,7 @@
     <ClCompile Include="d3denum.cpp" />
     <ClCompile Include="d3dframe.cpp" />
     <ClCompile Include="d3dutil.cpp" />
+    <ClCompile Include="d3dmath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="winmain.rc" />
