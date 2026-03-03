@@ -195,7 +195,7 @@ INT CD3DApplication::Run()
 				{
 					if( hr==DDERR_SURFACELOST )
 					{
-						OutputDebugString(_T("Render3DEnvironment() got DDERR_SURFACELOST, try restore..."));
+						OutputDebugString(_T("Render3DEnvironment() got DDERR_SURFACELOST, try restore...\n"));
 
 						CD3DFramework7 *pf = GetFramework();
 						hr = pf->RestoreSurfaces();
@@ -205,6 +205,8 @@ INT CD3DApplication::Run()
                     {
 						DestroyWindow( m_hWnd );
 					}
+
+					// return 0; // Should not do this.
 				}
             }
         }
