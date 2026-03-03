@@ -307,7 +307,7 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::OneTimeSceneInit()
 {
-	WORD i, j, ind, v;
+	WORD i, j, ind;
 
 	// Seed the random number generator
 	srand( (unsigned int)time(0) );
@@ -320,8 +320,12 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 			FLOAT      x = i / (FLOAT)(WALL_MESH_SIZE-1);
 			FLOAT      z = j / (FLOAT)(WALL_MESH_SIZE-1);
 			D3DVERTEX* v = &m_WallVertices[i*WALL_MESH_SIZE+j];
-			(*v) = D3DVERTEX( 10.0f*D3DVECTOR(x,0.0f,z),
-				D3DVECTOR(0.0f,1.0f,0.0f), x, z );
+			
+			(*v) = D3DVERTEX( 
+				10.0f * D3DVECTOR(x, 0.0f, z), // 3D position
+				D3DVECTOR(0.0f,1.0f,0.0f), // Normal
+				x, z // texture U,V
+				); 
 		}
 	}
 
@@ -362,7 +366,7 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 		}
 	}
 
-	// Now generate the traingle indices. Strip around north pole first
+	// Now generate the triangle indices. Strip around north pole first
 	for( i=0; i<SPHERE_MESH_SIZE*2; i++ )
 	{
 		m_SphereIndices[3*i+0] = 0;
@@ -373,6 +377,7 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 	}
 
 	// Now all the middle strips
+	WORD v = 0;
 	for( j=0; j<SPHERE_MESH_SIZE-1; j++ )
 	{
 		v = 2+j*SPHERE_MESH_SIZE*2;
@@ -485,18 +490,8 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 //-----------------------------------------------------------------------------
 // Defines, constants, and global variables
 //-----------------------------------------------------------------------------
-#define WALL_MESH_SIZE      12
-#define NUM_WALL_VERTICES   (WALL_MESH_SIZE*WALL_MESH_SIZE)
-#define NUM_WALL_INDICES    ((WALL_MESH_SIZE-1)*(WALL_MESH_SIZE-1)*6)
 
-#define SPHERE_MESH_SIZE    4
-#define NUM_SPHERE_VERTICES (2+SPHERE_MESH_SIZE*SPHERE_MESH_SIZE*2)
-#define NUM_SPHERE_INDICES  ( (SPHERE_MESH_SIZE*4 + SPHERE_MESH_SIZE*4* \
-	(SPHERE_MESH_SIZE-1) ) * 3 )
-
-#define rnd() ( ( ((FLOAT)rand())-((FLOAT)rand()) ) / RAND_MAX )
-
-
+// (chj: already in RoadRage.hpp)
 
 
 //-----------------------------------------------------------------------------
