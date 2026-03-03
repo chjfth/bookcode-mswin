@@ -190,8 +190,22 @@ INT CD3DApplication::Run()
             // Render a frame during idle time (no messages are waiting)
             if( m_bActive && m_bReady )
             {
-                if( FAILED( Render3DEnvironment() ) )
-                    DestroyWindow( m_hWnd );
+				HRESULT hr = Render3DEnvironment();
+                if( FAILED(hr) )
+				{
+					if( hr==DDERR_SURFACELOST )
+					{
+						OutputDebugString(_T("Render3DEnvironment() got DDERR_SURFACELOST, try restore..."));
+
+						CD3DFramework7 *pf = GetFramework();
+						hr = pf->RestoreSurfaces();
+						hr = RestoreSurfaces();
+					}
+					else
+                    {
+						DestroyWindow( m_hWnd );
+					}
+				}
             }
         }
     }

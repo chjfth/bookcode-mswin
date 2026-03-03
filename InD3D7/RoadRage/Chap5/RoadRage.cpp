@@ -263,22 +263,19 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 	// first, then the right eye.
 	if( m_bAppUseStereo && m_pDeviceInfo->bStereo && !m_pDeviceInfo->bWindowed )
 	{
-		do
-		{
-			// Render the scene from the left eye
-			m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matLeftView );
-			if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTargetLeft, 0 ) ) )
-				break;
-			if( FAILED( hr = Render() ) )
-				break;
+		// Render the scene from the left eye
+		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matLeftView );
+		if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTargetLeft, 0 ) ) )
+			return hr;
+		if( FAILED( hr = Render() ) )
+			return hr;
 
-			//Render the scene from the right eye
-			m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matRightView );
-			if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTarget, 0 ) ) )
-				break;
-			if( FAILED( hr = Render() ) )
-				break;
-		} while(0);
+		//Render the scene from the right eye
+		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matRightView );
+		if( FAILED( hr = m_pd3dDevice->SetRenderTarget( m_pddsRenderTarget, 0 ) ) )
+			return hr;
+		if( FAILED( hr = Render() ) )
+			return hr;
 	} 
 	else 
 	{
@@ -288,42 +285,17 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 
 		// Render the scene as normal
 		hr = Render();
+		if( FAILED(hr) )
+			return hr;
 	}
-
-	CD3DFramework7 *pf = GetFramework();
-	if( FAILED(hr) )
-	{
-		if( DDERR_SURFACELOST!=hr )
-			return hr; // true fail
-
-		OutputDebugString(_T("Render() got DDERR_SURFACELOST, try restore..."));
-
-		// try to restore surface
-		hr = pf->RestoreSurfaces();
-		hr = RestoreSurfaces();
-	}
-
-	if( FAILED(hr) )
-		return hr;
 
     // Show the frame rate, etc.
     if( m_bShowStats )
         ShowStats();
 
     // Show the frame on the primary surface.
+	CD3DFramework7 *pf = GetFramework();
     hr = pf->ShowFrame();
-	if( FAILED(hr) )
-	{
-		if( DDERR_SURFACELOST!=hr )
-			return hr; // true fail
-
-		OutputDebugString(_T("pf->ShowFrame() got DDERR_SURFACELOST, try restore..."));
-
-		// try to restore surface
-		hr = pf->RestoreSurfaces();
-		hr = RestoreSurfaces();
-	}
-
     return hr;
 }
 
