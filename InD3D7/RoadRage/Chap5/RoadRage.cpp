@@ -296,6 +296,8 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 		if( DDERR_SURFACELOST!=hr )
 			return hr; // true fail
 
+		OutputDebugString(_T("Render() got DDERR_SURFACELOST, try restore..."));
+
 		// try to restore surface
 		hr = pf->RestoreSurfaces();
 		hr = RestoreSurfaces();
@@ -314,6 +316,8 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 	{
 		if( DDERR_SURFACELOST!=hr )
 			return hr; // true fail
+
+		OutputDebugString(_T("pf->ShowFrame() got DDERR_SURFACELOST, try restore..."));
 
 		// try to restore surface
 		hr = pf->RestoreSurfaces();
