@@ -17,10 +17,13 @@
 #define NUM_WALL_VERTICES   (WALL_MESH_SIZE*WALL_MESH_SIZE)
 #define NUM_WALL_INDICES    ((WALL_MESH_SIZE-1)*(WALL_MESH_SIZE-1)*6)
 
-#define SPHERE_MESH_SIZE    4
-#define NUM_SPHERE_VERTICES (2 + SPHERE_MESH_SIZE*SPHERE_MESH_SIZE*2)
-#define NUM_SPHERE_INDICES  ( (SPHERE_MESH_SIZE*4 + SPHERE_MESH_SIZE*4* \
-	(SPHERE_MESH_SIZE-1) ) * 3 )
+#define NPSP_2   2  // north-pole and south-pole cost 2 vertices
+#define SPHERE_MESH_SIZE_X    8
+#define SPHERE_MESH_SIZE_Y    4
+#define NUM_SPHERE_VERTICES (NPSP_2 + SPHERE_MESH_SIZE_X*SPHERE_MESH_SIZE_Y)
+#define NUM_SPHERE_INDICES  ( \
+	(SPHERE_MESH_SIZE_X*2 + SPHERE_MESH_SIZE_X*(SPHERE_MESH_SIZE_Y-1)*2) \
+	* 3 ) // 3 vertices per triangle
 
 #define rnd() ( ( ((FLOAT)rand())-((FLOAT)rand()) ) / RAND_MAX )
 

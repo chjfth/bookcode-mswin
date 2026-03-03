@@ -317,14 +317,14 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 	{
 		for( j=0; j<WALL_MESH_SIZE; j++ )
 		{
-			FLOAT      x = i / (FLOAT)(WALL_MESH_SIZE-1);
-			FLOAT      z = j / (FLOAT)(WALL_MESH_SIZE-1);
+			FLOAT      x = i / (FLOAT)(WALL_MESH_SIZE-1);  // [0 .. 1]
+			FLOAT      z = j / (FLOAT)(WALL_MESH_SIZE-1);  // [0 .. 1]
 			D3DVERTEX* v = &m_WallVertices[i*WALL_MESH_SIZE+j];
 			
 			(*v) = D3DVERTEX( 
-				10.0f * D3DVECTOR(x, 0.0f, z), // 3D position
-				D3DVECTOR(0.0f,1.0f,0.0f), // Normal
-				x, z // texture U,V
+				10.0f * D3DVECTOR(x, 0.0f, z), // 3D position, // [0 .. 10]
+				D3DVECTOR(0.0f,1.0f,0.0f), // Normal, all straight upward
+				x, z // texture U,V [0 .. 1]
 				); 
 		}
 	}
@@ -337,6 +337,7 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 			m_WallIndices[ind++] = (i+0)*WALL_MESH_SIZE + (j+0);
 			m_WallIndices[ind++] = (i+0)*WALL_MESH_SIZE + (j+1);
 			m_WallIndices[ind++] = (i+1)*WALL_MESH_SIZE + (j+0);
+
 			m_WallIndices[ind++] = (i+1)*WALL_MESH_SIZE + (j+0);
 			m_WallIndices[ind++] = (i+0)*WALL_MESH_SIZE + (j+1);
 			m_WallIndices[ind++] = (i+1)*WALL_MESH_SIZE + (j+1);
@@ -344,79 +345,99 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 	}
 
 	// Generate the sphere data
-	FLOAT dj = g_PI/(SPHERE_MESH_SIZE+1.f);
-	FLOAT di = g_PI/SPHERE_MESH_SIZE;
+	FLOAT dj = g_PI / (SPHERE_MESH_SIZE_Y + 1);
+	FLOAT di = g_PI*2 / SPHERE_MESH_SIZE_X;
 
 	// Vertices 0 and 1 are the north and south poles
-	m_SphereVertices[0] = D3DVERTEX( D3DVECTOR(0.0f, 1.0f, 0.0f), 
-		D3DVECTOR(0.0f,-1.0f, 0.0f), rnd(), rnd() );
-	m_SphereVertices[1] = D3DVERTEX( D3DVECTOR(0.0f, -1.0f, 0.0f), 
-		D3DVECTOR(0.0f, 1.0f, 0.0f), rnd(), rnd() );
+	m_SphereVertices[0] = D3DVERTEX( 
+		D3DVECTOR(0.0f, 1.0f, 0.0f), 
+		D3DVECTOR(0.0f,-1.0f, 0.0f), 
+		rnd(), rnd() 
+		);
+	m_SphereVertices[1] = D3DVERTEX( 
+		D3DVECTOR(0.0f,-1.0f, 0.0f), 
+		D3DVECTOR(0.0f, 1.0f, 0.0f), 
+		rnd(), rnd() 
+		);
 
-	for( j=0; j<SPHERE_MESH_SIZE; j++ )
+	const int IDX_NP = 0; // north-pole VTX index
+	const int IDX_SP = 1; // south-pole VTX index
+
+	for( j=0; j<SPHERE_MESH_SIZE_Y; j++ )
 	{
-		for( i=0; i<SPHERE_MESH_SIZE*2; i++ ) 
+		for( i=0; i<SPHERE_MESH_SIZE_X; i++ ) 
 		{
 			D3DVECTOR   p;
 
-			p.y = (FLOAT)( cos((j+1) * dj) );
-			p.x = (FLOAT)( sin(i * di) * sin((j+1) * dj) );
-			p.z = (FLOAT)( cos(i * di) * sin((j+1) * dj) );
-			m_SphereVertices[2+i+j*SPHERE_MESH_SIZE*2] = D3DVERTEX(p, -p, rnd(), rnd());
+			// j = latitude
+			FLOAT radj = (j+1) * dj; // 1pi/5, 2pi/5, 3pi/5, 4pi/5
+
+			// i = longitude
+			FLOAT radi = i *di; // 0pi/8, 1pi/8, 2pi/8 ... 6ip/8, 7pi/8
+
+			p.y = (FLOAT)cos(radj);  
+			p.x = (FLOAT)( sin(radj) * sin(radi));
+			p.z = (FLOAT)( sin(radj) * cos(radi) );
+
+			m_SphereVertices[NPSP_2 + j*SPHERE_MESH_SIZE_X+i] = 
+				D3DVERTEX(p, -p, rnd(), rnd());
 		}
 	}
 
 	// Now generate the triangle indices. Strip around north pole first
-	for( i=0; i<SPHERE_MESH_SIZE*2; i++ )
+	for( i=0; i<SPHERE_MESH_SIZE_X; i++ )
 	{
+		// Chj: each triangle involves 3 vertices(=costs 3 indices)
 		m_SphereIndices[3*i+0] = 0;
-		m_SphereIndices[3*i+1] = i+2;
-		m_SphereIndices[3*i+2] = i+3;
-		if( i==SPHERE_MESH_SIZE*2-1 )
-			m_SphereIndices[3*i+2] = 2;
+		m_SphereIndices[3*i+1] = i+ NPSP_2;
+		m_SphereIndices[3*i+2] = i+ NPSP_2+1;
+
+		if( i == SPHERE_MESH_SIZE_X-1 )
+			m_SphereIndices[3*i+2] = NPSP_2;
 	}
 
 	// Now all the middle strips
 	WORD v = 0;
-	for( j=0; j<SPHERE_MESH_SIZE-1; j++ )
+	for( j=0; j<SPHERE_MESH_SIZE_Y-1; j++ )
 	{
-		v = 2+j*SPHERE_MESH_SIZE*2;
-		ind = 3*SPHERE_MESH_SIZE*2 + j*6*SPHERE_MESH_SIZE*2;
-		for( i=0; i<SPHERE_MESH_SIZE*2; i++ )
+		v = NPSP_2 + j*SPHERE_MESH_SIZE_X;
+		ind = 3*SPHERE_MESH_SIZE_X + j*6*SPHERE_MESH_SIZE_X;
+
+		for( i=0; i<SPHERE_MESH_SIZE_X; i++ )
 		{
 			m_SphereIndices[6*i+0+ind] = v+i;
-			m_SphereIndices[6*i+2+ind] = v+i+1;
-			m_SphereIndices[6*i+1+ind] = v+i+SPHERE_MESH_SIZE*2;
+			m_SphereIndices[6*i+2+ind] = v+i + 1;         // (longitude easter) LE
+			m_SphereIndices[6*i+1+ind] = v+i + SPHERE_MESH_SIZE_X;
 
-			m_SphereIndices[6*i+0+ind+3] = v+i+SPHERE_MESH_SIZE*2;
-			m_SphereIndices[6*i+2+ind+3] = v+i+1;
-			m_SphereIndices[6*i+1+ind+3] = v+i+SPHERE_MESH_SIZE*2+1;
-			if( i==SPHERE_MESH_SIZE*2-1 )
+			m_SphereIndices[6*i+0+ind+3] = v+i + SPHERE_MESH_SIZE_X;
+			m_SphereIndices[6*i+2+ind+3] = v+i + 1;                          // LE
+			m_SphereIndices[6*i+1+ind+3] = v+i + SPHERE_MESH_SIZE_X +1;   // LE
+			
+			// Chj: adjust LE wrapping
+			if( i == SPHERE_MESH_SIZE_X-1 )
 			{
-				m_SphereIndices[6*i+2+ind+0] = v+i+1-2*SPHERE_MESH_SIZE;
-				m_SphereIndices[6*i+2+ind+3] = v+i+1-2*SPHERE_MESH_SIZE;
-				m_SphereIndices[6*i+1+ind+3] = v+i+SPHERE_MESH_SIZE*2+1-2*SPHERE_MESH_SIZE;
+				m_SphereIndices[6*i+2+ind+0] = v;
+				m_SphereIndices[6*i+2+ind+3] = v;
+				m_SphereIndices[6*i+1+ind+3] = v + SPHERE_MESH_SIZE_X;
 			}
 		}
 	}
 
 	// Finally strip around south pole
-	v   = NUM_SPHERE_VERTICES-SPHERE_MESH_SIZE*2;
-	ind = NUM_SPHERE_INDICES-3*SPHERE_MESH_SIZE*2;
-	for( i=0; i<SPHERE_MESH_SIZE*2; i++ )
+	v   = NUM_SPHERE_VERTICES - SPHERE_MESH_SIZE_X;
+	ind = NUM_SPHERE_INDICES-3 * SPHERE_MESH_SIZE_X;
+	for( i=0; i<SPHERE_MESH_SIZE_X; i++ )
 	{
 		m_SphereIndices[3*i+0+ind] = 1;
 		m_SphereIndices[3*i+1+ind] = v+i+1;
 		m_SphereIndices[3*i+2+ind] = v+i;
-		if( i==SPHERE_MESH_SIZE*2-1 )
+		
+		if( i == SPHERE_MESH_SIZE_X-1 )
 			m_SphereIndices[3*i+1+ind] = v;
 	}
 
 	return S_OK;
 }
-
-
-
 
 
 
@@ -540,9 +561,12 @@ HRESULT CMyD3DApplication::Render()
 		// Draw sphere at light's position
 		D3DLIGHT7 light;
 		m_pd3dDevice->GetLight( 0, &light );
+		
 		D3DUtil_SetTranslateMatrix( matWorld, light.dvPosition.x,
 			light.dvPosition.y, light.dvPosition.z );
+		
 		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD, &matWorld );
+		
 		m_pd3dDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, D3DFVF_VERTEX, 
 			m_SphereVertices, NUM_SPHERE_VERTICES,
 			m_SphereIndices, NUM_SPHERE_INDICES, 0 );
