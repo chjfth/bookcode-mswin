@@ -111,8 +111,8 @@ VOID D3DUtil_InitLight( D3DLIGHT7& light, D3DLIGHTTYPE ltType,
 // Desc: Given an eye point, a lookat point, and an up vector, this
 //       function builds a 4x4 view matrix.
 //-----------------------------------------------------------------------------
-HRESULT D3DUtil_SetViewMatrix( D3DMATRIX& mat, D3DVECTOR& vFrom,
-	D3DVECTOR& vAt, D3DVECTOR& vWorldUp )
+HRESULT D3DUtil_SetViewMatrix( D3DMATRIX& mat, 
+	const D3DVECTOR& vFrom, const D3DVECTOR& vAt, const D3DVECTOR& vWorldUp )
 {
 	// Get the z basis vector, which points straight ahead. This is the
 	// difference from the eyepoint to the lookat point.
@@ -155,7 +155,7 @@ HRESULT D3DUtil_SetViewMatrix( D3DMATRIX& mat, D3DVECTOR& vFrom,
 	D3DVECTOR vRight = CrossProduct( vUp, vView );
 
 	// Start building the matrix. The first three rows contains the basis
-	// vectors used to rotate the view to point at the lookat point
+	// vectors used to rotate the view to point at the look-at point
 	D3DUtil_SetIdentityMatrix( mat );
 	mat._11 = vRight.x;    mat._12 = vUp.x;    mat._13 = vView.x;
 	mat._21 = vRight.y;    mat._22 = vUp.y;    mat._23 = vView.y;
@@ -172,14 +172,14 @@ HRESULT D3DUtil_SetViewMatrix( D3DMATRIX& mat, D3DVECTOR& vFrom,
 
 //-----------------------------------------------------------------------------
 // Name: D3DUtil_SetProjectionMatrix()
-// Desc: Sets the passed-in 4x4 matrix to a perpsective projection matrix built
-//       from the field-of-view (fov, in y), aspect ratio, near plane (D),
+// Desc: Sets the passed-in 4x4 matrix to a perspective projection matrix built
+//       from the field-of-view (FOV, in y), aspect ratio, near plane (D),
 //       and far plane (F). Note that the projection matrix is normalized for
 //       element [3][4] to be 1.0. This is performed so that W-based range fog
 //       will work correctly.
 //-----------------------------------------------------------------------------
-HRESULT D3DUtil_SetProjectionMatrix( D3DMATRIX& mat, FLOAT fFOV, FLOAT fAspect,
-	FLOAT fNearPlane, FLOAT fFarPlane )
+HRESULT D3DUtil_SetProjectionMatrix( D3DMATRIX& mat, 
+	FLOAT fFOV, FLOAT fAspect, FLOAT fNearPlane, FLOAT fFarPlane )
 {
 	if( fabs(fFarPlane-fNearPlane) < 0.01f )
 		return E_INVALIDARG;

@@ -81,8 +81,9 @@ protected:
     VOID    SetAppRightViewMatrix( D3DMATRIX mat ) { m_matRightView = mat; }
     VOID    SetAppViewMatrix( D3DMATRIX mat )      { m_matView      = mat; }
 
-	VOID    SetViewParams( D3DVECTOR* vEyePt, D3DVECTOR* vLookatPt,
-		D3DVECTOR* vUpVec, FLOAT fEyeDistance ); // Chap5
+	VOID    SetViewParams( 
+		const D3DVECTOR* vEyePt, const D3DVECTOR* vLookatPt,
+		const D3DVECTOR* vUpVec, FLOAT fEyeDistance ); // Chap5
 
     // Miscellaneous functions
     VOID    ShowStats();

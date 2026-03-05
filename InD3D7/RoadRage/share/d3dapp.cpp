@@ -830,8 +830,9 @@ VOID CD3DApplication::OutputText( DWORD x, DWORD y, TCHAR* str )
 //       must call this function rather than setting the D3D view matrix 
 //       yourself in order for stereo modes to work properly.
 //-----------------------------------------------------------------------------
-VOID CD3DApplication::SetViewParams( D3DVECTOR* vEyePt, D3DVECTOR* vLookatPt,
-	D3DVECTOR* vUpVec, FLOAT fEyeDistance )
+VOID CD3DApplication::SetViewParams( 
+	const D3DVECTOR* vEyePt, const D3DVECTOR* vLookatPt, const D3DVECTOR* vUpVec, 
+	FLOAT fEyeDistance )
 {
 	// Adjust camera position for left or right eye along the axis
 	// perpendicular to the view direction vector and the up vector.
