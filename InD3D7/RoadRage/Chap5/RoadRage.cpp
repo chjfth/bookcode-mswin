@@ -508,7 +508,7 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	//
 	FLOAT     toc = 0.3f*x - g_PI/4;
 	D3DVECTOR vFrom( sinf(toc)*4.0f, 3.0f, -cosf(toc)*4.0f );
-	// -- camera around a latitude circle
+	// -- camera around a latitude arc
 	
 	D3DVECTOR vAt( 0.0f, 0.0f, 0.0f );
 	// -- camera looking at world space origin
@@ -546,26 +546,26 @@ HRESULT CMyD3DApplication::Render()
 		D3DMATRIX matWorld, matTrans, matRotate;
 
 		// Draw the bottom wall
+		D3DUtil_SetRotateYMatrix( matRotate, 0.0f ); // 0.0 = no rotate
 		D3DUtil_SetTranslateMatrix( matTrans,-5.0f, -5.0f, -5.0f );
-		D3DUtil_SetRotateZMatrix( matRotate, 0.0f );
 		D3DMath_MatrixMultiply( matWorld, matRotate, matTrans );
 		m_pd3dDevice->SetTransform(D3DTRANSFORMSTATE_WORLD, &matWorld );
 		m_pd3dDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, D3DFVF_VERTEX,
 			m_WallVertices, NUM_WALL_VERTICES,
 			m_WallIndices, NUM_WALL_INDICES, 0 );
 
-		// Draw the back wall
-		D3DUtil_SetTranslateMatrix( matTrans, 5.0f,-5.0f, -5.0f );
+		// Draw the right-Side wall
 		D3DUtil_SetRotateZMatrix( matRotate, g_PI/2 );
+		D3DUtil_SetTranslateMatrix( matTrans, 5.0f,-5.0f, -5.0f );
 		D3DMath_MatrixMultiply( matWorld, matRotate, matTrans );
 		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD, &matWorld );
 		m_pd3dDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, D3DFVF_VERTEX,
 			m_WallVertices, NUM_WALL_VERTICES,
 			m_WallIndices, NUM_WALL_INDICES, 0 );
 
-		// Draw the side wall
-		D3DUtil_SetTranslateMatrix( matTrans, -5.0f, -5.0f, 5.0f );
+		// Draw the Back wall
 		D3DUtil_SetRotateXMatrix( matRotate,  -g_PI/2 );
+		D3DUtil_SetTranslateMatrix( matTrans, -5.0f, -5.0f, 5.0f );
 		D3DMath_MatrixMultiply( matWorld, matRotate, matTrans );
 		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD, &matWorld );
 		m_pd3dDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, D3DFVF_VERTEX,
