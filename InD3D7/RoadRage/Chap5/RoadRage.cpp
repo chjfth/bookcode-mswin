@@ -467,8 +467,11 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	FLOAT z = sinf( fTimeKey*2.640f );
 
 	// Set up the light structure
-	D3DLIGHT7 light;
+	D3DLIGHT7 light; 
 	ZeroMemory( &light, sizeof(light) );
+	// -- Chj note: Do not write  D3DLIGHT7 light={} , that will not clear it to all zeros,
+	//    due to D3DVECTOR's stupid do-nothing ctor in DX7.
+
 	light.dltType       = m_dltType;
 	light.dcvDiffuse.r  = 0.5f + 0.5f * x;
 	light.dcvDiffuse.g  = 0.5f + 0.5f * y;
