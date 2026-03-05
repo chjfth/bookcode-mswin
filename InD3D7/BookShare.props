@@ -54,6 +54,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>;;DIRECTINPUT_VERSION=0x700;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\share;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ddraw.lib;dxguid.lib;winmm.lib;;%(AdditionalDependencies)</AdditionalDependencies>

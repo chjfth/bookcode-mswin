@@ -213,13 +213,13 @@
     Source file list:
    -->
   <ItemGroup>
-    <ClCompile Include="d3dapp.cpp" />
-    <ClCompile Include="info.cpp" />
     <ClCompile Include="RoadRage.cpp" />
-    <ClCompile Include="d3denum.cpp" />
-    <ClCompile Include="d3dframe.cpp" />
-    <ClCompile Include="d3dutil.cpp" />
-    <ClCompile Include="d3dmath.cpp" />
+    <ClCompile Include="info.cpp" />
+    <ClCompile Include="..\share\d3dapp.cpp" />
+    <ClCompile Include="..\share\d3denum.cpp" />
+    <ClCompile Include="..\share\d3dframe.cpp" />
+    <ClCompile Include="..\share\d3dmath.cpp" />
+    <ClCompile Include="..\share\d3dutil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="winmain.rc" />
@@ -231,10 +231,11 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="info.hpp" />
     <ClInclude Include="RoadRage.hpp" />
-    <ClInclude Include="d3dapp.h" />
-    <ClInclude Include="d3denum.h" />
-    <ClInclude Include="d3dframe.h" />
-    <ClInclude Include="d3dutil.h" />
+    <ClInclude Include="..\share\d3dapp.h" />
+    <ClInclude Include="..\share\d3denum.h" />
+    <ClInclude Include="..\share\d3dframe.h" />
+    <ClInclude Include="..\share\d3dmath.h" />
+    <ClInclude Include="..\share\d3dutil.h" />
   </ItemGroup>
 
 
