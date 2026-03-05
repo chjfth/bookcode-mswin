@@ -279,9 +279,8 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 	} 
 	else 
 	{
-		// Set center viewing matrix if app is stereo-enabled
-		if( m_bAppUseStereo )
-			m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matView );
+		// Set center viewing matrix if app is NOT stereo-enabled
+		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matView );
 
 		// Render the scene as normal
 		
