@@ -284,7 +284,9 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 			m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &m_matView );
 
 		// Render the scene as normal
+		
 		hr = Render();
+		
 		if( FAILED(hr) )
 			return hr;
 	}
@@ -312,7 +314,7 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 	// Seed the random number generator
 	srand( (unsigned int)time(0) );
 
-	// Generate a square mesh in XZ plane from 0,0 to 1,1 for the walls
+	// Generate a square mesh in XZ plane from (0,0) to (1,1) for the walls
 	for( i=0; i<WALL_MESH_SIZE; i++ )
 	{
 		for( j=0; j<WALL_MESH_SIZE; j++ )
@@ -323,7 +325,7 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 			
 			(*v) = D3DVERTEX( 
 				10.0f * D3DVECTOR(x, 0.0f, z), // 3D position, // [0 .. 10]
-				D3DVECTOR(0.0f,1.0f,0.0f), // Normal, all straight upward
+				D3DVECTOR(0.0f, 1.0f, 0.0f),   // Normal, all straight upward
 				x, z // texture U,V [0 .. 1]
 				); 
 		}
@@ -449,8 +451,9 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 {
-	// Rotate through the various lights types
-	m_dltType = (D3DLIGHTTYPE)(1+(((DWORD)fTimeKey)/5)%3);
+	// Rotate through the various lights types 
+	// Chj: fTimeKey is in seconds, so, here change once every 5 sec.
+	m_dltType = D3DLIGHTTYPE(1 + (((DWORD)fTimeKey)/5)%3 );
 
 	// Make sure light is supported by the device
 	DWORD dwCaps = m_pDeviceInfo->ddDeviceDesc.dwVertexProcessingCaps;
@@ -484,9 +487,11 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 		light.dvPosition     = 4.5f * D3DVECTOR( x, y, z );
 		light.dvAttenuation1 = 0.4f;
 		break;
+	
 	case D3DLIGHT_DIRECTIONAL:
 		light.dvDirection    = D3DVECTOR( x, y, z );
 		break;
+	
 	case D3DLIGHT_SPOT:
 		light.dvDirection    = D3DVECTOR( x, y, z );
 		light.dvFalloff      = 100.0f;
@@ -498,10 +503,16 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	// Set the light
 	m_pd3dDevice->SetLight( 0, &light );
 
+	//
 	// Move the camera position around
+	//
 	FLOAT     toc = 0.3f*x - g_PI/4;
 	D3DVECTOR vFrom( sinf(toc)*4.0f, 3.0f, -cosf(toc)*4.0f );
+	// -- camera around a latitude circle
+	
 	D3DVECTOR vAt( 0.0f, 0.0f, 0.0f );
+	// -- camera looking at world space origin
+
 	D3DVECTOR vUp( 0.0f, 1.0f, 0.0f );
 	SetViewParams( &vFrom, &vAt, &vUp, 0.1f );
 

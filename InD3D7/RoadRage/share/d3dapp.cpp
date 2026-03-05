@@ -834,8 +834,11 @@ VOID CD3DApplication::SetViewParams(
 	const D3DVECTOR* vEyePt, const D3DVECTOR* vLookatPt, const D3DVECTOR* vUpVec, 
 	FLOAT fEyeDistance )
 {
+	// Chj memo: 2*fEyeDistance is the distance btw two eye-balls.
+
 	// Adjust camera position for left or right eye along the axis
 	// perpendicular to the view direction vector and the up vector.
+
 	D3DVECTOR vView = (*vLookatPt) - (*vEyePt);
 	vView = CrossProduct( vView, (*vUpVec) );
 	vView = Normalize( vView ) * fEyeDistance;
