@@ -76,6 +76,8 @@ public:
     LPDIRECTDRAWSURFACE7 GetRenderSurfaceLeft() { return m_pddsBackBufferLeft; }
     DWORD                GetRenderWidth()		{ return m_dwRenderWidth; }      // Dimensions of the render target
     DWORD                GetRenderHeight()		{ return m_dwRenderHeight; }     // Dimensions of the render target
+	FLOAT GetAspectRatio()  { return (FLOAT)m_dwRenderWidth/m_dwRenderHeight; }
+
     // Functions to aid rendering
     HRESULT RestoreSurfaces();
     HRESULT ShowFrame();

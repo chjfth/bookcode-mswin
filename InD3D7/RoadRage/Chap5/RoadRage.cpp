@@ -616,8 +616,11 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	// Set the transform matrices
 	D3DMATRIX matWorld, matProj;
 	D3DUtil_SetIdentityMatrix( matWorld );
-	D3DUtil_SetProjectionMatrix( matProj, 1.57f, 1.0f, 1.0f, 100.0f );
 	m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD,      &matWorld );
+
+	// [2026-03-06] Chj: Update projection-matrix according to varying viewport aspect-ratio.
+	FLOAT ratio = GetFramework()->GetAspectRatio();
+	D3DUtil_SetProjectionMatrix( matProj, 1.57f, ratio, 1.0f, 100.0f );
 	m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_PROJECTION, &matProj );
 
 	//

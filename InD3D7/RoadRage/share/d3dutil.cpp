@@ -183,11 +183,12 @@ HRESULT D3DUtil_SetProjectionMatrix( D3DMATRIX& mat,
 {
 	if( fabs(fFarPlane-fNearPlane) < 0.01f )
 		return E_INVALIDARG;
+	
 	if( fabs(sin(fFOV/2)) < 0.01f )
 		return E_INVALIDARG;
 
-	FLOAT w = fAspect * ( cosf(fFOV/2)/sinf(fFOV/2) );
-	FLOAT h =   1.0f  * ( cosf(fFOV/2)/sinf(fFOV/2) );
+	FLOAT w = ( cosf(fFOV/2)/sinf(fFOV/2) ) / fAspect; // [2026-03-06] Chj fix
+	FLOAT h = ( cosf(fFOV/2)/sinf(fFOV/2) );
 	FLOAT Q = fFarPlane / ( fFarPlane - fNearPlane );
 
 	ZeroMemory( &mat, sizeof(D3DMATRIX) );
