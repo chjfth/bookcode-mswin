@@ -637,6 +637,8 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_LIGHTING, TRUE );
 	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_AMBIENT,  0x20202020 );
 
+//	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME); // debug purpose
+
 	return S_OK;
 }
 
