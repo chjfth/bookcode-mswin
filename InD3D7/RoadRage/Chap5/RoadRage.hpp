@@ -66,7 +66,7 @@ public:
 	void	DisplayRRStats(HWND hwnd);
 	void	DisplayLegalInfo(HWND hwnd);
 
-//    VOID    OutputText( DWORD x, DWORD y, TCHAR* str );
+//  VOID    OutputText( DWORD x, DWORD y, TCHAR* str );
 	HRESULT Render3DEnvironment();
 
 	LRESULT MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );

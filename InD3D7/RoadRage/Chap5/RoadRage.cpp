@@ -123,8 +123,7 @@ VOID CMyD3DApplication::Cleanup3DEnvironment()
 }
 
 
-LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
-                                  LPARAM lParam )
+LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	HMENU hMenu;
 
@@ -187,7 +186,7 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 			break;
 
 		case IDM_EXIT:
-			PrintMessage(NULL, "MsgProc - IDM_EXIT", NULL, LOGFILE_ONLY);
+//			PrintMessage(NULL, "MsgProc - IDM_EXIT", NULL, LOGFILE_ONLY);
 			Cleanup3DEnvironment();
 			SendMessage( hWnd, WM_CLOSE, 0, 0 );
 			DestroyWindow( hWnd );
@@ -205,15 +204,14 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 		break;
 
 	case WM_CLOSE:
-		PrintMessage(NULL, "MsgProc - WM_CLOSE", NULL, LOGFILE_ONLY);
+//		PrintMessage(NULL, "MsgProc - WM_CLOSE", NULL, LOGFILE_ONLY);
 		Cleanup3DEnvironment();
 		DestroyWindow( hWnd );
 		PostQuitMessage(0);
 		return 0;
 
 	default:
-		return CD3DApplication::MsgProc( hWnd, uMsg, wParam,
-			lParam );
+		return CD3DApplication::MsgProc( hWnd, uMsg, wParam, lParam );
 	}}
 
     return DefWindowProc( hWnd, uMsg, wParam, lParam );
@@ -441,8 +439,6 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 }
 
 
-
-
 //-----------------------------------------------------------------------------
 // Name: FrameMove()
 // Desc: Called once per frame, the call is the entry point for animating
@@ -517,8 +513,6 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 
 	return S_OK;
 }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -606,7 +600,6 @@ HRESULT CMyD3DApplication::Render()
 }
 
 
-
 //-----------------------------------------------------------------------------
 // Name: InitDeviceObjects()
 // Desc: Initialize scene objects.
@@ -635,13 +628,12 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 	// Turn on lighting. Light will be set during FrameMove() call
 	m_pd3dDevice->LightEnable( 0, TRUE );
 	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_LIGHTING, TRUE );
-	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_AMBIENT,  0x20202020 );
+	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_AMBIENT,  0xFF202020 ); // 0xAARRGGBB
 
 //	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME); // debug purpose
 
 	return S_OK;
 }
-
 
 
 //-----------------------------------------------------------------------------
@@ -666,108 +658,6 @@ HRESULT CMyD3DApplication::DeleteDeviceObjects()
 }
 
 
-void PrintMessage(HWND hwnd,char *message1, char *message2, int message_mode)
-{
-	FILE *fp = NULL;
-	char tmessage[1000];
-
-
-	if((message1 == NULL) && (message2 == NULL))
-		return;
-
-	if((message1 != NULL) && (message2 != NULL))
-	{
-		strcpy_s(tmessage, message1);
-		strcat_s(tmessage, message2);
-	}
-	else
-	{
-		if(message1 != NULL) 
-			strcpy_s(tmessage, message1);
-
-		if(message2 != NULL) 
-			strcpy_s(tmessage, message2);
-	}
-
-
-	if(logfile_start_flag == TRUE)
-	{
-		fopen_s(&fp, "rrlogfile.txt","w");
-		fprintf( fp, "%s\n\n", "RR Logfile");
-	}
-	else
-	{
-		fopen_s(&fp, "rrlogfile.txt","a");
-	}
-
-	logfile_start_flag = FALSE;
-
-	if(fp == NULL)
-	{     
-		MessageBoxA(hwnd, "Can't load logfile", "File Error", MB_OK);
-		fclose(fp);
-		return;
-	}
-
-	fprintf( fp, " %s\n", tmessage );
-
-
-	if(message_mode != LOGFILE_ONLY)
-	{
-		hdc=GetDC(hwnd);
-		TextOutA(hdc,PrintMsgX,PrintMsgY, tmessage,strlen(tmessage));
-		PrintMsgY +=20;
-		ReleaseDC(hwnd,hdc);
-	}
-
-	fclose(fp);
-}
-
-
-void PrintMemAllocated(int mem, char *message)
-{
-	FILE *fp = NULL;
-	char buffer[1000];
-	char buffer2[1000];
-	int mem_kb;
-
-	if(logfile_start_flag == TRUE)
-	{
-		fopen_s(&fp, "rrlogfile.txt","w");
-		fprintf( fp, "%s\n\n", "RR Logfile");
-	}
-	else
-	{
-		fopen_s(&fp, "rrlogfile.txt","a");
-	}
-
-	logfile_start_flag = FALSE;
-
-	if(fp == NULL)
-	{     
-		MessageBoxA(NULL,"Can't load logfile","File Error",MB_OK);
-		fclose(fp);
-		return;
-	}
-
-	strcpy_s(buffer, "memory allocated for ");
-	strcat_s(buffer, message);
-	strcat_s(buffer, " = ");
-
-	mem_kb = mem / 1024;
-	_itoa_s(mem_kb, buffer2, 10);
-	strcat_s(buffer, buffer2);
-	strcat_s(buffer, " KB");
-
-	fprintf( fp, " %s\n", buffer );
-
-	total_allocated_memory_count += mem;
-
-	fclose(fp);
-}
-
-
-
 //-----------------------------------------------------------------------------
 // Name: WinMain()
 // Desc: Entry point to the program. Initializes everything, and goes into a
@@ -785,8 +675,6 @@ INT WINAPI _tWinMain( HINSTANCE hInst, HINSTANCE, LPTSTR strCmdLine, INT )
 
     d3dApp.Run();		
 	
-	PrintMessage(NULL, "Quitting", NULL, LOGFILE_ONLY);
-
 	CoUninitialize();
 	return TRUE;
 }
