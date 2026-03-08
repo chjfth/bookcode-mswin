@@ -93,7 +93,7 @@ protected:
 
 protected:
 	CxxDialog *m_pParamDlgbox; // modeless-dialogbox 
-	HWND AttachParamDlgbox(CxxDialog *pdlg){ m_pParamDlgbox = pdlg; }
+//	HWND AttachParamDlgbox(CxxDialog *pdlg){ m_pParamDlgbox = pdlg; }
 	
 
 public:

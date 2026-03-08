@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by winmain.rc
 //
 #define MENU_ABOUT                      1
@@ -27,6 +27,13 @@
 #define IDR_POPUP                       142
 #define IDD_ABOUT                       143
 #define IDD_CHANGEDEVICE                144
+#define IDD_PARAMS                      200
+#define IDC_BTN_UPDATE                  201
+
+#define IDC_RDO_PointLight              202
+#define IDC_RDO_SpotLight               203
+#define IDC_RDO_DirectionalLight        204
+
 #define IDC_DEVICE_COMBO                1000
 #define IDC_PLAYER_NAME_EDIT            1000
 #define IDC_MODE_COMBO                  1001
@@ -38,6 +45,8 @@
 #define IDC_BACK                        1005
 #define IDC_CHECK_DPLAY_PROTOCOL        1006
 #define IDC_EDIT_SESSION_NAME           1007
+#define IDC_CKB_LightAnimation          1010
+#define IDC_CKB_CameraAnimation         1011
 #define IDC_WINDOWED_CHECKBOX           1012
 #define IDC_SEARCH_CHECK                1013
 #define IDC_STEREO_CHECKBOX             1013
@@ -72,13 +81,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         40018
-#define _APS_NEXT_CONTROL_VALUE         1010
+#define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           102
-
-#define IDC_BUTTON1                     1025
-#define IDC_BUTTON2                     1044
-#define IDC_BUTTON3                     1045
-#define IDC_BUTTON4                     1046
-
 #endif
 #endif

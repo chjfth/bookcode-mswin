@@ -32,6 +32,14 @@ public:
 	
 	HWND GetHwnd(){ return m_hwndDlg; }
 
+	void Show(bool isShow, int x, int y)
+	{
+		ShowWindow(m_hwndDlg, isShow?SW_SHOW:SW_HIDE);
+		RECT rc = {};
+		GetWindowRect(m_hwndDlg, &rc);
+		MoveWindow(m_hwndDlg, x, y, rc.right-rc.left, rc.bottom-rc.top, TRUE);
+	}
+
 protected:
 	HWND m_hwndDlg;
 

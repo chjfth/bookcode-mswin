@@ -32,6 +32,7 @@
 #define MAX_NUM_FACE_INDICES	20000 
 #define MAX_NUM_VERTICES		40000
 
+class ParamDialog;
 
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
@@ -45,6 +46,15 @@ class CMyD3DApplication : public CD3DApplication
 
     D3DLIGHTTYPE m_dltType;
     VOID    Cleanup3DEnvironment();
+
+	// Chj >>>
+	
+	ParamDialog *m_ppbox;
+
+	D3DLIGHT7 m_light;
+	float m_camX_waggle; // in radian
+
+	// Chj <<<
 
 protected:
 	HRESULT OneTimeSceneInit();  // Chap5_chj

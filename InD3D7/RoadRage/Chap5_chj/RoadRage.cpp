@@ -9,6 +9,7 @@
 #define STRICT
 #define D3D_OVERLOADS
 #include "resource.h"
+#include <assert.h>
 #include <tchar.h>
 #include <math.h>
 #include <time.h>
@@ -18,6 +19,11 @@
 #include "D3DUtil.h"
 #include "D3DEnum.h"
 #include "RoadRage.hpp"
+#include <RECTxy.h>
+#include "CxxParamDialog.h"
+
+#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
 
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
@@ -99,6 +105,9 @@ CMyD3DApplication::CMyD3DApplication()
 	m_bShowStats = TRUE;
 
 	pCMyApp = this;
+
+	m_ppbox = NULL;
+	m_camX_waggle = 0;
 }
 
 
@@ -133,6 +142,20 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
     switch( uMsg )
     {{
+	case WM_CREATE:
+	{
+		HINSTANCE hInst = GetModuleHandle(NULL);
+		m_ppbox = new ParamDialog();
+		HWND hdlgbox = m_ppbox->CreateModeless(hInst, MAKEINTRESOURCE(IDD_PARAMS), hWnd);
+		assert(hdlgbox);
+
+		RECT rcmain = {};
+		GetWindowRect(hWnd, &rcmain);
+		int xbox = rcmain.left + RECTcx(rcmain);
+		m_ppbox->Show(TRUE, xbox, rcmain.top);
+		m_pParamDlgbox = m_ppbox;
+		break;
+	}
 	case WM_ACTIVATEAPP:
 		RRAppActive = (BOOL)wParam; // 1=activated , 0=deactivated
 		break;
@@ -190,6 +213,10 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			Cleanup3DEnvironment();
 			SendMessage( hWnd, WM_CLOSE, 0, 0 );
 			DestroyWindow( hWnd );
+
+			DestroyWindow(m_ppbox->GetHwnd());
+			m_pParamDlgbox = m_ppbox = NULL;
+
 			PostQuitMessage(0);
 			exit(0);
 
@@ -483,9 +510,10 @@ HRESULT CMyD3DApplication::InitDeviceObjects()
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 {
-	// Rotate through the various lights types 
-	// Chj: fTimeKey is in seconds, so, here change once every 5 sec.
-	m_dltType = D3DLIGHTTYPE(1 + (((DWORD)fTimeKey)/5)%3 );
+	// Chj: fTimeKey increases 1 each second.
+
+	// Chj: Use light-type according to parameter dlgbox.
+	m_dltType = m_ppbox->m_lighttype;
 
 	// Make sure light is supported by the device
 	DWORD dwCaps = m_pDeviceInfo->ddDeviceDesc.dwVertexProcessingCaps;
@@ -501,35 +529,37 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	FLOAT y = sinf( fTimeKey*2.246f );
 	FLOAT z = sinf( fTimeKey*2.640f );
 
-	// Set up the light structure
-	D3DLIGHT7 light; 
-	ZeroMemory( &light, sizeof(light) );
-	// -- Chj note: Do not write  D3DLIGHT7 light={} , that will not clear it to all zeros,
-	//    due to D3DVECTOR's stupid do-nothing ctor in DX7.
+	// Set up the light parameters
+	D3DLIGHT7 &light = m_light; 
 
-	light.dltType       = m_dltType;
-	light.dcvDiffuse.r  = 0.5f + 0.5f * x;
-	light.dcvDiffuse.g  = 0.5f + 0.5f * y;
-	light.dcvDiffuse.b  = 0.5f + 0.5f * z;
-	light.dvRange       = D3DLIGHT_RANGE_MAX;
-
-	switch( m_dltType )
+	if(m_ppbox->m_isLightAnimation)
 	{
-	case D3DLIGHT_POINT:
-		light.dvPosition     = 4.5f * D3DVECTOR( x, y, z );
-		light.dvAttenuation1 = 0.4f;
-		break;
-	
-	case D3DLIGHT_DIRECTIONAL:
-		light.dvDirection    = D3DVECTOR( x, y, z );
-		break;
-	
-	case D3DLIGHT_SPOT:
-		light.dvDirection    = D3DVECTOR( x, y, z );
-		light.dvFalloff      = 100.0f;
-		light.dvTheta        =   0.8f;
-		light.dvPhi          =   1.0f;
-		light.dvAttenuation0 =   1.0f;
+		ZeroMemory( &light, sizeof(light) );
+
+		light.dltType       = m_dltType;
+		light.dcvDiffuse.r  = 0.5f + 0.5f * x;
+		light.dcvDiffuse.g  = 0.5f + 0.5f * y;
+		light.dcvDiffuse.b  = 0.5f + 0.5f * z;
+		light.dvRange       = D3DLIGHT_RANGE_MAX;
+
+		switch( m_dltType )
+		{
+		case D3DLIGHT_POINT:
+			light.dvPosition     = 4.5f * D3DVECTOR( x, y, z );
+			light.dvAttenuation1 = 0.4f;
+			break;
+
+		case D3DLIGHT_DIRECTIONAL:
+			light.dvDirection    = D3DVECTOR( x, y, z );
+			break;
+
+		case D3DLIGHT_SPOT:
+			light.dvDirection    = D3DVECTOR( x, y, z );
+			light.dvFalloff      = 100.0f;
+			light.dvTheta        =   0.8f;
+			light.dvPhi          =   1.0f;
+			light.dvAttenuation0 =   1.0f;
+		}
 	}
 
 	// Set the light
@@ -538,7 +568,10 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	//
 	// Move the camera position around
 	//
-	FLOAT     toc = 0.3f*x - g_PI/4;
+	if( m_ppbox->m_isCameraAnimation) {
+		m_camX_waggle = x;
+	}
+	FLOAT     toc = 0.3f * m_camX_waggle - g_PI/4;
 	D3DVECTOR vFrom( sinf(toc)*4.0f, 3.0f, -cosf(toc)*4.0f );
 	// -- camera around a latitude arc
 	

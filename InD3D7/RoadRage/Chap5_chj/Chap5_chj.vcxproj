@@ -215,6 +215,7 @@
   <ItemGroup>
     <ClCompile Include="RoadRage.cpp" />
     <ClCompile Include="info.cpp" />
+    <ClCompile Include="CxxParamDialog.cpp" />
     <ClCompile Include="..\share\d3dapp.cpp" />
     <ClCompile Include="..\share\d3denum.cpp" />
     <ClCompile Include="..\share\d3dframe.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="info.hpp" />
     <ClInclude Include="RoadRage.hpp" />
+    <ClInclude Include="CxxParamDialog.h" />
     <ClInclude Include="..\share\d3dapp.h" />
     <ClInclude Include="..\share\d3denum.h" />
     <ClInclude Include="..\share\d3dframe.h" />
