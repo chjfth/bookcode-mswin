@@ -12,7 +12,7 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include "d3dapp.hpp"
+#include "d3dapp-helper.hpp"
 
 #define OBJECT_ID_STRAIGHT_ROAD			0
 #define OBJECT_ID_LEFTCURVE_ROAD		1

@@ -7,7 +7,7 @@
 #include "D3DUtil.h"
 #include "D3DRes.h"
 
-#include "world.hpp" // in parent dir
+#include "world.hpp" // in share subdir
 
 //-----------------------------------------------------------------------------
 // Defines, constants, and global variables
