@@ -650,8 +650,8 @@ HRESULT CMyD3DApplication::FinalCleanup()
 
 //-----------------------------------------------------------------------------
 // Name: DeleteDeviceObjects()
-// Desc: Called when the app is exitting, or the device is being changed,
-//       this function deletes any device dependant objects.
+// Desc: Called when the app is exiting, or the device is being changed,
+//       this function deletes any device-dependent objects.
 //-----------------------------------------------------------------------------
 HRESULT CMyD3DApplication::DeleteDeviceObjects()
 {

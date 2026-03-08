@@ -4,6 +4,9 @@
 // Desc: Application class for the Direct3D samples framework library.
 //
 // Copyright (c) 1998-1999 Microsoft Corporation. All rights reserved.
+//
+// [2026-03-08] Chj: Add support for attaching a modeless-dialogbox to tune program parameters.
+//
 //-----------------------------------------------------------------------------
 #ifndef  D3DAPP_H
 #define  D3DAPP_H
@@ -13,8 +16,7 @@
 #include "D3DEnum.h"
 #include "D3DUtil.h"
 #include "D3DRes.h"
-
-
+#include "CxxDialog.h"
 
 
 //-----------------------------------------------------------------------------
@@ -23,99 +25,105 @@
 //-----------------------------------------------------------------------------
 class CD3DApplication
 {
-    // Internal variables and member functions
-    CD3DFramework7* m_pFramework;
-    BOOL            m_bActive;
-    BOOL            m_bReady;
+	// Internal variables and member functions
+	CD3DFramework7* m_pFramework;
+	BOOL            m_bActive;
+	BOOL            m_bReady;
 
-    BOOL            m_bFrameMoving;
-    BOOL            m_bSingleStep;
-    DWORD           m_dwBaseTime;
-    DWORD           m_dwStopTime;
+	BOOL            m_bFrameMoving;
+	BOOL            m_bSingleStep;
+	DWORD           m_dwBaseTime;
+	DWORD           m_dwStopTime;
 
-    HRESULT Initialize3DEnvironment();
+	HRESULT Initialize3DEnvironment();
 
-    virtual HRESULT Render3DEnvironment();
-    VOID    Cleanup3DEnvironment();
-    VOID    DisplayFrameworkError( HRESULT, DWORD );
+	virtual HRESULT Render3DEnvironment();
+	VOID    Cleanup3DEnvironment();
+	VOID    DisplayFrameworkError( HRESULT, DWORD );
 
 public:
-	    HRESULT Change3DEnvironment();
+	HRESULT Change3DEnvironment();
 
 protected:
-    HWND                 m_hWnd;
-    D3DEnum_DeviceInfo*  m_pDeviceInfo;
-    LPDIRECTDRAW7        m_pDD;
+	HWND                 m_hWnd;
+	D3DEnum_DeviceInfo*  m_pDeviceInfo;
+	LPDIRECTDRAW7        m_pDD;
 	LPDIRECT3D7          m_pD3D;       // Chap5
 	LPDIRECT3DDEVICE7    m_pd3dDevice; // Chap5
 
-    LPDIRECTDRAWSURFACE7 m_pddsRenderTarget;
-    LPDIRECTDRAWSURFACE7 m_pddsRenderTargetLeft; // For stereo modes
-    DDSURFACEDESC2       m_ddsdRenderTarget;
+	LPDIRECTDRAWSURFACE7 m_pddsRenderTarget;
+	LPDIRECTDRAWSURFACE7 m_pddsRenderTargetLeft; // For stereo modes
+	DDSURFACEDESC2       m_ddsdRenderTarget;
 
-    // Overridable variables for the app
-    TCHAR*               m_strWindowTitle;
+	// Overridable variables for the app
+	TCHAR*               m_strWindowTitle;
 	BOOL                 m_bAppUseZBuffer; // Chap5
-    BOOL                 m_bAppUseStereo;
-    BOOL                 m_bShowStats;
-    HRESULT              (*m_fnConfirmDevice)(DDCAPS*, D3DDEVICEDESC7*);
+	BOOL                 m_bAppUseStereo;
+	BOOL                 m_bShowStats;
+	HRESULT              (*m_fnConfirmDevice)(DDCAPS*, D3DDEVICEDESC7*);
 
-    // Overridable functions for the 3D scene created by the app
-    virtual HRESULT OneTimeSceneInit()     { return S_OK; }
-    virtual HRESULT InitDeviceObjects()    { return S_OK; }
-    virtual HRESULT DeleteDeviceObjects()  { return S_OK; }
-    virtual HRESULT Render()               { return S_OK; }
-    virtual HRESULT FrameMove( FLOAT )     { return S_OK; }
-    virtual HRESULT RestoreSurfaces()      { return S_OK; }
-    virtual HRESULT FinalCleanup()         { return S_OK; }
+	// Overridable functions for the 3D scene created by the app
+	virtual HRESULT OneTimeSceneInit()     { return S_OK; }
+	virtual HRESULT InitDeviceObjects()    { return S_OK; }
+	virtual HRESULT DeleteDeviceObjects()  { return S_OK; }
+	virtual HRESULT Render()               { return S_OK; }
+	virtual HRESULT FrameMove( FLOAT )     { return S_OK; }
+	virtual HRESULT RestoreSurfaces()      { return S_OK; }
+	virtual HRESULT FinalCleanup()         { return S_OK; }
 
-    // Overridable power management (APM) functions
-    virtual LRESULT OnQuerySuspend( DWORD dwFlags );
-    virtual LRESULT OnResumeSuspend( DWORD dwData );
+	// Overridable power management (APM) functions
+	virtual LRESULT OnQuerySuspend( DWORD dwFlags );
+	virtual LRESULT OnResumeSuspend( DWORD dwData );
 
-    // View control functions (for stereo-enabled applications)
-    D3DMATRIX m_matLeftView;
-    D3DMATRIX m_matRightView;
-    D3DMATRIX m_matView;
-    VOID    SetAppLeftViewMatrix( D3DMATRIX mat )  { m_matLeftView  = mat; }
-    VOID    SetAppRightViewMatrix( D3DMATRIX mat ) { m_matRightView = mat; }
-    VOID    SetAppViewMatrix( D3DMATRIX mat )      { m_matView      = mat; }
+	// View control functions (for stereo-enabled applications)
+	D3DMATRIX m_matLeftView;
+	D3DMATRIX m_matRightView;
+	D3DMATRIX m_matView;
+	VOID    SetAppLeftViewMatrix( D3DMATRIX mat )  { m_matLeftView  = mat; }
+	VOID    SetAppRightViewMatrix( D3DMATRIX mat ) { m_matRightView = mat; }
+	VOID    SetAppViewMatrix( D3DMATRIX mat )      { m_matView      = mat; }
 
 	VOID    SetViewParams( 
 		const D3DVECTOR* vEyePt, const D3DVECTOR* vLookatPt,
 		const D3DVECTOR* vUpVec, FLOAT fEyeDistance ); // Chap5
 
-    // Miscellaneous functions
-    VOID    ShowStats();
-    VOID    OutputText( DWORD x, DWORD y, TCHAR* str );
+	// Miscellaneous functions
+	VOID    ShowStats();
+	VOID    OutputText( DWORD x, DWORD y, TCHAR* str );
+
+protected:
+	CxxDialog *m_pParamDlgbox; // modeless-dialogbox 
+	HWND AttachParamDlgbox(CxxDialog *pdlg){ m_pParamDlgbox = pdlg; }
+	
 
 public:
-    // Functions to create, run, pause, and clean up the application
-    virtual HRESULT Create( HINSTANCE, TCHAR* );
-    virtual INT     Run();
-    virtual LRESULT MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-    virtual VOID    Pause( BOOL bPause );
+	// Functions to create, run, pause, and clean up the application
+	virtual HRESULT Create( HINSTANCE, TCHAR* );
+	virtual INT     Run();
+	virtual LRESULT MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	virtual VOID    Pause( BOOL bPause );
 
 	// Accessor functions
 	CD3DFramework7 *     GetFramework()			{ return m_pFramework; };
-    HWND                 Get_hWnd()				{ return m_hWnd; };
+	HWND                 Get_hWnd()				{ return m_hWnd; };
 	BOOL				 GetbActive()			{ return m_bActive; };
 	BOOL				 GetbReady()			{ return m_bReady; };
 	VOID				 SetbReady(BOOL val)	{ m_bReady = val; };
 	VOID				 SetbActive(BOOL val)	{ m_bActive = val; };
 	VOID				 SetbFrameMoving(BOOL val)	{ m_bFrameMoving = val; };
-    BOOL				 GetbFrameMoving()		{ return m_bFrameMoving; };
+	BOOL				 GetbFrameMoving()		{ return m_bFrameMoving; };
 	LPDIRECT3DDEVICE7    GetDevice()			{ return m_pd3dDevice; }; // Chap5
-    DWORD				 GetBaseTime()			{ return m_dwBaseTime; };
-    DWORD				 GetStopTime()			{ return m_dwStopTime; };
+	DWORD				 GetBaseTime()			{ return m_dwBaseTime; };
+	DWORD				 GetStopTime()			{ return m_dwStopTime; };
 	VOID				 SetBaseTime(DWORD val)	{ m_dwBaseTime = val; };
 	VOID				 SetStopTime(DWORD val)	{ m_dwStopTime = val; };
-    VOID				 DeleteFramework()		{ SAFE_DELETE( m_pFramework ); };
+	VOID				 DeleteFramework()		{ SAFE_DELETE( m_pFramework ); };
 	BOOL				 GetSingleStep()		{ return m_bSingleStep; };
 	VOID				 SetSingleStep(BOOL val) { m_bSingleStep = val; };
     
 	// Class constructor
 	CD3DApplication();
+
 };
 
 

@@ -53,6 +53,8 @@ CD3DApplication::CD3DApplication()
     m_fnConfirmDevice = NULL;
 
     g_pD3DApp = this;
+
+	m_pParamDlgbox = NULL;
 }
 
 
@@ -178,6 +180,11 @@ INT CD3DApplication::Run()
 
         if( bGotMsg )
         {
+			if(m_pParamDlgbox && IsDialogMessage( m_pParamDlgbox->GetHwnd(), &msg ))
+			{
+				continue;
+			}
+
             // Translate and dispatch the message
             if( 0 == TranslateAccelerator( m_hWnd, hAccel, &msg ) )
             {
@@ -824,6 +831,7 @@ VOID CD3DApplication::OutputText( DWORD x, DWORD y, TCHAR* str )
     }
 }
 
+
 //-----------------------------------------------------------------------------
 // Name: SetViewParams()
 // Desc: Sets the parameters to be used by the SetViewMatrix() function.  You
@@ -851,6 +859,7 @@ VOID CD3DApplication::SetViewParams(
 	D3DUtil_SetViewMatrix( m_matRightView, vRightEyePt, *vLookatPt, *vUpVec );
 	D3DUtil_SetViewMatrix( m_matView,      *vEyePt,     *vLookatPt, *vUpVec );
 }
+
 
 
 //-----------------------------------------------------------------------------
