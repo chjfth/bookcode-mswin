@@ -48,7 +48,7 @@ class CMyD3DApplication : public CD3DApplication
 
 protected:
 	HRESULT OneTimeSceneInit();  // Chap5_chj
-	HRESULT InitDeviceObjects();
+	HRESULT InitDeviceObjects(); // Init 3D objecs in scene
 	HRESULT DeleteDeviceObjects();
 	HRESULT Render();
 	HRESULT FrameMove( FLOAT fTimeKey ); // Chap5_chj

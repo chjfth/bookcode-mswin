@@ -299,6 +299,7 @@ HRESULT CMyD3DApplication::Render3DEnvironment()
 }
 
 
+
 //-----------------------------------------------------------------------------
 // Name: OneTimeSceneInit()
 // Desc: Called during initial app startup, this function performs all the
@@ -434,6 +435,42 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 		if( i == SPHERE_MESH_SIZE_X-1 )
 			m_SphereIndices[3*i+1+ind] = v;
 	}
+
+	return S_OK;
+}
+
+
+//-----------------------------------------------------------------------------
+// Name: InitDeviceObjects()
+// Desc: Initialize 3D scene objects.
+//-----------------------------------------------------------------------------
+HRESULT CMyD3DApplication::InitDeviceObjects()
+{
+	// Set the transform matrices
+	D3DMATRIX matWorld, matProj;
+	D3DUtil_SetIdentityMatrix( matWorld );
+	m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD,      &matWorld );
+
+	// [2026-03-06] Chj: Update projection-matrix according to varying viewport aspect-ratio.
+	FLOAT ratio = GetFramework()->GetAspectRatio();
+	D3DUtil_SetProjectionMatrix( matProj, 1.57f, ratio, 1.0f, 100.0f );
+	m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_PROJECTION, &matProj );
+
+	//
+	// Chap5_chj below
+	//
+
+	// Create and set up the object material
+	D3DMATERIAL7 mtrl;
+	D3DUtil_InitMaterial( mtrl, 1.0f, 1.0f, 1.0f );
+	m_pd3dDevice->SetMaterial( &mtrl );
+
+	// Turn on lighting. Light will be set during FrameMove() call
+	m_pd3dDevice->LightEnable( 0, TRUE );
+	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_LIGHTING, TRUE );
+	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_AMBIENT,  0xFF202020 ); // 0xAARRGGBB
+
+	//	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME); // debug purpose
 
 	return S_OK;
 }
@@ -595,42 +632,6 @@ HRESULT CMyD3DApplication::Render()
 
 	// End the scene.
 	m_pd3dDevice->EndScene();
-
-	return S_OK;
-}
-
-
-//-----------------------------------------------------------------------------
-// Name: InitDeviceObjects()
-// Desc: Initialize scene objects.
-//-----------------------------------------------------------------------------
-HRESULT CMyD3DApplication::InitDeviceObjects()
-{
-	// Set the transform matrices
-	D3DMATRIX matWorld, matProj;
-	D3DUtil_SetIdentityMatrix( matWorld );
-	m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD,      &matWorld );
-
-	// [2026-03-06] Chj: Update projection-matrix according to varying viewport aspect-ratio.
-	FLOAT ratio = GetFramework()->GetAspectRatio();
-	D3DUtil_SetProjectionMatrix( matProj, 1.57f, ratio, 1.0f, 100.0f );
-	m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_PROJECTION, &matProj );
-
-	//
-	// Chap5_chj below
-	//
-
-	// Create and set up the object material
-	D3DMATERIAL7 mtrl;
-	D3DUtil_InitMaterial( mtrl, 1.0f, 1.0f, 1.0f );
-	m_pd3dDevice->SetMaterial( &mtrl );
-
-	// Turn on lighting. Light will be set during FrameMove() call
-	m_pd3dDevice->LightEnable( 0, TRUE );
-	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_LIGHTING, TRUE );
-	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_AMBIENT,  0xFF202020 ); // 0xAARRGGBB
-
-//	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME); // debug purpose
 
 	return S_OK;
 }
