@@ -13,6 +13,14 @@ ParamDialog::ParamDialog()
 	m_isCameraAnimation = FALSE;
 }
 
+void ParamDialog::ResetParams()
+{
+	m_CameraDistance = C_CameraDistance;
+	m_CameraSlideDegree = C_CameraSlideDegree;
+	m_CameraHeight = C_CameraHeight;
+	m_CameraWaggleDegree = 0.0f;
+}
+
 void ParamDialog::GuiToData(HWND hdlg)
 {
 	m_isLightAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_LightAnimation);

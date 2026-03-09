@@ -147,6 +147,8 @@ BEGIN
     CONTROL         "&1. Point light",IDC_RDO_PointLight,"Button",BS_AUTORADIOBUTTON | WS_GROUP,49,6,56,10
     CONTROL         "&2. Spot light",IDC_RDO_SpotLight,"Button",BS_AUTORADIOBUTTON,112,6,55,10
     CONTROL         "&3. Directional light",IDC_RDO_DirectionalLight,"Button",BS_AUTORADIOBUTTON,174,6,73,10
+    CONTROL         "",IDC_SPIN_CameraDistance,"msctls_updown32",UDS_ARROWKEYS,49,42,10,14
+    EDITTEXT        IDC_EDIT_CameraDistance,9,42,40,14,ES_AUTOHSCROLL
 END
 
 

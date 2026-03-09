@@ -6,8 +6,18 @@
 
 class CMyD3DApplication;
 
+//
+// Chj constants of default values
+//
+#define C_CameraDistance 4.0f
+#define C_CameraSlideDegree 45.f
+#define C_CameraHeight 3.0f
+
+
+
 class ParamDialog : public CxxDialog
 {
+	friend class CMyD3DApplication;
 public:
 	ParamDialog();
 
@@ -15,6 +25,8 @@ public:
 
 protected:
 	void GuiToData(HWND hdlg);
+
+	void ResetParams();
 
 protected:
 	void OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify);
@@ -27,6 +39,9 @@ private:
 
 	D3DLIGHTTYPE m_lighttype;
 
-	friend class CMyD3DApplication;
+	float m_CameraDistance;
+	float m_CameraSlideDegree;
+	float m_CameraHeight;
+	float m_CameraWaggleDegree;
 };
 

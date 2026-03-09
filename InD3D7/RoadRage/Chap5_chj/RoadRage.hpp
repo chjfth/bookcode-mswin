@@ -34,6 +34,7 @@
 
 class ParamDialog;
 
+
 //-----------------------------------------------------------------------------
 // Name: class CMyD3DApplication
 // Desc: Application class. The base class provides just about all the

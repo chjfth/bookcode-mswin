@@ -213,6 +213,7 @@
     Source file list:
    -->
   <ItemGroup>
+    <ClCompile Include="CHHI.cpp" />
     <ClCompile Include="RoadRage.cpp" />
     <ClCompile Include="info.cpp" />
     <ClCompile Include="CxxParamDialog.cpp" />
