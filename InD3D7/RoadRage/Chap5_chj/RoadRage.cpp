@@ -210,12 +210,14 @@ LRESULT CMyD3DApplication::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 		case IDM_EXIT:
 //			PrintMessage(NULL, "MsgProc - IDM_EXIT", NULL, LOGFILE_ONLY);
+
+			// Destroy modeless child first
+			DestroyWindow(m_ppbox->GetHwnd());
+			m_pParamDlgbox = m_ppbox = NULL;
+
 			Cleanup3DEnvironment();
 			SendMessage( hWnd, WM_CLOSE, 0, 0 );
 			DestroyWindow( hWnd );
-
-			DestroyWindow(m_ppbox->GetHwnd());
-			m_pParamDlgbox = m_ppbox = NULL;
 
 			PostQuitMessage(0);
 			exit(0);

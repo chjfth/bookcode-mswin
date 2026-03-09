@@ -1,7 +1,9 @@
+#include <assert.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <CommCtrl.h>
 #include <mswin/utils_wingui.h>
+#include <mswin/Editbox_EnableKbdAdjustFloatnum.h>
 
 #include "resource.h"
 #include "CxxParamDialog.h"
@@ -64,6 +66,11 @@ BOOL ParamDialog::OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam)
 	CheckDlgButton(hdlg, IDC_CKB_LightAnimation, TRUE);
 	CheckDlgButton(hdlg, IDC_CKB_CameraAnimation, TRUE);
 	CheckDlgButton(hdlg, IDC_RDO_PointLight, TRUE);
+
+	HWND hedit = GetDlgItem(hdlg, IDC_EDIT_CameraDistance);
+	SetWindowText(hedit, _T("1.0234"));
+	EditboxKAF_err kerr = Editbox_EnableKbdAdjustFloatnum(hedit, -2.0, 2.0, 0.1, _T("%g"), false);
+	assert(!kerr);
 
 	GuiToData(hdlg);
 
