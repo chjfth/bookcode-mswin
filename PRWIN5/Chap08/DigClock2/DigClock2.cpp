@@ -760,7 +760,7 @@ BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
 
 	HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
-	Editbox_EnableKbdAdjustNumber(hEdit, 0, 59, true, true);
+	Editbox_EnableKbdAdjustNumber(hEdit, 0, 59, 1, true, 2);
 
 	// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
 	int textlen = GetWindowTextLength (hEdit);
