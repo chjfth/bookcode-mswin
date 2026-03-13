@@ -52,17 +52,19 @@ class CMyD3DApplication : public CD3DApplication
 	
 	ParamDialog *m_ppbox;
 
+	FLOAT m_x, m_y, m_z; // to support animation on/off
+
 	D3DLIGHT7 m_light;
 	float m_camX_waggle; // in radian
 
 	// Chj <<<
 
 protected:
-	HRESULT OneTimeSceneInit();  // Chap5_chj
+	HRESULT OneTimeSceneInit();  // Chap5
 	HRESULT InitDeviceObjects(); // Init 3D objecs in scene
 	HRESULT DeleteDeviceObjects();
 	HRESULT Render();
-	HRESULT FrameMove( FLOAT fTimeKey ); // Chap5_chj
+	HRESULT FrameMove( FLOAT fTimeKey ); // Chap5
 	HRESULT FinalCleanup();
 
 public:
@@ -82,7 +84,7 @@ public:
 
 	LRESULT MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-	// Chap5_chj >>>
+	// Chap5 >>>
 	D3DVERTEX    m_WallVertices[NUM_WALL_VERTICES];
 	WORD         m_WallIndices[NUM_WALL_INDICES];
 	D3DVERTEX    m_SphereVertices[NUM_SPHERE_VERTICES];
@@ -91,11 +93,11 @@ public:
 	setupinfo_ptr setupinfo;
 
 	BOOL RRAppActive;
-	// Chap5_chj <<<
+	// Chap5 <<<
 
 	static HRESULT hr;
 
-	// Chap5_chj+
+	// Chap5+
 	D3DVALUE		angx, angy, angz; 
 	D3DVALUE		look_up_ang;
 	D3DVECTOR       m_vEyePt;

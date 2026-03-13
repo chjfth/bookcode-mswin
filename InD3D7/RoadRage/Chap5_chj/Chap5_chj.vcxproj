@@ -239,7 +239,7 @@
     <ClInclude Include="..\share\d3dframe.h" />
     <ClInclude Include="..\share\d3dmath.h" />
     <ClInclude Include="..\share\d3dutil.h" />
-    <ClInclude Include="..\share\CxxDialog.h" />
+    <ClInclude Include="..\share\CxxDialogBase.h" />
   </ItemGroup>
 
 

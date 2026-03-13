@@ -1,13 +1,14 @@
-#ifndef __CxxDialog_h_20260308_
-#define __CxxDialog_h_20260308_
+#ifndef __CxxDialog_h_20260313_
+#define __CxxDialog_h_20260313_
 
+#include <assert.h>
 #include <tchar.h>
 #include <windows.h>
 
-class CxxDialog
+class CxxDialogBase
 {
 public:
-	CxxDialog()
+	CxxDialogBase()
 	{
 		m_hwndDlg = NULL;
 	}
@@ -25,8 +26,9 @@ public:
 	
 	HWND CreateModeless(HINSTANCE hInstance, LPCTSTR lpTemplateName, HWND hWndParent)
 	{
-		m_hwndDlg = ::CreateDialogParam(hInstance, 
+		HWND hdlg = ::CreateDialogParam(hInstance, 
 			lpTemplateName, hWndParent, s_DialogProc, (LPARAM)this);
+		assert(hdlg == m_hwndDlg);
 		return m_hwndDlg;
 	}
 	
@@ -47,15 +49,17 @@ private:
 	static INT_PTR CALLBACK s_DialogProc(HWND hdlg,
 		UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		CxxDialog *pdlg = NULL;
+		CxxDialogBase *pdlg = NULL;
 		if(uMsg==WM_INITDIALOG)
 		{
-			pdlg = (CxxDialog*)lParam;
+			pdlg = (CxxDialogBase*)lParam;
 			SetWindowLongPtr(hdlg, DWLP_USER, (LONG_PTR)pdlg);
+
+			pdlg->m_hwndDlg = hdlg;
 		}
 		else
 		{
-			pdlg = (CxxDialog*)GetWindowLongPtr(hdlg, DWLP_USER);
+			pdlg = (CxxDialogBase*)GetWindowLongPtr(hdlg, DWLP_USER);
 		}
 
 		INT_PTR ret = 0;

@@ -21,6 +21,7 @@
 #include "RoadRage.hpp"
 #include <RECTxy.h>
 #include "CxxParamDialog.h"
+#include "chjutils.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -107,6 +108,7 @@ CMyD3DApplication::CMyD3DApplication()
 	pCMyApp = this;
 
 	m_ppbox = NULL;
+	m_x = m_y = m_z = 0;
 	m_camX_waggle = 0;
 }
 
@@ -527,41 +529,45 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	}
 
 	// Values for the light position, direction, and color
-	FLOAT x = sinf( fTimeKey*2.000f );
-	FLOAT y = sinf( fTimeKey*2.246f );
-	FLOAT z = sinf( fTimeKey*2.640f );
+
+	FLOAT newx = sinf( fTimeKey*2.000f );
+	FLOAT newy = sinf( fTimeKey*2.246f );
+	FLOAT newz = sinf( fTimeKey*2.640f );
+
+	if(m_ppbox->m_isLightAnimation)
+	{
+		m_x = newx; m_y = newy; m_z = newz;
+	}
 
 	// Set up the light parameters
 	D3DLIGHT7 &light = m_light; 
 
-	if(m_ppbox->m_isLightAnimation)
+	ZeroMemory( &light, sizeof(light) );
+	light.dltType = m_dltType;
+
+	FLOAT &x = m_x, &y = m_y, &z = m_z;
+	light.dcvDiffuse.r  = 0.5f + 0.5f * x;
+	light.dcvDiffuse.g  = 0.5f + 0.5f * y;
+	light.dcvDiffuse.b  = 0.5f + 0.5f * z;
+	light.dvRange       = D3DLIGHT_RANGE_MAX;
+
+	switch( m_dltType )
 	{
-		ZeroMemory( &light, sizeof(light) );
+	case D3DLIGHT_POINT:
+		light.dvPosition     = 4.5f * D3DVECTOR( x, y, z );
+		light.dvAttenuation1 = 0.4f;
+		break;
 
-		light.dltType       = m_dltType;
-		light.dcvDiffuse.r  = 0.5f + 0.5f * x;
-		light.dcvDiffuse.g  = 0.5f + 0.5f * y;
-		light.dcvDiffuse.b  = 0.5f + 0.5f * z;
-		light.dvRange       = D3DLIGHT_RANGE_MAX;
+	case D3DLIGHT_DIRECTIONAL:
+		light.dvDirection    = D3DVECTOR( x, y, z );
+		break;
 
-		switch( m_dltType )
-		{
-		case D3DLIGHT_POINT:
-			light.dvPosition     = 4.5f * D3DVECTOR( x, y, z );
-			light.dvAttenuation1 = 0.4f;
-			break;
-
-		case D3DLIGHT_DIRECTIONAL:
-			light.dvDirection    = D3DVECTOR( x, y, z );
-			break;
-
-		case D3DLIGHT_SPOT:
-			light.dvDirection    = D3DVECTOR( x, y, z );
-			light.dvFalloff      = 100.0f;
-			light.dvTheta        =   0.8f;
-			light.dvPhi          =   1.0f;
-			light.dvAttenuation0 =   1.0f;
-		}
+	case D3DLIGHT_SPOT:
+		light.dvDirection    = D3DVECTOR( x, y, z );
+		light.dvFalloff      = 100.0f;
+		light.dvTheta        =   0.8f;
+		light.dvPhi          =   1.0f;
+		light.dvAttenuation0 =   1.0f;
 	}
 
 	// Set the light
@@ -570,11 +576,19 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	//
 	// Move the camera position around
 	//
-	if( m_ppbox->m_isCameraAnimation) {
-		m_camX_waggle = x;
+	if( m_ppbox->m_isCameraAnimation ) {
+		m_camX_waggle = newx;
 	}
-	FLOAT     toc = 0.3f * m_camX_waggle - g_PI/4;
-	D3DVECTOR vFrom( sinf(toc)*4.0f, 3.0f, -cosf(toc)*4.0f );
+
+	FLOAT OrbitDegreeLive = m_ppbox->m_CameraOrbitDegree + 18 * m_camX_waggle;
+	m_ppbox->SetGui_CameraOrbitDegreeLive(OrbitDegreeLive) ;
+	
+	FLOAT toc = Deg2Rad(OrbitDegreeLive);
+
+	D3DVECTOR vFrom( 
+		cosf(toc) * m_ppbox->m_CameraDistance, 
+		m_ppbox->m_CameraHeight, 
+		sinf(toc) * m_ppbox->m_CameraDistance );
 	// -- camera around a latitude arc
 	
 	D3DVECTOR vAt( 0.0f, 0.0f, 0.0f );

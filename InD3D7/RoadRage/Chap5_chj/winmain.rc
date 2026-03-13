@@ -147,8 +147,14 @@ BEGIN
     CONTROL         "&1. Point light",IDC_RDO_PointLight,"Button",BS_AUTORADIOBUTTON | WS_GROUP,49,6,56,10
     CONTROL         "&2. Spot light",IDC_RDO_SpotLight,"Button",BS_AUTORADIOBUTTON,112,6,55,10
     CONTROL         "&3. Directional light",IDC_RDO_DirectionalLight,"Button",BS_AUTORADIOBUTTON,174,6,73,10
-    CONTROL         "",IDC_SPIN_CameraDistance,"msctls_updown32",UDS_ARROWKEYS,49,42,10,14
-    EDITTEXT        IDC_EDIT_CameraDistance,9,42,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDE_CameraHeight,9,48,40,14,ES_AUTOHSCROLL
+    LTEXT           "Camera height",IDC_STATIC,11,38,48,8
+    LTEXT           "Camera distance",IDC_STATIC,72,38,54,8
+    EDITTEXT        IDE_CameraDistance,72,48,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDE_CameraOrbitDegree,137,48,40,14,ES_AUTOHSCROLL
+    LTEXT           "Camera orbit",IDC_STATIC,137,38,42,8
+    LTEXT           "Orbit live degree",IDC_STATIC,185,38,54,8
+    EDITTEXT        IDE_CameraOrbitDegreeLive,185,48,40,14,ES_AUTOHSCROLL | ES_READONLY
 END
 
 

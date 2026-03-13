@@ -16,7 +16,7 @@
 #include "D3DEnum.h"
 #include "D3DUtil.h"
 #include "D3DRes.h"
-#include "CxxDialog.h"
+#include "CxxDialogBase.h"
 
 
 //-----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ protected:
 	VOID    OutputText( DWORD x, DWORD y, TCHAR* str );
 
 protected:
-	CxxDialog *m_pParamDlgbox; // modeless-dialogbox 
+	CxxDialogBase *m_pParamDlgbox; // modeless-dialogbox 
 //	HWND AttachParamDlgbox(CxxDialog *pdlg){ m_pParamDlgbox = pdlg; }
 	
 

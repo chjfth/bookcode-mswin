@@ -48,10 +48,12 @@
 #define IDC_WINDOWED_CHECKBOX           1012
 #define IDC_SEARCH_CHECK                1013
 #define IDC_STEREO_CHECKBOX             1013
-#define IDC_SPIN_CameraDistance         1013
 #define IDC_FULLSCREEN_TEXT             1014
-#define IDC_EDIT1                       1014
-#define IDC_EDIT_CameraDistance         1014
+#define IDE_CameraHeight                1014
+#define IDE_CameraDistance              1015
+#define IDE_CameraOrbitDegree           1016
+#define IDE_CameraOrbitDegree2          1017
+#define IDE_CameraOrbitDegreeLive       1017
 #define IDC_BUTTON1                     1025
 #define IDC_WAVE                        1028
 #define IDC_LOBBYCONNECTCANCEL          1029

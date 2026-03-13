@@ -8,23 +8,79 @@
 #include "resource.h"
 #include "CxxParamDialog.h"
 
+float getDlgItemFloat(HWND hdlg, int Uic)
+{
+	TCHAR sztext[100] = {};
+	GetDlgItemText(hdlg, Uic, sztext, ARRAYSIZE(sztext));
+	return (float)_ttof(sztext);
+}
 
 ParamDialog::ParamDialog()
 {
 	m_isLightAnimation = FALSE;
 	m_isCameraAnimation = FALSE;
+
+	m_CameraHeight = 0;
+	m_CameraDistance = 0;
+	m_CameraOrbitDegree = 0;
+//	m_CameraOrbitDegreeLive = 0;
+	m_CameraWaggleDegree = 0;
+}
+
+enum NumWrap_et { NumWrap_no=0, NumWrap_yes=1 };
+
+void ParamDlg_SetEditboxParams(HWND hdlg, int idcEditbox,
+	float init_val,
+	float min_val, float max_val, float step_val, const TCHAR *szfmt,
+	NumWrap_et numwrap,
+	const TCHAR *helptext)
+{
+	HWND hedit = GetDlgItem(hdlg, idcEditbox);
+	vaSetWindowText(hedit, szfmt, init_val);
+	EditboxKAF_err kerr = Editbox_EnableKbdAdjustFloatnum(hedit, 
+		min_val, max_val, step_val, szfmt, 
+		numwrap==NumWrap_yes ? true : false,
+		helptext);
+	assert(!kerr);
 }
 
 void ParamDialog::ResetParams()
 {
-	m_CameraDistance = C_CameraDistance;
-	m_CameraSlideDegree = C_CameraSlideDegree;
-	m_CameraHeight = C_CameraHeight;
-	m_CameraWaggleDegree = 0.0f;
+	HWND hdlg = m_hwndDlg;
+
+	CheckDlgButton(hdlg, IDC_CKB_LightAnimation, TRUE);
+	CheckDlgButton(hdlg, IDC_CKB_CameraAnimation, TRUE);
+	CheckDlgButton(hdlg, IDC_RDO_PointLight, TRUE);
+
+	ParamDlg_SetEditboxParams(hdlg, IDE_CameraHeight, 
+		C_CameraHeight,
+		-10.0f, 10.0f, 0.1f, _T("%.1f"),
+		NumWrap_no,
+		_T("Camera height from the ground(XZ-plane).")
+		);
+
+	ParamDlg_SetEditboxParams(hdlg, IDE_CameraDistance,
+		C_CameraDistance,
+		-10.0f, 10.0f, 0.1f, _T("%.1f"),
+		NumWrap_no,
+		_T("Camera distance from the Y axis.")
+		);
+
+	ParamDlg_SetEditboxParams(hdlg, IDE_CameraOrbitDegree,
+		C_CameraOrbitDegree,
+		-180.0f, 180.0f, 1.0f, _T("%.1f"),
+		NumWrap_yes,
+		_T("Camera orbit degree on the latitude. 0~90 means from +X to +Z.")
+		);
+
+	GuiToData();
+
 }
 
-void ParamDialog::GuiToData(HWND hdlg)
+void ParamDialog::GuiToData()
 {
+	HWND hdlg = m_hwndDlg;
+
 	m_isLightAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_LightAnimation);
 	m_isCameraAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_CameraAnimation);
 
@@ -33,11 +89,22 @@ void ParamDialog::GuiToData(HWND hdlg)
 		m_lighttype = D3DLIGHT_SPOT;
 	else if(IsDlgButtonChecked(hdlg, IDC_RDO_DirectionalLight))
 		m_lighttype = D3DLIGHT_DIRECTIONAL;
+
+	m_CameraHeight = getDlgItemFloat(hdlg, IDE_CameraHeight);
+	m_CameraDistance = getDlgItemFloat(hdlg, IDE_CameraDistance);
+	m_CameraOrbitDegree = getDlgItemFloat(hdlg, IDE_CameraOrbitDegree);
+	
+	m_CameraWaggleDegree = 0.0f;
+}
+
+void ParamDialog::SetGui_CameraOrbitDegreeLive(float degree)
+{
+	vaSetDlgItemText(m_hwndDlg, IDE_CameraOrbitDegreeLive, _T("%.1f"), degree);
 }
 
 void ParamDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify) 
 {
-	GuiToData(hdlg);
+	GuiToData();
 
 	switch (id) 
 	{{
@@ -53,6 +120,11 @@ void ParamDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 		break;
 	}
 	}}
+
+	if(codeNotify==EN_CHANGE)
+	{
+		GuiToData();
+	}
 }
 
 void ParamDialog::OnClose(HWND hdlg)
@@ -63,17 +135,7 @@ void ParamDialog::OnClose(HWND hdlg)
 
 BOOL ParamDialog::OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam) 
 {
-	CheckDlgButton(hdlg, IDC_CKB_LightAnimation, TRUE);
-	CheckDlgButton(hdlg, IDC_CKB_CameraAnimation, TRUE);
-	CheckDlgButton(hdlg, IDC_RDO_PointLight, TRUE);
-
-	HWND hedit = GetDlgItem(hdlg, IDC_EDIT_CameraDistance);
-	SetWindowText(hedit, _T("1.0234"));
-	EditboxKAF_err kerr = Editbox_EnableKbdAdjustFloatnum(hedit, -2.0, 2.0, 0.1, _T("%g"), false);
-	assert(!kerr);
-
-	GuiToData(hdlg);
-
+	ResetParams();
 	return TRUE;
 }
 
