@@ -17,6 +17,11 @@ float getDlgItemFloat(HWND hdlg, int Uic)
 
 ParamDialog::ParamDialog()
 {
+	m_lighttype = D3DLIGHT_POINT;
+	m_isPointLightLatitude = false;
+	m_PointLightHeight = C_PointLightHeight;
+	m_PointLightRadius = 0.0f;
+
 	m_isLightAnimation = FALSE;
 	m_isCameraAnimation = FALSE;
 
@@ -52,18 +57,25 @@ void ParamDialog::ResetParams()
 	CheckDlgButton(hdlg, IDC_CKB_CameraAnimation, TRUE);
 	CheckDlgButton(hdlg, IDC_RDO_PointLight, TRUE);
 
+	ParamDlg_SetEditboxParams(hdlg, IDE_PointLightRadius, 
+		C_PointLightRadius,
+		0.1f, 10.0f, 0.1f, _T("%.1f"),
+		NumWrap_no,
+		_T("Point-light radius around Y-axis.")
+		);
+
 	ParamDlg_SetEditboxParams(hdlg, IDE_CameraHeight, 
 		C_CameraHeight,
-		-10.0f, 10.0f, 0.1f, _T("%.1f"),
+		-15.0f, 15.0f, 0.1f, _T("%.1f"),
 		NumWrap_no,
 		_T("Camera height from the ground(XZ-plane).")
 		);
 
 	ParamDlg_SetEditboxParams(hdlg, IDE_CameraDistance,
 		C_CameraDistance,
-		-10.0f, 10.0f, 0.1f, _T("%.1f"),
+		0.0f, 10.0f, 0.1f, _T("%.1f"),
 		NumWrap_no,
-		_T("Camera distance from the Y axis.")
+		_T("Camera distance from the Y-axis.")
 		);
 
 	ParamDlg_SetEditboxParams(hdlg, IDE_CameraOrbitDegree,
@@ -81,14 +93,26 @@ void ParamDialog::GuiToData()
 {
 	HWND hdlg = m_hwndDlg;
 
-	m_isLightAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_LightAnimation);
-	m_isCameraAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_CameraAnimation);
-
 	m_lighttype = D3DLIGHT_POINT;
-	if(IsDlgButtonChecked(hdlg, IDC_RDO_SpotLight))
+	if(IsDlgButtonChecked(hdlg, IDC_RDO_PointLight))
+		m_isPointLightLatitude = false;
+	else if(IsDlgButtonChecked(hdlg, IDC_RDO_PointLight2))
+		m_isPointLightLatitude = true;
+	else if(IsDlgButtonChecked(hdlg, IDC_RDO_SpotLight))
 		m_lighttype = D3DLIGHT_SPOT;
 	else if(IsDlgButtonChecked(hdlg, IDC_RDO_DirectionalLight))
 		m_lighttype = D3DLIGHT_DIRECTIONAL;
+
+	m_PointLightRadius = getDlgItemFloat(hdlg, IDE_PointLightRadius);
+	//
+	HWND heditPointLightRadius = GetDlgItem(hdlg, IDE_PointLightRadius);
+	if(IsDlgButtonChecked(hdlg, IDC_RDO_PointLight2))
+		EnableWindow(heditPointLightRadius, TRUE);
+	else
+		EnableWindow(heditPointLightRadius, FALSE);
+
+	m_isLightAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_LightAnimation);
+	m_isCameraAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_CameraAnimation);
 
 	m_CameraHeight = getDlgItemFloat(hdlg, IDE_CameraHeight);
 	m_CameraDistance = getDlgItemFloat(hdlg, IDE_CameraDistance);
@@ -102,11 +126,11 @@ void ParamDialog::SetGui_CameraOrbitDegreeLive(float degree)
 	vaSetDlgItemText(m_hwndDlg, IDE_CameraOrbitDegreeLive, _T("%.1f"), degree);
 }
 
-void ParamDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify) 
+void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify) 
 {
 	GuiToData();
 
-	switch (id) 
+	switch (uic) 
 	{{
 	case IDC_BTN_UPDATE:
 	{
@@ -121,9 +145,10 @@ void ParamDialog::OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify)
 	}
 	}}
 
-	if(codeNotify==EN_CHANGE)
+	if(codeNotify==EN_CHANGE || codeNotify==BN_CLICKED)
 	{
-		GuiToData();
+		if(uic!=IDE_CameraOrbitDegreeLive)
+			GuiToData();
 	}
 }
 

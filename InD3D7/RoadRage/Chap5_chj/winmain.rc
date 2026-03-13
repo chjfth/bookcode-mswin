@@ -97,7 +97,7 @@ BEGIN
 
     IDD_PARAMS, DIALOG
     BEGIN
-        RIGHTMARGIN, 256
+        RIGHTMARGIN, 280
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -134,27 +134,30 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,125,25,50,14
 END
 
-IDD_PARAMS DIALOGEX 0, 0, 257, 116
+IDD_PARAMS DIALOGEX 0, 0, 281, 116
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CAPTION | WS_THICKFRAME
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Parameters"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Light type:",IDC_STATIC,4,4,37,12,SS_CENTERIMAGE
-    PUSHBUTTON      "Button1",IDC_BTN_UPDATE,104,98,50,14
-    CONTROL         "&Light animation",IDC_CKB_LightAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,5,21,64,10
-    CONTROL         "&Camera animation",IDC_CKB_CameraAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,97,21,73,10
     CONTROL         "&1. Point light",IDC_RDO_PointLight,"Button",BS_AUTORADIOBUTTON | WS_GROUP,49,6,56,10
-    CONTROL         "&2. Spot light",IDC_RDO_SpotLight,"Button",BS_AUTORADIOBUTTON,112,6,55,10
-    CONTROL         "&3. Directional light",IDC_RDO_DirectionalLight,"Button",BS_AUTORADIOBUTTON,174,6,73,10
-    EDITTEXT        IDE_CameraHeight,9,48,40,14,ES_AUTOHSCROLL
-    LTEXT           "Camera height",IDC_STATIC,11,38,48,8
-    LTEXT           "Camera distance",IDC_STATIC,72,38,54,8
-    EDITTEXT        IDE_CameraDistance,72,48,40,14,ES_AUTOHSCROLL
-    EDITTEXT        IDE_CameraOrbitDegree,137,48,40,14,ES_AUTOHSCROLL
-    LTEXT           "Camera orbit",IDC_STATIC,137,38,42,8
-    LTEXT           "Orbit live degree",IDC_STATIC,185,38,54,8
-    EDITTEXT        IDE_CameraOrbitDegreeLive,185,48,40,14,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "&2. Point light around latitude, radius:",IDC_RDO_PointLight2,
+                    "Button",BS_AUTORADIOBUTTON,111,6,133,10
+    CONTROL         "&3. Spot light",IDC_RDO_SpotLight,"Button",BS_AUTORADIOBUTTON,49,18,55,10
+    CONTROL         "&4. Directional light",IDC_RDO_DirectionalLight,"Button",BS_AUTORADIOBUTTON,111,18,73,10
+    EDITTEXT        IDE_PointLightRadius,245,5,25,13,ES_AUTOHSCROLL
+    CONTROL         "&Light animation",IDC_CKB_LightAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,5,32,64,10
+    CONTROL         "&Camera animation",IDC_CKB_CameraAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,97,32,73,10
+    LTEXT           "Camera height",IDC_STATIC,11,49,48,8
+    EDITTEXT        IDE_CameraHeight,9,59,40,14,ES_AUTOHSCROLL
+    LTEXT           "Camera distance",IDC_STATIC,67,49,54,8
+    EDITTEXT        IDE_CameraDistance,67,59,40,14,ES_AUTOHSCROLL
+    LTEXT           "Camera orbit",IDC_STATIC,137,49,42,8
+    EDITTEXT        IDE_CameraOrbitDegree,137,59,40,14,ES_AUTOHSCROLL
+    LTEXT           "Orbit live degree",IDC_STATIC,185,49,54,8
+    EDITTEXT        IDE_CameraOrbitDegreeLive,185,59,40,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Reset Params",IDC_BTN_Reset,111,98,59,14
 END
 
 

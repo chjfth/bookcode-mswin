@@ -534,9 +534,12 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	FLOAT newy = sinf( fTimeKey*2.246f );
 	FLOAT newz = sinf( fTimeKey*2.640f );
 
+	FLOAT newz2= cosf( fTimeKey*2.000f ); // use same radius as newx
+
 	if(m_ppbox->m_isLightAnimation)
 	{
-		m_x = newx; m_y = newy; m_z = newz;
+		m_x = newx; m_y = newy; m_z = newz; 
+		m_z2 = newz2;
 	}
 
 	// Set up the light parameters
@@ -552,11 +555,24 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	light.dvRange       = D3DLIGHT_RANGE_MAX;
 
 	switch( m_dltType )
-	{
+	{{
 	case D3DLIGHT_POINT:
-		light.dvPosition     = 4.5f * D3DVECTOR( x, y, z );
+	{
+		if(!m_ppbox->m_isPointLightLatitude) // book default
+		{
+			light.dvPosition = 4.5f * D3DVECTOR( x, y, z );
+		}
+		else
+		{
+			light.dvPosition = D3DVECTOR(
+				m_ppbox->m_PointLightRadius * x, 
+				m_ppbox->m_PointLightHeight,
+				m_ppbox->m_PointLightRadius * m_z2
+				);
+		}
 		light.dvAttenuation1 = 0.4f;
 		break;
+	}
 
 	case D3DLIGHT_DIRECTIONAL:
 		light.dvDirection    = D3DVECTOR( x, y, z );
@@ -568,7 +584,7 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 		light.dvTheta        =   0.8f;
 		light.dvPhi          =   1.0f;
 		light.dvAttenuation0 =   1.0f;
-	}
+	}}
 
 	// Set the light
 	m_pd3dDevice->SetLight( 0, &light );

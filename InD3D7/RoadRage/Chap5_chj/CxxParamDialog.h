@@ -9,9 +9,13 @@ class CMyD3DApplication;
 //
 // Chj constants of default values
 //
+#define C_PointLightRadius 4.5f
+#define C_PointLightHeight 2.0f
+
 #define C_CameraDistance 4.0f
 #define C_CameraOrbitDegree -135.0f
 #define C_CameraHeight 3.0f
+
 
 
 
@@ -36,10 +40,14 @@ protected:
 	void OnClose(HWND hwnd);
 
 private:
+	D3DLIGHTTYPE m_lighttype;
+	
+	bool m_isPointLightLatitude;
+	float m_PointLightHeight; // const now
+	float m_PointLightRadius;
+
 	BOOL m_isLightAnimation;
 	BOOL m_isCameraAnimation;
-
-	D3DLIGHTTYPE m_lighttype;
 
 	float m_CameraHeight;
 	float m_CameraDistance;

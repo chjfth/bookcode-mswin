@@ -29,9 +29,11 @@
 #define IDD_CHANGEDEVICE                144
 #define IDD_PARAMS                      200
 #define IDC_BTN_UPDATE                  201
+#define IDC_BTN_Reset                   201
 #define IDC_RDO_PointLight              202
 #define IDC_RDO_SpotLight               203
 #define IDC_RDO_DirectionalLight        204
+#define IDC_RDO_PointLight2             205
 #define IDC_DEVICE_COMBO                1000
 #define IDC_PLAYER_NAME_EDIT            1000
 #define IDC_MODE_COMBO                  1001
@@ -52,8 +54,9 @@
 #define IDE_CameraHeight                1014
 #define IDE_CameraDistance              1015
 #define IDE_CameraOrbitDegree           1016
-#define IDE_CameraOrbitDegree2          1017
 #define IDE_CameraOrbitDegreeLive       1017
+#define IDC_EDIT1                       1018
+#define IDE_PointLightRadius            1018
 #define IDC_BUTTON1                     1025
 #define IDC_WAVE                        1028
 #define IDC_LOBBYCONNECTCANCEL          1029
@@ -84,7 +87,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         40018
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

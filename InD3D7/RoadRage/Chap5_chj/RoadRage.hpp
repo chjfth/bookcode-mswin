@@ -52,7 +52,7 @@ class CMyD3DApplication : public CD3DApplication
 	
 	ParamDialog *m_ppbox;
 
-	FLOAT m_x, m_y, m_z; // to support animation on/off
+	FLOAT m_x, m_y, m_z, m_z2; // to support animation on/off
 
 	D3DLIGHT7 m_light;
 	float m_camX_waggle; // in radian
