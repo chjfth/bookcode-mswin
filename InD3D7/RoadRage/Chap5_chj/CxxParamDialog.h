@@ -2,20 +2,14 @@
 #include <windows.h>
 #include <d3dtypes.h>
 
+#include <TScalableArray.h>
+
+#include <mswin/LiveUic.h>
+using namespace liveuic;
+
 #include "CxxDialogBase.h"
 
 class CMyD3DApplication;
-
-//
-// Chj constants of default values
-//
-#define C_PointLightRadius 4.5f
-#define C_PointLightHeight 2.0f
-
-#define C_CameraDistance 4.0f
-#define C_CameraOrbitDegree -135.0f
-#define C_CameraHeight 3.0f
-
 
 
 
@@ -30,28 +24,34 @@ public:
 	virtual INT_PTR DialogProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 protected:
-	void GuiToData();
+	void DataFromGui();
 
-	void ResetParams();
+	void InitParams();
 
 protected:
 	void OnCommand(HWND hdlg, int id, HWND hwndCtl, UINT codeNotify);
 	BOOL OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam);
 	void OnClose(HWND hwnd);
 
+	// Chj added members:
+
+private:
+	TScalableArray<LiveUic*> m_saLiveUic;
+
 private:
 	D3DLIGHTTYPE m_lighttype;
-	
+	CRadioGroup mc_LightType; // mc: member of Uic type
 	bool m_isPointLightLatitude;
+
 	float m_PointLightHeight; // const now
-	float m_PointLightRadius;
+	CEditValue<float> mc_PointLightRadius;
 
-	BOOL m_isLightAnimation;
-	BOOL m_isCameraAnimation;
+	CCheckbox mc_LightAnimation; //BOOL m_isLightAnimation;
+	CCheckbox mc_CameraAnimation;
 
-	float m_CameraHeight;
-	float m_CameraDistance;
-	float m_CameraOrbitDegree;
+	CEditValue<float> mc_CameraHeight;
+	CEditValue<float> mc_CameraDistance;
+	CEditValue<float> mc_CameraOrbitDegree;
 //	float m_CameraOrbitDegreeLive;
 	float m_CameraWaggleDegree;
 };

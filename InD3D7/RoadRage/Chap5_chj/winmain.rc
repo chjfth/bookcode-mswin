@@ -97,7 +97,10 @@ BEGIN
 
     IDD_PARAMS, DIALOG
     BEGIN
-        RIGHTMARGIN, 280
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 277
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 112
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -157,7 +160,7 @@ BEGIN
     EDITTEXT        IDE_CameraOrbitDegree,137,59,40,14,ES_AUTOHSCROLL
     LTEXT           "Orbit live degree",IDC_STATIC,185,49,54,8
     EDITTEXT        IDE_CameraOrbitDegreeLive,185,59,40,14,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "Reset Params",IDC_BTN_Reset,111,98,59,14
+    PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,111,98,59,14
 END
 
 

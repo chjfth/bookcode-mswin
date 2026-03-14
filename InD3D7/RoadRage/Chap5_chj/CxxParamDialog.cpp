@@ -8,6 +8,17 @@
 #include "resource.h"
 #include "CxxParamDialog.h"
 
+//
+// Chj constants of default values
+//
+#define C_PointLightRadius 4.5f
+#define C_PointLightHeight 2.0f
+
+#define C_CameraDistance 4.0f
+#define C_CameraOrbitDegree -135.0f
+#define C_CameraHeight 3.0f
+
+
 float getDlgItemFloat(HWND hdlg, int Uic)
 {
 	TCHAR sztext[100] = {};
@@ -20,105 +31,121 @@ ParamDialog::ParamDialog()
 	m_lighttype = D3DLIGHT_POINT;
 	m_isPointLightLatitude = false;
 	m_PointLightHeight = C_PointLightHeight;
-	m_PointLightRadius = 0.0f;
 
-	m_isLightAnimation = FALSE;
-	m_isCameraAnimation = FALSE;
-
-	m_CameraHeight = 0;
-	m_CameraDistance = 0;
-	m_CameraOrbitDegree = 0;
-//	m_CameraOrbitDegreeLive = 0;
 	m_CameraWaggleDegree = 0;
 }
 
-enum NumWrap_et { NumWrap_no=0, NumWrap_yes=1 };
+//enum NumWrap_et { NumWrap_no=0, NumWrap_yes=1 };
+#define NumWrap_no FALSE
+#define NumWrap_yes TRUE
 
-void ParamDlg_SetEditboxParams(HWND hdlg, int idcEditbox,
-	float init_val,
-	float min_val, float max_val, float step_val, const TCHAR *szfmt,
-	NumWrap_et numwrap,
-	const TCHAR *helptext)
-{
-	HWND hedit = GetDlgItem(hdlg, idcEditbox);
-	vaSetWindowText(hedit, szfmt, init_val);
-	EditboxKAF_err kerr = Editbox_EnableKbdAdjustFloatnum(hedit, 
-		min_val, max_val, step_val, szfmt, 
-		numwrap==NumWrap_yes ? true : false,
-		helptext);
-	assert(!kerr);
-}
 
-void ParamDialog::ResetParams()
+void ParamDialog::InitParams()
 {
 	HWND hdlg = m_hwndDlg;
+	HWND hedit = NULL, hckbox = NULL;
+	float def_val=0, min_val=0, max_val=0;
+	EditboxKAF_err kerr;
 
-	CheckDlgButton(hdlg, IDC_CKB_LightAnimation, TRUE);
-	CheckDlgButton(hdlg, IDC_CKB_CameraAnimation, TRUE);
-	CheckDlgButton(hdlg, IDC_RDO_PointLight, TRUE);
+	// Light-type radio group
+	mc_LightType.Init(hdlg, IDC_RDO_PointLight, IDC_RDO_DirectionalLight);
+	m_saLiveUic.AppendTail(&mc_LightType);
 
-	ParamDlg_SetEditboxParams(hdlg, IDE_PointLightRadius, 
-		C_PointLightRadius,
-		0.1f, 10.0f, 0.1f, _T("%.1f"),
-		NumWrap_no,
+	// Light Animation checkbox
+	hckbox = GetDlgItem(hdlg, IDC_CKB_LightAnimation);
+	mc_LightAnimation.Init(hckbox, BST_CHECKED);
+	m_saLiveUic.AppendTail(&mc_LightAnimation);
+
+	// Camera Animation checkbox
+	hckbox = GetDlgItem(hdlg, IDC_CKB_CameraAnimation);
+	mc_CameraAnimation.Init(hckbox, BST_CHECKED);
+	m_saLiveUic.AppendTail(&mc_CameraAnimation);
+
+	// PointLight Radius
+	def_val = C_PointLightRadius;
+	min_val = 0.1f;
+	max_val = 10.0f;
+	hedit = GetDlgItem(hdlg, IDE_PointLightRadius);
+	mc_PointLightRadius.Init(hedit, def_val, min_val, max_val);
+	m_saLiveUic.AppendTail(&mc_PointLightRadius);
+	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val, 
+		0.1f, _T("%.1f"), NumWrap_no, // step_val, fmt
 		_T("Point-light radius around Y-axis.")
 		);
+	assert(!kerr);
 
-	ParamDlg_SetEditboxParams(hdlg, IDE_CameraHeight, 
-		C_CameraHeight,
-		-15.0f, 15.0f, 0.1f, _T("%.1f"),
-		NumWrap_no,
+	// Camera Height editbox
+	def_val = C_CameraHeight; 
+	min_val = -15.0f; 
+	max_val = 15.0f;
+	hedit = GetDlgItem(hdlg, IDE_CameraHeight);
+	mc_CameraHeight.Init(hedit, def_val, min_val, max_val);
+	m_saLiveUic.AppendTail(&mc_CameraHeight);
+	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val,
+		0.1f, _T("%.1f"), NumWrap_no, // step_val, fmt
 		_T("Camera height from the ground(XZ-plane).")
 		);
+	assert(!kerr);
 
-	ParamDlg_SetEditboxParams(hdlg, IDE_CameraDistance,
-		C_CameraDistance,
-		0.0f, 10.0f, 0.1f, _T("%.1f"),
-		NumWrap_no,
+	// Camera Distance editbox
+	def_val = C_CameraDistance;
+	min_val = 0.0f;
+	max_val = 10.0f;
+	hedit = GetDlgItem(hdlg, IDE_CameraDistance);
+	mc_CameraDistance.Init(hedit, def_val, min_val, max_val);
+	m_saLiveUic.AppendTail(&mc_CameraDistance);
+	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val,
+		0.1f, _T("%.1f"), NumWrap_no, // step_val, fmt
 		_T("Camera distance from the Y-axis.")
 		);
+	assert(!kerr);
 
-	ParamDlg_SetEditboxParams(hdlg, IDE_CameraOrbitDegree,
-		C_CameraOrbitDegree,
-		-180.0f, 180.0f, 1.0f, _T("%.1f"),
-		NumWrap_yes,
+	// Camera Orbit Degree editbox
+	def_val = C_CameraOrbitDegree;
+	min_val = -180.0f;
+	max_val = +180.0f;
+	hedit = GetDlgItem(hdlg, IDE_CameraOrbitDegree);
+	mc_CameraOrbitDegree.Init(hedit, def_val, min_val, max_val);
+	m_saLiveUic.AppendTail(&mc_CameraOrbitDegree);
+	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val,
+		1.0f, _T("%.1f"), NumWrap_yes, // step_val, fmt
 		_T("Camera orbit degree on the latitude. 0~90 means from +X to +Z.")
 		);
-
-	GuiToData();
-
 }
 
-void ParamDialog::GuiToData()
+void ParamDialog::DataFromGui()
 {
 	HWND hdlg = m_hwndDlg;
 
+	for(int i=0; i<m_saLiveUic.CurrentEles(); i++)
+	{
+		m_saLiveUic[i]->DataFromUic();
+	}
+
 	m_lighttype = D3DLIGHT_POINT;
-	if(IsDlgButtonChecked(hdlg, IDC_RDO_PointLight))
-		m_isPointLightLatitude = false;
-	else if(IsDlgButtonChecked(hdlg, IDC_RDO_PointLight2))
-		m_isPointLightLatitude = true;
-	else if(IsDlgButtonChecked(hdlg, IDC_RDO_SpotLight))
+	int uicLightType = mc_LightType.GetActive();
+	if(uicLightType==IDC_RDO_SpotLight)
 		m_lighttype = D3DLIGHT_SPOT;
-	else if(IsDlgButtonChecked(hdlg, IDC_RDO_DirectionalLight))
+	else if(uicLightType==IDC_RDO_DirectionalLight)
 		m_lighttype = D3DLIGHT_DIRECTIONAL;
-
-	m_PointLightRadius = getDlgItemFloat(hdlg, IDE_PointLightRadius);
 	//
-	HWND heditPointLightRadius = GetDlgItem(hdlg, IDE_PointLightRadius);
-	if(IsDlgButtonChecked(hdlg, IDC_RDO_PointLight2))
-		EnableWindow(heditPointLightRadius, TRUE);
-	else
-		EnableWindow(heditPointLightRadius, FALSE);
+	if(uicLightType==IDC_RDO_PointLight)
+		m_isPointLightLatitude = false;
 
-	m_isLightAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_LightAnimation);
-	m_isCameraAnimation = IsDlgButtonChecked(hdlg, IDC_CKB_CameraAnimation);
+	else if(uicLightType==IDC_RDO_PointLight2)
+		m_isPointLightLatitude = true;
 
-	m_CameraHeight = getDlgItemFloat(hdlg, IDE_CameraHeight);
-	m_CameraDistance = getDlgItemFloat(hdlg, IDE_CameraDistance);
-	m_CameraOrbitDegree = getDlgItemFloat(hdlg, IDE_CameraOrbitDegree);
-	
+	enableDlgItem(hdlg, IDE_PointLightRadius, m_isPointLightLatitude);
+			// 	m_PointLightRadius = getDlgItemFloat(hdlg, IDE_PointLightRadius);
+			// 	//
+			// 	HWND heditPointLightRadius = GetDlgItem(hdlg, IDE_PointLightRadius);
+			// 	if(IsDlgButtonChecked(hdlg, IDC_RDO_PointLight2))
+			// 		EnableWindow(heditPointLightRadius, TRUE);
+			// 	else
+			// 		EnableWindow(heditPointLightRadius, FALSE);
+
 	m_CameraWaggleDegree = 0.0f;
+
 }
 
 void ParamDialog::SetGui_CameraOrbitDegreeLive(float degree)
@@ -128,12 +155,16 @@ void ParamDialog::SetGui_CameraOrbitDegreeLive(float degree)
 
 void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify) 
 {
-	GuiToData();
+//	DataFromGui();
 
 	switch (uic) 
 	{{
-	case IDC_BTN_UPDATE:
+	case IDC_BTN_ResetParams:
 	{
+		for(int i=0; i<m_saLiveUic.CurrentEles(); i++)
+		{
+			m_saLiveUic[i]->Reset();
+		}
 		break;
 	}
 	case IDOK:
@@ -147,8 +178,8 @@ void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify)
 
 	if(codeNotify==EN_CHANGE || codeNotify==BN_CLICKED)
 	{
-		if(uic!=IDE_CameraOrbitDegreeLive)
-			GuiToData();
+		if(uic!=IDE_CameraOrbitDegreeLive && uic!=IDC_BTN_ResetParams)
+			DataFromGui();
 	}
 }
 
@@ -160,7 +191,9 @@ void ParamDialog::OnClose(HWND hdlg)
 
 BOOL ParamDialog::OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam) 
 {
-	ResetParams();
+	InitParams();
+	DataFromGui();
+
 	return TRUE;
 }
 

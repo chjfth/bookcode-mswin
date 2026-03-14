@@ -30,10 +30,11 @@
 #define IDD_PARAMS                      200
 #define IDC_BTN_UPDATE                  201
 #define IDC_BTN_Reset                   201
+#define IDC_BTN_ResetParams             201
 #define IDC_RDO_PointLight              202
-#define IDC_RDO_SpotLight               203
-#define IDC_RDO_DirectionalLight        204
-#define IDC_RDO_PointLight2             205
+#define IDC_RDO_PointLight2             203
+#define IDC_RDO_SpotLight               204
+#define IDC_RDO_DirectionalLight        205
 #define IDC_DEVICE_COMBO                1000
 #define IDC_PLAYER_NAME_EDIT            1000
 #define IDC_MODE_COMBO                  1001

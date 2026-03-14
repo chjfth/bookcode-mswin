@@ -536,7 +536,7 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 
 	FLOAT newz2= cosf( fTimeKey*2.000f ); // use same radius as newx
 
-	if(m_ppbox->m_isLightAnimation)
+	if(m_ppbox->mc_LightAnimation.GetState()==BST_CHECKED)
 	{
 		m_x = newx; m_y = newy; m_z = newz; 
 		m_z2 = newz2;
@@ -565,9 +565,9 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 		else
 		{
 			light.dvPosition = D3DVECTOR(
-				m_ppbox->m_PointLightRadius * x, 
+				m_ppbox->mc_PointLightRadius.GetValue() * x, 
 				m_ppbox->m_PointLightHeight,
-				m_ppbox->m_PointLightRadius * m_z2
+				m_ppbox->mc_PointLightRadius.GetValue() * m_z2
 				);
 		}
 		light.dvAttenuation1 = 0.4f;
@@ -592,19 +592,19 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 	//
 	// Move the camera position around
 	//
-	if( m_ppbox->m_isCameraAnimation ) {
+	if( m_ppbox->mc_CameraAnimation.IsChecked() ) {
 		m_camX_waggle = newx;
 	}
 
-	FLOAT OrbitDegreeLive = m_ppbox->m_CameraOrbitDegree + 18 * m_camX_waggle;
+	FLOAT OrbitDegreeLive = m_ppbox->mc_CameraOrbitDegree.GetValue() + 18 * m_camX_waggle;
 	m_ppbox->SetGui_CameraOrbitDegreeLive(OrbitDegreeLive) ;
 	
 	FLOAT toc = Deg2Rad(OrbitDegreeLive);
 
 	D3DVECTOR vFrom( 
-		cosf(toc) * m_ppbox->m_CameraDistance, 
-		m_ppbox->m_CameraHeight, 
-		sinf(toc) * m_ppbox->m_CameraDistance );
+		cosf(toc) * m_ppbox->mc_CameraDistance.GetValue(), 
+		m_ppbox->mc_CameraHeight.GetValue(), 
+		sinf(toc) * m_ppbox->mc_CameraDistance.GetValue() );
 	// -- camera around a latitude arc
 	
 	D3DVECTOR vAt( 0.0f, 0.0f, 0.0f );
