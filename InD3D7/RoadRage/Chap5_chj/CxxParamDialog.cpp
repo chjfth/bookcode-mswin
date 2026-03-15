@@ -136,13 +136,6 @@ void ParamDialog::DataFromGui()
 		m_isPointLightLatitude = true;
 
 	enableDlgItem(hdlg, IDE_PointLightRadius, m_isPointLightLatitude);
-			// 	m_PointLightRadius = getDlgItemFloat(hdlg, IDE_PointLightRadius);
-			// 	//
-			// 	HWND heditPointLightRadius = GetDlgItem(hdlg, IDE_PointLightRadius);
-			// 	if(IsDlgButtonChecked(hdlg, IDC_RDO_PointLight2))
-			// 		EnableWindow(heditPointLightRadius, TRUE);
-			// 	else
-			// 		EnableWindow(heditPointLightRadius, FALSE);
 
 	m_CameraWaggleDegree = 0.0f;
 
@@ -176,7 +169,7 @@ void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify)
 	}
 	}}
 
-	if(codeNotify==EN_CHANGE || codeNotify==BN_CLICKED)
+	if(codeNotify==BN_CLICKED) // codeNotify==EN_CHANGE || 
 	{
 		if(uic!=IDE_CameraOrbitDegreeLive && uic!=IDC_BTN_ResetParams)
 			DataFromGui();

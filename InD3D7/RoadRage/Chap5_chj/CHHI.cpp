@@ -3,12 +3,13 @@
 
 #define CHHI_ALL_IMPL
 
-//#define CxxWindowSubclass_DEBUG
+#define CxxWindowSubclass_DEBUG
 //#define DlgTooltipEasy_DEBUG
 #define Editbox_EnableKbdAdjustFloatnum_DEBUG
 
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
+#include <mswin/WinUser.itc.h>
 
 #include <mswin/CxxWindowSubclass.h>
 

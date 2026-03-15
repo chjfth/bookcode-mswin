@@ -28,8 +28,6 @@
 #define IDD_ABOUT                       143
 #define IDD_CHANGEDEVICE                144
 #define IDD_PARAMS                      200
-#define IDC_BTN_UPDATE                  201
-#define IDC_BTN_Reset                   201
 #define IDC_BTN_ResetParams             201
 #define IDC_RDO_PointLight              202
 #define IDC_RDO_PointLight2             203
