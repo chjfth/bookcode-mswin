@@ -22,9 +22,9 @@
 #include <RECTxy.h>
 #include "CxxParamDialog.h"
 #include "chjutils.h"
+#include "verstr.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
-
 
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
@@ -99,7 +99,7 @@ INT_PTR CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM )
 //-----------------------------------------------------------------------------
 CMyD3DApplication::CMyD3DApplication()                
 {
-    m_strWindowTitle  = TEXT( "Chapter 5 chj" );
+    m_strWindowTitle  = TEXT( "Chapter 5 chj v" ) _T(VER_STR);
 	m_bAppUseZBuffer  = TRUE;
     
 	m_fnConfirmDevice = NULL;
@@ -596,7 +596,9 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 		m_camX_waggle = newx;
 	}
 
-	FLOAT OrbitDegreeLive = m_ppbox->mc_CameraOrbitDegree.GetValue() + 18 * m_camX_waggle;
+	FLOAT OrbitCenterDegree = m_ppbox->mc_CameraOrbitDegree.GetValue();
+	FLOAT OribitWaggleDegreeMax = m_ppbox->mc_CameraWaggleDegreeMax.GetValue();
+	FLOAT OrbitDegreeLive = OrbitCenterDegree + (OribitWaggleDegreeMax/2) * m_camX_waggle;
 	m_ppbox->SetGui_CameraOrbitDegreeLive(OrbitDegreeLive) ;
 	
 	FLOAT toc = Deg2Rad(OrbitDegreeLive);

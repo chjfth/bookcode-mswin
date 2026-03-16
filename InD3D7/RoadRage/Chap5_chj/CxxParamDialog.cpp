@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <tchar.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <CommCtrl.h>
@@ -7,6 +8,7 @@
 
 #include "resource.h"
 #include "CxxParamDialog.h"
+#include "verstr.h"
 
 //
 // Chj constants of default values
@@ -17,7 +19,7 @@
 #define C_CameraDistance 4.0f
 #define C_CameraOrbitDegree -135.0f
 #define C_CameraHeight 3.0f
-
+#define C_CameraWaggleDegreeMax 36.0f
 
 float getDlgItemFloat(HWND hdlg, int Uic)
 {
@@ -31,8 +33,6 @@ ParamDialog::ParamDialog()
 	m_lighttype = D3DLIGHT_POINT;
 	m_isPointLightLatitude = false;
 	m_PointLightHeight = C_PointLightHeight;
-
-	m_CameraWaggleDegree = 0;
 }
 
 //enum NumWrap_et { NumWrap_no=0, NumWrap_yes=1 };
@@ -111,6 +111,18 @@ void ParamDialog::InitParams()
 		1.0f, _T("%.1f"), NumWrap_yes, // step_val, fmt
 		_T("Camera orbit degree on the latitude. 0~90 means from +X to +Z.")
 		);
+
+	// Camera Waggle Degree Max editbox
+	def_val = C_CameraWaggleDegreeMax;
+	min_val = 0.0f;
+	max_val = 90.0f;
+	hedit = GetDlgItem(hdlg, IDE_CameraWaggleDegreeMax);
+	mc_CameraWaggleDegreeMax.Init(hedit, def_val, min_val, max_val);
+	m_saLiveUic.AppendTail(&mc_CameraWaggleDegreeMax);
+	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val,
+		1.0f, _T("%.1f"), NumWrap_no, // step_val, fmt
+		_T("Camera waggle back-and-forth max degree, around the orbit-degree value.")
+		);
 }
 
 void ParamDialog::DataFromGui()
@@ -131,8 +143,6 @@ void ParamDialog::DataFromGui()
 		m_isPointLightLatitude = true;
 
 	enableDlgItem(hdlg, IDE_PointLightRadius, m_isPointLightLatitude);
-
-	m_CameraWaggleDegree = 0.0f;
 }
 
 void ParamDialog::SetGui_CameraOrbitDegreeLive(float degree)
@@ -171,6 +181,8 @@ void ParamDialog::OnClose(HWND hdlg)
 
 BOOL ParamDialog::OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam) 
 {
+	vaSetWindowText(hdlg, _T("InD3D chap5 v%s Parameters"), _T(VER_STR));
+
 	InitParams();
 	DataFromGui();
 

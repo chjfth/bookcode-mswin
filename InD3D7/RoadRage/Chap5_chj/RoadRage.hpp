@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------------
 // Defines, constants, and global variables
 //-----------------------------------------------------------------------------
- 
+
 #define WALL_MESH_SIZE      12
 #define NUM_WALL_VERTICES   (WALL_MESH_SIZE*WALL_MESH_SIZE)
 #define NUM_WALL_INDICES    ((WALL_MESH_SIZE-1)*(WALL_MESH_SIZE-1)*6)
@@ -55,7 +55,7 @@ class CMyD3DApplication : public CD3DApplication
 	FLOAT m_x, m_y, m_z, m_z2; // to support animation on/off
 
 	D3DLIGHT7 m_light;
-	float m_camX_waggle; // in radian
+	float m_camX_waggle; // in radian (0.0~1.0)
 
 	// Chj <<<
 

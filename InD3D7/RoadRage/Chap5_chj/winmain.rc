@@ -158,9 +158,11 @@ BEGIN
     EDITTEXT        IDE_CameraDistance,67,59,40,14,ES_AUTOHSCROLL
     LTEXT           "Camera orbit",IDC_STATIC,137,49,42,8
     EDITTEXT        IDE_CameraOrbitDegree,137,59,40,14,ES_AUTOHSCROLL
-    LTEXT           "Live degree",IDC_STATIC,185,49,38,8
-    EDITTEXT        IDE_CameraOrbitDegreeLive,185,59,40,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Live degree",IDC_STATIC,222,49,38,8
+    EDITTEXT        IDE_CameraOrbitDegreeLive,221,59,40,14,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,111,98,59,14
+    LTEXT           "(waggle)",IDC_STATIC,186,49,29,8
+    EDITTEXT        IDE_CameraWaggleDegreeMax,185,59,29,14,ES_AUTOHSCROLL
 END
 
 

@@ -53,6 +53,6 @@ private:
 	CEditValue<float> mc_CameraDistance;
 	CEditValue<float> mc_CameraOrbitDegree;
 //	float m_CameraOrbitDegreeLive;
-	float m_CameraWaggleDegree;
+	CEditValue<float> mc_CameraWaggleDegreeMax;
 };
 
