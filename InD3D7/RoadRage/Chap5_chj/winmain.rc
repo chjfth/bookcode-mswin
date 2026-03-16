@@ -151,14 +151,14 @@ BEGIN
     CONTROL         "&4. Directional light",IDC_RDO_DirectionalLight,"Button",BS_AUTORADIOBUTTON,111,18,73,10
     EDITTEXT        IDE_PointLightRadius,245,5,25,13,ES_AUTOHSCROLL
     CONTROL         "&Light animation",IDC_CKB_LightAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,5,32,64,10
-    CONTROL         "&Camera animation",IDC_CKB_CameraAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,97,32,73,10
+    CONTROL         "&Camera waggle",IDC_CKB_CameraAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,97,32,65,10
     LTEXT           "Camera height",IDC_STATIC,11,49,48,8
     EDITTEXT        IDE_CameraHeight,9,59,40,14,ES_AUTOHSCROLL
     LTEXT           "Camera distance",IDC_STATIC,67,49,54,8
     EDITTEXT        IDE_CameraDistance,67,59,40,14,ES_AUTOHSCROLL
     LTEXT           "Camera orbit",IDC_STATIC,137,49,42,8
     EDITTEXT        IDE_CameraOrbitDegree,137,59,40,14,ES_AUTOHSCROLL
-    LTEXT           "Orbit live degree",IDC_STATIC,185,49,54,8
+    LTEXT           "Live degree",IDC_STATIC,185,49,38,8
     EDITTEXT        IDE_CameraOrbitDegreeLive,185,59,40,14,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,111,98,59,14
 END

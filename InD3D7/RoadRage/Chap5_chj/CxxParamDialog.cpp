@@ -117,11 +117,6 @@ void ParamDialog::DataFromGui()
 {
 	HWND hdlg = m_hwndDlg;
 
-	for(int i=0; i<m_saLiveUic.CurrentEles(); i++)
-	{
-		m_saLiveUic[i]->DataFromUic();
-	}
-
 	m_lighttype = D3DLIGHT_POINT;
 	int uicLightType = mc_LightType.GetActive();
 	if(uicLightType==IDC_RDO_SpotLight)
@@ -138,7 +133,6 @@ void ParamDialog::DataFromGui()
 	enableDlgItem(hdlg, IDE_PointLightRadius, m_isPointLightLatitude);
 
 	m_CameraWaggleDegree = 0.0f;
-
 }
 
 void ParamDialog::SetGui_CameraOrbitDegreeLive(float degree)
@@ -148,7 +142,6 @@ void ParamDialog::SetGui_CameraOrbitDegreeLive(float degree)
 
 void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify) 
 {
-//	DataFromGui();
 
 	switch (uic) 
 	{{
@@ -168,12 +161,6 @@ void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify)
 		break;
 	}
 	}}
-
-	if(codeNotify==BN_CLICKED) // codeNotify==EN_CHANGE || 
-	{
-		if(uic!=IDE_CameraOrbitDegreeLive && uic!=IDC_BTN_ResetParams)
-			DataFromGui();
-	}
 }
 
 void ParamDialog::OnClose(HWND hdlg)
@@ -198,5 +185,11 @@ INT_PTR ParamDialog::DialogProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPARAM lPar
 		HANDLE_dlgMSG(hdlg, WM_COMMAND,       OnCommand);
 		HANDLE_dlgMSG(hdlg, WM_CLOSE,         OnClose);
 	}
+
+	if(uMsg==liveuic::wmDataChanged)
+	{
+		DataFromGui();
+	}
+
 	return FALSE;
 }

@@ -16,3 +16,5 @@
 #include <mswin/DlgTooltipEasy.h>
 
 #include <mswin/Editbox_EnableKbdAdjustFloatnum.h>
+
+#include <mswin/LiveUic.h>
