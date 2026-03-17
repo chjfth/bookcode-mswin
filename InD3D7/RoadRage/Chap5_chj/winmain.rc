@@ -100,7 +100,7 @@ BEGIN
         LEFTMARGIN, 4
         RIGHTMARGIN, 277
         TOPMARGIN, 4
-        BOTTOMMARGIN, 132
+        BOTTOMMARGIN, 140
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -137,7 +137,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,125,25,50,14
 END
 
-IDD_PARAMS DIALOGEX 0, 0, 281, 136
+IDD_PARAMS DIALOGEX 0, 0, 281, 144
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CAPTION | WS_THICKFRAME
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Parameters"
@@ -160,13 +160,17 @@ BEGIN
     EDITTEXT        IDE_CameraOrbitDegree,137,59,40,14,ES_AUTOHSCROLL
     LTEXT           "Live degree",IDC_STATIC,222,49,38,8
     EDITTEXT        IDE_CameraOrbitDegreeLive,221,59,40,14,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,111,118,59,14
+    PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,111,126,59,14
     LTEXT           "(waggle)",IDC_STATIC,186,49,29,8
     EDITTEXT        IDE_CameraWaggleDegreeMax,185,59,29,14,ES_AUTOHSCROLL
     CONTROL         "Render &back wall as grid",IDC_CKB_BackWallGrid,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,81,93,10
     CONTROL         "Render &right wall as grid",IDC_CKB_RightWallGrid,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,81,93,10
     CONTROL         "Render bal&l as grid",IDC_CKB_BallGrid,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,199,81,75,10
+    LTEXT           "Use &Z-buffer:",IDC_STATIC,4,98,44,8
+    CONTROL         "No",IDC_RDO_ZbufferNo,"Button",BS_AUTORADIOBUTTON,56,98,25,10
+    CONTROL         "Yes",IDC_RDO_ZbufferYes,"Button",BS_AUTORADIOBUTTON,91,98,27,10
+    CONTROL         "W-buffer",IDC_RDO_ZbufferW,"Button",BS_AUTORADIOBUTTON,125,98,45,10
 END
 
 

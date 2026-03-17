@@ -125,6 +125,10 @@ void ParamDialog::InitParams()
 	//
 	hckbox = GetDlgItem(hdlg, IDC_CKB_BallGrid);
 	mc_IsBallGrid.Init(hckbox, BST_UNCHECKED);
+
+	// Zbuffer radio-group
+	mc_Zbuffer.Init(hdlg, IDC_RDO_ZbufferNo, IDC_RDO_ZbufferW);
+
 }
 
 void ParamDialog::DataFromGui()
@@ -159,10 +163,6 @@ void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify)
 	{{
 	case IDC_BTN_ResetParams:
 	{
-// 		for(int i=0; i<m_saLiveUic.CurrentEles(); i++)
-// 		{
-// 			m_saLiveUic[i]->Reset();
-// 		}
 		DlgboxPeeker *peeker = GetDlgboxPeeker(hdlg);
 		peeker->ResetAllUicContent();
 		break;

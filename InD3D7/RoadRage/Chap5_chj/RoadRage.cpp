@@ -635,13 +635,20 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 HRESULT CMyD3DApplication::Render()
 {
 	// Clear the viewport
-	m_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L );
+	m_pd3dDevice->Clear( 0, NULL, 
+		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, // Chj: D3DCLEAR_ZBUFFER must be clear to use D3DRENDERSTATE_ZENABLE
+		0x00000000, 1.0f, 0L );
 
 	// Begin the scene
 	if( SUCCEEDED( m_pd3dDevice->BeginScene() ) )
 	{
 		D3DMATRIX matWorld, matTrans, matRotate;
 		D3DPRIMITIVETYPE primtype;
+
+		// Zbuffer type
+		D3DZBUFFERTYPE zbtype = (D3DZBUFFERTYPE) m_ppbox->mc_Zbuffer.GetActiveIndex();
+		zbtype = _MID_(D3DZB_FALSE, zbtype, D3DZB_USEW);
+		m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, zbtype);
 
 		// Draw the bottom wall
 		D3DUtil_SetRotateYMatrix( matRotate, 0.0f ); // 0.0 = no rotate

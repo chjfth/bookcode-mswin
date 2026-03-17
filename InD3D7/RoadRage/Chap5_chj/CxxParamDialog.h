@@ -46,7 +46,7 @@ private:
 	float m_PointLightHeight; // const now
 	CEditValue<float> mc_PointLightRadius;
 
-	CCheckbox mc_LightAnimation; //BOOL m_isLightAnimation;
+	CCheckbox mc_LightAnimation;
 	CCheckbox mc_CameraAnimation;
 
 	CEditValue<float> mc_CameraHeight;
@@ -58,5 +58,7 @@ private:
 	CCheckbox mc_IsBackWallGrid;
 	CCheckbox mc_IsRightWallGrid;
 	CCheckbox mc_IsBallGrid;
+
+	CRadioGroup mc_Zbuffer;
 };
 
