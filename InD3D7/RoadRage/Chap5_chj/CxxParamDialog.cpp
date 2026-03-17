@@ -49,17 +49,14 @@ void ParamDialog::InitParams()
 
 	// Light-type radio group
 	mc_LightType.Init(hdlg, IDC_RDO_PointLight, IDC_RDO_DirectionalLight);
-//	m_saLiveUic.AppendTail(&mc_LightType);
 
 	// Light Animation checkbox
 	hckbox = GetDlgItem(hdlg, IDC_CKB_LightAnimation);
 	mc_LightAnimation.Init(hckbox, BST_CHECKED);
-//	m_saLiveUic.AppendTail(&mc_LightAnimation);
 
 	// Camera Animation checkbox
 	hckbox = GetDlgItem(hdlg, IDC_CKB_CameraAnimation);
 	mc_CameraAnimation.Init(hckbox, BST_CHECKED);
-//	m_saLiveUic.AppendTail(&mc_CameraAnimation);
 
 	// PointLight Radius
 	def_val = C_PointLightRadius;
@@ -67,7 +64,6 @@ void ParamDialog::InitParams()
 	max_val = 10.0f;
 	hedit = GetDlgItem(hdlg, IDE_PointLightRadius);
 	mc_PointLightRadius.Init(hedit, def_val, min_val, max_val);
-//	m_saLiveUic.AppendTail(&mc_PointLightRadius);
 	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val, 
 		0.1f, _T("%.1f"), NumWrap_no, // step_val, fmt
 		_T("Point-light radius around Y-axis.")
@@ -80,7 +76,6 @@ void ParamDialog::InitParams()
 	max_val = 15.0f;
 	hedit = GetDlgItem(hdlg, IDE_CameraHeight);
 	mc_CameraHeight.Init(hedit, def_val, min_val, max_val);
-//	m_saLiveUic.AppendTail(&mc_CameraHeight);
 	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val,
 		0.1f, _T("%.1f"), NumWrap_no, // step_val, fmt
 		_T("Camera height from the ground(XZ-plane).")
@@ -93,7 +88,6 @@ void ParamDialog::InitParams()
 	max_val = 10.0f;
 	hedit = GetDlgItem(hdlg, IDE_CameraDistance);
 	mc_CameraDistance.Init(hedit, def_val, min_val, max_val);
-//	m_saLiveUic.AppendTail(&mc_CameraDistance);
 	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val,
 		0.1f, _T("%.1f"), NumWrap_no, // step_val, fmt
 		_T("Camera distance from the Y-axis.")
@@ -106,7 +100,6 @@ void ParamDialog::InitParams()
 	max_val = +180.0f;
 	hedit = GetDlgItem(hdlg, IDE_CameraOrbitDegree);
 	mc_CameraOrbitDegree.Init(hedit, def_val, min_val, max_val);
-//	m_saLiveUic.AppendTail(&mc_CameraOrbitDegree);
 	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val,
 		1.0f, _T("%.1f"), NumWrap_yes, // step_val, fmt
 		_T("Camera orbit degree on the latitude. 0~90 means from +X to +Z.")
@@ -118,11 +111,20 @@ void ParamDialog::InitParams()
 	max_val = 90.0f;
 	hedit = GetDlgItem(hdlg, IDE_CameraWaggleDegreeMax);
 	mc_CameraWaggleDegreeMax.Init(hedit, def_val, min_val, max_val);
-//	m_saLiveUic.AppendTail(&mc_CameraWaggleDegreeMax);
 	kerr = Editbox_EnableKbdAdjustFloatnum(hedit, min_val, max_val,
 		1.0f, _T("%.1f"), NumWrap_no, // step_val, fmt
 		_T("Camera waggle back-and-forth max degree, around the orbit-degree value.")
 		);
+
+	// Render wall/ball as grid checkbox
+	hckbox = GetDlgItem(hdlg, IDC_CKB_BackWallGrid);
+	mc_IsBackWallGrid.Init(hckbox, BST_UNCHECKED);
+	//
+	hckbox = GetDlgItem(hdlg, IDC_CKB_RightWallGrid);
+	mc_IsRightWallGrid.Init(hckbox, BST_UNCHECKED);
+	//
+	hckbox = GetDlgItem(hdlg, IDC_CKB_BallGrid);
+	mc_IsBallGrid.Init(hckbox, BST_UNCHECKED);
 }
 
 void ParamDialog::DataFromGui()

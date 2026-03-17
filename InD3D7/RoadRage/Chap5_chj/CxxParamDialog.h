@@ -54,5 +54,9 @@ private:
 	CEditValue<float> mc_CameraOrbitDegree;
 //	float m_CameraOrbitDegreeLive;
 	CEditValue<float> mc_CameraWaggleDegreeMax;
+
+	CCheckbox mc_IsBackWallGrid;
+	CCheckbox mc_IsRightWallGrid;
+	CCheckbox mc_IsBallGrid;
 };
 

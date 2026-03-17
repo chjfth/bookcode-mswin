@@ -57,6 +57,10 @@
 #define IDC_EDIT1                       1018
 #define IDE_PointLightRadius            1018
 #define IDE_CameraWaggleDegreeMax       1019
+#define IDC_CKB_BackWallGrid            1020
+#define IDC_CKB_RightWallGrid           1021
+#define IDC_CKB_BallAsGrid              1022
+#define IDC_CKB_BallGrid                1022
 #define IDC_BUTTON1                     1025
 #define IDC_WAVE                        1028
 #define IDC_LOBBYCONNECTCANCEL          1029
@@ -87,7 +91,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         40018
-#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_CONTROL_VALUE         1023
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

@@ -641,6 +641,7 @@ HRESULT CMyD3DApplication::Render()
 	if( SUCCEEDED( m_pd3dDevice->BeginScene() ) )
 	{
 		D3DMATRIX matWorld, matTrans, matRotate;
+		D3DPRIMITIVETYPE primtype;
 
 		// Draw the bottom wall
 		D3DUtil_SetRotateYMatrix( matRotate, 0.0f ); // 0.0 = no rotate
@@ -656,7 +657,8 @@ HRESULT CMyD3DApplication::Render()
 		D3DUtil_SetTranslateMatrix( matTrans, 5.0f,-5.0f, -5.0f );
 		D3DMath_MatrixMultiply( matWorld, matRotate, matTrans );
 		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD, &matWorld );
-		m_pd3dDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, D3DFVF_VERTEX,
+		primtype = m_ppbox->mc_IsRightWallGrid.IsChecked() ? D3DPT_LINESTRIP : D3DPT_TRIANGLELIST;
+		m_pd3dDevice->DrawIndexedPrimitive( primtype, D3DFVF_VERTEX,
 			m_WallVertices, NUM_WALL_VERTICES,
 			m_WallIndices, NUM_WALL_INDICES, 0 );
 
@@ -665,7 +667,8 @@ HRESULT CMyD3DApplication::Render()
 		D3DUtil_SetTranslateMatrix( matTrans, -5.0f, -5.0f, 5.0f );
 		D3DMath_MatrixMultiply( matWorld, matRotate, matTrans );
 		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD, &matWorld );
-		m_pd3dDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, D3DFVF_VERTEX,
+		primtype = m_ppbox->mc_IsBackWallGrid.IsChecked() ? D3DPT_LINESTRIP : D3DPT_TRIANGLELIST;
+		m_pd3dDevice->DrawIndexedPrimitive( primtype, D3DFVF_VERTEX,
 			m_WallVertices, NUM_WALL_VERTICES,
 			m_WallIndices, NUM_WALL_INDICES, 0 );
 
@@ -678,7 +681,8 @@ HRESULT CMyD3DApplication::Render()
 		
 		m_pd3dDevice->SetTransform( D3DTRANSFORMSTATE_WORLD, &matWorld );
 		
-		m_pd3dDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, D3DFVF_VERTEX, 
+		primtype = m_ppbox->mc_IsBallGrid.IsChecked() ? D3DPT_LINESTRIP : D3DPT_TRIANGLELIST;
+		m_pd3dDevice->DrawIndexedPrimitive( primtype, D3DFVF_VERTEX, 
 			m_SphereVertices, NUM_SPHERE_VERTICES,
 			m_SphereIndices, NUM_SPHERE_INDICES, 0 );
 
