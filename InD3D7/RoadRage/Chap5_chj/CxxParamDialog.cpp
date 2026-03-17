@@ -129,6 +129,9 @@ void ParamDialog::InitParams()
 	// Zbuffer radio-group
 	mc_Zbuffer.Init(hdlg, IDC_RDO_ZbufferNo, IDC_RDO_ZbufferW);
 
+	// Cull-mode radio-group
+	mc_Cullmode.Init(hdlg, IDC_RDO_CullNone, IDC_RDO_CullCounterClockwise, IDC_RDO_CullCounterClockwise);
+
 }
 
 void ParamDialog::DataFromGui()
@@ -158,7 +161,6 @@ void ParamDialog::SetGui_CameraOrbitDegreeLive(float degree)
 
 void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify) 
 {
-
 	switch (uic) 
 	{{
 	case IDC_BTN_ResetParams:
@@ -185,7 +187,7 @@ void ParamDialog::OnClose(HWND hdlg)
 
 BOOL ParamDialog::OnInitDialog(HWND hdlg, HWND hwndFocus, LPARAM lParam) 
 {
-	vaSetWindowText(hdlg, _T("InD3D chap5 v%s Parameters"), _T(VER_STR));
+	vaSetWindowText(hdlg, _T("InD3D Chap5_chj v%s Parameters"), _T(VER_STR));
 
 	InitParams();
 	DataFromGui();

@@ -63,8 +63,12 @@
 #define IDC_RDO_ZbufferNo               1024
 #define IDC_RDO_ZbufferYes              1025
 #define IDC_RDO_ZbufferW                1026
+#define IDC_RDO_CullNone                1027
 #define IDC_WAVE                        1028
+#define IDC_RDO_CullClockwise           1028
 #define IDC_LOBBYCONNECTCANCEL          1029
+#define IDC_RADIO3                      1029
+#define IDC_RDO_CullCounterClockwise    1029
 #define IDC_NUM_PLAYERS                 1030
 #define IDC_PLAYER_NAME                 1031
 #define IDC_WAIT_TEXT                   1035
@@ -93,7 +97,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         40018
-#define _APS_NEXT_CONTROL_VALUE         1025
+#define _APS_NEXT_CONTROL_VALUE         1028
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

@@ -60,5 +60,6 @@ private:
 	CCheckbox mc_IsBallGrid;
 
 	CRadioGroup mc_Zbuffer;
+	CRadioGroup mc_Cullmode;
 };
 

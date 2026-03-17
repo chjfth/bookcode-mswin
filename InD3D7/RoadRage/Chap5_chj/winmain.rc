@@ -171,6 +171,11 @@ BEGIN
     LTEXT           "Live degree",IDC_STATIC,222,49,38,8
     PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,111,126,59,14
     LTEXT           "(waggle)",IDC_STATIC,186,49,29,8
+    LTEXT           "&Cull mode:",IDC_STATIC,4,111,34,8
+    CONTROL         "Cull none",IDC_RDO_CullNone,"Button",BS_AUTORADIOBUTTON,44,110,45,10
+    CONTROL         "Cull clockwise",IDC_RDO_CullClockwise,"Button",BS_AUTORADIOBUTTON,91,110,59,10
+    CONTROL         "Cull counter-clockwise",IDC_RDO_CullCounterClockwise,
+                    "Button",BS_AUTORADIOBUTTON,151,110,86,10
 END
 
 

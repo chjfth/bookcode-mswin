@@ -58,8 +58,9 @@ int total_allocated_memory_count = 0;
 float angle_deg = 0.0f; // debug
 float temp_f	= 0.0f; // debug
 
-// Chap 5 >>>
+// Chap5 >>>
 
+/*
 BOOL logfile_start_flag = TRUE;
 BOOL RR_exit_debug_flag = FALSE;
 SETUPINFO setupinfo;
@@ -68,8 +69,9 @@ int num_op_guns = 0;
 int num_cars;
 
 int num_light_sources;
+*/
 
-// Chap5_chj <<<
+// Chap5 <<<
 
 CMyD3DApplication* pCMyApp;
 
@@ -99,7 +101,7 @@ INT_PTR CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM )
 //-----------------------------------------------------------------------------
 CMyD3DApplication::CMyD3DApplication()                
 {
-    m_strWindowTitle  = TEXT( "Chapter 5 chj v" ) _T(VER_STR);
+    m_strWindowTitle  = TEXT( "InD3D7 Chap5_chj v" ) _T(VER_STR);
 	m_bAppUseZBuffer  = TRUE;
     
 	m_fnConfirmDevice = NULL;
@@ -649,6 +651,11 @@ HRESULT CMyD3DApplication::Render()
 		D3DZBUFFERTYPE zbtype = (D3DZBUFFERTYPE) m_ppbox->mc_Zbuffer.GetActiveIndex();
 		zbtype = _MID_(D3DZB_FALSE, zbtype, D3DZB_USEW);
 		m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, zbtype);
+
+		// Cull mode
+		D3DCULL cullmode = (D3DCULL) (m_ppbox->mc_Cullmode.GetActiveIndex() + 1); // D3DCULL_NONE=1
+		cullmode = _MID_(D3DCULL_NONE, cullmode, D3DCULL_CCW);
+		m_pd3dDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, cullmode);
 
 		// Draw the bottom wall
 		D3DUtil_SetRotateYMatrix( matRotate, 0.0f ); // 0.0 = no rotate
