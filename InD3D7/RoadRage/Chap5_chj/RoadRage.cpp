@@ -439,11 +439,11 @@ HRESULT CMyD3DApplication::OneTimeSceneInit()
 		for( i=0; i<SPHERE_MESH_SIZE_X; i++ )
 		{
 			m_SphereIndices[6*i+0+ind] = v+i;
-			m_SphereIndices[6*i+2+ind] = v+i + 1;         // (longitude easter) LE
+			m_SphereIndices[6*i+2+ind] = v+i + 1;      // (longitude easter) LE
 			m_SphereIndices[6*i+1+ind] = v+i + SPHERE_MESH_SIZE_X;
 
 			m_SphereIndices[6*i+0+ind+3] = v+i + SPHERE_MESH_SIZE_X;
-			m_SphereIndices[6*i+2+ind+3] = v+i + 1;                          // LE
+			m_SphereIndices[6*i+2+ind+3] = v+i + 1;                       // LE
 			m_SphereIndices[6*i+1+ind+3] = v+i + SPHERE_MESH_SIZE_X +1;   // LE
 			
 			// Chj: adjust LE wrapping
@@ -590,6 +590,19 @@ HRESULT CMyD3DApplication::FrameMove( FLOAT fTimeKey )
 
 	// Set the light
 	m_pd3dDevice->SetLight( 0, &light );
+
+	if(m_dltType==D3DLIGHT_POINT)
+	{
+		SetDlgItemText(m_ppbox->m_hwndDlg, IDS_LightXYZ, _T("Light position:"));
+		m_ppbox->mc_LightXYZ.vaSetStr(_T("X: %.3f   Y: %.3f   Z: %.3f"), 
+			light.dvPosition.x, light.dvPosition.y, light.dvPosition.z);
+	}
+	else
+	{
+		SetDlgItemText(m_ppbox->m_hwndDlg, IDS_LightXYZ, _T("Light-to direction:"));
+		m_ppbox->mc_LightXYZ.vaSetStr(_T("X: %.3f   Y: %.3f   Z: %.3f"), 
+			light.dvDirection.x, light.dvDirection.y, light.dvDirection.z);
+	}
 
 	//
 	// Move the camera position around

@@ -616,6 +616,8 @@ HRESULT D3DEnum_SelectDefaultDevice( D3DEnum_DeviceInfo** ppDevice,
     else
         return D3DENUMERR_NOCOMPATIBLEDEVICES;
 
+//	(*ppDevice) = pSoftwareDevice; // Chj: Uncomment if force "RGB Emulation" desired.
+
     // Set the windowed state of the newly selected device  
     (*ppDevice)->bWindowed = TRUE;
 

@@ -49,6 +49,8 @@ private:
 	CCheckbox mc_LightAnimation;
 	CCheckbox mc_CameraAnimation;
 
+	CEditStr mc_LightXYZ;
+
 	CEditValue<float> mc_CameraHeight;
 	CEditValue<float> mc_CameraDistance;
 	CEditValue<float> mc_CameraOrbitDegree;

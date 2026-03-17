@@ -1,4 +1,4 @@
 #pragma once
 
-#define VER_STR "1.2" // chj adds version
+#define VER_STR "1.3" // chj adds version
 

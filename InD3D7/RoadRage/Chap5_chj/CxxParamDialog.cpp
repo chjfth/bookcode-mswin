@@ -70,6 +70,10 @@ void ParamDialog::InitParams()
 		);
 	assert(!kerr);
 
+	// show LightXYZ editbox (readonly)
+	hedit = GetDlgItem(hdlg, IDC_EDO_LightXYZ);
+	mc_LightXYZ.Init(hedit, NULL);
+
 	// Camera Height editbox
 	def_val = C_CameraHeight; 
 	min_val = -15.0f; 
