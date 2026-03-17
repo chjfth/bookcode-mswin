@@ -45,9 +45,9 @@
 extern INT_PTR CALLBACK AppAbout(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK AboutProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM );
 
-FLOAT                g_fCurrentTime;
-extern GUID                 g_AppGUID; 
-extern TCHAR                g_strAppName[256];
+FLOAT        g_fCurrentTime;
+extern GUID  g_AppGUID; 
+extern TCHAR g_strAppName[256];
 
 HDC hdc;
 

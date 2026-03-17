@@ -36,7 +36,7 @@ protected:
 	// Chj added members:
 
 private:
-	TScalableArray<LiveUic*> m_saLiveUic;
+//	TScalableArray<> m_saLiveUic;
 
 private:
 	D3DLIGHTTYPE m_lighttype;

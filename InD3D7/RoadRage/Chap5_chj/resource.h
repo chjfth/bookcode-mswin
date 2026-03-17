@@ -56,7 +56,6 @@
 #define IDE_CameraOrbitDegreeLive       1017
 #define IDC_EDIT1                       1018
 #define IDE_PointLightRadius            1018
-#define IDE_CameraOrbitDegree2          1019
 #define IDE_CameraWaggleDegreeMax       1019
 #define IDC_BUTTON1                     1025
 #define IDC_WAVE                        1028
