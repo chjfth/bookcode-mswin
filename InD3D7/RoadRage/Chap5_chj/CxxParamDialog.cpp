@@ -124,6 +124,9 @@ void ParamDialog::InitParams()
 	hckbox = GetDlgItem(hdlg, IDC_CKB_BackWallGrid);
 	mc_IsBackWallGrid.Init(hckbox, BST_UNCHECKED);
 	//
+	hckbox = GetDlgItem(hdlg, IDC_CKB_BottomGrid);
+	mc_IsBottomGrid.Init(hckbox, BST_UNCHECKED);
+	//
 	hckbox = GetDlgItem(hdlg, IDC_CKB_RightWallGrid);
 	mc_IsRightWallGrid.Init(hckbox, BST_UNCHECKED);
 	//

@@ -98,7 +98,7 @@ BEGIN
     IDD_PARAMS, DIALOG
     BEGIN
         LEFTMARGIN, 4
-        RIGHTMARGIN, 277
+        RIGHTMARGIN, 285
         TOPMARGIN, 4
         BOTTOMMARGIN, 151
     END
@@ -137,7 +137,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,125,25,50,14
 END
 
-IDD_PARAMS DIALOGEX 0, 0, 281, 155
+IDD_PARAMS DIALOGEX 0, 0, 289, 155
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CAPTION | WS_THICKFRAME
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Parameters"
@@ -153,26 +153,27 @@ BEGIN
     CONTROL         "&Light animation",IDC_CKB_LightAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,4,44,64,10
     CONTROL         "&Camera waggle",IDC_CKB_CameraAnimation,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,70,44,65,10
     LTEXT           "Light-to direction",IDS_LightXYZ,51,30,58,8
-    EDITTEXT        IDC_EDO_LightXYZ,112,30,138,10,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "Camera height",IDC_STATIC,11,61,48,8
-    LTEXT           "Camera distance",IDC_STATIC,67,61,54,8
-    EDITTEXT        IDE_CameraHeight,9,71,40,14,ES_AUTOHSCROLL
-    EDITTEXT        IDE_CameraDistance,67,71,40,14,ES_AUTOHSCROLL
-    EDITTEXT        IDE_CameraOrbitDegree,137,71,40,14,ES_AUTOHSCROLL
-    EDITTEXT        IDE_CameraWaggleDegreeMax,185,71,29,14,ES_AUTOHSCROLL
-    EDITTEXT        IDE_CameraOrbitDegreeLive,221,71,40,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    CONTROL         "Render &back wall as grid",IDC_CKB_BackWallGrid,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,93,93,10
+    EDITTEXT        IDC_EDO_LightXYZ,112,30,138,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    LTEXT           "Camera height",IDC_STATIC,11,58,48,8
+    LTEXT           "Camera distance",IDC_STATIC,67,58,54,8
+    EDITTEXT        IDE_CameraHeight,9,68,40,13,ES_AUTOHSCROLL
+    EDITTEXT        IDE_CameraDistance,67,68,40,13,ES_AUTOHSCROLL
+    EDITTEXT        IDE_CameraOrbitDegree,137,68,40,13,ES_AUTOHSCROLL
+    EDITTEXT        IDE_CameraWaggleDegreeMax,185,68,29,13,ES_AUTOHSCROLL
+    EDITTEXT        IDE_CameraOrbitDegreeLive,221,68,40,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    CONTROL         "Render &back wall as grid",IDC_CKB_BackWallGrid,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,87,93,10
+    CONTROL         "Render botto&m as grid",IDC_CKB_BottomGrid,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,99,87,87,10
     CONTROL         "Render &right wall as grid",IDC_CKB_RightWallGrid,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,93,93,10
-    CONTROL         "Render bal&l as grid",IDC_CKB_BallGrid,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,199,93,75,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,192,87,93,10
+    CONTROL         "Render bal&l as grid",IDC_CKB_BallGrid,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,97,75,10
     LTEXT           "Use &Z-buffer:",IDC_STATIC,4,110,44,8
     CONTROL         "No",IDC_RDO_ZbufferNo,"Button",BS_AUTORADIOBUTTON,56,110,25,10
     CONTROL         "Yes",IDC_RDO_ZbufferYes,"Button",BS_AUTORADIOBUTTON,91,110,27,10
     CONTROL         "W-buffer",IDC_RDO_ZbufferW,"Button",BS_AUTORADIOBUTTON,125,110,45,10
-    LTEXT           "Camera orbit",IDC_STATIC,137,61,42,8
-    LTEXT           "Live degree",IDC_STATIC,222,61,38,8
-    PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,111,137,59,14
-    LTEXT           "(waggle)",IDC_STATIC,186,61,29,8
+    LTEXT           "Camera orbit",IDC_STATIC,137,58,42,8
+    LTEXT           "Live degree",IDC_STATIC,222,58,38,8
+    PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,115,137,59,14
+    LTEXT           "(waggle)",IDC_STATIC,186,58,29,8
     LTEXT           "&Cull mode:",IDC_STATIC,4,123,34,8
     CONTROL         "Cull none",IDC_RDO_CullNone,"Button",BS_AUTORADIOBUTTON,44,122,45,10
     CONTROL         "Cull clockwise",IDC_RDO_CullClockwise,"Button",BS_AUTORADIOBUTTON,91,122,59,10

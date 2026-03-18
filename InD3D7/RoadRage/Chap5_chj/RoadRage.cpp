@@ -675,7 +675,8 @@ HRESULT CMyD3DApplication::Render()
 		D3DUtil_SetTranslateMatrix( matTrans,-5.0f, -5.0f, -5.0f );
 		D3DMath_MatrixMultiply( matWorld, matRotate, matTrans );
 		m_pd3dDevice->SetTransform(D3DTRANSFORMSTATE_WORLD, &matWorld );
-		m_pd3dDevice->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, D3DFVF_VERTEX,
+		primtype = m_ppbox->mc_IsBottomGrid.IsChecked() ? D3DPT_LINESTRIP : D3DPT_TRIANGLELIST;
+		m_pd3dDevice->DrawIndexedPrimitive( primtype, D3DFVF_VERTEX,
 			m_WallVertices, NUM_WALL_VERTICES,
 			m_WallIndices, NUM_WALL_INDICES, 0 );
 

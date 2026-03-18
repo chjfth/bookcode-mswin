@@ -58,6 +58,7 @@ private:
 	CEditValue<float> mc_CameraWaggleDegreeMax;
 
 	CCheckbox mc_IsBackWallGrid;
+	CCheckbox mc_IsBottomGrid;
 	CCheckbox mc_IsRightWallGrid;
 	CCheckbox mc_IsBallGrid;
 
