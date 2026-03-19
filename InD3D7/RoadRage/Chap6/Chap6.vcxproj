@@ -215,11 +215,16 @@
   <ItemGroup>
     <ClCompile Include="RoadRage.cpp" />
     <ClCompile Include="info.cpp" />
+    <ClCompile Include="..\share\chjutils.cpp" />
     <ClCompile Include="..\share\d3dapp.cpp" />
     <ClCompile Include="..\share\d3denum.cpp" />
     <ClCompile Include="..\share\d3dframe.cpp" />
     <ClCompile Include="..\share\d3dmath.cpp" />
     <ClCompile Include="..\share\d3dutil.cpp" />
+    <ClCompile Include="..\share\playsound.cpp" />
+    <ClCompile Include="..\share\wavread.cpp" />
+    <ClCompile Include="..\share\LoadWorld.cpp" />
+    <ClCompile Include="..\share\Import3DS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="winmain.rc" />
@@ -231,11 +236,15 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="info.hpp" />
     <ClInclude Include="RoadRage.hpp" />
+    <ClInclude Include="..\share\chjutils.h" />
     <ClInclude Include="..\share\d3dapp.h" />
     <ClInclude Include="..\share\d3denum.h" />
     <ClInclude Include="..\share\d3dframe.h" />
     <ClInclude Include="..\share\d3dmath.h" />
     <ClInclude Include="..\share\d3dutil.h" />
+    <ClInclude Include="..\share\wavread.h" />
+    <ClInclude Include="..\share\LoadWorld.hpp" />
+    <ClInclude Include="..\share\Import3DS.hpp" />
   </ItemGroup>
 
 

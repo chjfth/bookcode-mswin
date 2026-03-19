@@ -1,12 +1,3 @@
-
-// Road Rage version 1.1
-
-// Written by William Chin
-// Developed in MSDEV C++ v6.0 using the DirectX 6.0 SDK
-// Date : 3/7/99
-// File : world.hpp
-
-
 #ifndef __WORLD_H__
 #define __WORLD_H__
 
@@ -38,17 +29,32 @@
 #define OBJECT_ID_SLOPE					21
 #define OBJECT_ID_SLOPE_CORNER			22
 #define OBJECT_ID_CENTRAL_RESERVATION	23
-#define OBJECT_ID_MBSHOP1				24
+#define OBJECT_ID_WEAPON_AR15			24
+#define OBJECT_ID_WEAPON_MP5			25
+#define OBJECT_ID_PLAYER				26
+#define	OBJECT_ID_WEAPON_SNIPER			27
+#define	OBJECT_ID_WEAPON_PLASMA			28
+#define	OBJECT_ID_WEAPON_1				29
+#define	OBJECT_ID_WEAPON_2				30
+#define	OBJECT_ID_WEAPON_3				31
+#define	OBJECT_ID_WEAPON_4				32
+#define	OBJECT_ID_WEAPON_5				33
+#define	OBJECT_ID_WEAPON_6				34
+#define	OBJECT_ID_WEAPON_7				35
+#define	OBJECT_ID_WEAPON_8				36
+#define	OBJECT_ID_WEAPON_9				37
+#define	OBJECT_ID_WEAPON_10				38
 
 #define POLY_CMD_ERROR					0
 #define POLY_CMD_TRI_STRIP				1
 #define POLY_CMD_TRI_FAN				2
 #define POLY_CMD_TRI					3
-#define POLY_CMD_QUAD					4
-#define POLY_CMD_QUAD_TEX				5
-#define POLY_CMD_INDEXED_TRI			6
-#define POLY_CMD_INDEXED_TRI_FAN		7
-#define POLY_CMD_INDEXED_TRI_STRIP		8
+#define POLY_CMD_TRI_TEX				4
+#define POLY_CMD_QUAD					5
+#define POLY_CMD_QUAD_TEX				6
+#define POLY_CMD_INDEXED_TRI			7
+#define POLY_CMD_INDEXED_TRI_FAN		8
+#define POLY_CMD_INDEXED_TRI_STRIP		9
 
 #define KEYBOARD			1
 #define JOYSTICK			2
@@ -62,37 +68,28 @@
 
 #define LOGFILE_ONLY		1
 #define SCN_AND_FILE		2
-#define WALK_MODE			0
-#define DRIVE_MODE			1
+#define WALK_MODE	0
+#define DRIVE_MODE 1
 
-#define MAX_NUM_X_MAP_CELLS 512
-#define MAX_NUM_Z_MAP_CELLS 512
+#define SPOT_LIGHT_SOURCE			1
+#define	DIRECTIONAL_LIGHT_SOURCE	2
+#define	POINT_LIGHT_SOURCE			3
 
-#define MAX_NUM_DAT_OBJECTS 100
-#define MAX_NUM_MAP_OBJECTS 20000
+// typedef struct tagD3DAppMode { // Chj: already in d3dapp-helper.hpp
+// 	int     w;		      /* width */
+// 	int	    h;		      /* height */
+// 	int	    bpp;	      /* bits per pixel */
+// 	BOOL    bThisDriverCanDo; /*can current D3D driver render in this mode?*/
+// } D3DAppMode;
 
 typedef struct setupinfo_typ
 {
 	D3DAppMode vmode;	
 	int screen;
 	int control;
-	int TextureSize;
-	int NumTextures;
-	DWORD TextureMemNeeded;
 	BOOL sound;
 
 } SETUPINFO,*setupinfo_ptr;
-
-typedef struct texturemapping_typ
-{
-	float tu[4];
-	float tv[4];
-	int texture;
-	BOOL is_alpha_texture;
-	char tex_alias_name[100];
-
-} TEXTUREMAPPING,*texturemapping_ptr;
-
 
 typedef struct vert_typ
 {
@@ -110,6 +107,24 @@ typedef struct light_typ
 
 } LIGHT,*light_ptr;
 
+typedef struct lightsource_typ
+{
+	BYTE r;
+	BYTE g;
+	BYTE b;
+
+	int command;
+
+	float direction_x;
+	float direction_y;
+	float direction_z;
+
+	float position_x;
+	float position_y;
+	float position_z;
+
+} LIGHTSOURCE,*lightsouce_ptr;
+
 typedef struct objectlist_typ
 {
 	float x;
@@ -118,6 +133,7 @@ typedef struct objectlist_typ
 	float rot_angle; 
 	int type;
 	LIGHT *lit;
+	LIGHTSOURCE *light_source;
 
 } OBJECTLIST,*objectlist_ptr;
 
@@ -136,7 +152,6 @@ typedef struct gunlist_typ
 	int current_sequence;
 	char name[256];
 	int model_id;
-	int skin_tex_id;
 	int sound_id;
 	char file[256];
 
@@ -149,20 +164,22 @@ typedef struct player_typ
 	float z; 
 	float rot_angle; 
 	int model_id;
-	int skin_tex_id;
 	int current_weapon;
 	int current_car;
 	int current_frame;
 	int current_sequence;
-	int health;
-	int armour;
 	int frags;
-	int ping;
-	BOOL walk_or_drive_mode;
+	int health;
 	BOOL draw_external_wep;
+	BOOL bIsFiring;
+	BOOL bIsRunning;
+	BOOL bIsPlayerAlive;
+	BOOL bIsPlayerInWalkMode;
+	BOOL bStopAnimating;
+	BOOL bIsPlayerValid;
+	TCHAR name[256];
+
 	DWORD RRnetID;
-	DWORD dpid;
-	char name[256];
 
 } PLAYER,*player_ptr;
 
@@ -170,14 +187,12 @@ typedef struct pmdata_typ
 {
 	VERT **w;
 	VERT  *t; 
-	short *f;
-	short *num_vert;
-	short *poly_cmd;
-	short *texture_list;
-	short *num_verts_per_object;
-	short *num_faces_per_object;
+	int *f;
+	int *num_vert;
+	D3DPRIMITIVETYPE *poly_cmd;
+	int *num_verts_per_object; // new line added by BILL
+	int *num_faces_per_object; // new line added by BILL
 
-	int tex_alias;
 	int num_frames;
 	int num_verts;
 	int num_faces;
@@ -185,7 +200,6 @@ typedef struct pmdata_typ
 	int num_verts_per_frame;
 	int sequence_start_frame[50];
 	int sequence_stop_frame[50];
-	int texture_maps[100];
 
 	BOOL use_indexed_primitive;
 	float skx;
@@ -197,81 +211,20 @@ typedef struct pmdata_typ
 
 typedef struct objectdata_typ
 {
-	VERT *v; 
-	VERT *t; 
-	short *num_vert;
-	short *poly_cmd;
-	short *tex;
-
-	char name[64];
+	VERT v[2000]; // 6000
+	VERT t[2000]; // 6000
+	int f[2000];
+	int num_vert[2000];
+	D3DPRIMITIVETYPE poly_cmd[2000];
+	char name[256];
 	VERT connection[4];
 
 } OBJECTDATA,*objectdata_ptr;
 
-typedef struct world_typ
-{
-	OBJECTLIST	oblist[2000]; //MAX_NUM_MAP_OBJECTS];
-	int oblist_length;
-	
-	GUNLIST your_gun[12];
-	GUNLIST other_players_guns[12];
-	int gunlist_length;
-	int current_gun;
-	int current_gun_model_id;
-	int current_car;
-	int num_your_guns;
-	int num_op_guns;
-	
-	PLAYER player_list[50];
-	PLAYER car_list[50];
-	PLAYER debug[50];
+// void PrintMessage(HWND hwnd,char *message1, char *message2, int message_mode);
+// -- moved to chjutils.h 
 
-	int num_players;
-	int num_cars;
-	int num_debug_models;
-	int current_frame;
-	int current_sequence;
-
-	PLAYERMODELDATA pmdata[50];
-
-	OBJECTDATA obdata	      [MAX_NUM_DAT_OBJECTS];
-	short num_vert_per_object [MAX_NUM_DAT_OBJECTS];
-	short num_polys_per_object[MAX_NUM_DAT_OBJECTS];
-	int obdata_length;
-
-	short       *cell[MAX_NUM_X_MAP_CELLS][MAX_NUM_Z_MAP_CELLS];
-	short cell_length[MAX_NUM_X_MAP_CELLS][MAX_NUM_Z_MAP_CELLS];
-	BOOL   draw_flags[MAX_NUM_X_MAP_CELLS][MAX_NUM_Z_MAP_CELLS];
-
-	TEXTUREMAPPING TexMap[100]; 
-	int number_of_tex_aliases;
-
-	int num_verts_in_scene;
-	int num_triangles_in_scene;
-	int num_dp_commands_in_scene;
-
-	BOOL walk_mode_enabled;
-	BOOL display_scores;
-
-} WORLD,*world_ptr;
-
-
-
-void LoadYourGunAnimationSequenceList(int model_id, world_ptr wptr);
-void LoadPlayerAnimationSequenceList(int model_id, world_ptr wptr);
-void LoadDebugAnimationSequenceList(HWND hwnd, char *filename, int model_id, world_ptr wptr);
-BOOL LoadImportedModelList(HWND hwnd,char *filename,world_ptr wptr);
-BOOL LoadObjectData(HWND hwnd,char *filename,world_ptr wptr);
-BOOL LoadWorldMap(HWND hwnd,char *filename,world_ptr wptr); 
-BOOL InitWorldMap(HWND hwnd, char *filename, world_ptr wptr);
-BOOL InitPreCompiledWorldMap(HWND hwnd, char *filename, world_ptr wptr);
-void PrintMessage(HWND hwnd,char *message1, char *message2, int message_mode);
-int CheckObjectId(HWND hwnd, char *p, world_ptr wptr); 
-world_ptr GetWorldData();
-setupinfo_ptr LoadSetupInfo(HWND hwnd);
-void InitRRvariables(world_ptr wptr);
-
-
+#include "chjutils.h"
 
 
 #endif // __WORLD_H__
