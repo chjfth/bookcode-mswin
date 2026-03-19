@@ -205,7 +205,7 @@ typedef struct pmdata_typ
 	float skx;
 	float sky;
 	float scale;
-	char name[256];
+	TCHAR name[256];
 
 } PLAYERMODELDATA,*pmdata_ptr;
 
@@ -216,7 +216,7 @@ typedef struct objectdata_typ
 	int f[2000];
 	int num_vert[2000];
 	D3DPRIMITIVETYPE poly_cmd[2000];
-	char name[256];
+	TCHAR name[256];
 	VERT connection[4];
 
 } OBJECTDATA,*objectdata_ptr;

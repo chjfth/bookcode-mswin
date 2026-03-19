@@ -175,7 +175,7 @@ public:
 
 	C3DS();
 
-	BOOL Import3DS(HWND hwnd, char *filename, int pmodel_id, float scale);
+	BOOL Import3DS(HWND hwnd, const TCHAR *filename, int pmodel_id, float scale);
 
 	BOOL ProcessVertexData(HWND hwnd, FILE *fp);
 	BOOL ProcessFaceData(HWND hwnd, FILE *fp);
@@ -195,7 +195,7 @@ public:
 	void ProcessMasterScale(FILE *fp);
 	void Process3DSVersion(FILE *fp);
 
-	void PrintLogFile(FILE *logfile, char *commmand);
+	void PrintLogFile(FILE *logfile, const TCHAR *commmand);
 	void Write_pmdata_debugfile(HWND hwnd,  int pmodel_id);
 	void ReleaseTempMemory();
 };

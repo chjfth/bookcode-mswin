@@ -21,6 +21,16 @@
     <ClCompile Include="..\share\LoadWorld.cpp">
       <Filter>share</Filter>
     </ClCompile>
+    <ClCompile Include="..\share\chjutils.cpp" />
+    <ClCompile Include="..\share\wavread.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\playsound.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\Import3DS.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -45,6 +55,12 @@
       <Filter>share</Filter>
     </ClInclude>
     <ClInclude Include="..\share\LoadWorld.hpp">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\wavread.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\Import3DS.hpp">
       <Filter>share</Filter>
     </ClInclude>
   </ItemGroup>

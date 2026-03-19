@@ -16,13 +16,14 @@ public:
 
 	CLoadWorld();
 
-	BOOL LoadWorldMap(HWND hwnd,char *filename);
-	int  CheckObjectId(HWND hwnd, char *p); 
-	BOOL InitPreCompiledWorldMap(HWND hwnd, char *filename);
-	BOOL LoadObjectData(HWND hwnd, char *filename);
+	BOOL LoadWorldMap(HWND hwnd, const TCHAR *filename);
+	int  CheckObjectId(HWND hwnd, const TCHAR *p); 
+	BOOL InitPreCompiledWorldMap(HWND hwnd, const TCHAR *filename);
+	BOOL LoadObjectData(HWND hwnd, const TCHAR *filename);
+
 	BOOL ReadObDataVert(FILE *fp, int object_id, int vert_count, float dat_scale);
 	BOOL ReadObDataVertEx(FILE *fp, int object_id, int vert_count, float dat_scale);
-	BOOL LoadImportedModelList(HWND hwnd,char *filename);
+	BOOL LoadImportedModelList(HWND hwnd, const TCHAR *filename);
 	void LoadYourGunAnimationSequenceList(int model_id);	
 	void LoadPlayerAnimationSequenceList(int model_id);
 	void LoadDebugAnimationSequenceList(HWND hwnd, char *filename, int model_id);	

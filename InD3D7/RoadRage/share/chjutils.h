@@ -7,9 +7,9 @@
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
-void PrintMessage(HWND hwnd,char *message1, char *message2, int message_mode);
+void PrintMessage(HWND hwnd, const TCHAR *message1, const TCHAR *message2, int message_mode);
 
-void PrintMemAllocated(int mem, char *message);
+void PrintMemAllocated(int mem, const TCHAR *message);
 
 // From book code <<<
 

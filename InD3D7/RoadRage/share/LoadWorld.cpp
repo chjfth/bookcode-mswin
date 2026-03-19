@@ -30,7 +30,7 @@ int your_gun_count = 0;
 int car_count = 0;
 int type_num;
 int num_imported_models_loaded = 0;
-char g_model_filename[256];
+TCHAR g_model_filename[256];
 
 
 CLoadWorld* pCWorld;
@@ -41,12 +41,12 @@ CLoadWorld::CLoadWorld()
 	pCWorld = this;
 }
 
-BOOL CLoadWorld::LoadWorldMap(HWND hwnd,char *filename)
+BOOL CLoadWorld::LoadWorldMap(HWND hwnd, const TCHAR *filename)
 { 
-	FILE *fp;    
-	char s[256];
-	char p[256];
-	char buffer[100];
+	FILE *fp = NULL;    
+	TCHAR s[256] = {}; int sSIZE=ARRAYSIZE(s);
+	TCHAR p[256] = {}; int pSIZE=ARRAYSIZE(p);
+	TCHAR buffer[100] = {};
 	int y_count=30;
 	int done=0;
 	int object_count=0;
@@ -62,30 +62,30 @@ BOOL CLoadWorld::LoadWorldMap(HWND hwnd,char *filename)
 	BYTE red, green, blue;
 
 
-    fp = fopen(filename,"r");
+    errno_t ferr = _tfopen_s(&fp, filename, _T("r"));
     if(fp==NULL)
     {     
-		PrintMessage(hwnd, "Error can't load file ", filename, SCN_AND_FILE);
-        MessageBox(hwnd, filename, "Error can't load file", MB_OK);
+		PrintMessage(hwnd, _T("Error can't load file "), filename, SCN_AND_FILE);
+        MessageBox(hwnd, filename, _T("Error can't load file"), MB_OK);
 		return FALSE;
     }
 
-	PrintMessage(hwnd, "Loading map ", filename, SCN_AND_FILE);
+	PrintMessage(hwnd, _T("Loading map "), filename, SCN_AND_FILE);
 	pCMyApp->num_light_sources_in_map = 0;
 
 	while(done==0)
 	{
-		fscanf( fp, "%s", &s );
+		_ftscanf_s( fp, _T("%s"), &s,sSIZE );
 
-		if(strcmp(s,"OBJECT")==0)
+		if(_tcscmp(s,_T("OBJECT"))==0)
 		{
-			fscanf( fp, "%s", &p );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
 			
-			object_id = CheckObjectId(hwnd, (char *)&p);
+			object_id = CheckObjectId(hwnd, p);
 			if(object_id == -1)
 			{
-				PrintMessage(hwnd, "Error Bad Object ID in: LoadWorld ", p, SCN_AND_FILE);
-				MessageBox(hwnd,"Error Bad Object ID in: LoadWorld",NULL,MB_OK);
+				PrintMessage(hwnd, _T("Error Bad Object ID in: LoadWorld "), p, SCN_AND_FILE);
+				MessageBox(hwnd,_T("Error Bad Object ID in: LoadWorld"),NULL,MB_OK);
 				return FALSE;
 			}
 			if(lwm_start_flag == FALSE)
@@ -111,86 +111,86 @@ BOOL CLoadWorld::LoadWorldMap(HWND hwnd,char *filename)
 			lwm_start_flag = FALSE;
 		}
 		
-		if(strcmp(s,"CO_ORDINATES")==0)
+		if(_tcscmp(s,_T("CO_ORDINATES"))==0)
 		{
-			fscanf( fp, "%s", &p );
-			pCMyApp->oblist[object_count].x = (float)atof(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			pCMyApp->oblist[object_count].x = (float)_ttof(p);
 			
-			fscanf( fp, "%s", &p );
-			pCMyApp->oblist[object_count].y = (float)atof(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			pCMyApp->oblist[object_count].y = (float)_ttof(p);
 			
-			fscanf( fp, "%s", &p );
-			pCMyApp->oblist[object_count].z = (float)atof(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			pCMyApp->oblist[object_count].z = (float)_ttof(p);
 		}
 
-		if(strcmp(s,"ROT_ANGLE")==0)
+		if(_tcscmp(s,_T("ROT_ANGLE"))==0)
 		{
-			fscanf( fp, "%s", &p );
-			pCMyApp->oblist[object_count].rot_angle = (float)atof(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			pCMyApp->oblist[object_count].rot_angle = (float)_ttof(p);
 		}
 
-		if(strcmp(s,"LIGHT_ON_VERT")==0)
+		if(_tcscmp(s,_T("LIGHT_ON_VERT"))==0)
 		{	
-			fscanf( fp, "%s", &p );
-			lit_vert = atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			lit_vert = _ttoi(p);
 
-			fscanf( fp, "%s", &p );
-			red = atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			red = _ttoi(p);
 			pCMyApp->oblist[object_count].lit[lit_vert].r = red;
 
-			fscanf( fp, "%s", &p );
-			green = atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			green = _ttoi(p);
 			pCMyApp->oblist[object_count].lit[lit_vert].g = green;
 
-			fscanf( fp, "%s", &p );
-			blue = atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			blue = _ttoi(p);
 			pCMyApp->oblist[object_count].lit[lit_vert].b = blue;
 		}
 		
 		
-		if(strcmp(s,"LIGHT_SOURCE")==0)
+		if(_tcscmp(s,_T("LIGHT_SOURCE"))==0)
 		{	
-			fscanf( fp, "%s", &p );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
 
-			if(strcmp(p,"Spotlight") == 0)
+			if(_tcscmp(p,_T("Spotlight")) == 0)
 				pCMyApp->oblist[object_count].light_source->command = SPOT_LIGHT_SOURCE;
 				
-			if(strcmp(p,"directional") == 0)
+			if(_tcscmp(p,_T("directional")) == 0)
 				pCMyApp->oblist[object_count].light_source->command = DIRECTIONAL_LIGHT_SOURCE;
 
-			if(strcmp(p,"point") == 0)
+			if(_tcscmp(p,_T("point")) == 0)
 				pCMyApp->oblist[object_count].light_source->command = POINT_LIGHT_SOURCE;
 			
-			fscanf( fp, "%s", &p );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
 
-			if(strcmp(p,"POS")==0)	
+			if(_tcscmp(p,_T("POS"))==0)	
 			{
-				fscanf( fp, "%s", &p );
-				pCMyApp->oblist[object_count].light_source->position_x = (float)atof(p);
-				fscanf( fp, "%s", &p );
-				pCMyApp->oblist[object_count].light_source->position_y = (float)atof(p);
-				fscanf( fp, "%s", &p );
-				pCMyApp->oblist[object_count].light_source->position_z = (float)atof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->oblist[object_count].light_source->position_x = (float)_ttof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->oblist[object_count].light_source->position_y = (float)_ttof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->oblist[object_count].light_source->position_z = (float)_ttof(p);
 			}
 
-			fscanf( fp, "%s", &p );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
 
-			if(strcmp(p,"DIR")==0)
+			if(_tcscmp(p,_T("DIR"))==0)
 			{
-				fscanf( fp, "%s", &p );
-				pCMyApp->oblist[object_count].light_source->direction_x = (float)atof(p);
-				fscanf( fp, "%s", &p );
-				pCMyApp->oblist[object_count].light_source->direction_y = (float)atof(p);
-				fscanf( fp, "%s", &p );
-				pCMyApp->oblist[object_count].light_source->direction_z = (float)atof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->oblist[object_count].light_source->direction_x = (float)_ttof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->oblist[object_count].light_source->direction_y = (float)_ttof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->oblist[object_count].light_source->direction_z = (float)_ttof(p);
 			}
 
 			
 		}
 
-		if(strcmp(s,"END_FILE")==0)
+		if(_tcscmp(s,_T("END_FILE"))==0)
 		{
-			fscanf( fp, "%s", &p );	
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );	
 			pCMyApp->oblist_length = object_count+1;
 			done=1;
 		}
@@ -198,34 +198,34 @@ BOOL CLoadWorld::LoadWorldMap(HWND hwnd,char *filename)
 
 	fclose(fp);	
 	
-	itoa(pCMyApp->oblist_length, buffer, 10);
-	PrintMessage(hwnd, buffer, " map objects loaded (oblist_length)",SCN_AND_FILE);
-	PrintMessage(hwnd, "\n", NULL, LOGFILE_ONLY);
+	_itot_s(pCMyApp->oblist_length, buffer, 10);
+	PrintMessage(hwnd, buffer, _T(" map objects loaded (oblist_length)"),SCN_AND_FILE);
+	PrintMessage(hwnd, _T("\n"), NULL, LOGFILE_ONLY);
 	
 	return TRUE;
 }
 
-int CLoadWorld::CheckObjectId(HWND hwnd, char *p) 
+int CLoadWorld::CheckObjectId(HWND hwnd, const TCHAR *p) 
 {
 	int i;
-	char *buffer2;
+	const TCHAR *buffer2;
 
 	for(i = 0; i < pCMyApp->obdata_length; i++)
 	{
 		buffer2 = pCMyApp->obdata[i].name;
 
-		if(strcmp(buffer2, p)==0)
+		if(_tcscmp(buffer2, p)==0)
 		{
 			return i;
 		}
 	}
-	PrintMessage(hwnd, buffer2, "ERROR bad ID in : CheckObjectId ",SCN_AND_FILE);
-	MessageBox(hwnd,buffer2,"Bad ID in :CheckObjectId", MB_OK);
+	PrintMessage(hwnd, buffer2, _T("ERROR bad ID in: CheckObjectId"),SCN_AND_FILE);
+	MessageBox(hwnd,buffer2,_T("Bad ID in: CheckObjectId"), MB_OK);
 	
 	return -1; //error
 }
 
-BOOL CLoadWorld::InitPreCompiledWorldMap(HWND hwnd, char *filename)
+BOOL CLoadWorld::InitPreCompiledWorldMap(HWND hwnd, const TCHAR *filename)
 {
 	FILE *fp;    
 	char s[256];
@@ -299,7 +299,7 @@ BOOL CLoadWorld::InitPreCompiledWorldMap(HWND hwnd, char *filename)
 	return FALSE;
 }
 
-BOOL CLoadWorld::LoadObjectData(HWND hwnd, char *filename)
+BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 {
 	FILE *fp;    
 	int i;
@@ -314,9 +314,9 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, char *filename)
 	int num_v;
 	BOOL command_error;
 	float dat_scale;
-	char buffer[256];
-	char s[256];	
-	char p[256];
+	TCHAR buffer[256] = {};
+	TCHAR s[256] = {}; int sSIZE = ARRAYSIZE(s);	
+	TCHAR p[256] = {}; int pSIZE = ARRAYSIZE(p);
 
 
     fp = fopen(filename,"r");
@@ -578,7 +578,7 @@ BOOL CLoadWorld::ReadObDataVert(FILE *fp, int object_id, int vert_count, float d
 }
 
 
-BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, char *filename)
+BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 {
 	FILE *fp;    
 	char p[256];

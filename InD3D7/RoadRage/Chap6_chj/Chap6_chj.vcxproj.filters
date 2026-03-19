@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="RoadRage.cpp" />
@@ -19,6 +19,16 @@
       <Filter>share</Filter>
     </ClCompile>
     <ClCompile Include="..\share\LoadWorld.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\chjutils.cpp" />
+    <ClCompile Include="..\share\Import3DS.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\playsound.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\wavread.cpp">
       <Filter>share</Filter>
     </ClCompile>
   </ItemGroup>
@@ -45,6 +55,12 @@
       <Filter>share</Filter>
     </ClInclude>
     <ClInclude Include="..\share\LoadWorld.hpp">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\Import3DS.hpp">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\wavread.h">
       <Filter>share</Filter>
     </ClInclude>
   </ItemGroup>
