@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="RoadRage.cpp" />
+    <ClCompile Include="info.cpp" />
+    <ClCompile Include="..\share\d3dapp.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\d3denum.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\d3dframe.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\d3dmath.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\d3dutil.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\LoadWorld.cpp">
+      <Filter>share</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="info.hpp" />
+    <ClInclude Include="RoadRage.hpp" />
+    <ClInclude Include="..\share\d3dutil.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\d3dapp.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\d3denum.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\d3dframe.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\d3dmath.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\chjutils.h">
+      <Filter>share</Filter>
+    </ClInclude>
+    <ClInclude Include="..\share\LoadWorld.hpp">
+      <Filter>share</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="winmain.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\directx.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="share">
+      <UniqueIdentifier>{708ebd5e-98d7-49cd-8be7-ef7463a00039}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
