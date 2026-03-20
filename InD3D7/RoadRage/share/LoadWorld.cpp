@@ -57,7 +57,7 @@ BOOL CLoadWorld::LoadWorldMap(HWND hwnd, const TCHAR *filename)
 	BOOL lwm_start_flag=TRUE;
 	int num_lverts;
 	int i;
-	int mem_counter;
+	int mem_counter = 0;
 	int lit_vert;
 	BYTE red, green, blue;
 

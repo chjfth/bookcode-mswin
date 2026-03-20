@@ -12,7 +12,7 @@ static int PrintMsgX = 10;
 static int PrintMsgY = 10;
 
 
-void PrintMessage(HWND hwnd,char *message1, char *message2, int message_mode)
+void PrintMessage(HWND hwnd, const TCHAR *message1, const TCHAR *message2, int message_mode)
 {
 	FILE *fp = NULL;
 	char tmessage[1000];
@@ -70,7 +70,7 @@ void PrintMessage(HWND hwnd,char *message1, char *message2, int message_mode)
 }
 
 
-void PrintMemAllocated(int mem, char *message)
+void PrintMemAllocated(int mem, const TCHAR *message)
 {
 	FILE *fp = NULL;
 	char buffer[1000];
