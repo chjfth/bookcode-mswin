@@ -227,8 +227,8 @@ int CLoadWorld::CheckObjectId(HWND hwnd, const TCHAR *p)
 
 BOOL CLoadWorld::InitPreCompiledWorldMap(HWND hwnd, const TCHAR *filename)
 {
-	FILE *fp;    
-	char s[256];
+	FILE *fp = NULL;    
+	TCHAR s[256] = {}; const int sSIZE = ARRAYSIZE(s);
 	int w;
 	int done = 0;
 	int count;
@@ -236,13 +236,13 @@ BOOL CLoadWorld::InitPreCompiledWorldMap(HWND hwnd, const TCHAR *filename)
 	int mem_count;
 
 
-	PrintMessage(hwnd, "InitPreCompiledWorldMap: starting\n", NULL, LOGFILE_ONLY);
+	PrintMessage(hwnd, _T("InitPreCompiledWorldMap: starting\n"), NULL, LOGFILE_ONLY);
 		
-	fp = fopen(filename,"r");
+	_tfopen_s(&fp, filename, _T("r"));
     if(fp==NULL)
     {     
-		PrintMessage(hwnd,"Error can't load ", filename, SCN_AND_FILE);
-        MessageBox(hwnd,filename,"Error can't load file",MB_OK);
+		PrintMessage(hwnd, _T("Error can't load "), filename, SCN_AND_FILE);
+        MessageBox(hwnd,filename, _T("Error can't load file"),MB_OK);
 		return FALSE;
 	}
 
@@ -259,35 +259,35 @@ BOOL CLoadWorld::InitPreCompiledWorldMap(HWND hwnd, const TCHAR *filename)
 
 	while(done==0)
 	{
-		fscanf( fp, "%s", &s );
+		_ftscanf_s( fp, _T("%s"), &s,sSIZE );
 
-		if(strcmp(s,"END_FILE")==0)
+		if(_tcscmp(s,_T("END_FILE"))==0)
 		{	
 			done=1;
 			fclose(fp);	
-			PrintMessage(hwnd, "InitPreCompiledWorldMap: sucess\n\n", NULL, LOGFILE_ONLY);
+			PrintMessage(hwnd, _T("InitPreCompiledWorldMap: success\n\n"), NULL, LOGFILE_ONLY);
 			return TRUE;
 		}
 
-		cell_x = atoi(s);
+		cell_x = _ttoi(s);
 
 		if((cell_x >=0) && (cell_x <=200))
 		{
-			fscanf( fp, "%s", &s );
-			cell_z = atoi(s);
+			_ftscanf_s( fp, _T("%s"), &s,sSIZE );
+			cell_z = _ttoi(s);
 
 			if((cell_z >=0) && (cell_z <=200))
 			{
-				fscanf( fp, "%s", &s );
-				count = atoi(s);
+				_ftscanf_s( fp, _T("%s"), &s,sSIZE );
+				count = _ttoi(s);
 			
 				pCMyApp->cell[cell_x][cell_z] = new int[count];
 				mem_count = mem_count + (count* sizeof(int));
 							
 				for(w=0;w<count;w++)
 				{
-					fscanf( fp, "%s", &s );
-					pCMyApp->cell[cell_x][cell_z][w] = atoi(s);						
+					_ftscanf_s( fp, _T("%s"), &s,sSIZE );
+					pCMyApp->cell[cell_x][cell_z][w] = _ttoi(s);
 				}
 				
 				pCMyApp->cell_length[cell_x][cell_z] = count;
@@ -301,7 +301,7 @@ BOOL CLoadWorld::InitPreCompiledWorldMap(HWND hwnd, const TCHAR *filename)
 
 BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 {
-	FILE *fp;    
+	FILE *fp = NULL;
 	int i;
 	int done		  = 0;
 	int object_id	  = 0;
@@ -319,32 +319,31 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 	TCHAR p[256] = {}; int pSIZE = ARRAYSIZE(p);
 
 
-    fp = fopen(filename,"r");
+    _tfopen_s(&fp, filename, _T("r"));
 
     if(fp==NULL)
 	{     
-		PrintMessage(hwnd, "ERROR can't load ", filename, SCN_AND_FILE);
-		MessageBox(hwnd, filename, "Error can't load file",MB_OK);
+		PrintMessage(hwnd, _T("ERROR can't load "), filename, SCN_AND_FILE);
+		MessageBox(hwnd, filename, _T("Error can't load file"),MB_OK);
 		return FALSE;
     }
 
-	PrintMessage(hwnd, "Loading ", filename, SCN_AND_FILE);
+	PrintMessage(hwnd, _T("Loading "), filename, SCN_AND_FILE);
 	
 	while(done==0)
 	{
 		command_error = TRUE;
 
-		fscanf( fp, "%s", &s );
+		_ftscanf_s( fp, _T("%s"), &s,sSIZE );
 
-		if(strcmp(s,"OBJECT")==0)
-			
+		if(_tcscmp(s,_T("OBJECT"))==0)
 		{
 			dat_scale = 1.0; 
 
 			old_object_id = object_id;
 
-			fscanf( fp, "%s", &p );	// read object ID
-			object_id = atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );	// read object ID
+			object_id = _ttoi(p);
 
 			// find the highest object_id
 
@@ -353,7 +352,7 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 
 			if((object_id < 0) || (object_id > 99))
 			{
-				MessageBox(hwnd,"Error Bad Object ID in: LoadObjectData",NULL,MB_OK);
+				MessageBox(hwnd,_T("Error Bad Object ID in: LoadObjectData"),NULL,MB_OK);
 				return FALSE;
 			}
 
@@ -363,31 +362,31 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 			poly_count=0;
 			conn_cnt=0;
 			
-			fscanf( fp, "%s", &p );	// read object name
-			strcpy((char *)pCMyApp->obdata[object_id].name, (char *)&p);  
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );	// read object name
+			_tcscpy_s(pCMyApp->obdata[object_id].name, p);  
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"SCALE")==0)
+		if(_tcscmp(s,_T("SCALE"))==0)
 		{
-			fscanf( fp, "%s", &p );
-			dat_scale = (float)atof(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			dat_scale = (float)_ttof(p);
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"TEXTURE")== 0)
+		if(_tcscmp(s,_T("TEXTURE"))== 0)
 		{
-			fscanf( fp, "%s", &p );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"TYPE")==0)
+		if(_tcscmp(s,_T("TYPE"))==0)
 		{
-			fscanf( fp, "%s", &p );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"TRI")==0)
+		if(_tcscmp(s,_T("TRI"))==0)
 		{
 			for(i=0;i<3;i++)
 			{
@@ -401,7 +400,7 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"QUAD")==0)
+		if(_tcscmp(s,_T("QUAD"))==0)
 		{
 			ReadObDataVert(fp, object_id, vert_count,   dat_scale);
 			ReadObDataVert(fp, object_id, vert_count+1, dat_scale);
@@ -416,7 +415,7 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"TRITEX")==0)
+		if(_tcscmp(s,_T("TRITEX"))==0)
 		{
 			for(i=0;i<3;i++)
 			{
@@ -430,7 +429,7 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"QUADTEX")==0)
+		if(_tcscmp(s,_T("QUADTEX"))==0)
 		{
 			ReadObDataVertEx(fp, object_id, vert_count,   dat_scale);
 			ReadObDataVertEx(fp, object_id, vert_count+1, dat_scale);
@@ -445,11 +444,11 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"TRI_STRIP")==0)
+		if(_tcscmp(s,_T("TRI_STRIP"))==0)
 		{
 			// Get numbers of verts in triangle strip
-			fscanf( fp, "%s", &p );	
-			num_v = atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );	
+			num_v = _ttoi(p);
 
 			for(i = 0; i < num_v; i++)
 			{
@@ -463,11 +462,11 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"TRI_FAN")==0)
+		if(_tcscmp(s,_T("TRI_FAN"))==0)
 		{
 			// Get numbers of verts in triangle fan
-			fscanf( fp, "%s", &p );	
-			num_v = atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );	
+			num_v = _ttoi(p);
 
 			for(i = 0; i < num_v; i++)
 			{
@@ -481,28 +480,28 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"CONNECTION")==0)
+		if(_tcscmp(s,_T("CONNECTION"))==0)
 		{
 			if(conn_cnt<4)
 			{
-				fscanf( fp, "%s", &p );
-				pCMyApp->obdata[object_id].connection[conn_cnt].x = (float)atof(p);
-				fscanf( fp, "%s", &p );
-				pCMyApp->obdata[object_id].connection[conn_cnt].y = (float)atof(p);
-				fscanf( fp, "%s", &p );
-				pCMyApp->obdata[object_id].connection[conn_cnt].z = (float)atof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->obdata[object_id].connection[conn_cnt].x = (float)_ttof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->obdata[object_id].connection[conn_cnt].y = (float)_ttof(p);
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				pCMyApp->obdata[object_id].connection[conn_cnt].z = (float)_ttof(p);
 				conn_cnt++;
 			}
 			else
 			{
-				fscanf( fp, "%s", &p );
-				fscanf( fp, "%s", &p );
-				fscanf( fp, "%s", &p );
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+				_ftscanf_s( fp, _T("%s"), &p,pSIZE );
 			}
 			command_error = FALSE;
 		}
 
-		if(strcmp(s,"END_FILE")==0)
+		if(_tcscmp(s,_T("END_FILE"))==0)
 		{		
 			pCMyApp->num_vert_per_object[object_id]=vert_count;
 			pCMyApp->num_polys_per_object[object_id]=poly_count;
@@ -513,19 +512,19 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 
 		if(command_error == TRUE)
 		{
-			itoa(object_id, buffer, 10);
-			PrintMessage(NULL, "CLoadWorld::LoadObjectData - ERROR in objects.dat, object : ", buffer, LOGFILE_ONLY);
-			MessageBox(hwnd, s,"Unrecognised command",MB_OK);
+			_itot_s(object_id, buffer, 10);
+			PrintMessage(NULL, _T("CLoadWorld::LoadObjectData - ERROR in objects.dat, object : "), buffer, LOGFILE_ONLY);
+			MessageBox(hwnd, s,_T("Unrecognized command"),MB_OK);
 			fclose(fp);	
 			return FALSE;
 		}
 	}
 	fclose(fp);	
 	
-	itoa(pCMyApp->obdata_length, buffer, 10);
+	_itot_s(pCMyApp->obdata_length, buffer, 10);
 	
-	PrintMessage(hwnd, buffer, " DAT objects loaded" ,SCN_AND_FILE);
-	PrintMessage(hwnd, "\n", NULL, LOGFILE_ONLY);
+	PrintMessage(hwnd, buffer, _T(" DAT objects loaded") ,SCN_AND_FILE);
+	PrintMessage(hwnd, _T("\n"), NULL, LOGFILE_ONLY);
 	
 	return TRUE;
 }
@@ -533,26 +532,26 @@ BOOL CLoadWorld::LoadObjectData(HWND hwnd, const TCHAR *filename)
 BOOL CLoadWorld::ReadObDataVertEx(FILE *fp, int object_id, int vert_count, float dat_scale)
 { 
 	float x,y,z;
-	char p[256];
+	TCHAR p[256] = {}; const int pSIZE=ARRAYSIZE(p);
 
-	fscanf( fp, "%s", &p );
-	x = dat_scale * (float)atof(p);
+	_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+	x = dat_scale * (float)_ttof(p);
 	pCMyApp->obdata[object_id].v[vert_count].x = x;
 		
-	fscanf( fp, "%s", &p );
-	y = dat_scale * (float)atof(p);
+	_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+	y = dat_scale * (float)_ttof(p);
 	pCMyApp->obdata[object_id].v[vert_count].y = y;
 		
-	fscanf( fp, "%s", &p );
-	z = dat_scale * (float)atof(p);
+	_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+	z = dat_scale * (float)_ttof(p);
 	pCMyApp->obdata[object_id].v[vert_count].z = z;
 
 
-	fscanf( fp, "%s", &p );
-	pCMyApp->obdata[object_id].t[vert_count].x = (float)atof(p);
+	_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+	pCMyApp->obdata[object_id].t[vert_count].x = (float)_ttof(p);
 
-	fscanf( fp, "%s", &p );
-	pCMyApp->obdata[object_id].t[vert_count].y = (float)atof(p);
+	_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+	pCMyApp->obdata[object_id].t[vert_count].y = (float)_ttof(p);
 		
 	return TRUE;
 }
@@ -560,18 +559,18 @@ BOOL CLoadWorld::ReadObDataVertEx(FILE *fp, int object_id, int vert_count, float
 BOOL CLoadWorld::ReadObDataVert(FILE *fp, int object_id, int vert_count, float dat_scale)
 {  
 	float x,y,z;
-	char p[256];
+	TCHAR p[256]={}; const int pSIZE=ARRAYSIZE(p);
 
-	fscanf( fp, "%s", &p );
-	x = dat_scale * (float)atof(p);
+	_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+	x = dat_scale * (float)_ttof(p);
 	pCMyApp->obdata[object_id].v[vert_count].x = x;
 		
-	fscanf( fp, "%s", &p );
-	y = dat_scale * (float)atof(p);
+	_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+	y = dat_scale * (float)_ttof(p);
 	pCMyApp->obdata[object_id].v[vert_count].y = y;
 		
-	fscanf( fp, "%s", &p );
-	z = dat_scale * (float)atof(p);
+	_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+	z = dat_scale * (float)_ttof(p);
 	pCMyApp->obdata[object_id].v[vert_count].z = z;
 
 	return TRUE;
@@ -580,14 +579,14 @@ BOOL CLoadWorld::ReadObDataVert(FILE *fp, int object_id, int vert_count, float d
 
 BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 {
-	FILE *fp;    
-	char p[256];
+	FILE *fp = NULL;    
+	TCHAR p[256]={}; const int pSIZE=ARRAYSIZE(p);
 	int done = 0;
 	int i;
-	char command[256];
+	TCHAR command[256]={}; const int commandSIZE=ARRAYSIZE(command);
 	float f;
 	int model_id;
-	char model_filename[256];
+	TCHAR model_filename[256]={};
 	float scale;
 	BOOL command_recognised;	
 	BOOL Model_loaded_flags[1000] = {FALSE};
@@ -602,21 +601,21 @@ BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 		pCMyApp->debug[i].current_frame = 0;
 	}
 
-	fp = fopen(filename,"r");
+	_tfopen_s(&fp, filename, _T("r"));
 
     if(fp==NULL)
 	{     
-		PrintMessage(hwnd, "ERROR can't load ", filename, SCN_AND_FILE);
-		MessageBox(hwnd, filename, "Error can't load file",MB_OK);
+		PrintMessage(hwnd, _T("ERROR can't load "), filename, SCN_AND_FILE);
+		MessageBox(hwnd, filename, _T("Error can't load file"),MB_OK);
 		return FALSE;
     }
 
-	PrintMessage(hwnd, "Loading ", filename, SCN_AND_FILE);
+	PrintMessage(hwnd, _T("Loading "), filename, SCN_AND_FILE);
 
-	fscanf( fp, "%s", &command );
+	_ftscanf_s( fp, _T("%s"), &command,commandSIZE );
 
-	if(strcmp(command,"FILENAME") == 0)
-		fscanf( fp, "%s", &p );	// ignore comment
+	if(_tcscmp(command,_T("FILENAME")) == 0)
+		_ftscanf_s( fp, _T("%s"), &p,pSIZE );	// ignore comment
 	else
 		return FALSE;
 
@@ -625,57 +624,57 @@ BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 		command_recognised = FALSE;
 		scale = (float)0.4;
 
-		fscanf( fp, "%s", &command ); // get next command
+		_ftscanf_s( fp, _T("%s"), &command,commandSIZE ); // get next command
 
 		
-		fscanf( fp, "%s", &p );	// read player number
-		type_num = atoi(p);
+		_ftscanf_s( fp, _T("%s"), &p,pSIZE );	// read player number
+		type_num = _ttoi(p);
 			
-		fscanf( fp, "%s", &p );	// find model file foramt - 3DS ?
+		_ftscanf_s( fp, _T("%s"), &p,pSIZE );	// find model file format - 3DS ?
 					
-		if(strcmp(p,"3DS") == 0)
+		if(_tcscmp(p,_T("3DS")) == 0)
 			pCMyApp->model_format = k3DS_MODEL;
 
-		fscanf( fp, "%s", &p );	//  ignore comment "model_id"  
+		_ftscanf_s( fp, _T("%s"), &p,pSIZE );	//  ignore comment "model_id"  
 
-		fscanf( fp, "%s", &p );	// read model id
-		model_id = atoi(p);
+		_ftscanf_s( fp, _T("%s"), &p,pSIZE );	// read model id
+		model_id = _ttoi(p);
 			
-		fscanf( fp, "%s", &model_filename ); // read filename for object
+		_ftscanf_s( fp, _T("%s"), &model_filename,ARRAYSIZE(model_filename) ); // read filename for object
 
-		fscanf( fp, "%s", &p );	//  ignore comment "tex"  
+		_ftscanf_s( fp, _T("%s"), &p,pSIZE );	//  ignore comment "tex"  
 
-		fscanf( fp, "%s", &p );	// read texture alias id				
+		_ftscanf_s( fp, _T("%s"), &p,pSIZE );	// read texture alias id				
 
-		if(strcmp(command,"PLAYER") == 0)
+		if(_tcscmp(command,_T("PLAYER")) == 0)
 		{
-			fscanf( fp, "%s", &p ); // ignore comment pos
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment pos
 					
-			fscanf( fp, "%s", &p ); // x pos
-			pCMyApp->player_list[type_num].x = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // x pos
+			pCMyApp->player_list[type_num].x = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // y pos
-			pCMyApp->player_list[type_num].y = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // y pos
+			pCMyApp->player_list[type_num].y = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // z pos
-			pCMyApp->player_list[type_num].z = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // z pos
+			pCMyApp->player_list[type_num].z = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // ignore comment angle
-			fscanf( fp, "%s", &p ); // angle
-			pCMyApp->player_list[type_num].rot_angle = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment angle
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // angle
+			pCMyApp->player_list[type_num].rot_angle = (float)_ttoi(p);
 
 			pCMyApp->player_list[type_num].model_id = model_id;
 			pCMyApp->num_players++;
 
-			fscanf( fp, "%s", &p ); // ignore comment scale
-			fscanf( fp, "%f", &f );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment scale
+			_ftscanf_s( fp, _T("%f"), &f );
 			scale = f;
 
-			fscanf( fp, "%s", &p ); // Don't draw players external weapon
-			if(strcmp(p, "NO_EXTERNAL_WEP") == 0)
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // Don't draw players external weapon
+			if(_tcscmp(p, _T("NO_EXTERNAL_WEP")) == 0)
 				pCMyApp->player_list[type_num].draw_external_wep = FALSE;
 			
-			if(strcmp(p, "USE_EXTERNAL_WEP") == 0)
+			if(_tcscmp(p, _T("USE_EXTERNAL_WEP")) == 0)
 				pCMyApp->player_list[type_num].draw_external_wep = TRUE;
 			
 
@@ -686,56 +685,56 @@ BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 			command_recognised = TRUE;
 		}
 
-		if(strcmp(command,"CAR") == 0)
+		if(_tcscmp(command,_T("CAR")) == 0)
 		{
-			fscanf( fp, "%s", &p ); // ignore comment pos
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment pos
 					
-			fscanf( fp, "%s", &p ); // x pos
-			pCMyApp->car_list[type_num].x = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // x pos
+			pCMyApp->car_list[type_num].x = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // y pos
-			pCMyApp->car_list[type_num].y = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // y pos
+			pCMyApp->car_list[type_num].y = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // z pos
-			pCMyApp->car_list[type_num].z = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // z pos
+			pCMyApp->car_list[type_num].z = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // ignore comment angle
-			fscanf( fp, "%s", &p ); // angle
-			pCMyApp->car_list[type_num].rot_angle = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment angle
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // angle
+			pCMyApp->car_list[type_num].rot_angle = (float)_ttoi(p);
 
 			pCMyApp->car_list[type_num].model_id = model_id;
 			pCMyApp->num_cars++;
 
-			fscanf( fp, "%s", &p ); // ignore comment scale
-			fscanf( fp, "%f", &f );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment scale
+			_ftscanf_s( fp, _T("%f"), &f );
 			scale = f;
 
 			car_count++;
 			command_recognised = TRUE;
 		}
 
-		if(strcmp(command,"YOURGUN") == 0)
+		if(_tcscmp(command,_T("YOURGUN")) == 0)
 		{
-			fscanf( fp, "%s", &p ); // ignore comment pos
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment pos
 				
-			fscanf( fp, "%s", &p ); // x pos
-			pCMyApp->your_gun[type_num].x_offset = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // x pos
+			pCMyApp->your_gun[type_num].x_offset = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // y pos
-			pCMyApp->your_gun[type_num].z_offset = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // y pos
+			pCMyApp->your_gun[type_num].z_offset = (float)_ttoi(p);
 				
-			fscanf( fp, "%s", &p ); // z pos
-			pCMyApp->your_gun[type_num].y_offset = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // z pos
+			pCMyApp->your_gun[type_num].y_offset = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // ignore comment angle
-			fscanf( fp, "%s", &p ); // angle
-			pCMyApp->your_gun[type_num].rot_angle = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment angle
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // angle
+			pCMyApp->your_gun[type_num].rot_angle = (float)_ttoi(p);
 
 			pCMyApp->your_gun[type_num].model_id = model_id;
 			pCMyApp->num_your_guns++;
 
-			fscanf( fp, "%s", &p ); // ignore comment scale
-			fscanf( fp, "%f", &f );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment scale
+			_ftscanf_s( fp, _T("%f"), &f );
 			scale = f;
 
 			your_gun_count++;
@@ -744,28 +743,28 @@ BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 			command_recognised = TRUE;
 		}
 
-		if(strcmp(command,"DEBUG") == 0)
+		if(_tcscmp(command,_T("DEBUG")) == 0)
 		{
-			fscanf( fp, "%s", &p ); // ignore comment pos
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment pos
 				
-			fscanf( fp, "%s", &p ); // x pos
-			pCMyApp->debug[type_num].x = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // x pos
+			pCMyApp->debug[type_num].x = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // y pos
-			pCMyApp->debug[type_num].y = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // y pos
+			pCMyApp->debug[type_num].y = (float)_ttoi(p);
 				
-			fscanf( fp, "%s", &p ); // z pos
-			pCMyApp->debug[type_num].z = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // z pos
+			pCMyApp->debug[type_num].z = (float)_ttoi(p);
 					
-			fscanf( fp, "%s", &p ); // ignore comment angle
-			fscanf( fp, "%s", &p ); // angle
-			pCMyApp->debug[type_num].rot_angle = (float)atoi(p);
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment angle
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // angle
+			pCMyApp->debug[type_num].rot_angle = (float)_ttoi(p);
 
 			pCMyApp->debug[type_num].model_id = model_id;
 			pCMyApp->num_debug_models++;
 			
-			fscanf( fp, "%s", &p ); // ignore comment scale
-			fscanf( fp, "%f", &f );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment scale
+			_ftscanf_s( fp, _T("%f"), &f );
 			scale = f;
 
 			LoadDebugAnimationSequenceList(hwnd, model_filename, model_id);
@@ -773,20 +772,20 @@ BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 			command_recognised = TRUE;
 		}
 
-		if(strcmp(command,"OPGUN") == 0)
+		if(_tcscmp(command,_T("OPGUN")) == 0)
 		{			
 			pCMyApp->other_players_guns[type_num].model_id = model_id;
 			pCMyApp->num_op_guns++;
 			
-			fscanf( fp, "%s", &p ); // ignore comment scale
-			fscanf( fp, "%f", &f );
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE ); // ignore comment scale
+			_ftscanf_s( fp, _T("%f"), &f );
 			scale = f;
 
 			op_gun_count++;
 			command_recognised = TRUE;
 		}
 		
-		if(strcmp(command,"END_FILE") == 0)
+		if(_tcscmp(command,_T("END_FILE")) == 0)
 		{
 			done = 1;
 			command_recognised = TRUE;
@@ -796,7 +795,7 @@ BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 		{
 			if(Model_loaded_flags[model_id] == FALSE)
 			{
-				PrintMessage(hwnd, "loading  ", model_filename, SCN_AND_FILE);
+				PrintMessage(hwnd, _T("loading  "), model_filename, SCN_AND_FILE);
 			
 				if(pCMyApp->model_format == k3DS_MODEL)
 					pC3DS->Import3DS(hwnd, model_filename, model_id, scale);
@@ -806,8 +805,8 @@ BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 		}
 		else
 		{
-			PrintMessage(hwnd, "command unrecognised ", command, SCN_AND_FILE);
-			MessageBox(hwnd, command, "command unrecognised",MB_OK);
+			PrintMessage(hwnd, _T("command unrecognized "), command, SCN_AND_FILE);
+			MessageBox(hwnd, command, _T("command unrecognized"),MB_OK);
 			return FALSE;
 		}
 		
@@ -815,28 +814,29 @@ BOOL CLoadWorld::LoadImportedModelList(HWND hwnd, const TCHAR *filename)
 	} // end while loop
 
 	num_imported_models_loaded = player_count + your_gun_count + op_gun_count;
-	PrintMessage(hwnd, "\n", NULL, LOGFILE_ONLY);
+	PrintMessage(hwnd, _T("\n"), NULL, LOGFILE_ONLY);
 	fclose(fp);	
 	return TRUE;
 }
 
-void CLoadWorld::LoadDebugAnimationSequenceList(HWND hwnd, char *filename, int model_id)
+
+void CLoadWorld::LoadDebugAnimationSequenceList(HWND hwnd, const TCHAR *filename, int model_id)
 {
-	FILE *fp;    
+	FILE *fp = NULL;    
 	int done = 0;
 	int start_frame;
 	int stop_frame;
 	int sequence_number;
-	int file_ex_start;
+	int file_ex_start = 0;
 	int i;
-	char command[256];
-	char p[256];
-	char name[256];
+	TCHAR command[256]={};
+	TCHAR p[256]={}; const int pSIZE=ARRAYSIZE(p);
+	TCHAR name[256]={};
 
 	BOOL command_recognised;	
 
 
-	strcpy(g_model_filename, filename);
+	_tcscpy_s(g_model_filename, filename);
 
 	for (i = 0; i < 255; i++)
 	{
@@ -854,23 +854,23 @@ void CLoadWorld::LoadDebugAnimationSequenceList(HWND hwnd, char *filename, int m
 		}
 	}
 
-	strcpy(&g_model_filename[file_ex_start+1], "seq");
+	_tcscpy_s(&g_model_filename[file_ex_start+1], ARRAYSIZE(g_model_filename)-file_ex_start-1, _T("seq"));
 
-	fp = fopen(g_model_filename,"r");
+	_tfopen_s(&fp, g_model_filename, _T("r"));
 
     if(fp==NULL)
 	{     
-		PrintMessage(hwnd, "ERROR can't load ", g_model_filename, SCN_AND_FILE);
-		MessageBox(hwnd, g_model_filename, "Error can't load file",MB_OK);
+		PrintMessage(hwnd, _T("ERROR can't load "), g_model_filename, SCN_AND_FILE);
+		MessageBox(hwnd, g_model_filename, _T("Error can't load file"),MB_OK);
 		return;
     }
 
-	PrintMessage(hwnd, "Loading ", g_model_filename, SCN_AND_FILE);
+	PrintMessage(hwnd, _T("Loading "), g_model_filename, SCN_AND_FILE);
 
-	fscanf( fp, "%s", &command );
+	_ftscanf_s( fp, _T("%s"), &command,ARRAYSIZE(command) );
 
-	if(strcmp(command,"FILENAME") == 0)
-		fscanf( fp, "%s", &p );	// ignore comment
+	if(_tcscmp(command,_T("FILENAME")) == 0)
+		_ftscanf_s( fp, _T("%s"), &p,pSIZE );	// ignore comment
 	else
 		return;
 
@@ -882,41 +882,39 @@ void CLoadWorld::LoadDebugAnimationSequenceList(HWND hwnd, char *filename, int m
 	{
 		command_recognised = FALSE;
 	
-	
 		// read sequence number
-		fscanf( fp, "%s", &command ); 		
-		if(strcmpi(command, "SEQUENCE") == 0)
+		_ftscanf_s( fp, _T("%s"), &command,ARRAYSIZE(command) ); 
+		if(_tcsicmp(command, _T("SEQUENCE")) == 0)
 		{	
-			fscanf( fp, "%d", &sequence_number );
-
+			_ftscanf_s( fp, _T("%d"), &sequence_number );
 
 			// read start frame
-			fscanf( fp, "%s", &p );
-			if(strcmpi(p, "START_FRAME") != 0)
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			if(_tcsicmp(p, _T("START_FRAME")) != 0)
 				return;
 
-			fscanf( fp, "%d", &start_frame );	
+			_ftscanf_s( fp, _T("%d"), &start_frame );	
 			pCMyApp->pmdata[model_id].sequence_start_frame[sequence_number] = start_frame;
 			
 
 			// read stop frame
-			fscanf( fp, "%s", &p );
-			if(strcmpi(p, "STOP_FRAME") != 0)
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			if(_tcsicmp(p, _T("STOP_FRAME")) != 0)
 				return;
 
-			fscanf( fp, "%d", &stop_frame );	
+			_ftscanf_s( fp, _T("%d"), &stop_frame );	
 			pCMyApp->pmdata[model_id].sequence_stop_frame[sequence_number] = stop_frame;
 
 			// read name
-			fscanf( fp, "%s", &p );
-			if(strcmpi(p, "NAME") != 0)
+			_ftscanf_s( fp, _T("%s"), &p,pSIZE );
+			if(_tcsicmp(p, _T("NAME")) != 0)
 				return;
 
-			fscanf( fp, "%s", &name );	
+			_ftscanf_s( fp, _T("%s"), &name,ARRAYSIZE(name) );	
 			
 		}
 
-		if(strcmpi(command, "END_FILE") == 0)
+		if(_tcsicmp(command, _T("END_FILE")) == 0)
 			done = 1;		
 		
 	} // end while loop

@@ -81,13 +81,13 @@ public:
 	void AddPlayerLightSource(int player_num, float x, float y, float z);
 	setupinfo_ptr setupinfo;
 
-	VOID			OpenSoundFile(TCHAR *strFileName, int bufferNum);
+	VOID			OpenSoundFile(const TCHAR *strFileName, int bufferNum);
 	HRESULT			PlaySound(int bufferNum, BOOL bLooped); 
 	HRESULT			InitDirectSound( HWND hDlg );
 	HRESULT			FreeDirectSound();
-	VOID			LoadWaveFile( TCHAR* strFileName, int bufferNum );
+	VOID			LoadWaveFile( const TCHAR* strFileName, int bufferNum );
 
-	HRESULT			CreateStaticBuffer( TCHAR* strFileName );
+	HRESULT			CreateStaticBuffer( const TCHAR* strFileName );
 	HRESULT			FillBuffer(int bufferNum);
 	BOOL			IsBufferPlaying(int bufferNum); 
 	HRESULT			PlayBuffer( BOOL bLooped, int bufferNum );

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <tchar.h>
 #include <windows.h>
 #include "world.hpp"
 #include "chjutils.h"
@@ -15,7 +16,7 @@ static int PrintMsgY = 10;
 void PrintMessage(HWND hwnd, const TCHAR *message1, const TCHAR *message2, int message_mode)
 {
 	FILE *fp = NULL;
-	char tmessage[1000];
+	TCHAR tmessage[1000];
 
 
 	if((message1 == NULL) && (message2 == NULL))
@@ -23,45 +24,45 @@ void PrintMessage(HWND hwnd, const TCHAR *message1, const TCHAR *message2, int m
 
 	if((message1 != NULL) && (message2 != NULL))
 	{
-		strcpy_s(tmessage, message1);
-		strcat_s(tmessage, message2);
+		_tcscpy_s(tmessage, message1);
+		_tcscat_s(tmessage, message2);
 	}
 	else
 	{
 		if(message1 != NULL) 
-			strcpy_s(tmessage, message1);
+			_tcscpy_s(tmessage, message1);
 
 		if(message2 != NULL) 
-			strcpy_s(tmessage, message2);
+			_tcscpy_s(tmessage, message2);
 	}
 
 
 	if(logfile_start_flag == TRUE)
 	{
-		fopen_s(&fp, "rrlogfile.txt","w");
-		fprintf( fp, "%s\n\n", "RR Logfile");
+		_tfopen_s(&fp, _T("rrlogfile.txt"), _T("w"));
+		_ftprintf_s( fp, _T("%s\n\n"), _T("RR Logfile"));
 	}
 	else
 	{
-		fopen_s(&fp, "rrlogfile.txt","a");
+		_tfopen_s(&fp, _T("rrlogfile.txt"), _T("a"));
 	}
 
 	logfile_start_flag = FALSE;
 
 	if(fp == NULL)
 	{     
-		MessageBoxA(hwnd, "Can't load logfile", "File Error", MB_OK);
+		MessageBox(hwnd, _T("Can't load logfile"), _T("File Error"), MB_OK);
 		fclose(fp);
 		return;
 	}
 
-	fprintf( fp, " %s\n", tmessage );
+	_ftprintf( fp, _T(" %s\n"), tmessage );
 
 
 	if(message_mode != LOGFILE_ONLY)
 	{
 		HDC hdc=GetDC(hwnd);
-		TextOutA(hdc,PrintMsgX,PrintMsgY, tmessage,strlen(tmessage));
+		TextOut(hdc,PrintMsgX,PrintMsgY, tmessage, _tcslen(tmessage));
 		PrintMsgY +=20;
 		ReleaseDC(hwnd,hdc);
 	}
@@ -73,39 +74,39 @@ void PrintMessage(HWND hwnd, const TCHAR *message1, const TCHAR *message2, int m
 void PrintMemAllocated(int mem, const TCHAR *message)
 {
 	FILE *fp = NULL;
-	char buffer[1000];
-	char buffer2[1000];
+	TCHAR buffer[1000];
+	TCHAR buffer2[1000];
 	int mem_kb;
 
 	if(logfile_start_flag == TRUE)
 	{
-		fopen_s(&fp, "rrlogfile.txt","w");
-		fprintf( fp, "%s\n\n", "RR Logfile");
+		_tfopen_s(&fp, _T("rrlogfile.txt"), _T("w"));
+		_ftprintf_s( fp, _T("%s\n\n"), _T("RR Logfile"));
 	}
 	else
 	{
-		fopen_s(&fp, "rrlogfile.txt","a");
+		_tfopen_s(&fp, _T("rrlogfile.txt"), _T("a"));
 	}
 
 	logfile_start_flag = FALSE;
 
 	if(fp == NULL)
 	{     
-		MessageBoxA(NULL,"Can't load logfile","File Error",MB_OK);
+		MessageBox(NULL, _T("Can't load logfile"), _T("File Error"),MB_OK);
 		fclose(fp);
 		return;
 	}
 
-	strcpy_s(buffer, "memory allocated for ");
-	strcat_s(buffer, message);
-	strcat_s(buffer, " = ");
+	_tcscpy_s(buffer, _T("memory allocated for "));
+	_tcscat_s(buffer, message);
+	_tcscat_s(buffer, _T(" = "));
 
 	mem_kb = mem / 1024;
-	_itoa_s(mem_kb, buffer2, 10);
-	strcat_s(buffer, buffer2);
-	strcat_s(buffer, " KB");
+	_itot_s(mem_kb, buffer2, 10);
+	_tcscat_s(buffer, buffer2);
+	_tcscat_s(buffer, _T(" KB"));
 
-	fprintf( fp, " %s\n", buffer );
+	_ftprintf( fp, _T(" %s\n"), buffer );
 
 	total_allocated_memory_count += mem;
 

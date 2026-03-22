@@ -94,7 +94,7 @@ int num_light_sources;
 
 CMyD3DApplication* pCMyApp;
 
-void PrintMemAllocated(int mem, char *message);
+//void PrintMemAllocated(int mem, char *message); // declared in chjutils.h
 VOID DisplayError( CHAR* strMessage );
 
 
@@ -740,7 +740,7 @@ void CMyD3DApplication::ObjectToD3DVertList(int ob_type, int angle, int oblist_i
 		num_dp_commands_in_scene ++;
 
 		if((poly_command < 0) || (poly_command > 6))
-			PrintMessage(NULL, "CMyD3DApplication::ObjectToD3DVertList -  ERROR UNRECOGNISED COMMAND", NULL , LOGFILE_ONLY);
+			PrintMessage(NULL, _T("CMyD3DApplication::ObjectToD3DVertList -  ERROR UNRECOGNISED COMMAND"), NULL , LOGFILE_ONLY);
 
 	} // end for w
 
@@ -853,7 +853,7 @@ void CMyD3DApplication::InitRRvariables()
 	dy = (float)(szClient.bottom - szClient.top);
 	ASPECT_RATIO = 1.0f;
 
-	PrintMessage(NULL, "CMyD3DApplication::InitRRvariables - starting", NULL, LOGFILE_ONLY);
+	PrintMessage(NULL, _T("CMyD3DApplication::InitRRvariables - starting"), NULL, LOGFILE_ONLY);
 
 	walk_mode_enabled = TRUE;
 	current_gun = 0;
@@ -944,30 +944,30 @@ void CMyD3DApplication::InitRRvariables()
 	your_gun[1].sound_id = SND_FIRE_MP5;
 	current_gun = 0;
 
-	PrintMemAllocated(sizeof(OBJECTLIST[10000]), "oblist"); 
-	PrintMemAllocated(sizeof(OBJECTDATA[100]), "obdata"); 
+	PrintMemAllocated(sizeof(OBJECTLIST[10000]), _T("oblist")); 
+	PrintMemAllocated(sizeof(OBJECTDATA[100]), _T("obdata")); 
 
-	PrintMemAllocated(sizeof(D3DVERTEX[MAX_NUM_VERTICES]), "src_v"); 
+	PrintMemAllocated(sizeof(D3DVERTEX[MAX_NUM_VERTICES]), _T("src_v")); 
 
-	PrintMemAllocated(sizeof(PLAYER[10]), "player_list"); 
-	PrintMemAllocated(sizeof(PLAYER[10]), "car_list"); 
-	PrintMemAllocated(sizeof(PLAYER[10]), "debug"); 
-	PrintMemAllocated(sizeof(GUNLIST[10]), "your_gun"); 
-	PrintMemAllocated(sizeof(GUNLIST[10]), "other_players_guns"); 
-	PrintMemAllocated(sizeof(PLAYERMODELDATA[10]),"pmdata"); 
+	PrintMemAllocated(sizeof(PLAYER[10]), _T("player_list")); 
+	PrintMemAllocated(sizeof(PLAYER[10]), _T("car_list")); 
+	PrintMemAllocated(sizeof(PLAYER[10]), _T("debug")); 
+	PrintMemAllocated(sizeof(GUNLIST[10]), _T("your_gun")); 
+	PrintMemAllocated(sizeof(GUNLIST[10]), _T("other_players_guns")); 
+	PrintMemAllocated(sizeof(PLAYERMODELDATA[10]),_T("pmdata")); 
 
-	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), "poly_clip_flags"); 
-	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), "poly_clip"); 
-	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), "dp_command_index_mode"); 
-	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), "dp_commands"); 
-	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), "verts_per_poly"); 
-	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), "faces_per_poly"); 
-	PrintMemAllocated(sizeof(int[MAX_NUM_FACE_INDICES]), "src_f"); 
+	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), _T("poly_clip_flags")); 
+	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), _T("poly_clip")); 
+	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), _T("dp_command_index_mode")); 
+	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), _T("dp_commands")); 
+	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), _T("verts_per_poly")); 
+	PrintMemAllocated(sizeof(int[MAX_NUM_QUADS]), _T("faces_per_poly")); 
+	PrintMemAllocated(sizeof(int[MAX_NUM_FACE_INDICES]), _T("src_f")); 
 
-	PrintMemAllocated(sizeof(BOOL[MAX_NUM_QUADS]), "oblist_overdraw_flags");
-	PrintMemAllocated(sizeof(BOOL[MAX_NUM_QUADS]), "oblist_overlite_flags");
+	PrintMemAllocated(sizeof(BOOL[MAX_NUM_QUADS]), _T("oblist_overdraw_flags"));
+	PrintMemAllocated(sizeof(BOOL[MAX_NUM_QUADS]), _T("oblist_overlite_flags"));
 
-	PrintMemAllocated(total_allocated_memory_count, "TOTAL"); 
+	PrintMemAllocated(total_allocated_memory_count, _T("TOTAL")); 
 
 }
 
@@ -978,27 +978,27 @@ void CMyD3DApplication::InitRRvariables()
 
 BOOL CMyD3DApplication::LoadRR_Resources()
 {
-	if (!pCWorld->LoadObjectData(m_hWnd,"objects.dat"))
+	if (!pCWorld->LoadObjectData(m_hWnd,_T("objects.dat")))
 	{
-		PrintMessage(m_hWnd, "LoadObjectData failed", NULL, LOGFILE_ONLY);
+		PrintMessage(m_hWnd, _T("LoadObjectData failed"), NULL, LOGFILE_ONLY);
 		return FALSE;
 	}
 
-	if (!pCWorld->LoadWorldMap  (m_hWnd,"level1.map"))
+	if (!pCWorld->LoadWorldMap  (m_hWnd,_T("level1.map")))
 	{
-		PrintMessage(m_hWnd, "LoadWorldMap failed", NULL, LOGFILE_ONLY);
+		PrintMessage(m_hWnd, _T("LoadWorldMap failed"), NULL, LOGFILE_ONLY);
 		return FALSE;
 	}
 
-	if (!pCWorld->InitPreCompiledWorldMap(m_hWnd,"level1.cmp"))
+	if (!pCWorld->InitPreCompiledWorldMap(m_hWnd,_T("level1.cmp")))
 	{
-		PrintMessage(m_hWnd, "InitPreCompiledWorldMap failed", NULL, LOGFILE_ONLY);
+		PrintMessage(m_hWnd, _T("InitPreCompiledWorldMap failed"), NULL, LOGFILE_ONLY);
 		return FALSE;
 	}	
 
-	if (!pCWorld->LoadImportedModelList(m_hWnd,"modellist.dat"))
+	if (!pCWorld->LoadImportedModelList(m_hWnd,_T("modellist.dat")))
 	{
-		PrintMessage(m_hWnd, "LoadImportedModelList failed", NULL, LOGFILE_ONLY);
+		PrintMessage(m_hWnd, _T("LoadImportedModelList failed"), NULL, LOGFILE_ONLY);
 		return FALSE;
 	}
 
@@ -1163,7 +1163,7 @@ HRESULT CMyD3DApplication::Render()
 	if(rendering_first_frame == TRUE)
 	{
 		RRAppActive = TRUE;
-		PrintMessage(m_hWnd, "RenderScene : rendering first frame", NULL, LOGFILE_ONLY);
+		PrintMessage(m_hWnd, _T("RenderScene : rendering first frame"), NULL, LOGFILE_ONLY);
 	}
 
 
@@ -1398,7 +1398,7 @@ HRESULT CMyD3DApplication::Render()
 
 	if(number_of_polys_per_frame == 0)
 	{
-		PrintMessage(NULL, "number_of_polys_per_frame = 0", NULL, LOGFILE_ONLY);
+		PrintMessage(NULL, _T("number_of_polys_per_frame = 0"), NULL, LOGFILE_ONLY);
 		return TRUE;
 	}
 	car_speed=(float)0;
@@ -1407,13 +1407,13 @@ HRESULT CMyD3DApplication::Render()
 	hr = m_pd3dDevice->BeginScene();
 	if (hr != D3D_OK)
 	{
-		PrintMessage(NULL, "BeginScene : FAILED", NULL, LOGFILE_ONLY);
+		PrintMessage(NULL, _T("BeginScene : FAILED"), NULL, LOGFILE_ONLY);
 		return FALSE;
 	}
 
 	if (m_pd3dDevice->SetClipStatus(&status) != D3D_OK)
 	{
-		PrintMessage(NULL, "SetClipStatus : FAILED", NULL, LOGFILE_ONLY);
+		PrintMessage(NULL, _T("SetClipStatus : FAILED"), NULL, LOGFILE_ONLY);
 		return FALSE; 
 	}
 
@@ -1435,7 +1435,7 @@ HRESULT CMyD3DApplication::Render()
 			if (m_pd3dDevice->DrawPrimitive(dp_commands[i], D3DFVF_VERTEX, 
 				(LPVOID)&src_v[vert_index], verts_per_poly[i], NULL) != D3D_OK) 
 			{
-				PrintMessage(NULL, "CMyD3DApplication::Render - DrawPrimitive FAILED", NULL, LOGFILE_ONLY);		
+				PrintMessage(NULL, _T("CMyD3DApplication::Render - DrawPrimitive FAILED"), NULL, LOGFILE_ONLY);		
 				return FALSE;
 			}
 			vert_index += verts_per_poly[i];
@@ -1463,7 +1463,7 @@ HRESULT CMyD3DApplication::Render()
 				dwIndexCount, 
 				NULL) != D3D_OK) 
 			{
-				PrintMessage(NULL, "CMyD3DApplication::Render - DrawPrimitive FAILED", NULL, LOGFILE_ONLY);		
+				PrintMessage(NULL, _T("CMyD3DApplication::Render - DrawPrimitive FAILED"), NULL, LOGFILE_ONLY);		
 				return FALSE;
 			}
 
@@ -1477,19 +1477,19 @@ HRESULT CMyD3DApplication::Render()
 	if(rendering_first_frame == TRUE)
 	{
 		_itot_s(number_of_polys_per_frame, buffer, 10);
-		PrintMessage(NULL, "num_poly = ", buffer, LOGFILE_ONLY);	
+		PrintMessage(NULL, _T("num_poly = "), buffer, LOGFILE_ONLY);	
 	}
 
 	if (m_pd3dDevice->GetClipStatus(&status) != D3D_OK)
 	{
-		PrintMessage(NULL, "GetClipStatus : FAILED", NULL, LOGFILE_ONLY);
+		PrintMessage(NULL, _T("GetClipStatus : FAILED"), NULL, LOGFILE_ONLY);
 		return FALSE; 
 	}
 
 	hr = m_pd3dDevice->EndScene();
 	if (hr != D3D_OK)
 	{
-		PrintMessage(NULL, "EndScene : FAILED", NULL, LOGFILE_ONLY);
+		PrintMessage(NULL, _T("EndScene : FAILED"), NULL, LOGFILE_ONLY);
 		return FALSE;
 	}
 

@@ -26,7 +26,7 @@ public:
 	BOOL LoadImportedModelList(HWND hwnd, const TCHAR *filename);
 	void LoadYourGunAnimationSequenceList(int model_id);	
 	void LoadPlayerAnimationSequenceList(int model_id);
-	void LoadDebugAnimationSequenceList(HWND hwnd, char *filename, int model_id);	
+	void LoadDebugAnimationSequenceList(HWND hwnd, const TCHAR *filename, int model_id);	
 };
 
 #endif //__LOADWORLD_H

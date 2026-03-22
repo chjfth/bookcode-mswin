@@ -35,14 +35,14 @@ DWORD               g_dwBufferBytes;
 // Name: LoadWaveFile()
 // Desc: Loads the wave file into a secondary static DirectSound buffer
 //-----------------------------------------------------------------------------
-VOID CMyD3DApplication::LoadWaveFile( TCHAR* strFileName, int bufferNum )
+VOID CMyD3DApplication::LoadWaveFile( const TCHAR* strFileName, int bufferNum )
 {
-	PrintMessage(NULL, "Loading sound ", strFileName, LOGFILE_ONLY);
+	PrintMessage(NULL, _T("Loading sound "), strFileName, LOGFILE_ONLY);
     
     // Create the sound buffer object from the wave file data
     if( FAILED( CreateStaticBuffer( strFileName ) ) )
     {        
-		PrintMessage(NULL, "LoadWaveFile() - FAILED", NULL, LOGFILE_ONLY);
+		PrintMessage(NULL, _T("LoadWaveFile() - FAILED"), NULL, LOGFILE_ONLY);
     }
     else // The sound buffer was successfully created
     {
@@ -55,7 +55,7 @@ VOID CMyD3DApplication::LoadWaveFile( TCHAR* strFileName, int bufferNum )
 // Name: OpenSoundFile()
 // Desc: Called when the user requests to open a sound file
 //-----------------------------------------------------------------------------
-VOID CMyD3DApplication::OpenSoundFile(TCHAR *strFileName, int bufferNum)
+VOID CMyD3DApplication::OpenSoundFile(const TCHAR *strFileName, int bufferNum)
 {
     LoadWaveFile(strFileName, bufferNum);
 }
@@ -180,7 +180,7 @@ HRESULT CMyD3DApplication::FreeDirectSound()
 // Name: CreateStaticBuffer()
 // Desc: Creates a wave file, sound buffer and notification events 
 //-----------------------------------------------------------------------------
-HRESULT CMyD3DApplication::CreateStaticBuffer( TCHAR* strFileName )
+HRESULT CMyD3DApplication::CreateStaticBuffer( const TCHAR* strFileName )
 {
     HRESULT hr; 
 
@@ -190,7 +190,7 @@ HRESULT CMyD3DApplication::CreateStaticBuffer( TCHAR* strFileName )
     // Load the wave file
     if( FAILED( g_pWaveSoundRead->Open( strFileName ) ) )
     {
-		PrintMessage(NULL, "Bad wave file", NULL, LOGFILE_ONLY);
+		PrintMessage(NULL, _T("Bad wave file"), NULL, LOGFILE_ONLY);
     }
 
     // Set up the direct sound buffer, and only request the flags needed
@@ -367,7 +367,7 @@ HRESULT CMyD3DApplication::SetFrequency(int bufferNum, int frequency )
  
     if( FAILED( hr = g_pDSBuffer[1]->SetFrequency( (DWORD)frequency ) ) )
     {
-		PrintMessage(NULL, "CD3DApplication::SetFrequency - FAILED", NULL, LOGFILE_ONLY);
+		PrintMessage(NULL, _T("CD3DApplication::SetFrequency - FAILED"), NULL, LOGFILE_ONLY);
 		return hr;
 	}
 

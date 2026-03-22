@@ -27,6 +27,10 @@
 
 #include <dsound.h> // Book code buggy requirement, must be place after all DX headers.
 
+#ifdef UNICODE
+#error This project compiles only for "Debug ANSI". To compile for "Debug"(Unicode), use Chap6_chj instead.
+#endif
+
 
 //-----------------------------------------------------------------------------
 // Defines, constants, and global variables

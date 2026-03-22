@@ -44,7 +44,7 @@ int total_num_frames = 1;
 FACE3DS				faces	 [MAX_NUM_3DS_FACES];
 float				fverts	 [MAX_NUM_3DS_VERTICES][3];
 
-TCHAR material_list[MAX_NUM_3DS_TEXTURES][MAX_NAME_LENGTH];
+char material_list[MAX_NUM_3DS_TEXTURES][MAX_NAME_LENGTH]; // not TCHAR
 
 int	num_verts_in_object[MAX_NUM_3DS_OBJECTS];
 int	num_faces_in_object[MAX_NUM_3DS_OBJECTS];
@@ -77,7 +77,7 @@ BOOL C3DS::Import3DS(HWND hwnd, const TCHAR *filename, int pmodel_id, float scal
 	int num_frames;
 	int datfile_vert_cnt;
 	int quad_cnt=0;
-	unsigned short	command;
+	unsigned short	command = 0;
 	char temp;
 	float tx, ty, tz;
 	float angle;
@@ -993,7 +993,7 @@ void C3DS::AddMaterialName(HWND hwnd, FILE *fp)
 {	
 	int	i; 
 	BOOL error = TRUE;
-	TCHAR mat_name[256] = {};
+	char mat_name[256] = {};
 
 	for (i = 0; i < 256; i++)
 	{
@@ -1008,24 +1008,27 @@ void C3DS::AddMaterialName(HWND hwnd, FILE *fp)
 	if(error == TRUE)
 	{
 		MessageBox(hwnd, _T("Error : AddMaterialName"), NULL, MB_OK);
-		_tcscpy_s(material_list[num_materials], _T("error"));
+		strcpy_s(material_list[num_materials], "error");
 		return;
 	}
 
 	if(bEnable3dsLogfile)
-		_ftprintf_s(logfile, _T("MAT_NAME01  %s\n"), mat_name);
+		fprintf_s(logfile, "MAT_NAME01  %s\n", mat_name);
 	
-	_tcscpy_s(material_list[num_materials], mat_name) ;
+	strcpy_s(material_list[num_materials], mat_name) ;
 	num_materials++;
 }
 
 void C3DS::ProcessMaterialData(HWND hwnd, FILE *fp, int pmodel_id)
 {
+	// Chj memo: fp refers to jeep2.3ds etc, fopen-ed as "rb" (binary stream).
+	// Chap6's ProcessMaterialData is just a skeleton, book author will add more code later.
+
 	int	i; 
-	short findex;
-	unsigned short num_faces;
+	short findex = 0;
+	unsigned short num_faces = 0;
 	BOOL error = TRUE;
-	char mat_name[256];
+	char mat_name[256]={}; // Chj todo: This processes byte stream
 
 
 	for (i = 0; i < 256; i++)
@@ -1035,9 +1038,11 @@ void C3DS::ProcessMaterialData(HWND hwnd, FILE *fp, int pmodel_id)
 			break;
 	}
 
+	// Chj memo: mat_name is sth like "Material #1"
+
 	for (i = 0; i < MAX_NUM_3DS_TEXTURES; i++)
 	{
-		if(_tcsicmp(mat_name, material_list[i]) == 0)
+		if(strcmp(mat_name, material_list[i]) == 0)
 		{
 			error = FALSE;
 			break;
@@ -1047,18 +1052,18 @@ void C3DS::ProcessMaterialData(HWND hwnd, FILE *fp, int pmodel_id)
 	if(error == TRUE)
 	{
 		MessageBox(hwnd, _T("Error : ProcessMaterialData"), NULL, MB_OK);
-		_tcscpy_s(material_list[num_materials], _T("error"));
+		strcpy_s(material_list[num_materials], "error");
 		return;
 	}
 
 	fread(&num_faces, sizeof(num_faces), 1, fp);
 
 	if(bEnable3dsLogfile)
-		_ftprintf_s(logfile, _T("TRIANGLE_MATERIAL %d\n"), num_faces);
+		fprintf_s(logfile, "TRIANGLE_MATERIAL %d\n", num_faces);
 
 	for (i = 0; i < num_faces; i++)
 	{
-		fread(&findex, sizeof(short), 1, fp);
+		fread(&findex, sizeof(short), 1, fp); // Chj Q: read and discard??
 	}
 	return;
 }
