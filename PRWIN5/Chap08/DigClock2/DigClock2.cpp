@@ -35,10 +35,11 @@ Since 2024.10:
 #include "iversion.h"
 #include "utils.h"
 
+#include <mswin/WM_MOUSELEAVE_helper.h>
 
 #define Editbox_EnableKbdAdjustNumber_IMPL
 #define Editbox_EnableKbdAdjustNumber_DEBUG
-#include <mswin/Editbox_EnableKbdAdjustNumber.h>
+#include <mswin/Editbox_EnableKbdAdjustIntnum.h>
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -87,8 +88,6 @@ DWORD g_msectick_start = 0; // value from GetTickCount()
 
 HWND g_hdlgCountdownCfg;
 
-POINT g_ptClickCountDown;
-
 SIZE g_init_clisize = {192, 60}; // Initial main-window client-area size
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
@@ -106,7 +105,7 @@ static bool s_is_dragging = false;
 static bool s_is_moved = false;
 static int s_idxcolor = 0;
 
-static bool s_isScratchingMainWindow = false;
+static CWmMouseleaveHelper s_mouselvp;
 
 // Global vars for WndProc <<<
 
@@ -479,6 +478,8 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 
 	Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
 
+	s_mouselvp.SetHwnd(hwnd);
+
 	ReloadSetting(hwnd);
 
 	return TRUE; // create ok
@@ -555,24 +556,11 @@ void Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
 
 	// Handle Countdown-cfg panel show/hide
 
-	if(!s_isScratchingMainWindow)
+	CWmMouseleaveHelper::Move_ret moveret = s_mouselvp.do_WM_MOUSEMOVE();
+	if(moveret==CWmMouseleaveHelper::JustEntered)
 	{
-		// Establish WM_MOUSELEAVE tracking.
-		TRACKMOUSEEVENT tme = {sizeof(tme), TME_LEAVE, hwnd};
-		TrackMouseEvent(&tme);
-
-		POINT ptnow = {};
-		GetCursorPos(&ptnow);
-
 		if(g_ClockMode==CM_Countdown)
-		{
-			if(!(ptnow.x==g_ptClickCountDown.x && ptnow.y==g_ptClickCountDown.y))
-			{
-				s_isScratchingMainWindow = true;
-
-				Show_CountdownCfg();
-			}
-		}
+			Show_CountdownCfg();
 	}
 }
 
@@ -583,7 +571,7 @@ void My_OnMouseLeave(HWND hwnd)
 	// Note: If the mouse is over the cfg panel, WM_MOUSELEAVE *is* generated,
 	// but we should *not* consider it outside(=should not hide the panel).
 
-	s_isScratchingMainWindow = false;
+	s_mouselvp.do_WM_MOUSELEAVE();
 
 	if(!Is_MouseInClientRect(hwnd)) // mouse outside
 	{
@@ -732,6 +720,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HANDLE_MSG(hwnd, WM_PAINT, Cls_OnPaint);
 		
 		HANDLE_MSG(hwnd, WM_LBUTTONDOWN, Cls_OnLButtonDown);
+
 		HANDLE_MSG(hwnd, WM_MOUSEMOVE, Cls_OnMouseMove);
 		case WM_MOUSELEAVE: 
 			My_OnMouseLeave(hwnd);
@@ -760,7 +749,7 @@ BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
 
 	HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
-	Editbox_EnableKbdAdjustNumber(hEdit, 0, 59, 1, true, 2);
+	Editbox_EnableKbdAdjustIntnum(hEdit, 0, 59, 1, true, 2);
 
 	// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
 	int textlen = GetWindowTextLength (hEdit);
@@ -793,7 +782,6 @@ void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 		// Restart timer to align timing boundary.
 		SetTimer(hwndMain, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL);
 
-		GetCursorPos(&g_ptClickCountDown);
 		Hide_CountdownCfg();
 
 		SetDlgItemText(hDlg, IDB_StartCountDown, _T("Restart countdown"));
