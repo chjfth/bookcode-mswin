@@ -15,6 +15,10 @@
 #define IDM_HELP                        4001
 #define IDM_CLICK_CHANGE_COLOR          4002
 #define IDM_SHOW_TITLE                  4003
+#define IDM_MYPOPUP_SHOWDATE            32771
+#define IDM_SHOWDATE_NO                 32772
+#define IDM_SHOWDATE_YES                32773
+#define IDM_SHOWDATE_TIMEZONE           32774
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -23,7 +27,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        129
-#define _APS_NEXT_COMMAND_VALUE         32771
+#define _APS_NEXT_COMMAND_VALUE         32776
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

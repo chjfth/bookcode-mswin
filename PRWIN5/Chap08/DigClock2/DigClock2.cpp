@@ -75,10 +75,16 @@ void ShowHelp(HWND hwndParent)
 
 #define LESS_1millisec 1
 
+#define LOGICX_HHMMSS 276
+#define LOGICY_HHMMSS 72
+#define LOGICY_DATE 24  // since v1.8, show a date-bar at bottom
+
 HINSTANCE g_hInstance;
 
 BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
+
+BOOL g_isShowDate = 0;
 
 enum ClockMode_et { CM_WallTime=0, CM_Countdown=1 } g_ClockMode;
 
@@ -88,9 +94,8 @@ DWORD g_msectick_start = 0; // value from GetTickCount()
 
 HWND g_hdlgCountdownCfg;
 
-SIZE g_init_clisize = {192, 60}; // Initial main-window client-area size
-
-LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
+const int g_init_client_cx = 188; // Initial main-window client-area size(96dpi pixels)
+int g_now_client_cx;
 
 // Global vars for WndProc() >>>
 
@@ -124,6 +129,14 @@ bool SomeInit()
 
 	return true;
 }
+
+inline int clock_cy_from_cx(int cx)
+{
+	int logicy = LOGICY_HHMMSS + (g_isShowDate ? LOGICY_DATE : 0);
+	return cx * logicy / LOGICX_HHMMSS;
+}
+
+LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
@@ -161,10 +174,12 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		szAppName, TEXT ("Digital Clock"),
 		WS_POPUPWINDOW, // will set more styles in Hwnd_ShowTitle()
 		mousepos.x, mousepos.y,
-		g_init_clisize.cx, g_init_clisize.cy, // CW_USEDEFAULT, CW_USEDEFAULT, 
+		g_init_client_cx, clock_cy_from_cx(g_init_client_cx), // CW_USEDEFAULT, CW_USEDEFAULT, 
 		NULL, NULL, hInstance, NULL) ;
 	//
-	MyAdjustClientSize(hwnd, false, g_init_clisize.cx, g_init_clisize.cy, true);
+	MyAdjustClientSize(hwnd, false, g_init_client_cx, clock_cy_from_cx(g_init_client_cx), 
+		true // true: scale by XP-style-DPI.
+		);
 
 	g_hdlgCountdownCfg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwnd, Dlgproc_CountdownCfg);
 	assert(g_hdlgCountdownCfg);
@@ -375,6 +390,11 @@ void DisplayCountDown(HDC hdc)
 
 void RefreshTheClock(HDC hdc)
 {
+	HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
+
+	SelectObject (hdc, GetStockObject (NULL_PEN)) ;
+	SelectObject (hdc, hbrush) ;
+
 //	vaDbg(_T("RefreshTheClock()..."));
 	if(g_ClockMode==CM_WallTime)
 		DisplayWallTime (hdc, g_f24Hour, g_fSuppressHighDigit) ;
@@ -382,6 +402,44 @@ void RefreshTheClock(HDC hdc)
 		DisplayCountDown(hdc);
 	else
 		assert(0);
+
+	SelectObject(hdc, GetStockBrush(WHITE_BRUSH));
+	DeleteObject(hbrush);
+}
+
+void RefreshDateBar(HDC hdc)
+{
+	if(!g_isShowDate)
+		return;
+
+	LOGFONT lf = {};
+	lf.lfHeight = - LOGICY_DATE;
+	lf.lfWeight = 900; // make it bold
+	lf.lfPitchAndFamily = FIXED_PITCH|FF_ROMAN;
+	HFONT hfont = CreateFontIndirect(&lf);
+	assert(hfont);
+	SelectObject(hdc, hfont);
+
+	RECT rc = {0, LOGICY_HHMMSS,  LOGICX_HHMMSS, LOGICY_HHMMSS+LOGICY_DATE};
+
+	// Set background/foreground color, the inverse of HH:MM:SS
+
+	HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
+	FillRect(hdc, &rc, hbrush);
+
+	SYSTEMTIME st = {};
+	GetLocalTime(&st);
+	TCHAR szDate[40];
+	int slen = _sntprintf_s(szDate, _TRUNCATE, _T("%04d-%02d-%02d"), st.wYear, st.wMonth, st.wDay);
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, RGB(255,255,255));
+	DrawText(hdc, szDate, slen, &rc, DT_CENTER);
+
+	SelectObject(hdc, GetStockFont(SYSTEM_FONT));
+	DeleteObject(hfont);
+	SelectObject(hdc, GetStockBrush(WHITE_BRUSH));
+	DeleteObject(hbrush);
+
 }
 
 void ReloadSetting(HWND hwnd)
@@ -504,24 +562,28 @@ void Cls_OnPaint(HWND hwnd)
 	GetClientRect(hwnd, &rccli);
 	FillRect(hdc, &rccli, GetStockBrush(WHITE_BRUSH));
 
-	HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
+	const int logicx = LOGICX_HHMMSS;
+	const int logicy = clock_cy_from_cx(logicx);
 
 	SetMapMode (hdc, MM_ISOTROPIC) ;
-	SetWindowExtEx (hdc, 276, 72, NULL) ;
+	SetWindowExtEx (hdc, logicx, logicy, NULL) ;
 	SetViewportExtEx (hdc, s_cxClient, s_cyClient, NULL) ;
 
-	SetWindowOrgEx (hdc, 138, 36, NULL) ;
+	SetWindowOrgEx (hdc, logicx/2-1, logicy/2-1, NULL) ;
 	SetViewportOrgEx (hdc, s_cxClient / 2, s_cyClient / 2, NULL) ;
 
-	SelectObject (hdc, GetStockObject (NULL_PEN)) ;
-	SelectObject (hdc, hbrush) ;
+	// learn by debug
+	SIZE extWinChk = {}, extVptChk = {};
+	GetWindowExtEx(hdc, &extWinChk);   // [WinXP] extWinChk will always =SetWindowExtEx's
+	assert(extWinChk.cx==logicx && extWinChk.cy==logicy);
+	GetViewportExtEx(hdc, &extVptChk); // [WinXP] one of extVptChk.cx, extVptChk.cy may differ to SetViewportExtEx's
+	//
+	g_now_client_cx = extVptChk.cx;
 
+	RefreshDateBar(hdc);
 	RefreshTheClock(hdc); 
 
 	EndPaint_NoFlicker(hwnd, &ps) ;
-
-	SelectObject(hdc, GetStockBrush(WHITE_BRUSH));
-	DeleteObject(hbrush);
 }
 
 void Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
@@ -630,23 +692,38 @@ void Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags
 void Cls_OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
 {
 	HMENU hmenuPopup = hMenu;
-	if(hmenuPopup!=s_popmenu)
-		return;
+	if(hmenuPopup==s_popmenu)
+	{
+		CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
+			g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
 
-	CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
-		g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
+		EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
+			g_seconds_remain>0 ? MF_ENABLED: MF_GRAYED);
 
-	EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
-		g_seconds_remain>0 ? MF_ENABLED: MF_GRAYED);
+		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
+			s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
 
-	CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
-		s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
+		CheckMenuItem(hmenuPopup, IDM_CLICK_CHANGE_COLOR, 
+			s_is_change_color ? MF_CHECKED : MF_UNCHECKED);
 
-	CheckMenuItem(hmenuPopup, IDM_CLICK_CHANGE_COLOR, 
-		s_is_change_color ? MF_CHECKED : MF_UNCHECKED);
+		CheckMenuItem(hmenuPopup, IDM_SHOW_TITLE, 
+			s_is_show_title ? MF_CHECKED : MF_UNCHECKED);
+	}
+	else
+	{
+		// Consider it the "Show Date" popup.
 
-	CheckMenuItem(hmenuPopup, IDM_SHOW_TITLE, 
-		s_is_show_title ? MF_CHECKED : MF_UNCHECKED);
+		MENUITEMINFO mii = {sizeof(mii)};
+		mii.fMask = MIIM_ID;
+		BOOL b = GetMenuItemInfo(hmenuPopup, 0, TRUE, &mii);
+		assert(mii.wID==IDM_SHOWDATE_NO); // first item show be IDM_SHOWDATE_NO
+
+		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_NO, 
+			g_isShowDate ? MF_UNCHECKED : MF_CHECKED);
+
+		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_YES,
+			g_isShowDate ? MF_CHECKED : MF_UNCHECKED);
+	}
 }
 
 void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
@@ -678,6 +755,18 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	{
 		s_is_change_color = !s_is_change_color;
 	}
+	else if(cmdid==IDM_SHOWDATE_NO)
+	{
+		g_isShowDate = FALSE;
+		MyAdjustClientSize(hwnd, s_is_show_title,
+			g_now_client_cx, clock_cy_from_cx(g_now_client_cx), false);
+	}
+	else if(cmdid==IDM_SHOWDATE_YES)
+	{
+		g_isShowDate = TRUE;
+		MyAdjustClientSize(hwnd, s_is_show_title,
+			g_now_client_cx, clock_cy_from_cx(g_now_client_cx), false);
+	}
 	else if(cmdid==IDM_SHOW_TITLE)
 	{
 		s_is_show_title = !s_is_show_title;
@@ -694,7 +783,7 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	else if(cmdid==IDM_RESET_SIZE)
 	{
 		MyAdjustClientSize(hwnd, s_is_show_title, 
-			g_init_clisize.cx, g_init_clisize.cy, true);
+			g_init_client_cx, clock_cy_from_cx(g_init_client_cx), true);
 	}
 	else if(cmdid==IDM_EXIT)
 	{

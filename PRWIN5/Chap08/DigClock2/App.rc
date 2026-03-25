@@ -46,6 +46,12 @@ BEGIN
         MENUITEM "Stop countdown",              IDM_STOP_COUNTDOWN
         MENUITEM "&Always on Top",              IDM_ALWAYS_ON_TOP
         MENUITEM "&Click to change color",      IDM_CLICK_CHANGE_COLOR
+        POPUP "Show Date"
+        BEGIN
+            MENUITEM "No",                          IDM_SHOWDATE_NO
+            MENUITEM "Yes",                         IDM_SHOWDATE_YES
+            MENUITEM "Yes + Timezone",              IDM_SHOWDATE_TIMEZONE
+        END
         MENUITEM "&Show text title",            IDM_SHOW_TITLE
         MENUITEM "&Reset window size",          IDM_RESET_SIZE
         MENUITEM "&Minimize window",            IDM_MINIMIZE_WINDOW
