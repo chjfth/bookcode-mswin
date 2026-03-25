@@ -2,20 +2,6 @@
 
 double g_sysdpiScaling = 1.0;
 
-const TCHAR *GetExeFilename()
-{
-	static TCHAR exepath[MAX_PATH] = _T("Unknown exepath");
-	GetModuleFileName(NULL, exepath, ARRAYSIZE(exepath));
-
-	const TCHAR *pfilename = StrRChr(exepath, NULL, _T('\\'));
-	if(pfilename && pfilename[1])
-		pfilename++;
-	else
-		pfilename = exepath;
-
-	return pfilename;
-}
-
 void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop)
 {
 	SetWindowPos(hwnd, 
@@ -111,6 +97,11 @@ void MyAdjustClientSize(HWND hwnd, bool istitle, int cli_width, int cli_height,
 		rectNewFrame.bottom-rectNewFrame.top + clih_inc,
 		SWP_NOZORDER | SWP_FRAMECHANGED
 		);
+
+	// [2026-03-25] Need this two lines, otherwise:
+	// When switching ShowDate=Yes/Timezone, the bottom bar is NOT refreshed immediately. Why?
+	InvalidateRect(hwnd, NULL, TRUE);
+	UpdateWindow(hwnd);
 }
 
 bool Is_MouseInClientRect(HWND hwnd)

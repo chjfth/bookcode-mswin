@@ -15,6 +15,9 @@ Since 2022.05:
 
 Since 2024.10:
 * Add Countdown mode.
+
+Since 2026.03: (v1.8)
+* Optionally show Date at bottom bar.
 -----------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
@@ -29,17 +32,18 @@ Since 2024.10:
 #define CHHI_ALL_IMPL
 #include <vaDbgTs.h>
 #include <vaDbgTs_util.h>
-
 #include <CHHI_vaDBG_is_vaDbgTs.h>
 
-#include "iversion.h"
-#include "utils.h"
-
+#include <mswin/utils_env.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
 
 #define Editbox_EnableKbdAdjustNumber_IMPL
 #define Editbox_EnableKbdAdjustNumber_DEBUG
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
+
+#include "iversion.h"
+#include "utils.h"
+
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -85,6 +89,7 @@ BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
 
 BOOL g_isShowDate = 0;
+BOOL g_isShowTimezone = 0;
 
 enum ClockMode_et { CM_WallTime=0, CM_Countdown=1 } g_ClockMode;
 
@@ -412,6 +417,29 @@ void RefreshDateBar(HDC hdc)
 	if(!g_isShowDate)
 		return;
 
+	SYSTEMTIME st = {};
+	GetLocalTime(&st);
+	TCHAR szDate[40];
+	_sntprintf_s(szDate, _TRUNCATE, _T("%04d-%02d-%02d"), st.wYear, st.wMonth, st.wDay);
+
+	if(g_isShowTimezone)
+	{
+		TCHAR tzs[16];
+		int minutes = util_GetTimeZoneOffset();
+		if(minutes%60==0)
+		{
+			// "UTC+8" , "UTC-10" etc
+			_sntprintf_s(tzs, _TRUNCATE, _T("UTC%+d"), minutes/60);
+		}
+		else
+		{
+			// "+03:30" , "-03:30" etc, adding "UTC" prefix will be too long
+			_sntprintf_s(tzs, _TRUNCATE, _T("%+03d:%02d"), minutes/60, abs(minutes)%60);
+		}
+
+		_sntprintf_s(szDate, _TRUNCATE, _T("%s(%s)"), szDate, tzs);
+	}
+
 	LOGFONT lf = {};
 	lf.lfHeight = - LOGICY_DATE;
 	lf.lfWeight = 900; // make it bold
@@ -427,13 +455,9 @@ void RefreshDateBar(HDC hdc)
 	HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
 	FillRect(hdc, &rc, hbrush);
 
-	SYSTEMTIME st = {};
-	GetLocalTime(&st);
-	TCHAR szDate[40];
-	int slen = _sntprintf_s(szDate, _TRUNCATE, _T("%04d-%02d-%02d"), st.wYear, st.wMonth, st.wDay);
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, RGB(255,255,255));
-	DrawText(hdc, szDate, slen, &rc, DT_CENTER);
+	DrawText(hdc, szDate, (int)_tcslen(szDate), &rc, DT_CENTER);
 
 	SelectObject(hdc, GetStockFont(SYSTEM_FONT));
 	DeleteObject(hfont);
@@ -722,7 +746,10 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
 			g_isShowDate ? MF_UNCHECKED : MF_CHECKED);
 
 		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_YES,
-			g_isShowDate ? MF_CHECKED : MF_UNCHECKED);
+			(g_isShowDate && !g_isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_TIMEZONE,
+			(g_isShowDate && g_isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
 	}
 }
 
@@ -758,12 +785,21 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	else if(cmdid==IDM_SHOWDATE_NO)
 	{
 		g_isShowDate = FALSE;
+		g_isShowTimezone = FALSE;
 		MyAdjustClientSize(hwnd, s_is_show_title,
 			g_now_client_cx, clock_cy_from_cx(g_now_client_cx), false);
 	}
 	else if(cmdid==IDM_SHOWDATE_YES)
 	{
 		g_isShowDate = TRUE;
+		g_isShowTimezone = FALSE;
+		MyAdjustClientSize(hwnd, s_is_show_title,
+			g_now_client_cx, clock_cy_from_cx(g_now_client_cx), false);
+	}
+	else if(cmdid==IDM_SHOWDATE_TIMEZONE)
+	{
+		g_isShowDate = TRUE;
+		g_isShowTimezone = TRUE;
 		MyAdjustClientSize(hwnd, s_is_show_title,
 			g_now_client_cx, clock_cy_from_cx(g_now_client_cx), false);
 	}

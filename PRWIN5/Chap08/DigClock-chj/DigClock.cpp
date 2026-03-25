@@ -44,23 +44,9 @@ void ShowHelp(HWND hwndParent)
 
 SIZE g_init_winsize = {160, 60};
 
-LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
-
 void Hwnd_ShowTitle(HWND hwnd, bool istitle);
 
-const TCHAR *GetExeFilename()
-{
-	static TCHAR exepath[MAX_PATH] = _T("Unknown exepath");
-	GetModuleFileName(NULL, exepath, ARRAYSIZE(exepath));
-
-	const TCHAR *pfilename = StrRChr(exepath, NULL, _T('\\'));
-	if(pfilename && pfilename[1])
-		pfilename++;
-	else
-		pfilename = exepath;
-
-	return pfilename;
-}
+LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)

@@ -32,8 +32,6 @@ extern"C"{
 	// Ref: Raymond Chen https://devblogs.microsoft.com/oldnewthing/20031107-00/?p=41923
 
 
-const TCHAR *GetExeFilename();
-
 void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop);
 
 void MySaveSysDpiScaling();

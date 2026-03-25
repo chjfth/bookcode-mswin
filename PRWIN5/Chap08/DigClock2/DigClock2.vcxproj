@@ -208,7 +208,7 @@
     <ClInclude Include="iversion.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="..\..\..\__chjcxx\common-include\include\mswin\Editbox_EnableKbdAdjustNumber.h" />
+    <ClInclude Include="..\..\..\__chjcxx\common-include\include\mswin\Editbox_EnableKbdAdjustIntnum.h" />
   </ItemGroup>
   <!-- MSBuild system stock Cpp.targets -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
