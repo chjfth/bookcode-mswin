@@ -1,4 +1,11 @@
 #include "utils.h"
+#include <assert.h>
+#include <windows.h>
+#include <windowsx.h>
+#include <Shlwapi.h>
+
+#include <mswin/utils_wingui.h>
+
 
 double g_sysdpiScaling = 1.0;
 

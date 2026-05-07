@@ -194,8 +194,8 @@
    -->
   <ItemGroup>
     <ClCompile Include="DigClock2.cpp" />
-    <ClCompile Include="..\..\BeginPaint_NoFlicker.cpp" />
     <ClCompile Include="utils.cpp" />
+    <ClCompile Include="CHHI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc" />
@@ -204,7 +204,6 @@
     <None Include="DigClock2.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\BeginPaint_NoFlicker.h" />
     <ClInclude Include="iversion.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="resource.h" />

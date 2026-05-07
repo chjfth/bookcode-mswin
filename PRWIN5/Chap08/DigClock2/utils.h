@@ -2,19 +2,12 @@
 #define __utils_h_
 
 #include "targetver.h"
-#include <stdio.h>
-#include <tchar.h>
-#include <assert.h>
 #include <windows.h>
-#include <windowsx.h>
-#include <Shlwapi.h>
+#include <tchar.h>
 
 #include <vaDbgTs.h>
 #include <vaDbgTs_util.h>
 using namespace vaDbgTs_util;
-
-//#include "vaDbg.h"
-#include "..\..\BeginPaint_NoFlicker.h"
 
 
 #define APPNAME "DigClock2"
@@ -24,13 +17,13 @@ extern"C"{
 #endif
 
 
-#define HANDLE_dlgMSG(hwnd, message, fn) \
-  case (message): \
-  return SetDlgMsgResult( hwnd, message, HANDLE_##message((hwnd), (wParam), (lParam), (fn)) );
-	// For message processing in a WinAPI user's dialog-procedure, we need a further step
-	// beyond that of windowsx.h's HANDLE_MSG(). This HANDLE_dlgMSG() applies that further step.
-	// Ref: Raymond Chen https://devblogs.microsoft.com/oldnewthing/20031107-00/?p=41923
-
+// #define HANDLE_dlgMSG(hwnd, message, fn) \
+//   case (message): \
+//   return SetDlgMsgResult( hwnd, message, HANDLE_##message((hwnd), (wParam), (lParam), (fn)) );
+// 	// For message processing in a WinAPI user's dialog-procedure, we need a further step
+// 	// beyond that of windowsx.h's HANDLE_MSG(). This HANDLE_dlgMSG() applies that further step.
+// 	// Ref: Raymond Chen https://devblogs.microsoft.com/oldnewthing/20031107-00/?p=41923
+// 
 
 void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop);
 

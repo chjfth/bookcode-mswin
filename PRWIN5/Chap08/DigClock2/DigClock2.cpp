@@ -29,20 +29,17 @@ Since 2026.03: (v1.8)
 #include <shlwapi.h>
 #include "resource.h"
 
-#define CHHI_ALL_IMPL
 #include <vaDbgTs.h>
 #include <vaDbgTs_util.h>
 #include <CHHI_vaDBG_is_vaDbgTs.h>
 
 #include <mswin/utils_env.h>
+#include <mswin/utils_wingui.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
-
-#define Editbox_EnableKbdAdjustNumber_IMPL
-#define Editbox_EnableKbdAdjustNumber_DEBUG
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
 
-#include "iversion.h"
 #include "utils.h"
+#include "iversion.h"
 
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
