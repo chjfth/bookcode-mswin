@@ -837,10 +837,20 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
 	}
 	else
 	{
-		// Consider it the "Show Date" popup.
+		HMENU hSysMenu = GetSystemMenu(hwnd, FALSE);
+		if(hSysMenu==hmenuPopup)
+		{ 
+			// It is the sysmenu popup, with first menuitem mii.wID==SC_RESTORE (0xF120).
+			return;
+		}
+
+		HMENU hmSubpop = FindSubMenu_byText(s_popmenu, _T("Show Date"));
+		assert(hmSubpop==hmenuPopup); // just test, verified
+
+		// Consider it the "Show Date" popup. 
 
 		MENUITEMINFO mii = {sizeof(mii)};
-		mii.fMask = MIIM_ID;
+		mii.fMask = MIIM_ID | MIIM_FTYPE;
 		BOOL b = GetMenuItemInfo(hmenuPopup, 0, TRUE, &mii);
 		assert(mii.wID==IDM_SHOWDATE_NO); // first item show be IDM_SHOWDATE_NO
 
