@@ -21,10 +21,11 @@ void ShowHelp(HWND hwndParent);
 
 void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop);
 
-void MySaveSysDpiScaling();
+//void MySaveSysDpiScaling();
+int AfterDpiScale(int input);
 
-void MyAdjustClientSize(HWND hwnd, bool istitle, int cli_width=-1, int cli_height=-1,
-	bool isDpiScaling=false);
+//void MyAdjustClientSize(HWND hwnd, bool istitle, int cli_width=-1, int cli_height=-1,
+//	bool isDpiScaling=false);
 
 bool Is_MouseInClientRect(HWND hwnd);
 
@@ -32,6 +33,7 @@ void MoveWindow_byOffset(HWND hwnd, int offsetx, int offsety);
 
 const TCHAR* Seconds_to_HMS(int seconds);
 int HMS_to_Seconds(const TCHAR *szHMS);
+
 
 
 #ifdef __cplusplus

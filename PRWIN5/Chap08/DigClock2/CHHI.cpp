@@ -11,7 +11,7 @@
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
 
+#include <InterpretConst.h>
 #include <SimpleIniEx.h>
 #include <DataXIni.h>
-
 

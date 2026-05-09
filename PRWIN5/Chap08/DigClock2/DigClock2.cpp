@@ -20,7 +20,7 @@ Since 2026.03: (v1.8)
 * Optionally show Date at bottom bar.
 
 Since 2026.05: (v2.0)
-* User options are saved to DigClock2.ini .
+* User options are saved to DigClock2.ini, including last window pos.
   INI along-side EXE is preferred; if saving fail, fallback to $HOME dir.
 
 -----------------------------------------*/
@@ -41,6 +41,8 @@ Since 2026.05: (v2.0)
 #include <vaDbgTs_util.h>
 #include <CHHI_vaDBG_is_vaDbgTs.h>
 
+#include <CHwndTimer.h>
+#include <RECTxy.h>
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
@@ -48,6 +50,8 @@ Since 2026.05: (v2.0)
 
 #include <snTprintf.h>
 
+#include <InterpretConst.h>
+	using namespace itc;
 #include <DataXString.h>
 #include <DataXIni.h>
 
@@ -68,6 +72,8 @@ Since 2026.05: (v2.0)
 #define LOGICY_HHMMSS 72
 #define LOGICY_DATE 24  // since v1.8, show a date-bar at bottom
 
+#define DELAY_SAVE_INI_MILLISEC 1000
+
 HINSTANCE g_hInstance;
 
 //// Define/Declare these before "datax.h" >>>
@@ -80,8 +86,8 @@ DataXIni g_xini;
 BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
 
-BOOL g_isShowDate = 0;
-BOOL g_isShowTimezone = 0;
+DataXString_AutoSaveFile<bool> g_isShowDate(_T("false"));
+DataXString_AutoSaveFile<bool> g_isShowTimezone(_T("false"));
 
 DataXString_AutoSaveFile<ClockMode_et> g_ClockMode(_T("CM_WallTime"));
 
@@ -90,16 +96,19 @@ int g_seconds_remain = 0;
 DWORD g_msectick_start = 0; // value from GetTickCount()
 
 HWND g_hdlgCountdownCfg;
-
-const int g_init_client_cx = 188; // Initial main-window client-area size(96dpi pixels)
-int g_now_client_cx;
-
-static int    s_cxClient, s_cyClient ;
 static HMENU s_popmenu;
+
+static int s_cxClient, s_cyClient; // Clock window client-area size pixels
+static int s_axClient, s_ayClient; // Clock window client-area absolute(screen) position.
+
+int g_iso_client_cx; // maybe less than s_cxClient, if you squeeze clock-window's height.
 
 DataXString_AutoSaveFile<bool> s_is_always_on_top(_T("true"));
 DataXString_AutoSaveFile<bool> s_is_change_color(_T("false"));
 DataXString_AutoSaveFile<bool> s_is_show_title(_T("false"));
+
+const int g_init_client_cx = 188; // Default main-window client-area size(96dpi pixels)
+DataXString<RECT> g_dxClientRect; // Do no use Auto for this, so avoid intensive INI writing.
 
 static POINT s_pos_mousedown; // client-area position
 static bool s_is_dragging = false;
@@ -109,7 +118,6 @@ static int s_idxcolor = 0;
 static CWmMouseleaveHelper s_mouselvp;
 
 
-
 INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 bool SomeInit()
@@ -117,10 +125,10 @@ bool SomeInit()
 	InitCommonControls();
 	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
 
-	TCHAR szDbg[4] = {};
-	GetEnvironmentVariable(_T("DIGCLOCK_DBG"), szDbg, ARRAYSIZE(szDbg));
+//	TCHAR szDbg[4] = {}; 
+//	GetEnvironmentVariable(_T("DIGCLOCK_DBG"), szDbg, ARRAYSIZE(szDbg));
 	
-	MySaveSysDpiScaling();
+//	MySaveSysDpiScaling();
 
 	//
 	// Prepare for INI load/save.
@@ -142,15 +150,81 @@ bool SomeInit()
 	g_xini.AddItem(secname, _T("AlwaysOnTop"), &s_is_always_on_top);
 	g_xini.AddItem(secname, _T("IsClickToChangeColor"), &s_is_change_color);
 	g_xini.AddItem(secname, _T("IsShowWindowTitle"), &s_is_show_title);
+	g_xini.AddItem(secname, _T("IsShowDate"), &g_isShowDate);
+	g_xini.AddItem(secname, _T("IsShowTimezone"), &g_isShowTimezone);
+	g_xini.AddItem(secname, _T("ClientAreaRect"), &g_dxClientRect);
 
 	return true;
 }
+
+static bool ClientRectFromINI(RECT *prect)
+{
+	RECT &r = *prect;
+	r = g_dxClientRect;
+
+	// Check if INI-provided RECT is empty
+	if(RECTcx(r)==0 || RECTcy(r)==0)
+		return false;
+
+	// todo: further check RECT value properness 
+
+	return true;
+}
+
+class DelaySaveIniTimer : public CHwndTimer
+{
+public:
+	virtual void TimerCallback() cxx11_override
+	{
+		//vaDBG(_T("DelaySaveIniTimer..."));
+		g_xini.SaveIni();
+	}
+} s_DelaySaveIniTimer;
 
 inline int clock_cy_from_cx(int cx)
 {
 	int logicy = LOGICY_HHMMSS + (g_isShowDate ? LOGICY_DATE : 0);
 	return cx * logicy / LOGICX_HHMMSS;
 }
+
+void my_MoveWindow_byClientRect(HWND hwnd, const RECT& rcClient)
+{
+	static struct StyleBits
+	{
+		DWORD bits_on; DWORD bits_on_ex;
+	}
+	s_two_styles[2] =
+	{
+		{ WS_POPUPWINDOW | WS_THICKFRAME , WS_EX_DLGMODALFRAME }, // style bits for no-title window
+		{ WS_OVERLAPPEDWINDOW , WS_EX_TOOLWINDOW }, // style bits for has-title window
+	};
+
+	bool istitle = s_is_show_title;
+	UINT winstyle = Hwnd_TuneWinStyleBits (hwnd, s_two_styles[istitle].bits_on,    s_two_styles[!istitle].bits_on);
+	UINT exstyle = Hwnd_TuneWinStyleExBits(hwnd, s_two_styles[istitle].bits_on_ex, s_two_styles[!istitle].bits_on_ex);
+	MoveWindow_byClientRect(hwnd, &rcClient, winstyle, exstyle);
+}
+
+void my_AdjustClientRect(HWND hwnd, bool is_default_width=false)
+{
+	RECT clirect = {};
+	GetClientRect_ScreenPos(hwnd, &clirect);
+
+	int width = 0;
+	if(is_default_width)
+	{
+		width = AfterDpiScale(g_init_client_cx);
+	}
+	else
+	{
+		width = g_iso_client_cx;
+	}
+
+	clirect.right = clirect.left + width;
+	clirect.bottom = clirect.top + clock_cy_from_cx(width);
+	my_MoveWindow_byClientRect(hwnd, clirect);
+}
+
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -175,28 +249,31 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of BeginPaint_NoFlicker
 	wndclass.lpszMenuName  = NULL ;
 	wndclass.lpszClassName = szAppName ;
+	RegisterClass(&wndclass);
 
-	if (!RegisterClass (&wndclass))
-	{
-		MessageBox (NULL, TEXT ("Program requires Windows NT!"), 
-			szAppName, MB_ICONERROR) ;
-		return 0 ;
-	}
+	const int default_client_width_with_dpi = AfterDpiScale(g_init_client_cx);
 
 	POINT mousepos = {};
 	GetCursorPos(&mousepos);
 
+	RECT inirect  = {};
+	bool iniok = ClientRectFromINI(&inirect);
+
+	RECT clirect = {}; // in screen coord
+	clirect.left = iniok ? inirect.left : mousepos.x;
+	clirect.top  = iniok ? inirect.top  : mousepos.y;
+	
+	clirect.right  = iniok ? inirect.right : (clirect.left + default_client_width_with_dpi);
+	clirect.bottom = iniok ? inirect.bottom : (clirect.top + clock_cy_from_cx(default_client_width_with_dpi));
+
 	hwnd = CreateWindowEx (0,
 		szAppName, TEXT ("Digital Clock"),
-		WS_POPUPWINDOW, // will set more styles in Hwnd_ShowTitle()
-		mousepos.x, mousepos.y,
-		g_init_client_cx, clock_cy_from_cx(g_init_client_cx), // CW_USEDEFAULT, CW_USEDEFAULT, 
+		WS_POPUPWINDOW, // casual, change soon
+		clirect.left, clirect.top, // temporal X,Y pos, tune soon
+		RECTcx(clirect), RECTcy(clirect),
 		NULL, NULL, hInstance, NULL) ;
-	//
-	MyAdjustClientSize(hwnd, s_is_show_title, 
-		g_init_client_cx, clock_cy_from_cx(g_init_client_cx), 
-		true // true: scale by XP-style-DPI.
-		);
+	
+	my_MoveWindow_byClientRect(hwnd, clirect);
 
 	g_hdlgCountdownCfg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwnd, Dlgproc_CountdownCfg);
 	assert(g_hdlgCountdownCfg);
@@ -278,9 +355,6 @@ void DisplayDigit (HDC hdc, int iNumber, bool is_scale_down=false)
 
 	POINT arPtVertex[NVERTEX] = {};
 
-
-//SetWindowExtEx (hdc, 276*2, 72*2, NULL) ;
-
 	int          iSeg ;
 
 	for (iSeg = 0 ; iSeg < ARRAYSIZE(ptSegment) ; iSeg++)
@@ -302,9 +376,6 @@ void DisplayDigit (HDC hdc, int iNumber, bool is_scale_down=false)
 			Polygon (hdc, pVertex, NVERTEX) ;
 		}
 	}
-
-//SetWindowExtEx (hdc, 276, 72, NULL) ;
-
 }
 
 void DisplayTwoDigits (HDC hdc, int iNumber, BOOL fSuppress, bool is_scale_down=false)
@@ -579,10 +650,29 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	return TRUE; // create ok
 }
 
+static void OnWinMoveSize(HWND hwnd)
+{
+	RECT rect = {s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient + s_cyClient };
+	g_dxClientRect.SetValue(rect);
+	s_DelaySaveIniTimer.StartTimerOnce(hwnd, DELAY_SAVE_INI_MILLISEC);
+}
+
 void Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
 {
 	s_cxClient = cx;
 	s_cyClient = cy;
+
+	// vaDbgTs(_T("compare s_cxClient, g_iso_client_cx: %d vs %d"), s_cxClient, g_iso_client_cx);
+	OnWinMoveSize(hwnd);
+}
+
+void Cls_OnMove(HWND hwnd, int x, int y)
+{
+	POINT abspos = {0, 0};
+	ClientToScreen(hwnd, &abspos);
+	s_axClient = abspos.x; s_ayClient = abspos.y;
+
+	OnWinMoveSize(hwnd);
 }
 
 void Cls_OnTimer(HWND hwnd, UINT id)
@@ -614,7 +704,7 @@ void Cls_OnPaint(HWND hwnd)
 	assert(extWinChk.cx==logicx && extWinChk.cy==logicy);
 	GetViewportExtEx(hdc, &extVptChk); // [WinXP] one of extVptChk.cx, extVptChk.cy may differ to SetViewportExtEx's
 	//
-	g_now_client_cx = extVptChk.cx;
+	g_iso_client_cx = extVptChk.cx;
 
 	RefreshDateBar(hdc);
 	RefreshTheClock(hdc); 
@@ -798,27 +888,24 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	{
 		g_isShowDate = FALSE;
 		g_isShowTimezone = FALSE;
-		MyAdjustClientSize(hwnd, s_is_show_title,
-			g_now_client_cx, clock_cy_from_cx(g_now_client_cx), false);
+		my_AdjustClientRect(hwnd);
 	}
 	else if(cmdid==IDM_SHOWDATE_YES)
 	{
 		g_isShowDate = TRUE;
 		g_isShowTimezone = FALSE;
-		MyAdjustClientSize(hwnd, s_is_show_title,
-			g_now_client_cx, clock_cy_from_cx(g_now_client_cx), false);
+		my_AdjustClientRect(hwnd);
 	}
 	else if(cmdid==IDM_SHOWDATE_TIMEZONE)
 	{
 		g_isShowDate = TRUE;
 		g_isShowTimezone = TRUE;
-		MyAdjustClientSize(hwnd, s_is_show_title,
-			g_now_client_cx, clock_cy_from_cx(g_now_client_cx), false);
+		my_AdjustClientRect(hwnd);
 	}
 	else if(cmdid==IDM_SHOW_TITLE)
 	{
 		s_is_show_title = !s_is_show_title;
-		MyAdjustClientSize(hwnd, s_is_show_title);
+		my_AdjustClientRect(hwnd);
 	}
 	else if(cmdid==IDM_MINIMIZE_WINDOW)
 	{
@@ -830,8 +917,9 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	}
 	else if(cmdid==IDM_RESET_SIZE)
 	{
-		MyAdjustClientSize(hwnd, s_is_show_title, 
-			g_init_client_cx, clock_cy_from_cx(g_init_client_cx), true);
+		RECT clirect = {};
+		GetClientRect_ScreenPos(hwnd, &clirect);
+		my_AdjustClientRect(hwnd, true);
 	}
 	else if(cmdid==IDM_EXIT)
 	{
@@ -853,6 +941,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		HANDLE_MSG(hwnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hwnd, WM_SIZE, Cls_OnSize);
+		HANDLE_MSG(hwnd, WM_MOVE, Cls_OnMove);
 		HANDLE_MSG(hwnd, WM_TIMER, Cls_OnTimer);
 		HANDLE_MSG(hwnd, WM_PAINT, Cls_OnPaint);
 		

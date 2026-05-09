@@ -9,7 +9,7 @@
 #include "iversion.h"
 
 
-double g_sysdpiScaling = 1.0;
+//double g_sysdpiScaling = 1.0;
 
 void ShowHelp(HWND hwndParent)
 {
@@ -45,6 +45,7 @@ void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop)
 		);
 }
 
+/*
 void MySaveSysDpiScaling()
 {
 	HDC hdc = GetDC(NULL);
@@ -54,7 +55,25 @@ void MySaveSysDpiScaling()
 	g_sysdpiScaling = (double)sysdpi / 96;
 	// -- This will not change without user sign-out/sign-in, even on Win10.1607+.
 }
+*/
 
+int AfterDpiScale(int input)
+{
+	static double s_sysdpiScaling = 0;
+	if (s_sysdpiScaling == 0)
+	{
+		HDC hdc = GetDC(NULL);
+		int sysdpi = GetDeviceCaps(hdc, LOGPIXELSX); // or GetDeviceCaps
+		BOOL succ = ReleaseDC(NULL, hdc);
+
+		s_sysdpiScaling = (double)sysdpi / 96;
+	}
+
+	return (int)(input * s_sysdpiScaling);
+}
+
+#if 0
+// v2.0: Instead use MoveWindow_byClientRect() and my_AdjustClientRect()
 void MyAdjustClientSize(HWND hwnd, bool istitle, int cli_width, int cli_height, 
 	bool isDpiScaling)
 {
@@ -103,7 +122,6 @@ void MyAdjustClientSize(HWND hwnd, bool istitle, int cli_width, int cli_height,
 	DWORD winstyleEx = (DWORD)GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	winstyleEx &= (~twownds[!istitle].bits_on_ex);
 	winstyleEx |= twownds[istitle].bits_on_ex;
-
 	SetWindowLongPtr(hwnd, GWL_EXSTYLE, winstyleEx);
 
 	// (must) Repaint the window frame, so that we can calculate its *new* border size.
@@ -138,6 +156,7 @@ void MyAdjustClientSize(HWND hwnd, bool istitle, int cli_width, int cli_height,
 	InvalidateRect(hwnd, NULL, TRUE);
 	UpdateWindow(hwnd);
 }
+#endif
 
 bool Is_MouseInClientRect(HWND hwnd)
 {

@@ -30,6 +30,15 @@ public:
 };
 
 
+/*
+const Enum2Val_st _e2v_ClockMode[] =
+{
+	ITC_NAMEPAIR(CM_WallTime),
+	ITC_NAMEPAIR(CM_Countdown),
+};
+CInterpretConst itc_ClockMode(_e2v_ClockMode, ITCF_SINT);
+*/
+
 template<typename FORMAT>
 struct DataXTraits<ClockMode_et, FORMAT>
 {
@@ -52,6 +61,26 @@ struct DataXTraits<ClockMode_et, FORMAT>
 			return _T("CM_Countdown");
 		else
 			return _T("CM_WallTime");
+	}
+};
+
+template<typename FORMAT>
+struct DataXTraits<RECT, FORMAT>
+{
+	// Represent a RECT value into "left,top,right,down" string-form.
+
+	static RECT FromString(const TCHAR* s)
+	{
+		RECT rect = {};
+		_stscanf_s(s, _T("%d,%d,%d,%d"), &rect.left, &rect.top, &rect.right, &rect.bottom);
+		return rect;
+	}
+
+	static Sdring ToString(const RECT& rect)
+	{
+		TCHAR sz[80];
+		snTprintf(sz, _T("%d,%d,%d,%d"), rect.left, rect.top, rect.right, rect.bottom);
+		return sz;
 	}
 };
 
