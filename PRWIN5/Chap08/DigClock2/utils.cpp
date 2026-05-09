@@ -6,8 +6,36 @@
 
 #include <mswin/utils_wingui.h>
 
+#include "iversion.h"
+
 
 double g_sysdpiScaling = 1.0;
+
+void ShowHelp(HWND hwndParent)
+{
+	static TCHAR *s_help_fmt =
+		_T("DigClock2 by Jimm Chen. (version %d.%d.%d)\r\n")
+		_T("\r\n")
+		_T("This clock program works in wall-time mode or countdown mode.\r\n")
+		_T("Clock drawing code by DigClock from Charles Petzold [PRWIN5] Chap08.\r\n")
+
+		_T("\r\n")
+		_T("To Move the clock window:\r\n")
+		_T("(1) Click and drag with mouse left button.\r\n")
+		_T("(2) Use keyboard arrow keys, pixel by pixel. Press Ctrl key to accelerate.\r\n")
+		_T("\r\n")
+		_T("To change digit color: \r\n")
+		_T("(1) Left click on the clock for next color.\r\n")
+		_T("(2) Shift+click to cycle back.\r\n")
+		_T("\r\n")
+		_T("In countdown mode, you can use keyboard Up/Down to adjust time values.\r\n")
+		_T("\r\n")
+		_T("Compiled on: ") _T(__DATE__) _T(", ") _T(__TIME__)
+		;
+	vaMsgBox(hwndParent, MB_OK | MB_ICONINFORMATION, _T("Help"),
+		s_help_fmt, THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD);
+}
+
 
 void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop)
 {

@@ -18,15 +18,23 @@ Since 2024.10:
 
 Since 2026.03: (v1.8)
 * Optionally show Date at bottom bar.
+
+Since 2026.05: (v2.0)
+* User options are saved to DigClock2.ini .
+  INI along-side EXE is preferred; if saving fail, fallback to $HOME dir.
+
 -----------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
+#include "CHHI_DEBUG.h"
+
 #include <tchar.h>
 #include <assert.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <CommCtrl.h>
 #include <shlwapi.h>
+#include <ShlObj.h>
 #include "resource.h"
 
 #include <vaDbgTs.h>
@@ -38,36 +46,16 @@ Since 2026.03: (v1.8)
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
 
+#include <snTprintf.h>
+
+#include <DataXString.h>
+#include <DataXIni.h>
+
 #include "utils.h"
 #include "iversion.h"
 
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
-
-void ShowHelp(HWND hwndParent)
-{
-	static TCHAR *s_help_fmt =
-		_T("DigClock2 by Jimm Chen. (version %d.%d.%d)\r\n")
-		_T("\r\n")
-		_T("This clock program works in wall-time mode or countdown mode.\r\n")
-		_T("Clock drawing code by DigClock from Charles Petzold [PRWIN5] Chap08.\r\n")
-
-		_T("\r\n")
-		_T("To Move the clock window:\r\n")
-		_T("(1) Click and drag with mouse left button.\r\n")
-		_T("(2) Use keyboard arrow keys, pixel by pixel. Press Ctrl key to accelerate.\r\n")
-		_T("\r\n")
-		_T("To change digit color: \r\n")
-		_T("(1) Left click on the clock for next color.\r\n")
-		_T("(2) Shift+click to cycle back.\r\n")
-		_T("\r\n")
-		_T("In countdown mode, you can use keyboard Up/Down to adjust time values.\r\n")
-		_T("\r\n")
-		_T("Compiled on: ") _T(__DATE__) _T(", ") _T(__TIME__)
-		;
-	vaMsgBox(hwndParent, MB_OK|MB_ICONINFORMATION,_T("Help"), 
-		s_help_fmt, THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD);
-}
 
 #define MY_TIMER_INTERVAL_1000ms 1000 // request exactly 1 seconds per WM_TIMER callback
 
@@ -82,13 +70,20 @@ void ShowHelp(HWND hwndParent)
 
 HINSTANCE g_hInstance;
 
+//// Define/Declare these before "datax.h" >>>
+enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
+DataXIni g_xini;
+//// Define/Declare these before "datax.h" <<<
+
+#include "datax.h"
+
 BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
 
 BOOL g_isShowDate = 0;
 BOOL g_isShowTimezone = 0;
 
-enum ClockMode_et { CM_WallTime=0, CM_Countdown=1 } g_ClockMode;
+DataXString_AutoSaveFile<ClockMode_et> g_ClockMode(_T("CM_WallTime"));
 
 int g_seconds_countdown_cfg = 60;
 int g_seconds_remain = 0;
@@ -99,13 +94,12 @@ HWND g_hdlgCountdownCfg;
 const int g_init_client_cx = 188; // Initial main-window client-area size(96dpi pixels)
 int g_now_client_cx;
 
-// Global vars for WndProc() >>>
-
 static int    s_cxClient, s_cyClient ;
 static HMENU s_popmenu;
-static bool s_is_always_on_top = true;
-static bool s_is_change_color = false;
-static bool s_is_show_title = false;
+
+DataXString_AutoSaveFile<bool> s_is_always_on_top(_T("true"));
+DataXString_AutoSaveFile<bool> s_is_change_color(_T("false"));
+DataXString_AutoSaveFile<bool> s_is_show_title(_T("false"));
 
 static POINT s_pos_mousedown; // client-area position
 static bool s_is_dragging = false;
@@ -114,7 +108,6 @@ static int s_idxcolor = 0;
 
 static CWmMouseleaveHelper s_mouselvp;
 
-// Global vars for WndProc <<<
 
 
 INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
@@ -128,6 +121,27 @@ bool SomeInit()
 	GetEnvironmentVariable(_T("DIGCLOCK_DBG"), szDbg, ARRAYSIZE(szDbg));
 	
 	MySaveSysDpiScaling();
+
+	//
+	// Prepare for INI load/save.
+	//
+
+	TCHAR exedir_ini[MAX_PATH] = {};
+	snTprintf(exedir_ini, _T("%s\\%s.ini"), GetExeDir(), GetExeStemname());
+
+	TCHAR userdir[MAX_PATH] = {}, userdir_ini[MAX_PATH];
+	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, userdir);
+	assert(userdir[0]);
+	snTprintf(userdir_ini, _T("%s\\%s.ini"), userdir, GetExeStemname());
+
+	const TCHAR* const ar_inifiles[] = { exedir_ini, userdir_ini };
+	g_xini.LoadIni(ar_inifiles, ARRAYSIZE(ar_inifiles));
+
+	const TCHAR *secname = _T("cfg");
+	g_xini.AddItem(secname, _T("ClockMode"), &g_ClockMode);
+	g_xini.AddItem(secname, _T("AlwaysOnTop"), &s_is_always_on_top);
+	g_xini.AddItem(secname, _T("IsClickToChangeColor"), &s_is_change_color);
+	g_xini.AddItem(secname, _T("IsShowWindowTitle"), &s_is_show_title);
 
 	return true;
 }
@@ -179,7 +193,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		g_init_client_cx, clock_cy_from_cx(g_init_client_cx), // CW_USEDEFAULT, CW_USEDEFAULT, 
 		NULL, NULL, hInstance, NULL) ;
 	//
-	MyAdjustClientSize(hwnd, false, g_init_client_cx, clock_cy_from_cx(g_init_client_cx), 
+	MyAdjustClientSize(hwnd, s_is_show_title, 
+		g_init_client_cx, clock_cy_from_cx(g_init_client_cx), 
 		true // true: scale by XP-style-DPI.
 		);
 

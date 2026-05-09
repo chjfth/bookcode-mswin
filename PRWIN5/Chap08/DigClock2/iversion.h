@@ -1,8 +1,8 @@
 #ifndef __iversion_h_
 #define __iversion_h_
 
-#define THISEXE_VMAJOR 1
-#define THISEXE_VMINOR 9
+#define THISEXE_VMAJOR 2
+#define THISEXE_VMINOR 0
 #define THISEXE_VBUILD 0
 
 #define THISEXEstr__(n) #n
