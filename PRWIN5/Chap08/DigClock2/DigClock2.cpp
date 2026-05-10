@@ -26,7 +26,7 @@ Since 2026.05: (v2.0)
 -----------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
-#include "CHHI_DEBUG.h"
+#include <CHHI_DEBUG.h>
 
 #include <tchar.h>
 #include <assert.h>
@@ -60,6 +60,11 @@ Since 2026.05: (v2.0)
 
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
+#ifndef DigClock2_DEBUG
+#include <CHHI_vaDBG_hide.h> // Suppress/invalidate vaDBG macros, from now on
+#endif
+
 
 #define MY_TIMER_INTERVAL_1000ms 1000 // request exactly 1 seconds per WM_TIMER callback
 
@@ -96,7 +101,8 @@ int g_seconds_remain = 0;
 DWORD g_msectick_start = 0; // value from GetTickCount()
 
 HWND g_hdlgCountdownCfg;
-static HMENU s_popmenu;
+
+static HMENU s_hmenuRootPopup;
 
 static int s_cxClient, s_cyClient; // Clock window client-area size pixels
 static int s_axClient, s_ayClient; // Clock window client-area absolute(screen) position.
@@ -636,10 +642,10 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	SetTimer(hwnd, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL) ;
 	SetTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL, 500, NULL);
 
-	if(!s_popmenu)
+	if(!s_hmenuRootPopup)
 	{
-		s_popmenu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MENU1));
-		s_popmenu = GetSubMenu(s_popmenu, 0) ; 
+		s_hmenuRootPopup = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MENU1));
+		s_hmenuRootPopup = GetSubMenu(s_hmenuRootPopup, 0) ; 
 	}
 
 	Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
@@ -813,13 +819,16 @@ void Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags
 {
 	POINT point = {x, y};
 	ClientToScreen (hwnd, &point) ;
-	TrackPopupMenu(s_popmenu, TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL) ;
+	TrackPopupMenu(s_hmenuRootPopup, TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL) ;
 }
 
-void Cls_OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
+void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMenu)
 {
-	HMENU hmenuPopup = hMenu;
-	if(hmenuPopup==s_popmenu)
+	// The program has two popups, one is s_hmenuRootPopup.
+	// the other is "Show Date". We should only care for the very two popup.
+	// In other word, various system-menu popups should be ignored.
+
+	if(hmenuPopup==s_hmenuRootPopup)
 	{
 		CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
 			g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
@@ -835,27 +844,25 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
 
 		CheckMenuItem(hmenuPopup, IDM_SHOW_TITLE, 
 			s_is_show_title ? MF_CHECKED : MF_UNCHECKED);
+
+		return;
 	}
-	else
-	{
-		HMENU hSysMenu = GetSystemMenu(hwnd, FALSE);
-		if(hSysMenu==hmenuPopup)
-		{ 
-			// It is the sysmenu popup, with first menuitem mii.wID==SC_RESTORE (0xF120).
-			return;
-		}
 
-		HMENU hmSubpop = FindSubMenu_byText(s_popmenu, _T("Show Date"));
-		assert(hmSubpop==hmenuPopup); // just test, verified
+	// Now we should find out the "Show Date" popup's menu-handle.
+	// I do it everytime dynamically, bcz in the future, the menu text can be in
+	// different language, so it will be hard to determine the menu-handle in advance.
 
-		// Consider it the "Show Date" popup. 
+	HMENU hmShowDate = FindSubMenu_byText(s_hmenuRootPopup, _T("Show Date"));
+	
 
-		MENUITEMINFO mii = {sizeof(mii)};
+	if (hmShowDate == hmenuPopup)
+	{ 
+		MENUITEMINFO mii = { sizeof(mii) };
 		mii.fMask = MIIM_ID | MIIM_FTYPE;
 		BOOL b = GetMenuItemInfo(hmenuPopup, 0, TRUE, &mii);
-		assert(mii.wID==IDM_SHOWDATE_NO); // first item show be IDM_SHOWDATE_NO
+		assert(mii.wID == IDM_SHOWDATE_NO); // first item show be IDM_SHOWDATE_NO
 
-		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_NO, 
+		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_NO,
 			g_isShowDate ? MF_UNCHECKED : MF_CHECKED);
 
 		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_YES,
@@ -863,6 +870,19 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
 
 		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_TIMEZONE,
 			(g_isShowDate && g_isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
+
+	}
+	else
+	{	// Add some debug messages.
+		HMENU hSysMenu = GetSystemMenu(hwnd, FALSE);
+		if (hSysMenu == hmenuPopup)
+		{
+			vaDBG2(_T("See GetSystemMenu() popup, hmenu=0x%X"), (Uint)hmenuPopup);
+		}
+		else
+		{
+			vaDBG2(_T("Unknown menu popup, hmenu=0x%X"), (Uint)hmenuPopup);
+		}
 	}
 }
 
@@ -1037,3 +1057,8 @@ Dlgproc_CountdownCfg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE; // Let Dlg-manager do default for current message.
 }
+
+
+#ifndef DigClock2_DEBUG
+#include <CHHI_vaDBG_show.h> // Now restore vaDBG macros
+#endif
