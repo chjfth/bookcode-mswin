@@ -619,9 +619,10 @@ void DoTimer(HWND hwnd, int idtimer)
 
 				do_CountdownDone(hwnd);
 			}
-		}
-		
-		InvalidateRect (hwnd, NULL, TRUE); // draw UI according to g_seconds_remain
+
+			InvalidateRect(hwnd, NULL, TRUE); // draw UI according to g_seconds_remain
+		} // g_seconds_remain>0		
+
 	}
 	else if(idtimer==ID_TIMER_HIDE_CFG_PANEL)
 	{
