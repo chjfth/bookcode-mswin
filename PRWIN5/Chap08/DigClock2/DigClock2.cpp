@@ -131,11 +131,6 @@ bool SomeInit()
 	InitCommonControls();
 	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
 
-//	TCHAR szDbg[4] = {}; 
-//	GetEnvironmentVariable(_T("DIGCLOCK_DBG"), szDbg, ARRAYSIZE(szDbg));
-	
-//	MySaveSysDpiScaling();
-
 	//
 	// Prepare for INI load/save.
 	//
@@ -274,7 +269,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	hwnd = CreateWindowEx (0,
 		szAppName, TEXT ("Digital Clock"),
-		WS_POPUPWINDOW, // casual, change soon
+		WS_POPUPWINDOW | WS_CLIPCHILDREN, // casual, tune soon
+		// note: WS_CLIPCHILDREN avoids re-paint flicking when floatbar is visible and counting down.
 		clirect.left, clirect.top, // temporal X,Y pos, tune soon
 		RECTcx(clirect), RECTcy(clirect),
 		NULL, NULL, hInstance, NULL) ;
@@ -626,8 +622,13 @@ void DoTimer(HWND hwnd, int idtimer)
 				do_CountdownDone(hwnd);
 			}
 
-			InvalidateRect(hwnd, NULL, TRUE); // draw UI according to g_seconds_remain
+			InvalidateRect(hwnd, NULL, TRUE); // Redraw UI according to g_seconds_remain.
+
 		} // g_seconds_remain>0		
+		else if(g_ClockMode==CM_WallTime)
+		{
+			InvalidateRect(hwnd, NULL, TRUE); // Redraw current time.
+		}
 
 	}
 	else if(idtimer==ID_TIMER_HIDE_CFG_PANEL)
