@@ -55,8 +55,8 @@ Since 2026.05: (v2.0)
 #include <DataXString.h>
 #include <DataXIni.h>
 
-#include "utils.h"
 #include "iversion.h"
+#include "utils.h"
 
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -81,20 +81,28 @@ Since 2026.05: (v2.0)
 
 HINSTANCE g_hInstance;
 
-//// Define/Declare these before "datax.h" >>>
 enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
+
+#include "datax.h" // should place it after `ClockMode_et` definition
+
 DataXIni g_xini;
-//// Define/Declare these before "datax.h" <<<
 
-#include "datax.h"
+#define INI_SECNAME _T("cfg")
 
-BOOL g_f24Hour;
-BOOL g_fSuppressHighDigit;
+DataXString_AutoSaveIni<ClockMode_et> g_ClockMode(g_xini,INI_SECNAME, _T("ClockMode"), _T("CM_WallTime"));
 
-DataXString_AutoSaveFile<bool> g_isShowDate(_T("false"));
-DataXString_AutoSaveFile<bool> g_isShowTimezone(_T("false"));
+DataXString_AutoSaveIni<bool> g_isShowDate(g_xini,INI_SECNAME, _T("IsShowDate"), _T("false"));
+DataXString_AutoSaveIni<bool> g_isShowTimezone(g_xini,INI_SECNAME, _T("IsShowTimezone"), _T("false"));
 
-DataXString_AutoSaveFile<ClockMode_et> g_ClockMode(_T("CM_WallTime"));
+DataXString_AutoSaveIni<bool> s_is_always_on_top(g_xini,INI_SECNAME, _T("AlwaysOnTop"), _T("true"));
+DataXString_AutoSaveIni<bool> s_is_change_color(g_xini,INI_SECNAME, _T("IsClickToChangeColor"), _T("false"));
+DataXString_AutoSaveIni<bool> s_is_show_title(g_xini,INI_SECNAME, _T("IsShowWindowTitle"), _T("false"));
+// -- todo: Use #define to simplfy the patter
+
+DataXString<RECT> g_dxClientRect; 
+// -- Do no use _AutoSaveIni for this, so avoid intensive INI writing.
+//    When user drags/resize the window, Client-area RECT value would change very frequently.
+
 
 int g_seconds_countdown_cfg = 60;
 int g_seconds_remain = 0;
@@ -109,17 +117,15 @@ static int s_axClient, s_ayClient; // Clock window client-area absolute(screen) 
 
 int g_iso_client_cx; // maybe less than s_cxClient, if you squeeze clock-window's height.
 
-DataXString_AutoSaveFile<bool> s_is_always_on_top(_T("true"));
-DataXString_AutoSaveFile<bool> s_is_change_color(_T("false"));
-DataXString_AutoSaveFile<bool> s_is_show_title(_T("false"));
-
 const int g_init_client_cx = 188; // Default main-window client-area size(96dpi pixels)
-DataXString<RECT> g_dxClientRect; // Do no use Auto for this, so avoid intensive INI writing.
 
 static POINT s_pos_mousedown; // client-area position
 static bool s_is_dragging = false;
 static bool s_is_moved = false;
 static int s_idxcolor = 0;
+
+BOOL g_f24Hour;
+BOOL g_fSuppressHighDigit;
 
 static CWmMouseleaveHelper s_mouselvp;
 
@@ -146,14 +152,7 @@ bool SomeInit()
 	const TCHAR* const ar_inifiles[] = { exedir_ini, userdir_ini };
 	g_xini.LoadIni(ar_inifiles, ARRAYSIZE(ar_inifiles));
 
-	const TCHAR *secname = _T("cfg");
-	g_xini.AddItem(secname, _T("ClockMode"), &g_ClockMode);
-	g_xini.AddItem(secname, _T("AlwaysOnTop"), &s_is_always_on_top);
-	g_xini.AddItem(secname, _T("IsClickToChangeColor"), &s_is_change_color);
-	g_xini.AddItem(secname, _T("IsShowWindowTitle"), &s_is_show_title);
-	g_xini.AddItem(secname, _T("IsShowDate"), &g_isShowDate);
-	g_xini.AddItem(secname, _T("IsShowTimezone"), &g_isShowTimezone);
-	g_xini.AddItem(secname, _T("ClientAreaRect"), &g_dxClientRect);
+	g_xini.AddItem(INI_SECNAME, _T("ClientAreaRect"), &g_dxClientRect);
 
 	return true;
 }
