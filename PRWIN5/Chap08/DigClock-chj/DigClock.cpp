@@ -249,7 +249,7 @@ void DisplayTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 
 static BOOL   f24Hour, fSuppress ;
 //
-void ReloadSetting(HWND hwnd)
+void winenv_ReloadSetting(HWND hwnd)
 {
 	TCHAR         szBuffer [2] ;
 
@@ -368,11 +368,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
 
-		ReloadSetting(hwnd);
+		winenv_ReloadSetting(hwnd);
 		return 0;
 	}
 	case WM_SETTINGCHANGE:
-		ReloadSetting(hwnd);
+		winenv_ReloadSetting(hwnd);
 		return 0 ;
 
 	case WM_SIZE:

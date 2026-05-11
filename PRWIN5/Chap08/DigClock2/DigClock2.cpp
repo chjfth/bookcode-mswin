@@ -131,31 +131,69 @@ static CWmMouseleaveHelper s_mouselvp;
 
 
 INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+void ReloadIni_and_Redraw(HWND);
 
-bool SomeInit()
+void InitOnce()
 {
 	InitCommonControls();
 	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
 
-	//
-	// Prepare for INI load/save.
-	//
-
-	TCHAR exedir_ini[MAX_PATH] = {};
-	snTprintf(exedir_ini, _T("%s\\%s.ini"), GetExeDir(), GetExeStemname());
-
-	TCHAR userdir[MAX_PATH] = {}, userdir_ini[MAX_PATH];
-	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, userdir);
-	assert(userdir[0]);
-	snTprintf(userdir_ini, _T("%s\\%s.ini"), userdir, GetExeStemname());
-
-	const TCHAR* const ar_inifiles[] = { exedir_ini, userdir_ini };
-	g_xini.LoadIni(ar_inifiles, ARRAYSIZE(ar_inifiles));
-
 	g_xini.AddItem(INI_SECNAME, _T("ClientAreaRect"), &g_dxClientRect);
-
-	return true;
 }
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+	PSTR szCmdLine, int iCmdShow)
+{
+	InitOnce();
+
+	static TCHAR szAppName[] = TEXT(APPNAME);
+	HWND         hwnd;
+	MSG          msg;
+	WNDCLASS     wndclass;
+	g_hInstance = hInstance;
+
+	wndclass.style = CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc = WndProc;
+	wndclass.cbClsExtra = 0;
+	wndclass.cbWndExtra = 0;
+	wndclass.hInstance = hInstance;
+	wndclass.hIcon = LoadIcon(hInstance, _T("MYPROGRAM"));
+	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of BeginPaint_NoFlicker
+	wndclass.lpszMenuName = NULL;
+	wndclass.lpszClassName = szAppName;
+	RegisterClass(&wndclass);
+
+
+	hwnd = CreateWindowEx(0,
+		szAppName, TEXT("Digital Clock"),
+		WS_POPUPWINDOW | WS_CLIPCHILDREN, // casual, tune soon
+										  // note: WS_CLIPCHILDREN avoids re-paint flicking when floatbar is visible and counting down.
+		0, 0, 200, 100, // temporal window pos, change later in ReloadIni()
+		NULL, NULL, hInstance, NULL);
+
+	ReloadIni_and_Redraw(hwnd);
+
+	g_hdlgCountdownCfg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwnd, Dlgproc_CountdownCfg);
+	assert(g_hdlgCountdownCfg);
+
+	SetWindowText(hwnd, GetExeFilename());
+
+	ShowWindow(hwnd, iCmdShow);
+	UpdateWindow(hwnd);
+
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		if (!IsDialogMessage(g_hdlgCountdownCfg, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+	return (int)msg.wParam;
+}
+
 
 static bool ClientRectFromINI(RECT *prect)
 {
@@ -170,16 +208,6 @@ static bool ClientRectFromINI(RECT *prect)
 
 	return true;
 }
-
-class DelaySaveIniTimer : public CHwndTimer
-{
-public:
-	virtual void TimerCallback() cxx11_override
-	{
-		//vaDBG(_T("DelaySaveIniTimer..."));
-		g_xini.SaveIni();
-	}
-} s_DelaySaveIniTimer;
 
 inline int clock_cy_from_cx(int cx)
 {
@@ -200,10 +228,59 @@ void my_MoveWindow_byClientRect(HWND hwnd, const RECT& rcClient)
 	};
 
 	bool istitle = s_is_show_title;
-	UINT winstyle = Hwnd_TuneWinStyleBits (hwnd, s_two_styles[istitle].bits_on,    s_two_styles[!istitle].bits_on);
+	UINT winstyle = Hwnd_TuneWinStyleBits(hwnd, s_two_styles[istitle].bits_on, s_two_styles[!istitle].bits_on);
 	UINT exstyle = Hwnd_TuneWinStyleExBits(hwnd, s_two_styles[istitle].bits_on_ex, s_two_styles[!istitle].bits_on_ex);
 	MoveWindow_byClientRect(hwnd, &rcClient, winstyle, exstyle);
 }
+
+void ReloadIni_and_Redraw(HWND hwnd)
+{
+	static TCHAR exedir_ini[MAX_PATH] = {};
+	static TCHAR userdir[MAX_PATH] = {}, userdir_ini[MAX_PATH] = {};
+
+	if(!exedir_ini[0] || !userdir_ini[0])
+	{
+		snTprintf(exedir_ini, _T("%s\\%s.ini"), GetExeDir(), GetExeStemname());
+
+		SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, userdir);
+		assert(userdir[0]);
+		snTprintf(userdir_ini, _T("%s\\%s.ini"), userdir, GetExeStemname());
+	}
+
+	const TCHAR* const ar_inifiles[] = { exedir_ini, userdir_ini };
+	g_xini.LoadIni(ar_inifiles, ARRAYSIZE(ar_inifiles));
+
+	// Reposition DigClock window according to new INI content.
+
+	const int default_client_width_with_dpi = AfterDpiScale(g_init_client_cx);
+
+	POINT mousepos = {};
+	GetCursorPos(&mousepos);
+
+	RECT inirect = {};
+	bool iniok = ClientRectFromINI(&inirect);
+
+	RECT clirect = {}; // in screen coord
+	clirect.left = iniok ? inirect.left : mousepos.x;
+	clirect.top = iniok ? inirect.top : mousepos.y;
+
+	clirect.right = iniok ? inirect.right : (clirect.left + default_client_width_with_dpi);
+	clirect.bottom = iniok ? inirect.bottom : (clirect.top + clock_cy_from_cx(default_client_width_with_dpi));
+
+	my_MoveWindow_byClientRect(hwnd, clirect);
+}
+
+
+class DelaySaveIniTimer : public CHwndTimer
+{
+public:
+	virtual void TimerCallback() cxx11_override
+	{
+		//vaDBG(_T("DelaySaveIniTimer..."));
+		g_xini.SaveIni();
+	}
+} s_DelaySaveIniTimer;
+
 
 void my_AdjustClientRect(HWND hwnd, bool is_default_width=false)
 {
@@ -225,76 +302,6 @@ void my_AdjustClientRect(HWND hwnd, bool is_default_width=false)
 	my_MoveWindow_byClientRect(hwnd, clirect);
 }
 
-
-LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
-
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	PSTR szCmdLine, int iCmdShow)
-{
-	SomeInit();
-
-	static TCHAR szAppName[] = TEXT (APPNAME) ;
-	HWND         hwnd ;
-	MSG          msg ;
-	WNDCLASS     wndclass ;
-	g_hInstance = hInstance;
-
-	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
-	wndclass.lpfnWndProc   = WndProc ;
-	wndclass.cbClsExtra    = 0 ;
-	wndclass.cbWndExtra    = 0 ;
-	wndclass.hInstance     = hInstance ;
-	wndclass.hIcon         = LoadIcon(hInstance, _T("MYPROGRAM"));
-	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of BeginPaint_NoFlicker
-	wndclass.lpszMenuName  = NULL ;
-	wndclass.lpszClassName = szAppName ;
-	RegisterClass(&wndclass);
-
-	const int default_client_width_with_dpi = AfterDpiScale(g_init_client_cx);
-
-	POINT mousepos = {};
-	GetCursorPos(&mousepos);
-
-	RECT inirect  = {};
-	bool iniok = ClientRectFromINI(&inirect);
-
-	RECT clirect = {}; // in screen coord
-	clirect.left = iniok ? inirect.left : mousepos.x;
-	clirect.top  = iniok ? inirect.top  : mousepos.y;
-	
-	clirect.right  = iniok ? inirect.right : (clirect.left + default_client_width_with_dpi);
-	clirect.bottom = iniok ? inirect.bottom : (clirect.top + clock_cy_from_cx(default_client_width_with_dpi));
-
-	hwnd = CreateWindowEx (0,
-		szAppName, TEXT ("Digital Clock"),
-		WS_POPUPWINDOW | WS_CLIPCHILDREN, // casual, tune soon
-		// note: WS_CLIPCHILDREN avoids re-paint flicking when floatbar is visible and counting down.
-		clirect.left, clirect.top, // temporal X,Y pos, tune soon
-		RECTcx(clirect), RECTcy(clirect),
-		NULL, NULL, hInstance, NULL) ;
-	
-	my_MoveWindow_byClientRect(hwnd, clirect);
-
-	g_hdlgCountdownCfg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwnd, Dlgproc_CountdownCfg);
-	assert(g_hdlgCountdownCfg);
-
-	SetWindowText(hwnd, GetExeFilename());
-
-	ShowWindow (hwnd, iCmdShow) ;
-	UpdateWindow (hwnd) ;
-
-
-	while (GetMessage (&msg, NULL, 0, 0))
-	{
-		if(!IsDialogMessage(g_hdlgCountdownCfg, &msg))
-		{
-			TranslateMessage (&msg) ;
-			DispatchMessage (&msg) ;
-		}
-	}
-	return (int)msg.wParam ;
-}
 
 static COLORREF s_colors[] = 
 {
@@ -550,7 +557,7 @@ void RefreshDateBar(HDC hdc)
 
 }
 
-void ReloadSetting(HWND hwnd)
+void winenv_ReloadSetting(HWND hwnd)
 {
 	TCHAR         szBuffer [2] ;
 
@@ -652,7 +659,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 
 	s_mouselvp.SetHwnd(hwnd);
 
-	ReloadSetting(hwnd);
+	winenv_ReloadSetting(hwnd);
 
 	return TRUE; // create ok
 }
@@ -992,7 +999,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);
 
 		case WM_SETTINGCHANGE: // for user-locale(time format) change
-			ReloadSetting(hwnd);
+			winenv_ReloadSetting(hwnd);
 			return 0 ;
 	}
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
