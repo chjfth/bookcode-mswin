@@ -105,6 +105,7 @@ DataXString<RECT> g_dxClientRect;
 // -- Do no use _AutoSaveIni for this, so avoid intensive INI writing.
 //    When user drags/resize the window, Client-area RECT value would change very frequently.
 
+int g_firstUpdateWindowDone = 0;
 
 int g_seconds_countdown_cfg = 60;
 int g_seconds_remain = 0;
@@ -184,6 +185,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	ShowWindow(hwnd, iCmdShow);
 	UpdateWindow(hwnd);
+
+	g_firstUpdateWindowDone = 1;
 
 	hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 	assert(hAccel);
@@ -287,7 +290,8 @@ class DelaySaveIniTimer : public CHwndTimer
 public:
 	virtual void TimerCallback() cxx11_override
 	{
-		//vaDBG(_T("DelaySaveIniTimer..."));
+		vaDBG2(_T("DelaySaveIniTimer triggered..."));
+
 		g_xini.SaveIni();
 	}
 } s_DelaySaveIniTimer;
@@ -675,9 +679,15 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 
 static void OnWinMoveSize(HWND hwnd)
 {
-	RECT rect = {s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient + s_cyClient };
-	g_dxClientRect.SetValue(rect);
-	s_DelaySaveIniTimer.StartTimerOnce(hwnd, DELAY_SAVE_INI_MILLISEC);
+	if(g_firstUpdateWindowDone>0)
+	{
+		// Launch INI saving only AFTER Main window is shown.
+
+		RECT rect = { s_axClient, s_ayClient, s_axClient + s_cxClient, s_ayClient + s_cyClient };
+		g_dxClientRect.SetValue(rect);
+		s_DelaySaveIniTimer.StartTimerOnce(hwnd, DELAY_SAVE_INI_MILLISEC);
+	}
+
 }
 
 void Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
