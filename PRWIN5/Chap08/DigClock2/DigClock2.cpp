@@ -19,9 +19,11 @@ Since 2024.10:
 Since 2026.03: (v1.8)
 * Optionally show Date at bottom bar.
 
-Since 2026.05: (v2.0)
+Since 2026.05: (v2.2)
 * User options are saved to DigClock2.ini, including last window pos.
   INI along-side EXE is preferred; if saving fail, fallback to $HOME dir.
+* Add "Load default" menu(Ctrl+Alt+D).
+* Developer hotkey: Ctrl+Alt+L, reload INI settings.
 
 -----------------------------------------*/
 
@@ -151,6 +153,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	HWND         hwnd;
 	MSG          msg;
 	WNDCLASS     wndclass;
+	HACCEL       hAccel;
 	g_hInstance = hInstance;
 
 	wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -164,7 +167,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	wndclass.lpszMenuName = NULL;
 	wndclass.lpszClassName = szAppName;
 	RegisterClass(&wndclass);
-
 
 	hwnd = CreateWindowEx(0,
 		szAppName, TEXT("Digital Clock"),
@@ -183,12 +185,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	ShowWindow(hwnd, iCmdShow);
 	UpdateWindow(hwnd);
 
+	hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
+	assert(hAccel);
+
+
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		if (!IsDialogMessage(g_hdlgCountdownCfg, &msg))
+		if (!TranslateAccelerator(hwnd, hAccel, &msg))
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			if (!IsDialogMessage(g_hdlgCountdownCfg, &msg))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
 	}
 	return (int)msg.wParam;
@@ -201,7 +210,7 @@ static bool ClientRectFromINI(RECT *prect)
 	r = g_dxClientRect;
 
 	// Check if INI-provided RECT is empty
-	if(RECTcx(r)==0 || RECTcy(r)==0)
+	if(RECTcx(r)<=0 || RECTcy(r)<=0)
 		return false;
 
 	// todo: further check RECT value properness 
@@ -268,6 +277,8 @@ void ReloadIni_and_Redraw(HWND hwnd)
 	clirect.bottom = iniok ? inirect.bottom : (clirect.top + clock_cy_from_cx(default_client_width_with_dpi));
 
 	my_MoveWindow_byClientRect(hwnd, clirect);
+
+	Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
 }
 
 
@@ -655,8 +666,6 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 		s_hmenuRootPopup = GetSubMenu(s_hmenuRootPopup, 0) ; 
 	}
 
-	Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
-
 	s_mouselvp.SetHwnd(hwnd);
 
 	winenv_ReloadSetting(hwnd);
@@ -958,6 +967,15 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 		RECT clirect = {};
 		GetClientRect_ScreenPos(hwnd, &clirect);
 		my_AdjustClientRect(hwnd, true);
+	}
+	else if(cmdid==ID_ACCEL_ReloadIni)
+	{
+		ReloadIni_and_Redraw(hwnd);
+	}
+	else if(cmdid==ID_ACCEL_ResetDefault)
+	{
+		g_xini.ResetDefault();
+		ReloadIni_and_Redraw(hwnd);
 	}
 	else if(cmdid==IDM_EXIT)
 	{
