@@ -91,15 +91,17 @@ DataXIni g_xini;
 
 #define INI_SECNAME _T("cfg")
 
-DataXString_AutoSaveIni<ClockMode_et> g_ClockMode(g_xini,INI_SECNAME, _T("ClockMode"), _T("CM_WallTime"));
+#define MY_DEFINE_AUTOINI(varname, datatype, keyname, default_val) \
+	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), _T(default_val));
 
-DataXString_AutoSaveIni<bool> g_isShowDate(g_xini,INI_SECNAME, _T("IsShowDate"), _T("false"));
-DataXString_AutoSaveIni<bool> g_isShowTimezone(g_xini,INI_SECNAME, _T("IsShowTimezone"), _T("false"));
+MY_DEFINE_AUTOINI(g_ClockMode, ClockMode_et, "ClockMode", "CM_WallTime");
 
-DataXString_AutoSaveIni<bool> s_is_always_on_top(g_xini,INI_SECNAME, _T("AlwaysOnTop"), _T("true"));
-DataXString_AutoSaveIni<bool> s_is_change_color(g_xini,INI_SECNAME, _T("IsClickToChangeColor"), _T("false"));
-DataXString_AutoSaveIni<bool> s_is_show_title(g_xini,INI_SECNAME, _T("IsShowWindowTitle"), _T("false"));
-// -- todo: Use #define to simplfy the patter
+MY_DEFINE_AUTOINI(g_isShowDate,     bool, "IsShowDate", "false");
+MY_DEFINE_AUTOINI(g_isShowTimezone, bool, "IsShowTimezone", "false");
+
+MY_DEFINE_AUTOINI(s_is_always_on_top, bool, "AlwaysOnTop", "true");
+MY_DEFINE_AUTOINI(s_is_change_color,  bool, "IsClickToChangeColor", "false");
+MY_DEFINE_AUTOINI(s_is_show_title,    bool, "IsShowWindowTitle", "false");
 
 DataXString<RECT> g_dxClientRect; 
 // -- Do no use _AutoSaveIni for this, so avoid intensive INI writing.
@@ -143,6 +145,8 @@ void InitOnce()
 	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
 
 	g_xini.AddItem(INI_SECNAME, _T("ClientAreaRect"), &g_dxClientRect);
+	// -- This should not be DataXString_AutoSaveIni, to avoid intensive INI-file writing 
+	//    when user drag to change window position/size.
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
