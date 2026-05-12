@@ -49,6 +49,7 @@ Since 2026.05: (v2.2)
 #include <mswin/utils_wingui.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
+#include <WinMultiMon.h>
 
 #include <snTprintf.h>
 

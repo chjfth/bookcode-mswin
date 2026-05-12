@@ -15,3 +15,5 @@
 #include <SimpleIniEx.h>
 #include <DataXIni.h>
 
+#include <WinMultiMon.h>
+
