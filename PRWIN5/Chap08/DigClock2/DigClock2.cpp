@@ -22,7 +22,7 @@ Since 2026.03: (v1.8)
 Since 2026.05: (v2.2)
 * User options are saved to DigClock2.ini, including last window pos.
   INI along-side EXE is preferred; if saving fail, fallback to $HOME dir.
-* Add "Load default" menu(Ctrl+Alt+D).
+* Add "Reset all settings"(load program default) menu, or hotkey Ctrl+Alt+D .
 * Developer hotkey: Ctrl+Alt+L, reload INI settings.
 
 -----------------------------------------*/
@@ -49,6 +49,7 @@ Since 2026.05: (v2.2)
 #include <mswin/utils_wingui.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
+#include <RECTxy.h>
 #include <WinMultiMon.h>
 
 #include <snTprintf.h>
@@ -212,20 +213,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 
 
-static bool ClientRectFromINI(RECT *prect)
-{
-	RECT &r = *prect;
-	r = g_dxClientRect;
-
-	// Check if INI-provided RECT is empty
-	if(RECTcx(r)<=0 || RECTcy(r)<=0)
-		return false;
-
-	// todo: further check RECT value properness 
-
-	return true;
-}
-
 inline int clock_cy_from_cx(int cx)
 {
 	int logicy = LOGICY_HHMMSS + (g_isShowDate ? LOGICY_DATE : 0);
@@ -250,6 +237,28 @@ void my_MoveWindow_byClientRect(HWND hwnd, const RECT& rcClient)
 	MoveWindow_byClientRect(hwnd, &rcClient, winstyle, exstyle);
 }
 
+static bool ClientRectFromINI(HWND hwnd, RECT *prect)
+{
+	RECT &r = *prect;
+	r = g_dxClientRect;
+
+	// Check if INI-provided RECT is empty
+	if(RECTcx(r)<=0 || RECTcy(r)<=0)
+		return false;
+
+	RECT rectfix = mumo_PlaceRectInsideScreen(r, true);
+	if (rectfix != r)
+	{
+		vaDBG2(_T("DigClock2 client-area is outside of monitors, fix it from %s to %s"), 
+			RECTtext(r).c_str(), RECTtext(rectfix).c_str());
+		
+		my_MoveWindow_byClientRect(hwnd, rectfix);
+		r = rectfix;
+	}
+
+	return true;
+}
+
 void ReloadIni_and_Redraw(HWND hwnd)
 {
 	static TCHAR exedir_ini[MAX_PATH] = {};
@@ -271,18 +280,20 @@ void ReloadIni_and_Redraw(HWND hwnd)
 
 	const int default_client_width_with_dpi = AfterDpiScale(g_init_client_cx);
 
-	POINT mousepos = {};
-	GetCursorPos(&mousepos);
+	RECT clirect = {};
+	bool iniok = ClientRectFromINI(hwnd, &clirect);
 
-	RECT inirect = {};
-	bool iniok = ClientRectFromINI(&inirect);
+	if (!iniok) // INI is emppty
+	{
+		POINT mousepos = {};
+		GetCursorPos(&mousepos);
 
-	RECT clirect = {}; // in screen coord
-	clirect.left = iniok ? inirect.left : mousepos.x;
-	clirect.top = iniok ? inirect.top : mousepos.y;
+		clirect.left = mousepos.x;
+		clirect.top = mousepos.y;
 
-	clirect.right = iniok ? inirect.right : (clirect.left + default_client_width_with_dpi);
-	clirect.bottom = iniok ? inirect.bottom : (clirect.top + clock_cy_from_cx(default_client_width_with_dpi));
+		clirect.right = clirect.left + default_client_width_with_dpi;
+		clirect.bottom = clirect.top + clock_cy_from_cx(default_client_width_with_dpi);
+	}
 
 	my_MoveWindow_byClientRect(hwnd, clirect);
 
