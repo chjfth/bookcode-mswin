@@ -876,13 +876,15 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 
 	// Now we should find out the "Show Date" popup's menu-handle.
 	// I do it everytime dynamically, bcz in the future, the menu text can be in
-	// different language, so it will be hard to determine the menu-handle in advance.
+	// different language, so it will be hard to determine that menu-handle in advance.
 
 	HMENU hmShowDate = FindSubMenu_byText(s_hmenuRootPopup, _T("Show Date"));
-	
+	HMENU hmReset    = FindSubMenu_byText(s_hmenuRootPopup, _T("&Reset")); // just debug
 
-	if (hmShowDate == hmenuPopup)
-	{ 
+	if (hmenuPopup == hmShowDate)
+	{
+		vaDBG2(_T("See [Show Date] menu popup, hmenu=0x%X"), (Uint)hmenuPopup);
+
 		MENUITEMINFO mii = { sizeof(mii) };
 		mii.fMask = MIIM_ID | MIIM_FTYPE;
 		BOOL b = GetMenuItemInfo(hmenuPopup, 0, TRUE, &mii);
@@ -901,14 +903,12 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 	else
 	{	// Add some debug messages.
 		HMENU hSysMenu = GetSystemMenu(hwnd, FALSE);
-		if (hSysMenu == hmenuPopup)
-		{
+		if (hmenuPopup == hSysMenu)
 			vaDBG2(_T("See GetSystemMenu() popup, hmenu=0x%X"), (Uint)hmenuPopup);
-		}
+		else if(hmenuPopup == hmReset)
+			vaDBG2(_T("See [Reset] menu popup, hmenu=0x%X"), (Uint)hmenuPopup);
 		else
-		{
 			vaDBG2(_T("Unknown menu popup, hmenu=0x%X"), (Uint)hmenuPopup);
-		}
 	}
 }
 
@@ -982,7 +982,7 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	{
 		ReloadIni_and_Redraw(hwnd);
 	}
-	else if(cmdid==ID_ACCEL_ResetDefault)
+	else if(cmdid==IDM_RESET_ALL_SETTINGS)
 	{
 		g_xini.ResetDefault();
 		ReloadIni_and_Redraw(hwnd);

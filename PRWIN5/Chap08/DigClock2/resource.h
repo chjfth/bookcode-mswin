@@ -8,7 +8,8 @@
 #define IDM_ALWAYS_ON_TOP               1000
 #define IDB_StartCountDown              1000
 #define IDM_RESET_SIZE                  1001
-#define IDM_MINIMIZE_WINDOW             1002
+#define IDM_RESET_ALL_SETTINGS          1002
+#define IDM_MINIMIZE_WINDOW             1003
 #define IDM_COUNTDOWN_MODE              2000
 #define IDM_STOP_COUNTDOWN              2001
 #define IDM_MYPOPUP_SHOWDATE            2002
@@ -21,7 +22,6 @@
 #define IDM_SHOW_TITLE                  2009
 #define IDC_EDIT1                       3000
 #define ID_ACCEL_ReloadIni              4000
-#define ID_ACCEL_ResetDefault           4001
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -30,7 +30,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         4003
+#define _APS_NEXT_COMMAND_VALUE         4005
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

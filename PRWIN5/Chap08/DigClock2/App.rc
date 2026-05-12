@@ -32,7 +32,7 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 IDR_ACCELERATOR1 ACCELERATORS
 BEGIN
     "L",            ID_ACCEL_ReloadIni,     VIRTKEY, CONTROL, ALT, NOINVERT
-    "D",            ID_ACCEL_ResetDefault,  VIRTKEY, CONTROL, ALT, NOINVERT
+    "D",            IDM_RESET_ALL_SETTINGS, VIRTKEY, CONTROL, ALT, NOINVERT
 END
 
 #endif    // Chinese (Simplified, PRC) resources
@@ -76,8 +76,12 @@ BEGIN
             MENUITEM "Yes + Timezone",              IDM_SHOWDATE_TIMEZONE
         END
         MENUITEM "&Show text title",            IDM_SHOW_TITLE
-        MENUITEM "&Reset window size",          IDM_RESET_SIZE
         MENUITEM "&Minimize window",            IDM_MINIMIZE_WINDOW
+        POPUP "&Reset"
+        BEGIN
+            MENUITEM "&Reset window size",          IDM_RESET_SIZE
+            MENUITEM "&Reset all settings",         IDM_RESET_ALL_SETTINGS
+        END
         MENUITEM "&Help",                       IDM_HELP
         MENUITEM "&Exit",                       IDM_EXIT
     END
