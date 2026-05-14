@@ -133,7 +133,7 @@ static bool s_is_dragging = false;
 static bool s_is_moved = false;
 
 static int s_idxcolor = 0;
-static DataXString<RGB_wingui> s_dxDigitColor;
+static DataXString<RGB_wingui> s_dxDigitColor(_T("RGB(64,160,255)")); // sky blue
 
 BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
