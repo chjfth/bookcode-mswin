@@ -24,6 +24,8 @@ Since 2026.05: (v2.2)
   INI along-side EXE is preferred; if saving fail, fallback to $HOME dir.
 * Add "Reset all settings"(load program default) menu, or hotkey Ctrl+Alt+D .
 * Developer hotkey: Ctrl+Alt+L, reload INI settings.
+* Now user can manually set arbitrary color from INI, like this:
+*    DigitColor=RGB(255,168,88)
 
 -----------------------------------------*/
 
@@ -129,7 +131,9 @@ const int g_init_client_cx = 188; // Default main-window client-area size(96dpi 
 static POINT s_pos_mousedown; // client-area position
 static bool s_is_dragging = false;
 static bool s_is_moved = false;
+
 static int s_idxcolor = 0;
+static DataXString<RGB_wingui> s_dxDigitColor;
 
 BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
@@ -149,6 +153,8 @@ void InitOnce()
 	g_xini.AddItem(INI_SECNAME, _T("ClientAreaRect"), &g_dxClientRect);
 	// -- This should not be DataXString_AutoSaveIni, to avoid intensive INI-file writing 
 	//    when user drag to change window position/size.
+
+	g_xini.AddItem(INI_SECNAME, _T("DigitColor"), &s_dxDigitColor);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -283,7 +289,7 @@ void ReloadIni_and_Redraw(HWND hwnd)
 	RECT clirect = {};
 	bool iniok = ClientRectFromINI(hwnd, &clirect);
 
-	if (!iniok) // INI is emppty
+	if (!iniok) // INI is empty
 	{
 		POINT mousepos = {};
 		GetCursorPos(&mousepos);
@@ -334,29 +340,33 @@ void my_AdjustClientRect(HWND hwnd, bool is_default_width=false)
 }
 
 
-static COLORREF s_colors[] = 
+COLORREF SwitchDigitColor(int shift)
 {
-	RGB(0x40, 0xA0, 0xFF), // sky blue
-	RGB(0x00, 0xA8, 0x58), // pond green
-	RGB(0xD4, 0x62, 0x62), // dark red
-	RGB(0xC0, 0x30, 0xFF), // shining purple
-	RGB(0x70, 0x42, 0x14), // brown
-	RGB(0xF8, 0x60, 0x30), // deep orange
-	RGB(0x30, 0xA0, 0xD0), // dyeing blue
-	RGB(0xff, 0x00, 0xff), // magenta
-	RGB(0xff, 0x00, 0x00), // full red
-};
+	static int s_idxcolor = 0;
+	static COLORREF s_colors[] =
+	{
+		RGB(0x40, 0xA0, 0xFF), // sky blue
+		RGB(0x00, 0xA8, 0x58), // pond green
+		RGB(0xD4, 0x62, 0x62), // dark red
+		RGB(0xC0, 0x30, 0xFF), // shining purple
+		RGB(0x70, 0x42, 0x14), // brown
+		RGB(0xF8, 0x60, 0x30), // deep orange
+		RGB(0x30, 0xA0, 0xD0), // dyeing blue
+		RGB(0xff, 0x00, 0xff), // magenta
+		RGB(0xff, 0x00, 0x00), // full red
+	};
 
-int Get_NewColorIdx(int old, int shift)
-{
 	int total = ARRAYSIZE(s_colors);
-	int idxnew = old + shift;
+
+	int idxnew = s_idxcolor + shift;
 	if(idxnew>=total)
 		idxnew = 0;
 	else if(idxnew<0)
 		idxnew = total-1;
 	
-	return idxnew;
+	s_idxcolor = idxnew;
+	
+	return s_colors[s_idxcolor];
 }
 
 int Digit_ScaleDown(int value)
@@ -517,7 +527,8 @@ void DisplayCountDown(HDC hdc)
 
 void RefreshTheClock(HDC hdc)
 {
-	HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
+	COLORREF digitcolor = (RGB_wingui)s_dxDigitColor;
+	HBRUSH hbrush = CreateSolidBrush(digitcolor);
 
 	SelectObject (hdc, GetStockObject (NULL_PEN)) ;
 	SelectObject (hdc, hbrush) ;
@@ -574,7 +585,8 @@ void RefreshDateBar(HDC hdc)
 
 	// Set background/foreground color, the inverse of HH:MM:SS
 
-	HBRUSH hbrush = CreateSolidBrush(s_colors[s_idxcolor]);
+	COLORREF digitcolor = (RGB_wingui)s_dxDigitColor;
+	HBRUSH hbrush = CreateSolidBrush(digitcolor);
 	FillRect(hdc, &rc, hbrush);
 
 	SetBkMode(hdc, TRANSPARENT);
@@ -701,7 +713,7 @@ static void OnWinMoveSize(HWND hwnd)
 
 		RECT rect = { s_axClient, s_ayClient, s_axClient + s_cxClient, s_ayClient + s_cyClient };
 		g_dxClientRect.SetValue(rect);
-		s_DelaySaveIniTimer.StartTimerOnce(hwnd, DELAY_SAVE_INI_MILLISEC);
+		s_DelaySaveIniTimer.StartDelayedWork(hwnd, DELAY_SAVE_INI_MILLISEC);
 	}
 
 }
@@ -828,8 +840,10 @@ void Cls_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
 	{
 		if(s_is_change_color)
 		{
-			s_idxcolor = Get_NewColorIdx(s_idxcolor, (isCtrl||isShift) ? -1 : 1);
+			s_dxDigitColor = SwitchDigitColor(isCtrl||isShift ? -1 : 1);
 			InvalidateRect(hwnd, NULL, TRUE);
+
+			s_DelaySaveIniTimer.StartDelayedWork(hwnd, DELAY_SAVE_INI_MILLISEC);
 		}
 	}
 }
