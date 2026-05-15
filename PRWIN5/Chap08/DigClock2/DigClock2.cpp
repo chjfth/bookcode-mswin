@@ -38,7 +38,7 @@ Since 2026.05: (v2.2)
 #include <windowsx.h>
 #include <CommCtrl.h>
 #include <shlwapi.h>
-#include <ShlObj.h>
+#include <ShlObj-winxp-patch.h>
 #include "resource.h"
 
 #include <vaDbgTs.h>
@@ -88,7 +88,9 @@ Since 2026.05: (v2.2)
 HINSTANCE g_hInstance;
 
 enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
+
 struct Format_int_as_HHMMSS {};
+struct Format_COLORREF_as_RGB {};
 
 #include "datax.h" // should place it after `ClockMode_et` definition
 
@@ -139,7 +141,7 @@ static bool s_is_dragging = false;
 static bool s_is_moved = false;
 
 static int s_idxcolor = 0;
-static DataXString<RGB_wingui> s_dxDigitColor(_T("RGB(64,160,255)")); // sky blue
+static DataXString<Uint, Format_COLORREF_as_RGB> s_dxDigitColor(_T("RGB(64,160,255)")); // sky blue
 
 BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
@@ -533,7 +535,7 @@ void DisplayCountDown(HDC hdc)
 
 void RefreshTheClock(HDC hdc)
 {
-	COLORREF digitcolor = (RGB_wingui)s_dxDigitColor;
+	COLORREF digitcolor = s_dxDigitColor;
 	HBRUSH hbrush = CreateSolidBrush(digitcolor);
 
 	SelectObject (hdc, GetStockObject (NULL_PEN)) ;
@@ -591,7 +593,7 @@ void RefreshDateBar(HDC hdc)
 
 	// Set background/foreground color, the inverse of HH:MM:SS
 
-	COLORREF digitcolor = (RGB_wingui)s_dxDigitColor;
+	COLORREF digitcolor = s_dxDigitColor;
 	HBRUSH hbrush = CreateSolidBrush(digitcolor);
 	FillRect(hdc, &rc, hbrush);
 

@@ -72,3 +72,25 @@ struct DataXTraits<int, Format_int_as_HHMMSS>
 	}
 };
 
+template<>
+struct DataXTraits<Uint, Format_COLORREF_as_RGB>
+{
+	static Uint FromString(const TCHAR* s)
+	{
+		if (!s)
+			return 0;
+
+		Uint r = 0, g = 0, b = 0;
+		_stscanf_s(s, _T("RGB(%u,%u,%u)"), &r, &g, &b);
+		return RGB(r, g, b);
+	}
+
+	static Sdring ToString(Uint colorref)
+	{
+		TCHAR sz[32];
+		Uchar r = colorref, g = colorref>>8, b = colorref>>16;
+		snTprintf(sz, _T("RGB(%u,%u,%u)"), r, g, b);
+		return Sdring(sz);
+	}
+};
+
