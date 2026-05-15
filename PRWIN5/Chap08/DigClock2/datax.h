@@ -54,3 +54,21 @@ struct DataXTraits<RECT, FORMAT>
 	}
 };
 
+
+template<>
+struct DataXTraits<int, Format_int_as_HHMMSS>
+{
+	static int FromString(const TCHAR* s)
+	{
+		if (!s)
+			return 0;
+
+		return HMS_to_Seconds(s, false);
+	}
+
+	static Sdring ToString(int seconds)
+	{
+		return Seconds_to_HMS(seconds);
+	}
+};
+

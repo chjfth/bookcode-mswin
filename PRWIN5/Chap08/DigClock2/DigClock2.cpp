@@ -88,6 +88,7 @@ Since 2026.05: (v2.2)
 HINSTANCE g_hInstance;
 
 enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
+struct Format_int_as_HHMMSS {};
 
 #include "datax.h" // should place it after `ClockMode_et` definition
 
@@ -98,6 +99,10 @@ DataXIni g_xini;
 #define MY_DEFINE_AUTOINI(varname, datatype, keyname, default_val) \
 	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), _T(default_val));
 
+#define MY_DEFINE_AUTOINI_FORMAT(varname, datatype, format, keyname, default_val) \
+	DataXString_AutoSaveIni<datatype, format> varname(g_xini, INI_SECNAME, _T(keyname), _T(default_val));
+
+
 MY_DEFINE_AUTOINI(g_ClockMode, ClockMode_et, "ClockMode", "CM_WallTime");
 
 MY_DEFINE_AUTOINI(g_isShowDate,     bool, "IsShowDate", "false");
@@ -107,13 +112,14 @@ MY_DEFINE_AUTOINI(s_is_always_on_top, bool, "AlwaysOnTop", "true");
 MY_DEFINE_AUTOINI(s_is_change_color,  bool, "IsClickToChangeColor", "false");
 MY_DEFINE_AUTOINI(s_is_show_title,    bool, "IsShowWindowTitle", "false");
 
+MY_DEFINE_AUTOINI_FORMAT(g_seconds_countdown_cfg, int, Format_int_as_HHMMSS, "CountdownCfg", "00:01:00");
+
 DataXString<RECT> g_dxClientRect; 
 // -- Do no use _AutoSaveIni for this, so avoid intensive INI writing.
 //    When user drags/resize the window, Client-area RECT value would change very frequently.
 
 int g_firstUpdateWindowDone = 0;
 
-int g_seconds_countdown_cfg = 60;
 int g_seconds_remain = 0;
 DWORD g_msectick_start = 0; // value from GetTickCount()
 
@@ -1067,8 +1073,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 {
-	const TCHAR *pszCfg = Seconds_to_HMS(g_seconds_countdown_cfg);
-	SetDlgItemText(hDlg, IDC_EDIT1, pszCfg);
+	Sdring cfghms = Seconds_to_HMS(g_seconds_countdown_cfg);
+	SetDlgItemText(hDlg, IDC_EDIT1, cfghms);
 
 	HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
 	Editbox_EnableKbdAdjustIntnum(hEdit, 0, 59, 1, true, 2);
@@ -1091,7 +1097,7 @@ void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 	{
 		TCHAR szHMS[20] = {};
 		GetDlgItemText(hDlg, IDC_EDIT1, szHMS, ARRAYSIZE(szHMS)-1);
-		int seconds = HMS_to_Seconds(szHMS);
+		int seconds = HMS_to_Seconds(szHMS, true);
 		if(seconds<0)
 			return;
 

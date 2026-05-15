@@ -181,11 +181,11 @@ void MoveWindow_byOffset(HWND hwnd, int offsetx, int offsety)
 		oldrect.right-oldrect.left, oldrect.bottom-oldrect.top, TRUE);
 }
 
-const TCHAR* Seconds_to_HMS(int seconds)
+Sdring Seconds_to_HMS(int seconds)
 {
-	// Turn 63 seconds into "00:01:03"
+	// Example: Turn 63 seconds into "00:01:03"
 
-	static TCHAR szHMS[40];
+	TCHAR szHMS[40];
 
 	int zSeconds = seconds % 60;
 	int tmp = seconds / 60;
@@ -196,7 +196,7 @@ const TCHAR* Seconds_to_HMS(int seconds)
 	return szHMS;
 }
 
-int HMS_to_Seconds(const TCHAR *szHMS)
+int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox)
 {
 	// Strip leading spaces.
 	const TCHAR *pszHMS = szHMS;
@@ -205,10 +205,13 @@ int HMS_to_Seconds(const TCHAR *szHMS)
 
 	// Turn "00:01:03" into 63 seconds.
 	// -1 on error.
-	if(! (pszHMS[2]==':' && pszHMS[5]==':') )
+	if(! (pszHMS[2]==':' && pszHMS[5]==':' && pszHMS[8]=='\0') )
 	{
-		vaMsgBox(NULL, MB_OK|MB_ICONWARNING, _T(APPNAME),
-			_T("Time format error:\r\n\r\n%s"), pszHMS);
+		if(error_msgbox)
+		{
+			vaMsgBox(NULL, MB_OK | MB_ICONWARNING, _T(APPNAME),
+				_T("Time format error:\r\n\r\n%s"), pszHMS);
+		}
 		return -1;
 	}
 
