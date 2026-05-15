@@ -638,7 +638,16 @@ void Hide_CountdownCfg()
 void do_CountdownDone(HWND hwnd)
 {
 	(void)hwnd;
+
+	MessageBeep(MB_OK); // time-up beep
+
 	SetDlgItemText(g_hdlgCountdownCfg, IDB_StartCountDown, _T("Start countdown"));
+
+	if (IsIconic(hwnd)) {
+		ShowWindow(hwnd, SW_RESTORE);
+	}
+	BringWindowToTop(hwnd);
+	SetForegroundWindow(hwnd);
 }
 
 void DoTimer(HWND hwnd, int idtimer)
@@ -672,8 +681,6 @@ void DoTimer(HWND hwnd, int idtimer)
 
 			if(prev_remain>0 && g_seconds_remain==0)
 			{
-				MessageBeep(MB_OK); // time-up beep
-
 				do_CountdownDone(hwnd);
 			}
 
@@ -718,10 +725,18 @@ static void OnWinMoveSize(HWND hwnd)
 		// Launch INI saving only AFTER Main window is shown.
 
 		RECT rect = { s_axClient, s_ayClient, s_axClient + s_cxClient, s_ayClient + s_cyClient };
-		g_dxClientRect.SetValue(rect);
+
+		// Note: On Win10, When a window is minimized, we can see rect.left=rect.top=-32000,
+		// and rect.right, rect.bottom may be (-31770,-31902), 
+		// So, check for improper rect values before saving to INI.
+
+		if(!(rect.left==-32000 && rect.top==-32000) && RECTcx(rect)>0 && RECTcx(rect)>0)
+		{
+			g_dxClientRect.SetValue(rect);
+		}
+
 		s_DelaySaveIniTimer.StartDelayedWork(hwnd, DELAY_SAVE_INI_MILLISEC);
 	}
-
 }
 
 void Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
