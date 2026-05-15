@@ -47,11 +47,11 @@ Since 2026.05: (v2.2)
 
 #include <CHwndTimer.h>
 #include <RECTxy.h>
+#include <win32cozy.h>
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
-#include <RECTxy.h>
 #include <WinMultiMon.h>
 
 #include <snTprintf.h>
@@ -936,7 +936,7 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 
 	if (hmenuPopup == hmShowDate)
 	{
-		vaDBG2(_T("See [Show Date] menu popup, hmenu=0x%X"), (Uint)hmenuPopup);
+		vaDBG2(_T("See [Show Date] menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
 
 		MENUITEMINFO mii = { sizeof(mii) };
 		mii.fMask = MIIM_ID | MIIM_FTYPE;
@@ -957,11 +957,11 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 	{	// Add some debug messages.
 		HMENU hSysMenu = GetSystemMenu(hwnd, FALSE);
 		if (hmenuPopup == hSysMenu)
-			vaDBG2(_T("See GetSystemMenu() popup, hmenu=0x%X"), (Uint)hmenuPopup);
+			vaDBG2(_T("See GetSystemMenu() popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
 		else if(hmenuPopup == hmReset)
-			vaDBG2(_T("See [Reset] menu popup, hmenu=0x%X"), (Uint)hmenuPopup);
+			vaDBG2(_T("See [Reset] menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
 		else
-			vaDBG2(_T("Unknown menu popup, hmenu=0x%X"), (Uint)hmenuPopup);
+			vaDBG2(_T("Unknown menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
 	}
 }
 

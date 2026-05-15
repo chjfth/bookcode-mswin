@@ -5,6 +5,8 @@
 
 #define CHHI_ALL_IMPL
 
+#include <ShlObj-winxp-patch.h>
+
 #include <StringHelper.h>
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
