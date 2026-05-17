@@ -19,6 +19,9 @@
 #include "D3DEnum.h"
 #include "RoadRage.hpp"
 
+#define makeTsdring_IMPL // needed by d3denum.cpp
+#include <makeTsdring.h>
+
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }

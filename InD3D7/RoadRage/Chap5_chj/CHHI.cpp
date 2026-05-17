@@ -7,6 +7,10 @@
 //#define DlgTooltipEasy_DEBUG
 //#define Editbox_EnableKbdAdjustFloatnum_DEBUG
 
+#include <ShlObj-winxp-patch.h>
+
+#include <makeTsdring.h>
+
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
 #include <mswin/WinUser.itc.h>
