@@ -101,7 +101,7 @@ BEGIN
         LEFTMARGIN, 4
         RIGHTMARGIN, 285
         TOPMARGIN, 4
-        BOTTOMMARGIN, 151
+        BOTTOMMARGIN, 168
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -138,7 +138,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,125,25,50,14
 END
 
-IDD_PARAMS DIALOGEX 0, 0, 289, 155
+IDD_PARAMS DIALOGEX 0, 0, 289, 172
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CAPTION | WS_THICKFRAME
 EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Parameters"
@@ -173,14 +173,16 @@ BEGIN
     CONTROL         "W-buffer",IDC_RDO_ZbufferW,"Button",BS_AUTORADIOBUTTON,125,110,45,10
     LTEXT           "Camera orbit",IDC_STATIC,137,58,42,8
     LTEXT           "Live degree",IDC_STATIC,222,58,38,8
-    PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,115,137,59,14
     LTEXT           "(waggle)",IDC_STATIC,186,58,29,8
     LTEXT           "&Cull mode:",IDC_STATIC,4,123,34,8
     CONTROL         "Cull none",IDC_RDO_CullNone,"Button",BS_AUTORADIOBUTTON,44,122,45,10
     CONTROL         "Cull clockwise",IDC_RDO_CullClockwise,"Button",BS_AUTORADIOBUTTON,91,122,59,10
     CONTROL         "Cull counter-clockwise",IDC_RDO_CullCounterClockwise,
                     "Button",BS_AUTORADIOBUTTON,151,122,86,10
-    PUSHBUTTON      "?",IDC_BTN_HELP,271,140,14,11
+    LTEXT           "Commen&t:",IDC_STATIC,4,139,34,8
+    EDITTEXT        IDC_EDIT_COMMENT,42,137,242,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "Reset Params",IDC_BTN_ResetParams,115,154,59,14
+    PUSHBUTTON      "?",IDC_BTN_HELP,271,157,14,11
 END
 
 

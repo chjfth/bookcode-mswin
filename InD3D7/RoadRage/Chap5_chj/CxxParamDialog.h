@@ -69,5 +69,7 @@ private:
 
 	LiveUicXString<CRadioGroup, int> mc_Zbuffer;
 	LiveUicXString<CRadioGroup, int> mc_Cullmode;
+
+	LiveUicXString<CEditStr, Sdring> mc_edtComment;
 };
 

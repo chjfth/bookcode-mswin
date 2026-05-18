@@ -158,6 +158,11 @@ void ParamDialog::InitParams()
 	// Cull-mode radio-group
 	mc_Cullmode.Init(hdlg, IDC_RDO_CullNone, IDC_RDO_CullCounterClockwise, IDC_RDO_CullCounterClockwise);
 	m_xini.AddItem(ini_secname, _T("rdb_Cullmode"), &mc_Cullmode);
+
+	// Edit Comment
+	HWND hedtComment = GetDlgItem(hdlg, IDC_EDIT_COMMENT);
+	mc_edtComment.Init(hedtComment, _T("Free comments here."));
+	m_xini.AddItem(ini_secname, _T("edt_Comment"), &mc_edtComment);;
 }
 
 void ParamDialog::DataFromGui()
