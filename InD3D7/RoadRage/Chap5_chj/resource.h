@@ -76,6 +76,7 @@
 #define IDC_PLAYER_NAME                 1031
 #define IDS_LightXYZ                    1031
 #define IDC_CHECK1                      1032
+#define IDC_BTN_HELP                    1033
 #define IDC_WAIT_TEXT                   1035
 #define IDC_BUTTON1                     1043
 #define IDC_BUTTON2                     1044
@@ -100,9 +101,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        144
+#define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         40018
-#define _APS_NEXT_CONTROL_VALUE         1033
+#define _APS_NEXT_CONTROL_VALUE         1034
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

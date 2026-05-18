@@ -30,6 +30,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // remains consistent on all systems.
 IDI_MAIN_ICON           ICON                    "..\\DirectX.ico"
 
+
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -179,6 +180,7 @@ BEGIN
     CONTROL         "Cull clockwise",IDC_RDO_CullClockwise,"Button",BS_AUTORADIOBUTTON,91,122,59,10
     CONTROL         "Cull counter-clockwise",IDC_RDO_CullCounterClockwise,
                     "Button",BS_AUTORADIOBUTTON,151,122,86,10
+    PUSHBUTTON      "?",IDC_BTN_HELP,271,140,14,11
 END
 
 
@@ -205,6 +207,17 @@ BEGIN
     BEGIN
         MENUITEM "Light Sources",               MENU_LIGHT_SOURCES
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_PARAMS AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 #endif    // English (United States) resources

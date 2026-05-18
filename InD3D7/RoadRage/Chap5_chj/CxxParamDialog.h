@@ -4,8 +4,10 @@
 
 #include <TScalableArray.h>
 
-#include <mswin/LiveUic.h>
-using namespace liveuic;
+#include <mswin/LiveUicXString.h>
+	using namespace liveuic;
+
+#include <DataXIni.h>
 
 #include "CxxDialogBase.h"
 
@@ -38,31 +40,34 @@ protected:
 private:
 //	TScalableArray<> m_saLiveUic;
 
+	DataXIni m_xini;
+
 private:
 	D3DLIGHTTYPE m_lighttype;
-	CRadioGroup mc_LightType; // mc: member of Uic type
+	LiveUicXString<CRadioGroup, int> mc_LightType; // mc: member of Uic type
 	bool m_isPointLightLatitude;
 
 	float m_PointLightHeight; // const now
-	CEditValue<float> mc_PointLightRadius;
 
-	CCheckbox mc_LightAnimation;
-	CCheckbox mc_CameraAnimation;
+	LiveUicXString<CEditValue<float>, float> mc_PointLightRadius;
 
-	CEditStr mc_LightXYZ;
+	LiveUicXString<CCheckbox, int> mc_LightAnimation;
+	LiveUicXString<CCheckbox, int> mc_CameraAnimation;
 
-	CEditValue<float> mc_CameraHeight;
-	CEditValue<float> mc_CameraDistance;
-	CEditValue<float> mc_CameraOrbitDegree;
+	CEditStr mc_LightXYZ; // UI-readonly info
+
+	LiveUicXString<CEditValue<float>, float> mc_CameraHeight;
+	LiveUicXString<CEditValue<float>, float> mc_CameraDistance;
+	LiveUicXString<CEditValue<float>, float> mc_CameraOrbitDegree;
 //	float m_CameraOrbitDegreeLive;
-	CEditValue<float> mc_CameraWaggleDegreeMax;
+	LiveUicXString<CEditValue<float>, float> mc_CameraWaggleDegreeMax;
 
-	CCheckbox mc_IsBackWallGrid;
-	CCheckbox mc_IsBottomGrid;
-	CCheckbox mc_IsRightWallGrid;
-	CCheckbox mc_IsBallGrid;
+	LiveUicXString<CCheckbox, int> mc_IsBackWallGrid;
+	LiveUicXString<CCheckbox, int> mc_IsBottomGrid;
+	LiveUicXString<CCheckbox, int> mc_IsRightWallGrid;
+	LiveUicXString<CCheckbox, int> mc_IsBallGrid;
 
-	CRadioGroup mc_Zbuffer;
-	CRadioGroup mc_Cullmode;
+	LiveUicXString<CRadioGroup, int> mc_Zbuffer;
+	LiveUicXString<CRadioGroup, int> mc_Cullmode;
 };
 

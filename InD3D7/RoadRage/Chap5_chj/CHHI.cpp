@@ -22,3 +22,5 @@
 #include <mswin/Editbox_EnableKbdAdjustFloatnum.h>
 
 #include <mswin/LiveUic.h>
+#include <DataXIni.h>
+
