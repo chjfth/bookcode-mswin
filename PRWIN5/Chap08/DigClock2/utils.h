@@ -9,6 +9,7 @@
 #include <vaDbgTs.h>
 #include <vaDbgTs_util.h>
 using namespace vaDbgTs_util;
+#include <utils_env.h>
 
 
 #define APPNAME "DigClock2"
@@ -31,6 +32,10 @@ void MoveWindow_byOffset(HWND hwnd, int offsetx, int offsety);
 Sdring Seconds_to_HMS(int seconds);
 int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox=false);
 
+inline const TCHAR* GetIniStemName()
+{
+	return GetExeStemname();
+}
 
 
 #endif

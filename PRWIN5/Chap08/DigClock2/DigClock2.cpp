@@ -98,23 +98,23 @@ DataXIni g_xini;
 
 #define INI_SECNAME _T("cfg")
 
-#define MY_DEFINE_AUTOINI(varname, datatype, keyname, default_val) \
+#define MY_DEFINE_AUTOINI(datatype, varname, keyname, default_val) \
 	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), _T(default_val));
 
-#define MY_DEFINE_AUTOINI_FORMAT(varname, datatype, format, keyname, default_val) \
+#define MY_DEFINE_AUTOINI_FORMAT(datatype, varname, format, keyname, default_val) \
 	DataXString_AutoSaveIni<datatype, format> varname(g_xini, INI_SECNAME, _T(keyname), _T(default_val));
 
 
-MY_DEFINE_AUTOINI(g_ClockMode, ClockMode_et, "ClockMode", "CM_WallTime");
+MY_DEFINE_AUTOINI(ClockMode_et, g_ClockMode, "ClockMode", "CM_WallTime");
 
-MY_DEFINE_AUTOINI(g_isShowDate,     bool, "IsShowDate", "false");
-MY_DEFINE_AUTOINI(g_isShowTimezone, bool, "IsShowTimezone", "false");
+MY_DEFINE_AUTOINI(bool, g_isShowDate,       "IsShowDate", "false");
+MY_DEFINE_AUTOINI(bool, g_isShowTimezone,   "IsShowTimezone", "false");
 
-MY_DEFINE_AUTOINI(s_is_always_on_top, bool, "AlwaysOnTop", "true");
-MY_DEFINE_AUTOINI(s_is_change_color,  bool, "IsClickToChangeColor", "false");
-MY_DEFINE_AUTOINI(s_is_show_title,    bool, "IsShowWindowTitle", "false");
+MY_DEFINE_AUTOINI(bool, s_is_always_on_top, "AlwaysOnTop", "true");
+MY_DEFINE_AUTOINI(bool, s_is_change_color,  "IsClickToChangeColor", "false");
+MY_DEFINE_AUTOINI(bool, s_is_show_title,    "IsShowWindowTitle", "false");
 
-MY_DEFINE_AUTOINI_FORMAT(g_seconds_countdown_cfg, int, Format_int_as_HHMMSS, "CountdownCfg", "00:01:00");
+MY_DEFINE_AUTOINI_FORMAT(int, g_seconds_countdown_cfg, Format_int_as_HHMMSS, "CountdownCfg", "00:01:00");
 
 DataXString<RECT> g_dxClientRect; 
 // -- Do no use _AutoSaveIni for this, so avoid intensive INI writing.
@@ -280,11 +280,11 @@ void ReloadIni_and_Redraw(HWND hwnd)
 
 	if(!exedir_ini[0] || !userdir_ini[0])
 	{
-		snTprintf(exedir_ini, _T("%s\\%s.ini"), GetExeDir(), GetExeStemname());
+		snTprintf(exedir_ini, _T("%s\\%s.ini"), GetExeDir(), GetIniStemName());
 
 		SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, userdir);
 		assert(userdir[0]);
-		snTprintf(userdir_ini, _T("%s\\%s.ini"), userdir, GetExeStemname());
+		snTprintf(userdir_ini, _T("%s\\%s.ini"), userdir, GetIniStemName());
 	}
 
 	const TCHAR* const ar_inifiles[] = { exedir_ini, userdir_ini };

@@ -17,7 +17,7 @@ void ShowHelp(HWND hwndParent)
 		_T("DigClock2 by Jimm Chen. (version %d.%d.%d)\r\n")
 		_T("\r\n")
 		_T("This clock program works in wall-time mode or countdown mode.\r\n")
-		_T("Clock drawing code by DigClock from Charles Petzold [PRWIN5] Chap08.\r\n")
+		_T("Clock digits drawing code is written by Charles Petzold [PRWIN5] Chap08.\r\n")
 
 		_T("\r\n")
 		_T("To Move the clock window:\r\n")
@@ -30,10 +30,14 @@ void ShowHelp(HWND hwndParent)
 		_T("\r\n")
 		_T("In countdown mode, you can use keyboard Up/Down to adjust time values.\r\n")
 		_T("\r\n")
+		_T("User settings are saved to %s.ini .\r\n")
+		_T("\r\n")
 		_T("Compiled on: ") _T(__DATE__) _T(", ") _T(__TIME__)
 		;
 	vaMsgBox(hwndParent, MB_OK | MB_ICONINFORMATION, _T("Help"),
-		s_help_fmt, THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD);
+		s_help_fmt, 
+		THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD,
+		GetIniStemName());
 }
 
 
