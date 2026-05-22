@@ -3,7 +3,7 @@
 
 #define THISEXE_VMAJOR 2
 #define THISEXE_VMINOR 2
-#define THISEXE_VBUILD 8
+#define THISEXE_VBUILD 9
 
 #define THISEXEstr__(n) #n
 #define THISEXEstr(n) THISEXEstr__(n)

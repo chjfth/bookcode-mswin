@@ -98,27 +98,23 @@ DataXIni g_xini;
 
 #define INI_SECNAME _T("cfg")
 
-#define MY_DEFINE_AUTOINI(datatype, varname, keyname, default_val) \
-	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), _T(default_val));
+#define MY_DATA_AutoSaveINI(datatype, varname, keyname, default_val) \
+	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
 
-#define MY_DEFINE_AUTOINI_FORMAT(datatype, varname, format, keyname, default_val) \
-	DataXString_AutoSaveIni<datatype, format> varname(g_xini, INI_SECNAME, _T(keyname), _T(default_val));
+#define MY_DATAT_AutoSaveINI_FORMAT(datatype, varname, format, keyname, default_val) \
+	DataXString_AutoSaveIni<datatype, format> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
 
+MY_DATA_AutoSaveINI(ClockMode_et, g_ClockMode, "ClockMode", CM_WallTime);
 
-MY_DEFINE_AUTOINI(ClockMode_et, g_ClockMode, "ClockMode", "CM_WallTime");
+MY_DATA_AutoSaveINI(bool, g_isShowDate,       "IsShowDate", false);
+MY_DATA_AutoSaveINI(bool, g_isShowTimezone,   "IsShowTimezone", false);
 
-MY_DEFINE_AUTOINI(bool, g_isShowDate,       "IsShowDate", "false");
-MY_DEFINE_AUTOINI(bool, g_isShowTimezone,   "IsShowTimezone", "false");
+MY_DATA_AutoSaveINI(bool, s_is_always_on_top, "AlwaysOnTop", true);
+MY_DATA_AutoSaveINI(bool, s_is_change_color,  "IsClickToChangeColor", false);
+MY_DATA_AutoSaveINI(bool, s_is_show_title,    "IsShowWindowTitle", false);
 
-MY_DEFINE_AUTOINI(bool, s_is_always_on_top, "AlwaysOnTop", "true");
-MY_DEFINE_AUTOINI(bool, s_is_change_color,  "IsClickToChangeColor", "false");
-MY_DEFINE_AUTOINI(bool, s_is_show_title,    "IsShowWindowTitle", "false");
+MY_DATAT_AutoSaveINI_FORMAT(int, g_seconds_countdown_cfg, Format_int_as_HHMMSS, "CountdownCfg", _T("00:01:00"));
 
-MY_DEFINE_AUTOINI_FORMAT(int, g_seconds_countdown_cfg, Format_int_as_HHMMSS, "CountdownCfg", "00:01:00");
-
-DataXString<RECT> g_dxClientRect; 
-// -- Do no use _AutoSaveIni for this, so avoid intensive INI writing.
-//    When user drags/resize the window, Client-area RECT value would change very frequently.
 
 int g_firstUpdateWindowDone = 0;
 
@@ -141,7 +137,12 @@ static bool s_is_dragging = false;
 static bool s_is_moved = false;
 
 static int s_idxcolor = 0;
-static DataXString<Uint, Format_COLORREF_as_RGB> s_dxDigitColor(_T("RGB(64,160,255)")); // sky blue
+static DataXString_BindIni<Uint, Format_COLORREF_as_RGB> s_dxDigitColor(
+	g_xini, INI_SECNAME, _T("DigitColor"), _T("RGB(64,160,255)")); // sky blue
+
+DataXString_BindIni<RECT> g_dxClientRect(g_xini, INI_SECNAME, _T("ClientAreaRect"));
+// -- This should not be DataXString_AutoSaveIni, to avoid intensive INI-file writing 
+//    when user drag to change window position/size.
 
 BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
@@ -157,12 +158,6 @@ void InitOnce()
 {
 	InitCommonControls();
 	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
-
-	g_xini.AddItem(INI_SECNAME, _T("ClientAreaRect"), &g_dxClientRect);
-	// -- This should not be DataXString_AutoSaveIni, to avoid intensive INI-file writing 
-	//    when user drag to change window position/size.
-
-	g_xini.AddItem(INI_SECNAME, _T("DigitColor"), &s_dxDigitColor);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -734,7 +729,7 @@ static void OnWinMoveSize(HWND hwnd)
 
 		if(!(rect.left==-32000 && rect.top==-32000) && RECTcx(rect)>0 && RECTcx(rect)>0)
 		{
-			g_dxClientRect.SetValue(rect);
+			g_dxClientRect = rect;
 		}
 
 		s_DelaySaveIniTimer.StartDelayedWork(hwnd, DELAY_SAVE_INI_MILLISEC);
