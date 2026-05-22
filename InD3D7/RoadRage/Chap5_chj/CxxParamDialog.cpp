@@ -198,6 +198,7 @@ void ParamDialog::OnCommand(HWND hdlg, int uic, HWND hwndCtl, UINT codeNotify)
 	{
 		DlgboxPeeker *peeker = GetDlgboxPeeker(hdlg);
 		peeker->ResetAllUicContent();
+		m_xini.ResetDefault();
 		break;
 	}
 	case IDC_BTN_HELP:
