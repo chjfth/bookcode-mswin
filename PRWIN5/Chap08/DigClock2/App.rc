@@ -33,6 +33,8 @@ IDR_ACCELERATOR1 ACCELERATORS
 BEGIN
     "L",            ID_ACCEL_ReloadIni,     VIRTKEY, CONTROL, ALT, NOINVERT
     "D",            IDM_RESET_ALL_SETTINGS, VIRTKEY, CONTROL, ALT, NOINVERT
+    "T",            IDM_DO_TEST1,           VIRTKEY, CONTROL, ALT, NOINVERT
+    "Y",            IDM_DO_TEST2,           VIRTKEY, CONTROL, ALT, NOINVERT
 END
 
 #endif    // Chinese (Simplified, PRC) resources

@@ -124,7 +124,7 @@ HWND g_hdlgCountdownCfg;
 static HMENU s_hmenuRootPopup;
 
 static int s_cxClient, s_cyClient; // Clock window client-area size pixels
-static int s_axClient, s_ayClient; // Clock window client-area absolute(screen) position.
+static int s_axClient, s_ayClient; // Clock window client-area absolute(screen) position(left,top).
 
 int g_iso_client_cx; // maybe less than s_cxClient, if you squeeze clock-window's height.
 
@@ -319,6 +319,32 @@ public:
 	}
 } s_DelaySaveIniTimer;
 
+
+class WindowShakeTimer : public CHwndTimer
+{
+public:
+	virtual void TimerCallback() cxx11_override
+	{
+		const int nudge_max = AfterDpiScale(20);
+
+		// Generate random value between [-nudge_max , +nudge_max]
+
+		int nudgeX = nudge_max - rand() % (nudge_max*2);
+		int nudgeY = nudge_max - rand() % (nudge_max*2);
+
+		RECT rcCliAbs = {s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient+s_cyClient};
+		OffsetRect(&rcCliAbs, nudgeX, nudgeY);
+
+		MoveWindow_byClientRect(m_hwnd, &rcCliAbs);
+	}
+
+	virtual void TimerOffCallback() cxx11_override
+	{
+		RECT rcCliAbs = {s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient+s_cyClient};
+		MoveWindow_byClientRect(m_hwnd, &rcCliAbs);
+	}
+
+} s_WindowShakeTimer;
 
 void my_AdjustClientRect(HWND hwnd, bool is_default_width=false)
 {
@@ -719,7 +745,7 @@ static void OnWinMoveSize(HWND hwnd)
 	{
 		// Launch INI saving only AFTER Main window is shown.
 
-		RECT rect = { s_axClient, s_ayClient, s_axClient + s_cxClient, s_ayClient + s_cyClient };
+		RECT rect = { s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient+s_cyClient };
 
 		// Note: On Win10, When a window is minimized, we can see rect.left=rect.top=-32000,
 		// and rect.right, rect.bottom may be (-31770,-31902), 
@@ -745,11 +771,14 @@ void Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
 
 void Cls_OnMove(HWND hwnd, int x, int y)
 {
-	POINT abspos = {0, 0};
-	ClientToScreen(hwnd, &abspos);
-	s_axClient = abspos.x; s_ayClient = abspos.y;
+	if(! s_WindowShakeTimer.IsTicking())
+	{
+		POINT abspos = { 0, 0 };
+		ClientToScreen(hwnd, &abspos);
+		s_axClient = abspos.x; s_ayClient = abspos.y;
 
-	OnWinMoveSize(hwnd);
+		OnWinMoveSize(hwnd);
+	}
 }
 
 void Cls_OnTimer(HWND hwnd, UINT id)
@@ -1032,6 +1061,14 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	{
 		g_xini.ResetDefault();
 		ReloadIni_and_Redraw(hwnd);
+	}
+	else if(cmdid==IDM_DO_TEST1)
+	{
+		s_WindowShakeTimer.StartPeriodicWorkT(hwnd, 20, false, 2000);
+	}
+	else if (cmdid == IDM_DO_TEST2)
+	{
+		s_WindowShakeTimer.StopTimer();
 	}
 	else if(cmdid==IDM_EXIT)
 	{
