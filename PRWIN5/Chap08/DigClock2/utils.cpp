@@ -226,4 +226,21 @@ int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox)
 	return seconds;
 }
 
+CInterpretConst& get_itcClockMode()
+{
+	// This function returns the single s_itcClockMode object.
+	//
+	// Note: I cannot define s_itcClockMode as real C++ global object, because
+	// another global object(DataXString_AutoSaveIni<bool> g_ClockMode)'s ctor refers
+	// to s_itcClockMode. C++ global-object initializer cannot guarantee which one
+	// in constructed first.
+
+	static const Enum2Val_st _e2v_ClockMode[] =
+	{
+		ITC_NAMEPAIR(CM_WallTime),
+		ITC_NAMEPAIR(CM_Countdown),
+	};
+	static CInterpretConst s_itcClockMode(_e2v_ClockMode, ITCF_SINT);
+	return s_itcClockMode;
+}
 

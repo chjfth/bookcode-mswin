@@ -87,8 +87,6 @@ Since 2026.05: (v2.2)
 
 HINSTANCE g_hInstance;
 
-enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
-
 struct Format_int_as_HHMMSS {};
 struct Format_COLORREF_as_RGB {};
 

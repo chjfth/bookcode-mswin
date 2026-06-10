@@ -11,6 +11,13 @@
 using namespace vaDbgTs_util;
 #include <utils_env.h>
 
+#include <InterpretConst.h>
+using namespace itc;
+
+enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
+
+extern CInterpretConst& get_itcClockMode();
+
 
 #define APPNAME "DigClock2"
 

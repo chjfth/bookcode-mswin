@@ -1,36 +1,23 @@
 
 
-/*
-const Enum2Val_st _e2v_ClockMode[] =
-{
-	ITC_NAMEPAIR(CM_WallTime),
-	ITC_NAMEPAIR(CM_Countdown),
-};
-CInterpretConst itc_ClockMode(_e2v_ClockMode, ITCF_SINT);
-*/
-
 template<typename FORMAT>
 struct DataXTraits<ClockMode_et, FORMAT>
 {
 	static ClockMode_et FromString(const TCHAR* s)
 	{
-		if (shp_stricmp(s, _T("CM_WallTime")) ==0 )
-			return CM_WallTime;
-		else if (shp_stricmp(s, _T("CM_Countdown")) == 0)
-			return CM_Countdown;
-		else
-		{
-			// TODO? Thrown exception to tell invalid INI-value?
-			return CM_WallTime;
-		}
+		CInterpretConst& itcClockMode = get_itcClockMode();
+		bool is_err = false;
+		ClockMode_et cm = (ClockMode_et)itcClockMode.NamesToVal(s, &is_err);
+		// -- TODO? Thrown exception when is_err==true?
+		
+		return cm;
 	}
 
 	static Sdring ToString(ClockMode_et val)
 	{
-		if(val==CM_Countdown)
-			return _T("CM_Countdown");
-		else
-			return _T("CM_WallTime");
+		CInterpretConst& itcClockMode = get_itcClockMode();
+		Sdring text = ITCSnv(val, itcClockMode);
+		return text;
 	}
 };
 
