@@ -99,7 +99,7 @@ DataXIni g_xini;
 #define MY_DATA_AutoSaveINI(datatype, varname, keyname, default_val) \
 	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
 
-#define MY_DATAT_AutoSaveINI_FORMAT(datatype, varname, format, keyname, default_val) \
+#define MY_DATA_AutoSaveINI_FORMAT(datatype, varname, format, keyname, default_val) \
 	DataXString_AutoSaveIni<datatype, format> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
 
 MY_DATA_AutoSaveINI(ClockMode_et, g_ClockMode, "ClockMode", CM_WallTime);
@@ -111,7 +111,11 @@ MY_DATA_AutoSaveINI(bool, s_is_always_on_top, "AlwaysOnTop", true);
 MY_DATA_AutoSaveINI(bool, s_is_change_color,  "IsClickToChangeColor", false);
 MY_DATA_AutoSaveINI(bool, s_is_show_title,    "IsShowWindowTitle", false);
 
-MY_DATAT_AutoSaveINI_FORMAT(int, g_seconds_countdown_cfg, Format_int_as_HHMMSS, "CountdownCfg", _T("00:01:00"));
+MY_DATA_AutoSaveINI_FORMAT(int, g_seconds_countdown_cfg, Format_int_as_HHMMSS, "CountdownCfg", _T("00:01:00"));
+
+MY_DATA_AutoSaveINI(int, g_timedue_shake_seconds, "TimeDueShakeSeconds", 1);
+const int SHAKE_TIMER_INTERVAL = 25; // millisec
+const int SHAKE_NUDGE_MAX = 20; // for 96dpi monitor
 
 
 int g_firstUpdateWindowDone = 0;
@@ -319,32 +323,6 @@ public:
 	}
 } s_DelaySaveIniTimer;
 
-
-class WindowShakeTimer : public CHwndTimer
-{
-public:
-	virtual void TimerCallback() cxx11_override
-	{
-		const int nudge_max = AfterDpiScale(20);
-
-		// Generate random value between [-nudge_max , +nudge_max]
-
-		int nudgeX = nudge_max - rand() % (nudge_max*2);
-		int nudgeY = nudge_max - rand() % (nudge_max*2);
-
-		RECT rcCliAbs = {s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient+s_cyClient};
-		OffsetRect(&rcCliAbs, nudgeX, nudgeY);
-
-		MoveWindow_byClientRect(m_hwnd, &rcCliAbs);
-	}
-
-	virtual void TimerOffCallback() cxx11_override
-	{
-		RECT rcCliAbs = {s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient+s_cyClient};
-		MoveWindow_byClientRect(m_hwnd, &rcCliAbs);
-	}
-
-} s_WindowShakeTimer;
 
 void my_AdjustClientRect(HWND hwnd, bool is_default_width=false)
 {
@@ -669,6 +647,14 @@ void do_CountdownDone(HWND hwnd)
 	}
 	BringWindowToTop(hwnd);
 	SetForegroundWindow(hwnd);
+
+	// Shake the window if user wants it.
+	if(g_timedue_shake_seconds>0)
+	{
+		const int nudge_max = AfterDpiScale(SHAKE_NUDGE_MAX);
+		g_winshaker.ShakeStart(hwnd, nudge_max, SHAKE_TIMER_INTERVAL, 
+			g_timedue_shake_seconds*1000);
+	}
 }
 
 void DoTimer(HWND hwnd, int idtimer)
@@ -771,14 +757,11 @@ void Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
 
 void Cls_OnMove(HWND hwnd, int x, int y)
 {
-	if(! s_WindowShakeTimer.IsTicking())
-	{
-		POINT abspos = { 0, 0 };
-		ClientToScreen(hwnd, &abspos);
-		s_axClient = abspos.x; s_ayClient = abspos.y;
+	POINT abspos = { 0, 0 };
+	ClientToScreen(hwnd, &abspos);
+	s_axClient = abspos.x; s_ayClient = abspos.y;
 
-		OnWinMoveSize(hwnd);
-	}
+	OnWinMoveSize(hwnd);
 }
 
 void Cls_OnTimer(HWND hwnd, UINT id)
@@ -820,6 +803,12 @@ void Cls_OnPaint(HWND hwnd)
 
 void Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
 {
+	if(g_winshaker.IsTicking())
+	{ 
+		g_winshaker.ShakeStop();
+		return;
+	}
+
 	s_is_dragging = true;
 	s_is_moved = false;
 	SetCapture(hwnd);
@@ -1064,11 +1053,11 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	}
 	else if(cmdid==IDM_DO_TEST1)
 	{
-		s_WindowShakeTimer.StartPeriodicWorkT(hwnd, 20, false, 2000);
+//		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
 	}
 	else if (cmdid == IDM_DO_TEST2)
 	{
-		s_WindowShakeTimer.StopTimer();
+//		g_winshaker.ShakeStop();
 	}
 	else if(cmdid==IDM_EXIT)
 	{

@@ -4,12 +4,15 @@
 #include <windowsx.h>
 #include <Shlwapi.h>
 
+#include <_MINMAX_.h>
+#include <RECTxy.h>
 #include <mswin/utils_wingui.h>
 
 #include "iversion.h"
 
-
 //double g_sysdpiScaling = 1.0;
+
+WindowShaker g_winshaker;
 
 void ShowHelp(HWND hwndParent)
 {
@@ -244,3 +247,43 @@ CInterpretConst& get_itcClockMode()
 	return s_itcClockMode;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+void WindowShaker::TimerCallback()
+{
+	// Generate random value between [-nudge_max , +nudge_max]
+
+	int nudgeX = m_nudge_max - rand() % (m_nudge_max * 2);
+	int nudgeY = m_nudge_max - rand() % (m_nudge_max * 2);
+
+	RECT rcnew = m_rcOrigWin;
+	OffsetRect(&rcnew, nudgeX, nudgeY);
+
+	MoveWindow(m_hwnd, RECT_disXYWH(rcnew), FALSE);
+}
+
+void WindowShaker::TimerOffCallback()
+{
+	MoveWindow(m_hwnd, RECT_disXYWH(m_rcOrigWin), FALSE);
+}
+
+
+void WindowShaker::ShakeStart(HWND hwnd, int nudge_max, 
+	int interval_millisec, int duration_millisec)
+{
+	nudge_max = _MAX_(1, nudge_max);
+	interval_millisec = _MAX_(10, interval_millisec);
+	duration_millisec = _MAX_(100, duration_millisec);
+
+	m_hwnd = hwnd;
+	m_nudge_max = nudge_max;
+
+	GetWindowRect(hwnd, &m_rcOrigWin);
+
+	StartPeriodicWorkT(hwnd, interval_millisec, false, duration_millisec);
+}
+
+void WindowShaker::ShakeStop()
+{
+	StopTimer();
+}

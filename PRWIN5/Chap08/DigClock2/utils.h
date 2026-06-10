@@ -5,11 +5,13 @@
 #include <windows.h>
 #include <tchar.h>
 #include <sdring.h>
+#include <commdefs.h>
 
 #include <vaDbgTs.h>
 #include <vaDbgTs_util.h>
 using namespace vaDbgTs_util;
 #include <utils_env.h>
+#include <CHwndTimer.h>
 
 #include <InterpretConst.h>
 using namespace itc;
@@ -44,5 +46,23 @@ inline const TCHAR* GetIniStemName()
 	return GetExeStemname();
 }
 
+
+class WindowShaker : public CHwndTimer
+{
+public:
+	void ShakeStart(HWND hwnd, int nudge_max, int interval_millisec, int duration_millisec);
+	void ShakeStop();
+
+protected:
+	virtual void TimerCallback() cxx11_override;
+	virtual void TimerOffCallback() cxx11_override;
+
+private:
+	HWND m_hwnd;
+	RECT m_rcOrigWin; // original window position
+	int m_nudge_max;
+};
+
+extern WindowShaker g_winshaker;
 
 #endif
