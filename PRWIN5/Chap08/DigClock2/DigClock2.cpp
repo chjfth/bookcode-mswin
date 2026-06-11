@@ -727,7 +727,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 
 static void OnWinMoveSize(HWND hwnd)
 {
-	if(g_firstUpdateWindowDone>0)
+	if(g_firstUpdateWindowDone>0 && !g_winshaker.IsTicking())
 	{
 		// Launch INI saving only AFTER Main window is shown.
 
