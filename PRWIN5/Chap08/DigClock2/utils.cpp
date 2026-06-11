@@ -273,14 +273,18 @@ void WindowShaker::ShakeStart(HWND hwnd, int nudge_max,
 {
 	nudge_max = _MAX_(1, nudge_max);
 	interval_millisec = _MAX_(10, interval_millisec);
-	duration_millisec = _MAX_(100, duration_millisec);
+	if(duration_millisec>=0)
+		duration_millisec = _MAX_(100, duration_millisec);
 
 	m_hwnd = hwnd;
 	m_nudge_max = nudge_max;
 
 	GetWindowRect(hwnd, &m_rcOrigWin);
 
-	StartPeriodicWorkT(hwnd, interval_millisec, false, duration_millisec);
+	if(duration_millisec>0)
+		StartPeriodicWorkT(hwnd, interval_millisec, false, duration_millisec);
+	else if(duration_millisec<0)
+		StartPeriodicWorkN(hwnd, interval_millisec, false, -1);
 }
 
 void WindowShaker::ShakeStop()

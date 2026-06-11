@@ -69,6 +69,17 @@ BEGIN
     BEGIN
         MENUITEM "Count-&down mode",            IDM_COUNTDOWN_MODE
         MENUITEM "Stop countdown",              IDM_STOP_COUNTDOWN
+        POPUP "&When countdown due"
+        BEGIN
+            POPUP "&Shake window"
+            BEGIN
+                MENUITEM "&No shake",                   ID_SHAKE_NOSHAKE
+                MENUITEM "&1 second",                   ID_SHAKE_1SEC
+                MENUITEM "&3 seconds",                  ID_SHAKE_3SEC
+                MENUITEM "&5 seconds",                  ID_SHAKE_5SEC
+                MENUITEM "&Forever",                    ID_SHAKE_FOREVER
+            END
+        END
         MENUITEM "&Always on Top",              IDM_ALWAYS_ON_TOP
         MENUITEM "&Click to change color",      IDM_CLICK_CHANGE_COLOR
         POPUP "Show Date"

@@ -649,7 +649,7 @@ void do_CountdownDone(HWND hwnd)
 	SetForegroundWindow(hwnd);
 
 	// Shake the window if user wants it.
-	if(g_timedue_shake_seconds>0)
+	if(g_timedue_shake_seconds!=0)
 	{
 		const int nudge_max = AfterDpiScale(SHAKE_NUDGE_MAX);
 		g_winshaker.ShakeStart(hwnd, nudge_max, SHAKE_TIMER_INTERVAL, 
@@ -938,12 +938,16 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 		return;
 	}
 
-	// Now we should find out the "Show Date" popup's menu-handle.
+	// Now we should find out each popup's menu-handle([Show Date], [Shake window] etc).
 	// I do it everytime dynamically, bcz in the future, the menu text can be in
 	// different language, so it will be hard to determine that menu-handle in advance.
 
 	HMENU hmShowDate = FindSubMenu_byText(s_hmenuRootPopup, _T("Show Date"));
 	HMENU hmReset    = FindSubMenu_byText(s_hmenuRootPopup, _T("&Reset")); // just debug
+	assert(hmReset);
+	
+	HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
+	HMENU hmShakeWindow = FindSubMenu_byText(hmWhenTimedue, _T("&Shake window"));
 
 	if (hmenuPopup == hmShowDate)
 	{
@@ -963,6 +967,51 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_TIMEZONE,
 			(g_isShowDate && g_isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
 
+	}
+	if (hmenuPopup == hmShakeWindow)
+	{
+		vaDBG2(_T("See [Shake window] menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
+		
+		bool is_stock = false;
+		const int shake_seconds = g_timedue_shake_seconds;
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_NOSHAKE, 
+			shake_seconds==0 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_1SEC,
+			shake_seconds==1 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_3SEC,
+			shake_seconds ==3 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_5SEC,
+			shake_seconds==5 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_FOREVER,
+			shake_seconds<0 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
+
+		bool is_custom = IsMenuitemExist_byID(hmShakeWindow, ID_SHAKE_CUSTOM_SEC);
+
+		if(is_stock)
+		{
+			if(is_custom)
+			{
+				DeleteMenu(hmShakeWindow, ID_SHAKE_CUSTOM_SEC, MF_BYCOMMAND);
+			}
+		}
+		else
+		{
+			// User set in INI a seconds value that is not "stock".
+			// So we add an extra menu item to exhibit the custom value from INI.
+			if(!is_custom)
+			{
+				AppendMenu(hmShakeWindow, MF_STRING, ID_SHAKE_CUSTOM_SEC, _T("~pending~"));
+			}
+			TCHAR text[40];
+			snTprintf(text, _T("%d seconds (from INI)"), shake_seconds);
+			SetMenuitemText_byID(hmShakeWindow, ID_SHAKE_CUSTOM_SEC, text);
+			CheckMenuItem(hmShakeWindow, ID_SHAKE_CUSTOM_SEC, MF_CHECKED);
+		}
 	}
 	else
 	{	// Add some debug messages.
@@ -1051,6 +1100,26 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 		g_xini.ResetDefault();
 		ReloadIni_and_Redraw(hwnd);
 	}
+	else if(cmdid==ID_SHAKE_NOSHAKE)
+	{
+		g_timedue_shake_seconds = 0;
+	}
+	else if(cmdid==ID_SHAKE_1SEC)
+	{
+		g_timedue_shake_seconds = 1;
+	}
+	else if(cmdid==ID_SHAKE_3SEC)
+	{
+		g_timedue_shake_seconds = 3;
+	}
+	else if(cmdid==ID_SHAKE_5SEC)
+	{
+		g_timedue_shake_seconds = 5;
+	}
+	else if(cmdid==ID_SHAKE_FOREVER)
+	{
+		g_timedue_shake_seconds = -1;
+	}
 	else if(cmdid==IDM_DO_TEST1)
 	{
 //		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
@@ -1131,6 +1200,8 @@ void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 
 	if(idcmd==IDB_StartCountDown)
 	{
+		g_winshaker.ShakeStop();
+
 		TCHAR szHMS[20] = {};
 		GetDlgItemText(hDlg, IDC_EDIT1, szHMS, ARRAYSIZE(szHMS)-1);
 		int seconds = HMS_to_Seconds(szHMS, true);
