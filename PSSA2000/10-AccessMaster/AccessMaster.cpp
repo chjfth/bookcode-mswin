@@ -19,7 +19,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include <mswin/JULayout2.h>
 
-#include <vaDbg.h>
+#include <vaDbgTs.h>
+#include <mswin/utils_wingui.h>
 
 #include "../chjutils/chjutils.h"
 #include "../chjutils/ch10-DumpSD.h"
@@ -415,7 +416,7 @@ HRESULT CSecurityInformation::GetObjectInformation(
 	pObjectInfo->pszServerName = NULL;
 	pObjectInfo->pszObjectName = m_pInfo->m_szObjectName;
 
-	vaDbgS(
+	vaDbgTs(
 		_T("System calls our CSecurityInformation::GetObjectInformation(), we return (to ACLUI) SI_OBJECT_INFO:\n")
 		_T("  .pszObjectName = \"%s\"\n")
 		_T("  .hInstance = 0x%p\n")
@@ -441,7 +442,7 @@ HRESULT CSecurityInformation::GetSecurity(
 	HRESULT hr = 1;
 	PSECURITY_DESCRIPTOR pSD = NULL;
 
-	vaDbgS(
+	vaDbgTs(
 		_T("System calls our CSecurityInformation::GetSecurity(), requesting:\n")
 		_T("  RequestedInformation = %s")
 		, 
@@ -487,7 +488,7 @@ HRESULT CSecurityInformation::GetSecurity(
 			_sntprintf_s(sz_which_object, _TRUNCATE, _T("object-name: \"%s\""), m_pInfo->m_szName);
 		else
 			_sntprintf_s(sz_which_object, _TRUNCATE, _T("object-handle: 0x%p (as in our process)"), m_pInfo->m_hHandle);
-		vaDbgS(
+		vaDbgTs(
 			_T("We return (to ACLUI) security info about :\n")
 			_T("  %s\n")
 			_T("  object-type: %s\n")
@@ -516,7 +517,7 @@ HRESULT CSecurityInformation::GetAccessRights(const GUID* pguidObjectType,
 	// dwFlags==0, when the "starting" ALCUI is displayed.
 	// dwFlags==SI_ADVANCED, when user clicks [Advanced] button.
 
-	vaDbgS(
+	vaDbgTs(
 		_T("System calls our CSecurityInformation::GetAccessRights(), passing in:\n")
 		_T("  dwFlags = %s")
 		, 
@@ -577,12 +578,12 @@ HRESULT CSecurityInformation::GetInheritTypes(PSI_INHERIT_TYPE* ppPropagTypes,
 		*pcPropagTypes = 0;
 	}
 
-	vaDbgS(_T("System calls our CSecurityInformation::GetInheritTypes(). We return %d propagation-types."),
+	vaDbgTs(_T("System calls our CSecurityInformation::GetInheritTypes(). We return %d propagation-types."),
 		*pcPropagTypes);
 
 	for(int i=0; i<(int)*pcPropagTypes; i++)
 	{
-		vaDbgS(
+		vaDbgTs(
 			_T("  Propagation-type #%d:\n")
 			_T("    SI_INHERIT_TYPE.pszName = %s\n")
 			_T("    SI_INHERIT_TYPE.dwFlags = %s")
@@ -603,7 +604,7 @@ HRESULT CSecurityInformation::GetInheritTypes(PSI_INHERIT_TYPE* ppPropagTypes,
 HRESULT CSecurityInformation::PropertySheetPageCallback(HWND hwnd, UINT uMsg, 
 	SI_PAGE_TYPE uPage) 
 {
-	vaDbgS(_T("PSPcallback: hwnd=0x%08X , MSG=%s , Pagetype=%s"), 
+	vaDbgTs(_T("PSPcallback: hwnd=0x%08X , MSG=%s , Pagetype=%s"), 
 		hwnd,
 		ITCS(uMsg, Aclui_PSPCB_xxx), 
 		ITCS(uPage, Aclui_SI_PAGE_xxx)
@@ -618,7 +619,7 @@ HRESULT CSecurityInformation::PropertySheetPageCallback(HWND hwnd, UINT uMsg,
 
 		bool succ = JULayout::PropSheetProc(hwndPrsht, PSCB_INITIALIZED_1, 0); // [2025-01-23] Pending: should pass in uMsg as 2nd param
 		
-		vaDbgS(L"JULayout::PropSheetProc()=%s", succ?L"success":L"fail");
+		vaDbgTs(L"JULayout::PropSheetProc()=%s", succ?L"success":L"fail");
 	}
 
 	return(S_OK);
@@ -658,7 +659,7 @@ HRESULT CSecurityInformation::SetSecurity(
 	GetSecurityDescriptorControl(pSecurityDescriptor, &sdCtrl, &ulRevision);
 
 	// Dump debug:
-	vaDbgS(
+	vaDbgTs(
 		_T("System calls our CSecurityInformation::SetSecurity(), passing in:\n")
 		_T("  SecurityInformation = %s\n")
 		_T("  SD Dump below:")

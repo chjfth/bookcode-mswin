@@ -28,7 +28,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "..\ClassLib\PrintBuf.h"      // See Appendix B.
 
-#include <vaDbg.h>
+#include <vaDbgTs.h>
+#include <mswin/utils_wingui.h>
 #include "../chjutils/chjutils.h"
 
 #include "LSAStr.h"

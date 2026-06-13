@@ -4,13 +4,13 @@
 #include <Ntsecapi.h> // for LSA_HANDLE
 #include <Lm.h> // for NetApiBufferFree 
 
-#include <vaDbg.h>
-
 typedef DWORD WinError_t;
 
 
 //////////////////////////////////////////////////////////////////////////
 
+#include <vaDbgTs.h>
+#include <mswin/WinError.itc.h>
 
 #include <EnsureClnup_mswin.h>
 
@@ -64,8 +64,19 @@ inline const TCHAR* sorf(BOOL succ)
 
 //// PSSA2000 specific:
 
-const TCHAR *WinerrStr(DWORD winerr=0);
-const TCHAR *app_WinErrStr(DWORD winerr); // same as above
+#define app_WinErrStr(winerr) ITCSvn(winerr, itc::WinError)
+
+#define WinerrStrNow (GetLastError()==0 ? _T("success") : ITCS_WinError) 
+// -- replace pre-202606's WinerrStr()
+
+inline TCHAR *now_timestr(TCHAR buf[], int bufchars)
+{
+	TCHAR inbuf[40];
+	_sntprintf_s(buf, bufchars, _TRUNCATE, 
+		_T("[%s]"), va_now_hms_ms(inbuf, ARRAYSIZE(inbuf)));
+	return buf;
+}
+
 
 //
 // User-callbacks for CH10_DumpSD()

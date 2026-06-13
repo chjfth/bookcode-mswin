@@ -3,7 +3,7 @@
 #include "../chjutils/ch10-DumpSD.h"
 #include "../chjutils/chjutils.h"
 
-#include <vaDbg.h>
+#include <vaDbgTs.h>
 
 BOOL myEnablePrivilege(PTSTR szPriv, BOOL fEnabled) 
 {

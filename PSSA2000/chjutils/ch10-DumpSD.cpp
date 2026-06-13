@@ -1,8 +1,10 @@
 #include "ch10-DumpSD.h"
 
-#include <vaDbg.h>
+#include <vaDbgTs.h>
+//#include <mswin/utils_wingui.h>
 #include "chjutils.h"
 
+#define vaDbgS vaDbgTs
 
 TCHAR * SID2Repr(PSID pvSid, TCHAR buf[], int buflen)
 {

@@ -9,12 +9,14 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "..\ClassLib\IOCP.h"          /* See Appendix B */
 #include "..\ClassLib\EnsureCleanup.h" /* See Appendix B */
 
-#include <vaDbg.h>
+#include <vaDbgTs.h>
+#include <mswin/utils_wingui.h>
 #include <mswin/WinSvc.itc.h>
 #include <mswin/Dbt.itc.h>
 
 #include "../chjutils/chjutils.h"
 
+#define SERVICESTATUS_IMPL
 #include "ServiceStatus.h"
 
 
@@ -168,11 +170,11 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 					{
 						// Only show UI when not running as service.
 						vaMsgBox(NULL, MB_OK|MB_ICONEXCLAMATION, nullptr,
-							_T("CreateNamedPipe() fail, %s"), WinerrStr(winerr));
+							_T("CreateNamedPipe() fail, %s"), app_WinErrStr(winerr));
 					}
 					else
 					{
-						vaDbgTs(_T("03-TimeService: CreateNamedPipe() fail, %s"), WinerrStr(winerr));
+						vaDbgTs(_T("03-TimeService: CreateNamedPipe() fail, %s"), app_WinErrStr(winerr));
 					}
 					exit(5);
 				}
@@ -237,7 +239,7 @@ void WINAPI TimeServiceMain(DWORD dwArgc, PTSTR* pszArgv)
 					_T("[INFO] CH03 TimeService.cpp: iocp.GetStatus() fail, %s")
 					_T("  -- this error can be ignored.")
 					, 
-					WinerrStr());
+					WinerrStrNow);
 			}
 			
 			dwControl = dwNumBytes;
@@ -260,7 +262,7 @@ int myInstallService()
 
 	if(hSCM.IsInvalid())
 	{
-		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenSCManager() fail, %s"), WinerrStr());
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenSCManager() fail, %s"), WinerrStrNow);
 		return 4;
 	}
 
@@ -296,8 +298,8 @@ int myInstallService()
 	else
 	{
 		winerr = GetLastError();
-		vaDbgTs(_T("CreateService() fail, %s"), WinerrStr(winerr));
-		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("CreateService() fail, %s"), WinerrStr(winerr));
+		vaDbgTs(_T("CreateService() fail, %s"), app_WinErrStr(winerr));
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("CreateService() fail, %s"), app_WinErrStr(winerr));
 		return 4;
 	}
 
@@ -320,7 +322,7 @@ int myRemoveService()
 
 	if(hSCM.IsInvalid())
 	{
-		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenSCManager() fail, %s"), WinerrStr());
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenSCManager() fail, %s"), WinerrStrNow);
 		return 4;
 	}
 
@@ -330,7 +332,7 @@ int myRemoveService()
 
 	if(hService.IsInvalid())
 	{
-		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenService() fail, %s"), WinerrStr());
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("OpenService() fail, %s"), WinerrStrNow);
 		return 4;
 	}
 
@@ -338,7 +340,7 @@ int myRemoveService()
 	BOOL succ = DeleteService(hService);
 	if(!succ)
 	{
-		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("DeleteService() fail, %s"), WinerrStr());
+		vaMsgBox(NULL, MB_OK|MB_ICONERROR, nullptr, _T("DeleteService() fail, %s"), WinerrStrNow);
 		return 4;
 	}
 
@@ -374,7 +376,7 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR pszCmdLine, int)
 			TEXT("\n")
 			TEXT("   /install\t\tInstalls the service in the SCM's database.\n")
 			TEXT("   /remove\t\tRemoves the service from the SCM's database.\n")
-			TEXT("   /debug\t\tRuns as a normal process for debugging.")
+			TEXT("   /debug\t\tRuns as a normal process for debugging.\n")
 			TEXT("   /service\t\tRun as a service (should only be set in the SCM's database)")
 			,
 			g_szServiceName, MB_OK);

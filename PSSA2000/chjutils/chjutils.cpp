@@ -36,61 +36,6 @@ const TCHAR *Const2Str(
 	return ret_known ? _T("Unknown") : NULL;
 }
 
-////
-
-#include "winerrs.partial.cpp"
-
-const TCHAR * Winerr2Str(DWORD winerr)
-{
-	return Const2Str(gar_Winerr2Str, winerr, true);
-}
-
-const TCHAR *WinerrStr(DWORD winerr)
-{
-	static TCHAR s_retbuf[80] = {};
-	s_retbuf[0] = 0;
-
-	if (winerr==0 || winerr==(DWORD)-1)
-		winerr = GetLastError();
-
-	const TCHAR *errstr = Const2Str(gar_Winerr2Str, winerr, false);
-
-	if(errstr)
-	{
-		_sntprintf_s(s_retbuf, _TRUNCATE, _T("WinErr=%d (%s)"), winerr, errstr);
-	}
-	else
-	{
-		TCHAR szErrDesc[200] = {};
-		DWORD retchars = FormatMessage(
-			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, 
-			winerr,
-			MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), // LANGID
-			szErrDesc, ARRAYSIZE(szErrDesc)-1,
-			NULL); 
-
-		if(retchars>0)
-		{
-			_sntprintf_s(s_retbuf, _TRUNCATE, _T("WinErr=%d, %s"), winerr, szErrDesc);
-		}
-		else
-		{
-			_sntprintf_s(s_retbuf, _TRUNCATE, 
-				_T("WinErr=%d (FormatMessage does not known this error-code)"), 
-				winerr);
-		}
-	}
-
-	return s_retbuf;
-}
-
-const TCHAR *app_WinErrStr(DWORD winerr)
-{
-	return WinerrStr(winerr);
-}
-
-
 //////////////////////////////////////////////////////////////////////////
 
 TCHAR *parse_cmdparam_TCHARs(

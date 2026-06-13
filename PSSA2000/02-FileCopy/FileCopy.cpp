@@ -15,7 +15,10 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 #include "..\ClassLib\IOCP.h"             // See Appendix B.
 #include "..\ClassLib\EnsureCleanup.h"    // See Appendix B.
 
-#include <vaDbg.h>
+//#include <vaDbg.h>
+#include <vaDbgTs.h>
+#include <mswin/utils_wingui.h>
+
 #include "..\chjutils\chjutils.h"
 
 
@@ -88,9 +91,9 @@ static void vaDbgReadWriteResult(BOOL succ, const TCHAR *opstr)
 {
 #ifdef DEBUG_ALL
 	if(succ)
-		vaDbg(_T("%s success."), opstr);
+		vaDbgTs(_T("%s success."), opstr);
 	else 
-		vaDbg(_T("%s error, winerr=%d."), opstr, GetLastError());
+		vaDbgTs(_T("%s error, winerr=%d."), opstr, GetLastError());
 #endif 
 }
 
@@ -161,8 +164,7 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 		
 		TCHAR timebuf[40];
 #ifdef DEBUG_ALL
-		vaDbg(_T("%s iocp.GetStatus(%s)=%s"), 
-			now_timestr(timebuf, ARRAYSIZE(timebuf)), 
+		vaDbgTs(_T("iocp.GetStatus(%s)=%s"), 
 			CompKey==CK_READ ? _T("read") : _T("WRITE"),
 			succ ? _T("succ") : _T("fail"));
 #else
@@ -173,8 +175,7 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 			if(*pWinErr==0)
 				*pWinErr = nowerr; // record first error
 			
-			vaDbgS(_T("%s iocp.GetStatus(%s) fail. %s"), 
-				now_timestr(timebuf, ARRAYSIZE(timebuf)), 
+			vaDbgTs(_T("iocp.GetStatus(%s) fail. %s"), 
 				CompKey==CK_READ ? _T("read") : _T("WRITE"),
 				app_WinErrStr(nowerr));
 		}

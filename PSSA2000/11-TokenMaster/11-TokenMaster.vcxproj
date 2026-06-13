@@ -111,10 +111,13 @@
         "v120" on VC2013
         "v140" on VC2015
         "v141" on VC2017
-          "v142" on VC2019
-          "v143" on VC2022
+        "v142" on VC2019
+        "v143" on VC2022
       -->
     <PlatformToolset Condition="$(DefaultPlatformToolset)!=''">$(DefaultPlatformToolset)</PlatformToolset>
+
+    <!-- Chj special: For VC2013 and VC2015, I want them to produce WinXP-runnable EXE. (I want v120_xp or v140_xp) -->
+    <PlatformToolset Condition="$(DefaultPlatformToolset)=='v120' or $(DefaultPlatformToolset)=='v140'">$(DefaultPlatformToolset)_xp</PlatformToolset>
   </PropertyGroup>
 
   <!---->
@@ -150,7 +153,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\..\share;..\..\__chjcxx\common-include\include\mswin;..\..\__chjcxx\common-include\include;..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\_devdbg;.;..\..\share;..\..\__chjcxx\common-include\include\mswin;..\..\__chjcxx\common-include\include;..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -206,7 +209,6 @@
     <ClCompile Include="DumpInfo.cpp" />
     <ClCompile Include="..\chjutils\chjutils.cpp" />
     <ClCompile Include="..\chjutils\ch10-DumpSD.cpp" />
-    <ClCompile Include="..\..\share\vaDbg.cpp" />
     <ClCompile Include="CHHI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -222,10 +224,8 @@
     <ClInclude Include="shareinc.h" />
     <ClInclude Include="DumpInfo.h" />
     <ClInclude Include="DaclPage.h" />
-    <ClInclude Include="..\..\share\vaDbg.h" />
     <ClInclude Include="..\chjutils\chjutils.h" />
     <ClInclude Include="..\chjutils\ch10-DumpSD.h" />
-    <ClInclude Include="..\..\__chjcxx\common-include\include\mswin\Combobox_EnableWideDrop.h" />
   </ItemGroup>
 
   <!-- MSBuild system stock Cpp.targets -->

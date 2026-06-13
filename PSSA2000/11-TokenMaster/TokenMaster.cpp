@@ -9,6 +9,8 @@ Notices: Copyright (c) 2000 Jeffrey Richter
 
 #include "..\ClassLib\AutoBuf.h"       // See Appendix B.
 
+#include <mswin/utils_env.h>
+#include <mswin/utils_wingui.h>
 #include <mswin/Combobox_EnableWideDrop.h>
 
 #include "DaclPage.h"

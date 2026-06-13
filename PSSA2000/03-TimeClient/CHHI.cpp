@@ -11,8 +11,3 @@
 #include <mswin/utils_wingui.h>
 //
 #include <mswin/WinError.itc.h>
-#include <mswin/winuser.itc.h>
-#include <mswin/winnt.itc.h>
-#include <mswin/WinSvc.itc.h>
-#include <mswin/Dbt.itc.h>
-
