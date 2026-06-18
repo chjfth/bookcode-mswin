@@ -108,8 +108,10 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 		FILE_SHARE_READ, NULL, OPEN_EXISTING, 
 		FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED, 
 		NULL);
-	if (hfileSrc.IsInvalid()) 
+	if (hfileSrc.IsInvalid())  {
+		*pWinErr = GetLastError();
 		return FALSE;
+	}
 
 	// Get the file's size
 	GetFileSizeEx(hfileSrc, &liFileSizeSrc);
@@ -123,8 +125,10 @@ BOOL in_FileCopy(PCTSTR pszFileSrc, PCTSTR pszFileDst,
 		0, NULL, CREATE_ALWAYS, 
 		FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED, 
 		hfileSrc);
-	if (hfileDst.IsInvalid()) 
+	if (hfileDst.IsInvalid()) {
+		*pWinErr = GetLastError();
 		return FALSE;
+	}
 
 	// File systems extend files synchronously. Extend the destination file 
 	// now so that I/Os execute asynchronously improving performance.
