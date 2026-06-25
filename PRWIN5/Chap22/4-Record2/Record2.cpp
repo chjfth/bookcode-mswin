@@ -53,6 +53,10 @@ INT_PTR CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
+	case WM_INITDIALOG:
+		Set_WindowIcon(hwnd, MAKEINTRESOURCE(1));
+		return TRUE;
+
 	case WM_COMMAND:
 		switch (wParam)
 		{
