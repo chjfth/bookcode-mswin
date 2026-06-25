@@ -1,12 +1,19 @@
 /*----------------------------------------
    TESTMCI.C -- MCI Command String Tester
                 (c) Charles Petzold, 1998
+
+[2026-06-25] Chj update: Show mcierror value as well as szError[]
   ----------------------------------------*/
 
 #include <windows.h>
 #include "resource.h"
 
 #pragma comment(lib, "winmm.lib")
+
+#define CHHI_ALL_IMPL
+#include <snTprintf.h>
+#include <mswin/utils_wingui.h>
+#include <mswin/mmsystem.itc.h>
 
 
 #define ID_TIMER    1
@@ -38,6 +45,8 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_INITDIALOG:
+		Set_WindowIcon(hwnd, MAKEINTRESOURCE(1));
+		
 		// Center the window on screen
 
 		GetWindowRect (hwnd, &rect) ;
@@ -56,8 +65,7 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDOK:
 			// Find the line numbers corresponding to the selection
 
-			SendMessage (hwndEdit, EM_GETSEL, (WPARAM) &iCharBeg, 
-				(LPARAM) &iCharEnd) ;
+			SendMessage (hwndEdit, EM_GETSEL, (WPARAM)&iCharBeg, (LPARAM)&iCharEnd) ;
 
 			iLineBeg = SendMessage (hwndEdit, EM_LINEFROMCHAR, iCharBeg, 0) ;
 			iLineEnd = SendMessage (hwndEdit, EM_LINEFROMCHAR, iCharEnd, 0) ;
@@ -68,7 +76,7 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				// Get the line and terminate it; ignore if blank
 
-				* (WORD *) szCommand = sizeof (szCommand) / sizeof (TCHAR) ;
+				*(WORD*)szCommand = sizeof(szCommand) / sizeof(TCHAR) ;
 
 				iLength = SendMessage (hwndEdit, EM_GETLINE, iLine, 
 					(LPARAM) szCommand) ;
@@ -88,10 +96,11 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				// Set the Error String field (even if no error)
 
-				mciGetErrorString (error, szError, 
-					sizeof(szError)/sizeof(TCHAR)) ;
+				szError[0] = '\0';
+				mciGetErrorString (error, szError, sizeof(szError)/sizeof(TCHAR)) ;
 
-				SetDlgItemText (hwnd, IDC_ERROR_STRING, szError) ;
+				vaSetDlgItemText(hwnd, IDC_ERROR_STRING, 
+					_T("mcierror=%s\r\n%s"), ITCSvn(error, itc::MCIERR_xxx), szError);
 			}
 			// Send the caret to the end of the last selected line
 
@@ -101,8 +110,7 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			// Insert a carriage return/line feed combination
 
-			SendMessage (hwndEdit, EM_REPLACESEL, FALSE, 
-				(LPARAM) TEXT ("\r\n")) ;
+			SendMessage (hwndEdit, EM_REPLACESEL, FALSE, (LPARAM)TEXT("\r\n")) ;
 			SetFocus (hwndEdit) ;
 			return TRUE ;
 
