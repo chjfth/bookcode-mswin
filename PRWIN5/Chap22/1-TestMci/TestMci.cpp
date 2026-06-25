@@ -1,108 +1,167 @@
-/*------------------------------------------------------------
-TestMci.cpp skeleton program 
--- Displays "Hello, WindowsX!" in client area
-				 
-   Compile it with command line in Visual C++ 2010+:
-   
-cl /c /Od /MT /Zi /D_DEBUG /D_UNICODE /DUNICODE TestMci.cpp
-rc TestMci.rc
-link /debug TestMci.obj TestMci.res kernel32.lib user32.lib gdi32.lib
+/*----------------------------------------
+   TESTMCI.C -- MCI Command String Tester
+                (c) Charles Petzold, 1998
+  ----------------------------------------*/
 
-   Then we can load it into Visual C++ debugger.
-  ------------------------------------------------------------*/
-
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <windowsx.h>
-#include <tchar.h>
-#include <assert.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include "resource.h"
 
-#include "utils.h"
+#pragma comment(lib, "winmm.lib")
 
-LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
-int WINAPI _tWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-					PTSTR szCmdLine, int nCmdShow)
+#define ID_TIMER    1
+
+BOOL CALLBACK DlgProc (HWND, UINT, WPARAM, LPARAM) ;
+
+TCHAR szAppName [] = TEXT ("TestMci") ;
+
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
+	PSTR szCmdLine, int iCmdShow)
 {
-	(void)hPrevInstance; (void)szCmdLine; 
-	static TCHAR szAppName[] = TEXT ("TestMci") ;
-	HWND         hwnd = NULL;
-	MSG          msg = {};
-	WNDCLASS     wndclass = {};
-
-	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
-	wndclass.lpfnWndProc   = WndProc ;
-	wndclass.cbClsExtra    = 0 ;
-	wndclass.cbWndExtra    = 0 ;
-	wndclass.hInstance     = hInstance ;
-	wndclass.hIcon         = LoadIcon (hInstance, MAKEINTRESOURCE(1)) ;
-	wndclass.hCursor       = LoadCursor (NULL, IDC_ARROW) ;
-	wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH) ;
-	wndclass.lpszMenuName  = NULL ;
-	wndclass.lpszClassName = szAppName ;
-
-	RegisterClass (&wndclass);
-	 
-	hwnd = CreateWindow (szAppName,    // window class name
-		TEXT ("The TestMci Program"), // window caption
-		WS_OVERLAPPEDWINDOW,           // window style
-		CW_USEDEFAULT,   // initial x position
-		CW_USEDEFAULT,   // initial y position
-		400,             // initial x size
-		200,             // initial y size
-		NULL,            // parent window handle
-		NULL,            // window menu handle
-		hInstance,       // program instance handle
-		NULL) ;          // creation parameters
-	 
-	ShowWindow (hwnd, nCmdShow) ;
-	UpdateWindow (hwnd) ;
-	
-	while (GetMessage (&msg, NULL, 0, 0))
+	if (-1 == DialogBox (hInstance, szAppName, NULL, DlgProc))
 	{
-		TranslateMessage (&msg) ;
-		DispatchMessage (&msg) ;
+		MessageBox (NULL, TEXT ("This program requires Windows NT!"),
+			szAppName, MB_ICONERROR) ;
 	}
-
-	return (int)msg.wParam; // the value N told by PostQuitMessage(N);
+	return 0 ;
 }
 
-BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	return TRUE; // success, go on creation
-}
-
-void Cls_OnPaint(HWND hwnd)
-{
-	PAINTSTRUCT ps = {};
+	static HWND hwndEdit ;
+	int         iCharBeg, iCharEnd, iLineBeg, iLineEnd, iChar, iLine, iLength ;
+	MCIERROR    error ;
 	RECT        rect ;
-	HDC hdc = BeginPaint (hwnd, &ps) ;
+	TCHAR       szCommand [1024], szReturn [1024], 
+		szError [1024], szBuffer [32] ;
 
-	GetClientRect (hwnd, &rect) ;          
-	Ellipse(hdc, 0,0, rect.right, rect.bottom);
-	DrawText (hdc, TEXT ("Hello, WindowsX !"), -1, &rect,
-		DT_SINGLELINE | DT_CENTER | DT_VCENTER) ;
-
-	EndPaint (hwnd, &ps) ;
-}
-
-void Cls_OnDestroy(HWND hwnd)
-{
-	PostQuitMessage(44);
-}
-
-
-LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	
 	switch (message)
-	{{
-		HANDLE_MSG(hwnd, WM_CREATE, Cls_OnCreate);
-		HANDLE_MSG(hwnd, WM_PAINT, Cls_OnPaint);
-		HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);
-	}}
-	
-	return DefWindowProc (hwnd, message, wParam, lParam) ;
+	{
+	case WM_INITDIALOG:
+		// Center the window on screen
+
+		GetWindowRect (hwnd, &rect) ;
+		SetWindowPos (hwnd, NULL, 
+			(GetSystemMetrics (SM_CXSCREEN) - rect.right + rect.left) / 2,
+			(GetSystemMetrics (SM_CYSCREEN) - rect.bottom + rect.top) / 2,
+			0, 0, SWP_NOZORDER | SWP_NOSIZE) ;
+
+		hwndEdit = GetDlgItem (hwnd, IDC_MAIN_EDIT) ;
+		SetFocus (hwndEdit) ;
+		return FALSE ;
+
+	case WM_COMMAND:
+		switch (LOWORD (wParam))
+		{
+		case IDOK:
+			// Find the line numbers corresponding to the selection
+
+			SendMessage (hwndEdit, EM_GETSEL, (WPARAM) &iCharBeg, 
+				(LPARAM) &iCharEnd) ;
+
+			iLineBeg = SendMessage (hwndEdit, EM_LINEFROMCHAR, iCharBeg, 0) ;
+			iLineEnd = SendMessage (hwndEdit, EM_LINEFROMCHAR, iCharEnd, 0) ;
+
+			// Loop through all the lines               
+
+			for (iLine = iLineBeg ; iLine <= iLineEnd ; iLine++)
+			{
+				// Get the line and terminate it; ignore if blank
+
+				* (WORD *) szCommand = sizeof (szCommand) / sizeof (TCHAR) ;
+
+				iLength = SendMessage (hwndEdit, EM_GETLINE, iLine, 
+					(LPARAM) szCommand) ;
+				szCommand [iLength] = '\0' ;
+
+				if (iLength == 0)
+					continue ;
+
+				// Send the MCI command
+
+				error = mciSendString (szCommand, szReturn, 
+					sizeof(szReturn)/sizeof(TCHAR), hwnd) ;
+
+				// Set the Return String field
+
+				SetDlgItemText (hwnd, IDC_RETURN_STRING, szReturn) ;
+
+				// Set the Error String field (even if no error)
+
+				mciGetErrorString (error, szError, 
+					sizeof(szError)/sizeof(TCHAR)) ;
+
+				SetDlgItemText (hwnd, IDC_ERROR_STRING, szError) ;
+			}
+			// Send the caret to the end of the last selected line
+
+			iChar  = SendMessage (hwndEdit, EM_LINEINDEX,  iLineEnd, 0) ;
+			iChar += SendMessage (hwndEdit, EM_LINELENGTH, iCharEnd, 0) ;
+			SendMessage (hwndEdit, EM_SETSEL, iChar, iChar) ;
+
+			// Insert a carriage return/line feed combination
+
+			SendMessage (hwndEdit, EM_REPLACESEL, FALSE, 
+				(LPARAM) TEXT ("\r\n")) ;
+			SetFocus (hwndEdit) ;
+			return TRUE ;
+
+		case IDCANCEL:
+			EndDialog (hwnd, 0) ;
+			return TRUE ;
+
+		case IDC_MAIN_EDIT:
+			if (HIWORD (wParam) == EN_ERRSPACE)
+			{
+				MessageBox (hwnd, TEXT ("Error control out of space."),
+					szAppName, MB_OK | MB_ICONINFORMATION) ;
+				return TRUE ;
+			}
+			break ;
+		}
+		break ;
+
+	case MM_MCINOTIFY:
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_MESSAGE), TRUE) ;
+
+		wsprintf (szBuffer, TEXT ("Device ID = %i"), lParam) ;
+		SetDlgItemText (hwnd, IDC_NOTIFY_ID, szBuffer) ;
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_ID), TRUE) ;
+
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_SUCCESSFUL),
+			wParam & MCI_NOTIFY_SUCCESSFUL) ;
+
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_SUPERSEDED),
+			wParam & MCI_NOTIFY_SUPERSEDED) ;
+
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_ABORTED),
+			wParam & MCI_NOTIFY_ABORTED) ;
+
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_FAILURE),
+			wParam & MCI_NOTIFY_FAILURE) ;
+
+		SetTimer (hwnd, ID_TIMER, 5000, NULL) ;
+		return TRUE ;
+
+	case WM_TIMER:
+		KillTimer (hwnd, ID_TIMER) ;
+
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_MESSAGE), FALSE) ;
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_ID), FALSE) ;
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_SUCCESSFUL), FALSE) ;
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_SUPERSEDED), FALSE) ;
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_ABORTED), FALSE) ;
+		EnableWindow (GetDlgItem (hwnd, IDC_NOTIFY_FAILURE), FALSE) ;
+		return TRUE ;
+
+	case WM_SYSCOMMAND:
+		switch (LOWORD (wParam))
+		{
+		case SC_CLOSE:
+			EndDialog (hwnd, 0) ;
+			return TRUE ;
+		}
+		break ;
+	}
+	return FALSE ;
 }

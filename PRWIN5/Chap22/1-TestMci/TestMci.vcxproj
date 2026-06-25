@@ -212,7 +212,6 @@
    -->
   <ItemGroup>
     <ClCompile Include="TestMci.cpp" />
-    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestMci.rc" />
@@ -222,7 +221,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="utils.h" />
   </ItemGroup>
   
   <!-- MSBuild system stock Cpp.targets -->
@@ -232,7 +230,7 @@
 
   <!-- import VSPG start -->
   <PropertyGroup>
-    <VSPG_BootsDir_NoTBS Condition="exists('..\..\__VSPG\_VSPG\boots\_VSPG.props')" >..\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>
+    <VSPG_BootsDir_NoTBS Condition="exists('..\..\..\__VSPG\_VSPG\boots\_VSPG.props')" >..\..\..\__VSPG\_VSPG\boots</VSPG_BootsDir_NoTBS>
     <VSPG_BootsDir_NoTBS Condition="exists('$(SolutionDir)_VSPG\boots\_VSPG.props')">$(SolutionDir)_VSPG\boots</VSPG_BootsDir_NoTBS>
   </PropertyGroup>
   <ImportGroup Label="PropertySheets">
