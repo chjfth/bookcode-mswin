@@ -5,6 +5,7 @@
 
 #include <windows.h>
 #include <math.h>
+#include <assert.h>
 #pragma comment(lib, "winmm.lib")
 
 #include <mswin/utils_wingui.h> // Set_WindowIcon()
@@ -18,7 +19,7 @@
 #define OUT_BUFFER_SIZE  4096
 #define PI                  3.14159
 
-BOOL CALLBACK DlgProc (HWND, UINT, WPARAM, LPARAM) ;
+INT_PTR CALLBACK DlgProc (HWND, UINT, WPARAM, LPARAM) ;
 
 TCHAR szAppName [] = TEXT ("SineWave") ;
 
@@ -49,7 +50,7 @@ VOID FillBuffer (PBYTE pBuffer, int iFreq)
 	}
 }
 
-BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static BOOL         bShutOff, bClosing ;
 	static HWAVEOUT     hWaveOut ;
@@ -214,6 +215,7 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 
 		// Fill and send out a new buffer
+		assert((UINT_PTR)hWaveOut==(UINT_PTR)wParam);
 
 		FillBuffer ( (BYTE*)(((PWAVEHDR)lParam)->lpData), iFreq ) ;
 		waveOutWrite (hWaveOut, (PWAVEHDR)lParam, sizeof(WAVEHDR)) ;

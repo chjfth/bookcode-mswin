@@ -18,7 +18,7 @@
 
 #define ID_TIMER    1
 
-BOOL CALLBACK DlgProc (HWND, UINT, WPARAM, LPARAM) ;
+INT_PTR CALLBACK DlgProc (HWND, UINT, WPARAM, LPARAM) ;
 
 TCHAR szAppName [] = TEXT ("TestMci") ;
 
@@ -33,7 +33,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return 0 ;
 }
 
-BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HWND hwndEdit ;
 	int         iCharBeg, iCharEnd, iLineBeg, iLineEnd, iChar, iLine, iLength ;
@@ -67,8 +67,8 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			SendMessage (hwndEdit, EM_GETSEL, (WPARAM)&iCharBeg, (LPARAM)&iCharEnd) ;
 
-			iLineBeg = SendMessage (hwndEdit, EM_LINEFROMCHAR, iCharBeg, 0) ;
-			iLineEnd = SendMessage (hwndEdit, EM_LINEFROMCHAR, iCharEnd, 0) ;
+			iLineBeg = (int)SendMessage(hwndEdit, EM_LINEFROMCHAR, iCharBeg, 0) ;
+			iLineEnd = (int)SendMessage(hwndEdit, EM_LINEFROMCHAR, iCharEnd, 0) ;
 
 			// Loop through all the lines               
 
@@ -78,7 +78,7 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				*(WORD*)szCommand = sizeof(szCommand) / sizeof(TCHAR) ;
 
-				iLength = SendMessage (hwndEdit, EM_GETLINE, iLine, 
+				iLength = (int)SendMessage(hwndEdit, EM_GETLINE, iLine, 
 					(LPARAM) szCommand) ;
 				szCommand [iLength] = '\0' ;
 
@@ -104,8 +104,8 @@ BOOL CALLBACK DlgProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			// Send the caret to the end of the last selected line
 
-			iChar  = SendMessage (hwndEdit, EM_LINEINDEX,  iLineEnd, 0) ;
-			iChar += SendMessage (hwndEdit, EM_LINELENGTH, iCharEnd, 0) ;
+			iChar  = (int) SendMessage(hwndEdit, EM_LINEINDEX,  iLineEnd, 0) ;
+			iChar += (int) SendMessage(hwndEdit, EM_LINELENGTH, iCharEnd, 0) ;
 			SendMessage (hwndEdit, EM_SETSEL, iChar, iChar) ;
 
 			// Insert a carriage return/line feed combination
