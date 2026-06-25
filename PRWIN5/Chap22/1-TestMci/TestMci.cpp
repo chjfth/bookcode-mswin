@@ -12,7 +12,7 @@
 
 #define CHHI_ALL_IMPL
 #include <snTprintf.h>
-#include <mswin/utils_wingui.h>
+#include <mswin/utils_wingui.h> // Set_WindowIcon()
 #include <mswin/mmsystem.itc.h>
 
 
