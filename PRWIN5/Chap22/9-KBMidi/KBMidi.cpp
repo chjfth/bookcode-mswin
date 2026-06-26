@@ -335,6 +335,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd); 
 
+	Set_WindowIcon(hwnd, MAKEINTRESOURCE(1));
+
 	while (GetMessage (&msg, NULL, 0, 0))
 	{
 		TranslateMessage (&msg) ;
