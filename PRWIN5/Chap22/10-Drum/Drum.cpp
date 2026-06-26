@@ -10,7 +10,7 @@
 
 #pragma comment(lib, "winmm.lib")
 
-//#define CHHI_ALL_IMPL
+#define CHHI_ALL_IMPL
 //#include <snTprintf.h>
 #include <mswin/utils_wingui.h> // Set_WindowIcon()
 //#include <mswin/mmsystem.itc.h>
@@ -116,12 +116,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static DRUM  drum ;
 	static HMENU hMenu ;
 	static int   iTempo = 50, iIndexLast ;
-	static TCHAR szFileName  [MAX_PATH], szTitleName [MAX_PATH] ;
+	static TCHAR szFileName[MAX_PATH], szTitleName[MAX_PATH] ;
 	HDC          hdc ;
 	int          i, x, y ;
 	PAINTSTRUCT  ps ;
 	POINT        point ;
-	RECT         rect ;
+	RECT         rcClient = {};
 	TCHAR      * szError ;
 
 	switch (message)
@@ -140,9 +140,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		cxChar = LOWORD (GetDialogBaseUnits ()) ;
 		cyChar = HIWORD (GetDialogBaseUnits ()) ;
 
-		GetWindowRect (hwnd, &rect) ;
-		MoveWindow (hwnd, rect.left, rect.top, 
-			77 * cxChar, 29 * cyChar, FALSE) ;
+		// Chj update: We keep client-area constant, no matter how thick the window-title.
+		GetClientRect_ScreenPos(hwnd, &rcClient);
+		rcClient.right = rcClient.left + 75 * cxChar;
+		rcClient.bottom = rcClient.top + 26 * cyChar;
+		MoveWindow_byClientRect(hwnd, &rcClient);
 
 		hMenu = GetMenu (hwnd) ;
 
