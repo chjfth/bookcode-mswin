@@ -1,6 +1,7 @@
 /*----------------------------------------
    Wakeup.C -- MCI Command String Tester
                 (c) Charles Petzold, 1998
+   v1.1: Double-click window blank area to test alarm-playing.
   ----------------------------------------*/
 
 #include <windows.h>
@@ -63,12 +64,12 @@ HWND hwndFocus ;
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInst,
 	PSTR szCmdLine, int iCmdShow)
 {
-	static TCHAR szAppName [] = TEXT ("WakeUp") ;
+	static TCHAR szAppName [] = TEXT ("WakeUp (1.1)") ;
 	HWND         hwnd ;
 	MSG          msg ;
 	WNDCLASS     wndclass ;
 
-	wndclass.style         = 0 ;
+	wndclass.style         = CS_DBLCLKS ;
 	wndclass.lpfnWndProc   = WndProc ;
 	wndclass.cbClsExtra    = 0 ;
 	wndclass.cbWndExtra    = 0 ;
@@ -87,8 +88,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInst,
 	}
 
 	hwnd = CreateWindow (szAppName, szAppName,
-		WS_OVERLAPPED | WS_CAPTION | 
-		WS_SYSMENU | WS_MINIMIZEBOX,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, hInstance, NULL) ;
@@ -144,6 +144,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		*pwaveform = waveform ;
 
 		for (i = 0 ; i < HALFSAMPS ; i++)
+		{
 			if (i % 600 < 300)
 				if (i % 16 < 8)
 					pwaveform->byData[i] = 25 ;
@@ -154,6 +155,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					pwaveform->byData[i] = 25 ;
 				else
 					pwaveform->byData[i] = 230 ;
+		}
 
 		// Get character size and set a fixed window size.
 
@@ -289,6 +291,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// The WM_COMMAND message comes from the two buttons. 
 
+	case WM_LBUTTONDBLCLK: // Chj: double-click to test alarm-playing
 	case WM_TIMER:
 
 		// When the timer message comes, kill the timer (because we only
