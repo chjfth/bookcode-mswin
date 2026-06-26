@@ -44,7 +44,7 @@ typedef struct
 	PCMWAVEFORMAT pwf ;
 	char  chData[4] ;
 	DWORD dwDataSize ;
-	BYTE  byData[1] ; // variable length
+	BYTE  byData[1] ; // variable length, byData[0] errs on C++ compiler
 } WAVEFORM;
 
 // The window proc and the subclass proc
@@ -54,7 +54,7 @@ LRESULT CALLBACK SubProc (HWND, UINT, WPARAM, LPARAM) ;
 
 // Original window procedure addresses for the subclassed windows
 
-WNDPROC SubbedProc [3] ;
+WNDPROC SubbedProc[3] ;
 
 // The current child window with the input focus
 
@@ -187,12 +187,12 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// Subclass the three child windows
 
-		SubbedProc [ID_TIMEPICK] = (WNDPROC) 
-			SetWindowLong (hwndDTP, GWL_WNDPROC, (LONG) SubProc) ;
-		SubbedProc [ID_CHECKBOX] = (WNDPROC) 
-			SetWindowLong (hwndCheck, GWL_WNDPROC, (LONG) SubProc);
-		SubbedProc [ID_PUSHBTN] = (WNDPROC) 
-			SetWindowLong (hwndPush, GWL_WNDPROC, (LONG) SubProc) ;
+		SubbedProc[ID_TIMEPICK] = (WNDPROC) 
+			SetWindowLong (hwndDTP, GWL_WNDPROC, (LONG)SubProc) ;
+		SubbedProc[ID_CHECKBOX] = (WNDPROC) 
+			SetWindowLong (hwndCheck, GWL_WNDPROC, (LONG)SubProc);
+		SubbedProc[ID_PUSHBTN] = (WNDPROC) 
+			SetWindowLong (hwndPush, GWL_WNDPROC, (LONG)SubProc) ;
 
 		// Set the date and time picker control to the current time
 		// plus 9 hours, rounded down to next lowest hour
@@ -253,8 +253,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// The "Turn Off" button turns off the ringing alarm, and also
 			// unchecks the "Set Alarm" button and disables itself.
 
-		case ID_PUSHBTN:
-			PlaySound (NULL, NULL, 0) ;
+		case ID_PUSHBTN: // Turn Off button
+			PlaySound (NULL, NULL, 0) ; // stop playing sound
 			SendMessage (hwndCheck, BM_SETCHECK, 0, 0) ;
 			EnableWindow (hwndDTP, TRUE) ;
 			EnableWindow (hwndCheck, TRUE) ;
@@ -280,7 +280,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (SendMessage (hwndCheck, BM_GETCHECK, 0, 0))
 				{
 					KillTimer (hwnd, ID_TIMER) ;
-					SendMessage (hwndCheck, BM_SETCHECK, 0, 0) ;
+					SendMessage (hwndCheck, BM_SETCHECK, 0, 0) ; // uncheck []Alarm
 				}
 				return 0 ;
 			}
@@ -292,7 +292,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 
 		// When the timer message comes, kill the timer (because we only
-		// want a one-shot) and start the annoying alarm noise going.
+		// want one-shot) and start the annoying alarm noise going.
 
 		KillTimer (hwnd, ID_TIMER) ;
 		PlaySound ((PTSTR) pwaveform,  NULL, 
@@ -336,16 +336,18 @@ LRESULT CALLBACK SubProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_CHAR:
-		if (wParam == '\t')
+		if (wParam == '\t') 
 		{
+			// Mimic Tab-key switching focus.
 			idNext = id ;
 
-			do
-			idNext = (idNext + 
-				(GetKeyState (VK_SHIFT) < 0 ? 2 : 1)) % 3 ;
-			while (!IsWindowEnabled (GetDlgItem (GetParent (hwnd), idNext)));
+			do {
+				idNext = (idNext + 
+					(GetKeyState (VK_SHIFT) < 0 ? 2 : 1)) % 3 ;
+			
+			} while (!IsWindowEnabled( GetDlgItem(GetParent(hwnd), idNext) ));
 
-			SetFocus (GetDlgItem (GetParent (hwnd), idNext)) ;
+			SetFocus( GetDlgItem(GetParent(hwnd), idNext) );
 			return 0 ;
 		}
 		break ;
@@ -354,5 +356,5 @@ LRESULT CALLBACK SubProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hwndFocus = hwnd ;
 		break ;
 	}
-	return CallWindowProc (SubbedProc [id], hwnd, message, wParam, lParam) ;
+	return CallWindowProc (SubbedProc[id], hwnd, message, wParam, lParam) ;
 }
