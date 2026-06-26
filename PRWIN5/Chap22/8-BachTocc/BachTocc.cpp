@@ -9,6 +9,7 @@
 
 #include <mswin/utils_wingui.h> // Set_WindowIcon()
 
+#define MIDI_CHANNEL 0 // Chj: [0~15] This changes musical instrument(timbre)
 
 #define ID_TIMER    1
 
@@ -76,8 +77,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static struct
 	{
-		int iDur ;
-		int iNote [2] ;
+		int iDur;
+		int iNote[2]; // Chj: two-tone polyphonic
 	}
 	noteseq [] = { 110, 69, 81,  110, 67, 79,  990, 69, 81,  220, -1, -1,
 		110, 67, 79,  110, 65, 77,  110, 64, 76,  110, 62, 74,
@@ -101,10 +102,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				szAppName, MB_ICONEXCLAMATION | MB_OK) ;
 			return -1 ;
 		}
+		
 		// Send Program Change messages for "Church Organ"
-
 		MidiOutMessage (hMidiOut, 0xC0,  0, 19, 0) ;
 
+		// Chj: Delay 100ms before playing first note
 		SetTimer (hwnd, ID_TIMER, 1000, NULL) ;
 		return 0 ;
 
@@ -115,17 +117,18 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			// Note Off messages for previous note
 
-			if (iIndex != 0 && noteseq[iIndex - 1].iNote[i] != -1)
+			if (iIndex != 0 && noteseq[iIndex-1].iNote[i] != -1)
 			{
-				MidiOutMessage (hMidiOut, 0x80,  0,
-					noteseq[iIndex - 1].iNote[i], 0) ;
+				MidiOutMessage (hMidiOut, 0x80,  MIDI_CHANNEL,
+					noteseq[iIndex-1].iNote[i], 0) ;
 			}
+
 			// Note On messages for new note
 
-			if (iIndex != sizeof (noteseq) / sizeof (noteseq[0]) &&
+			if (iIndex != sizeof(noteseq)/sizeof(noteseq[0]) &&
 				noteseq[iIndex].iNote[i] != -1)
 			{
-				MidiOutMessage (hMidiOut, 0x90,  0,
+				MidiOutMessage (hMidiOut, 0x90,  MIDI_CHANNEL,
 					noteseq[iIndex].iNote[i], 127) ;
 			}
 		}
