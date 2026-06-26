@@ -145,16 +145,17 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		for (i = 0 ; i < HALFSAMPS ; i++)
 		{
+			const int margin = 30; // [1~127] the less, the louder
 			if (i % 600 < 300)
 				if (i % 16 < 8)
-					pwaveform->byData[i] = 25 ;
+					pwaveform->byData[i] = margin ;
 				else
-					pwaveform->byData[i] = 230 ;
+					pwaveform->byData[i] = 255-margin ;
 			else
 				if (i % 8 < 4)
-					pwaveform->byData[i] = 25 ;
+					pwaveform->byData[i] = margin ;
 				else
-					pwaveform->byData[i] = 230 ;
+					pwaveform->byData[i] = 255-margin ;
 		}
 
 		// Get character size and set a fixed window size.
