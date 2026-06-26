@@ -9,7 +9,8 @@
 
 #include <mswin/utils_wingui.h> // Set_WindowIcon()
 
-#define MIDI_CHANNEL 0 // Chj: [0~15] This changes musical instrument(timbre)
+#define TIMBRE_PROGRAM 19 // Chj: [0~127] Select timbre. 19=Church Organ
+#define MIDI_CHANNEL 0    // Chj: [0~15] This also affects musical instrument(timbre)
 
 #define ID_TIMER    1
 
@@ -103,8 +104,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return -1 ;
 		}
 		
-		// Send Program Change messages for "Church Organ"
-		MidiOutMessage (hMidiOut, 0xC0,  0, 19, 0) ;
+		// Send Program Change messages for "Church Organ"(19)
+		MidiOutMessage (hMidiOut, 0xC0,  0, TIMBRE_PROGRAM, 0) ;
 
 		// Chj: Delay 100ms before playing first note
 		SetTimer (hwnd, ID_TIMER, 1000, NULL) ;
