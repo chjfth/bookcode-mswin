@@ -100,12 +100,14 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	ShowWindow (hwnd, iCmdShow) ;
 	UpdateWindow (hwnd) ;
 
+	Set_WindowIcon(hwnd, MAKEINTRESOURCE(1));
+
 	while (GetMessage (&msg, NULL, 0, 0))
 	{
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
-	return msg.wParam ;
+	return (int)msg.wParam ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -423,7 +425,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			Ellipse (hdc, (x + 40) * cxChar, (2 * y + 3) * cyChar / 4,
 				(x + 41) * cxChar, (2 * y + 5) * cyChar / 4);
 
-			iIndexLast = wParam ;
+			iIndexLast = (int)wParam ;
 			SelectObject (hdc, GetStockObject (BLACK_BRUSH)) ;
 		}
 

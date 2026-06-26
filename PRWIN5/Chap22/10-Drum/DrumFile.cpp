@@ -10,8 +10,7 @@
 
 OPENFILENAME ofn = { sizeof (OPENFILENAME) } ;
 
-TCHAR * szFilter[] = { TEXT ("Drum Files (*.DRM)"),  
-	TEXT ("*.drm"), TEXT ("") } ;
+TCHAR * szFilter[] = { TEXT("Drum Files (*.DRM)"),  TEXT("*.drm"), TEXT("") } ;
 
 TCHAR szDrumID   [] = TEXT ("DRUM") ;
 TCHAR szListID   [] = TEXT ("LIST") ;
@@ -98,7 +97,6 @@ TCHAR * DrumFileWrite (DRUM * pdrum, TCHAR * szFileName)
 	// Create a time string
 
 	GetLocalTime (&st) ;
-
 	wsprintfA (szDateBuf, "%04d-%02d-%02d", st.wYear, st.wMonth, st.wDay) ;
 
 	// Create "ISCD" sub-sub-chunk
@@ -106,8 +104,8 @@ TCHAR * DrumFileWrite (DRUM * pdrum, TCHAR * szFileName)
 	mmckinfo[2].ckid = mmioStringToFOURCC (szDateID, 0) ;
 
 	wError |= mmioCreateChunk (hmmio, &mmckinfo[2], 0) ;
-	wError |= (mmioWrite (hmmio, szDateBuf, (strlen (szDateBuf) + 1)) !=
-		(int) (strlen (szDateBuf) + 1)) ;
+	int wrlen = (int)strlen(szDateBuf) + 1;
+	wError |= ( mmioWrite(hmmio, szDateBuf, wrlen) != wrlen );
 	wError |= mmioAscend (hmmio, &mmckinfo[2], 0) ;
 	wError |= mmioAscend (hmmio, &mmckinfo[1], 0) ;
 
