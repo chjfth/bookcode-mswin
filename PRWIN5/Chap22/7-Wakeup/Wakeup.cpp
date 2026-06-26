@@ -103,7 +103,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInst,
 		TranslateMessage (&msg) ;
 		DispatchMessage (&msg) ;
 	}
-	return msg.wParam ;
+	return (int)msg.wParam ;
 }
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -132,7 +132,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		// Some initialization stuff
 
-		hInstance = (HINSTANCE) GetWindowLong (hwnd, GWL_HINSTANCE) ;
+		hInstance = (HINSTANCE) GetWindowLong (hwnd, GWLP_HINSTANCE) ;
 
 		icex.dwSize = sizeof (icex) ;
 		icex.dwICC  = ICC_DATE_CLASSES ;
@@ -190,11 +190,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Subclass the three child windows
 
 		SubbedProc[ID_TIMEPICK] = (WNDPROC) 
-			SetWindowLong (hwndDTP, GWL_WNDPROC, (LONG)SubProc) ;
+			SetWindowLong (hwndDTP, GWLP_WNDPROC, (LONG)SubProc) ;
 		SubbedProc[ID_CHECKBOX] = (WNDPROC) 
-			SetWindowLong (hwndCheck, GWL_WNDPROC, (LONG)SubProc);
+			SetWindowLong (hwndCheck, GWLP_WNDPROC, (LONG)SubProc);
 		SubbedProc[ID_PUSHBTN] = (WNDPROC) 
-			SetWindowLong (hwndPush, GWL_WNDPROC, (LONG)SubProc) ;
+			SetWindowLong (hwndPush, GWLP_WNDPROC, (LONG)SubProc) ;
 
 		// Set the date and time picker control to the current time
 		// plus 9 hours, rounded down to next lowest hour
