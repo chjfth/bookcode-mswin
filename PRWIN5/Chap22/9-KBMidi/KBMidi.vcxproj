@@ -81,8 +81,8 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20260626-0000-0000-0000-203441000001}</ProjectGuid>
-    <ProjectName>KBMidi</ProjectName>
-     <TargetName>$(ProjectName)</TargetName>
+    <ProjectName>22-9 KBMidi</ProjectName>
+     <TargetName>22-KBMidi</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   

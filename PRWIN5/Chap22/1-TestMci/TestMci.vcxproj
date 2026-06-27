@@ -81,8 +81,8 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20260625-0000-0000-0000-102737000001}</ProjectGuid>
-    <ProjectName>TestMci</ProjectName>
-     <TargetName>$(ProjectName)</TargetName>
+    <ProjectName>22-1 TestMci</ProjectName>
+     <TargetName>22-TestMci</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   

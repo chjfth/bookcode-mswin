@@ -81,8 +81,8 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20260626-0000-0000-0000-104606000001}</ProjectGuid>
-    <ProjectName>Wakeup</ProjectName>
-     <TargetName>$(ProjectName)</TargetName>
+    <ProjectName>22-7 Wakeup</ProjectName>
+     <TargetName>22-Wakeup</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   

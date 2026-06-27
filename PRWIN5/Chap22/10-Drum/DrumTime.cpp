@@ -89,6 +89,7 @@ void DrumEndSequence (BOOL bRightAway)
 			// stop the timer
 			if (uTimerID)
 				timeKillEvent (uTimerID) ;
+
 			timeEndPeriod (uTimerRes) ;
 
 			// turn off all notes
