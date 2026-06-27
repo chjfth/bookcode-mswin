@@ -201,10 +201,6 @@
    -->
   <ItemGroup>
     <ClCompile Include="PopPad1.cpp" />
-    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\share\vaDbg.h" />
   </ItemGroup>
   <!-- MSBuild system stock Cpp.targets -->
   <ItemGroup>

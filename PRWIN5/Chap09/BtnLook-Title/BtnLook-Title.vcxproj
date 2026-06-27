@@ -187,17 +187,12 @@
    -->
   <ItemGroup>
     <ClCompile Include="BtnLook.cpp" />
-    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BtnLook-Title.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Colors1\Colors1.vcxproj" />
-    <None Include="button.ico" />
   </ItemGroup>
   <!-- MSBuild system stock Cpp.targets -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
