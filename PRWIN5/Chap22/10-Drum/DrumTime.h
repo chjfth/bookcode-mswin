@@ -14,8 +14,8 @@ typedef struct
      short iMsecPerBeat ;
      short iVelocity ;
      short iNumBeats ;
-     DWORD dwSeqPerc [NUM_PERC] ;
-     DWORD dwSeqPian [NUM_PERC] ;
+     DWORD dwSeqPerc [NUM_PERC] ; // percussion
+     DWORD dwSeqPian [NUM_PERC] ; // piano
 }
 DRUM, * PDRUM ;
 

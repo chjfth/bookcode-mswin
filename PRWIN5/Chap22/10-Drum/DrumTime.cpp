@@ -36,10 +36,15 @@ void DrumSetParams (PDRUM pdrum)
 
 BOOL DrumBeginSequence (HWND hwnd)
 {
-	TIMECAPS tc ;
+	TIMECAPS tc = {};
 
 	hwndNotify = hwnd ;           // Save window handle for notification
 	DrumEndSequence (TRUE) ;      // Stop current sequence if running
+
+	// Chj add some test code:
+ 	MMTIME mmtime = {};
+ 	auto mmr = timeGetSystemTime(&mmtime, sizeof(mmtime)); // Ret: mmtime.uType==TIME_MS
+ 	DWORD ms1 = timeGetTime(); // ms1 == mmtime.u.ms
 
 	// Open the MIDI Mapper output port
 
@@ -53,12 +58,13 @@ BOOL DrumBeginSequence (HWND hwnd)
 
 	// Begin sequence by setting a timer event
 
-	timeGetDevCaps (&tc, sizeof (TIMECAPS)) ;
+	timeGetDevCaps (&tc, sizeof(TIMECAPS)) ;
 	uTimerRes = minmax (tc.wPeriodMin, TIMER_RES, tc.wPeriodMax) ;
 	timeBeginPeriod (uTimerRes) ;
 
-	uTimerID = timeSetEvent (max ((UINT) uTimerRes, (UINT) drum.iMsecPerBeat),
-		uTimerRes, DrumTimerFunc, 0, TIME_ONESHOT) ;
+	uTimerID = timeSetEvent( max((UINT)uTimerRes, (UINT)drum.iMsecPerBeat),
+		uTimerRes, DrumTimerFunc, 0, TIME_ONESHOT );
+	// -- Chj: On WinXP, I see uTimerID = 16, 33, 50 etc
 
 	if (uTimerID == 0)
 	{
@@ -131,7 +137,7 @@ void CALLBACK DrumTimerFunc (UINT  uID, UINT uMsg, DWORD_PTR dwUser,
 		return ;
 	}
 
-	// Note On messages for channels 9 and 0
+	// Note On messages for channel-idx 9 and 0
 
 	for (i = 0 ; i < NUM_PERC ; i++)
 	{
@@ -144,10 +150,10 @@ void CALLBACK DrumTimerFunc (UINT  uID, UINT uMsg, DWORD_PTR dwUser,
 		dwSeqPercLast[i] = drum.dwSeqPerc[i] ;
 		dwSeqPianLast[i] = drum.dwSeqPian[i] ;
 	}
-	// Set a new timer event
 
-	uTimerID = timeSetEvent (max ((int) uTimerRes, drum.iMsecPerBeat),
-		uTimerRes, DrumTimerFunc, 0, TIME_ONESHOT) ;
+	// Set a new timer event
+	uTimerID = timeSetEvent( max((int)uTimerRes, drum.iMsecPerBeat),
+		uTimerRes, DrumTimerFunc, 0, TIME_ONESHOT );
 
 	if (uTimerID == 0)
 	{
