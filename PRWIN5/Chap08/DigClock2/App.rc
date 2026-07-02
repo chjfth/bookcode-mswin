@@ -37,6 +37,14 @@ BEGIN
     "Y",            IDM_DO_TEST2,           VIRTKEY, CONTROL, ALT, NOINVERT
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// WAV
+//
+
+IDR_WAV1                WAV                     "chime-2sec.wav"
+
 #endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -78,6 +86,11 @@ BEGIN
                 MENUITEM "&3 seconds",                  ID_SHAKE_3SEC
                 MENUITEM "&5 seconds",                  ID_SHAKE_5SEC
                 MENUITEM "&Forever",                    ID_SHAKE_FOREVER
+            END
+            POPUP "&Play sound"
+            BEGIN
+                MENUITEM "&None",                       ID_PLAYSOUND_NONE
+                MENUITEM "&Default",                    ID_PLAYSOUND_DEFAULT
             END
         END
         MENUITEM "&Always on Top",              IDM_ALWAYS_ON_TOP

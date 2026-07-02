@@ -19,3 +19,6 @@
 
 #include <WinMultiMon.h>
 
+#include <mswin/IPlaySound_mswin.h>
+
+

@@ -1,4 +1,5 @@
-#include "utils.h"
+#include <CHHI_DEBUG.h>
+
 #include <assert.h>
 #include <windows.h>
 #include <windowsx.h>
@@ -8,11 +9,21 @@
 #include <RECTxy.h>
 #include <mswin/utils_wingui.h>
 
+#include "utils.h"
+
 #include "iversion.h"
 
-//double g_sysdpiScaling = 1.0;
+#include <CHHI_vaDBG_is_vaDbgTs.h>
+
+#ifndef DigClock2_DEBUG
+#include <CHHI_vaDBG_hide.h> // Suppress/invalidate vaDBG macros, from now on
+#endif
+
 
 WindowShaker g_winshaker;
+
+ChimePlay g_chimeplay;
+
 
 void ShowHelp(HWND hwndParent)
 {
@@ -291,3 +302,91 @@ void WindowShaker::ShakeStop()
 {
 	StopTimer();
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+UINT ChimePlay::SetDefaultChime(const void *ptrWavBin, int nBytes, HWND hwndToNotify)
+{
+// 	if (!hwndToNotify)  // mere test code
+// 	{
+// 		IPlaySound_RegisterHwndNotify(m_playsound, hwndToNotify);
+// 		return 0;
+// 	}
+
+	assert(ptrWavBin && nBytes);
+	m_ptrWavBin = ptrWavBin;
+	m_nbWaveBin = nBytes;
+
+	return IPlaySound_RegisterHwndNotify(m_playsound, hwndToNotify);
+}
+
+IPlaySound::ReCode_et 
+ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
+{
+	// First check if pszSoundFile repeats last call
+
+	if(Sdring::str_match(pszSoundFile, m_soundfile))
+	{
+		RepeatOnce();
+		return IPlaySound::E_Success;
+	}
+	else
+	{
+		IPlaySound::ReCode_et pserr = m_playsound->OpenSoundFile(pszSoundFile);
+		if (pserr)
+		{
+			vaDBG1(_T("[DigClock2] ChimePlay::PlayOnce(): OpenSoundFile(\"%s\") fails with %s"),
+				pszSoundFile, ITCS(pserr, itc::IPlaySound_ReCode));
+			return pserr;
+		}
+
+		pserr = m_playsound->PlayOnce();
+		if (pserr)
+		{
+			vaDBG1(_T("[DigClock2] ChimePlay::PlayOnce(): PlayOnce(\"%s\") fails with %s"),
+				pszSoundFile, ITCS(pserr, itc::IPlaySound_ReCode));
+			return pserr;
+		}
+
+		m_purpose = purpose;
+		m_soundfile = pszSoundFile;
+
+		return IPlaySound::E_Success;
+	}
+}
+
+void ChimePlay::RepeatOnce()
+{
+	if (!m_playsound->IsOpened())
+	{
+		assert(m_ptrWavBin);
+		if(!m_ptrWavBin)
+			return;
+
+		IPlaySound::ReCode_et pserr = 
+			m_playsound->OpenWavBin(m_ptrWavBin, m_nbWaveBin);
+
+		if (pserr)
+		{
+			vaDBG1(_T("[DigClock2] ChimePlay::RepeatOnce(): OpenSoundBin() fails with %s"),
+				ITCS(pserr, itc::IPlaySound_ReCode));
+			return;
+		}
+	}
+
+	m_playsound->PlayOnce();
+}
+
+void ChimePlay::PlayStop()
+{
+	m_playsound->Stop();
+
+	m_purpose = None;
+}
+
+
+
+
+#ifndef DigClock2_DEBUG
+#include <CHHI_vaDBG_show.h> // Now restore vaDBG macros
+#endif

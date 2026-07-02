@@ -16,6 +16,9 @@ using namespace vaDbgTs_util;
 #include <InterpretConst.h>
 using namespace itc;
 
+#include <mswin/IPlaySound_mswin.h>
+
+
 enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
 
 extern const CInterpretConst& itc__ClockMode();
@@ -64,5 +67,52 @@ private:
 };
 
 extern WindowShaker g_winshaker;
+
+
+class ChimePlay  // singleton
+{
+public:
+	enum Purpose_et
+	{
+		None = 0,
+		TimeDue = 1,
+		SndPreview = 2,
+	};
+
+	ChimePlay()
+	{
+		m_playsound = IPlaySound::CreateObj();
+	}
+
+	~ChimePlay()
+	{
+		delete m_playsound;
+	}
+
+	// DigClock2 UI code should call it first.
+	UINT SetDefaultChime(const void *ptrWavBin, int nBytes, HWND hwndToNotify); 
+
+	IPlaySound::ReCode_et PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile);
+	// -- If pszSoundFile==nullptr, then play the default chime.
+
+	void RepeatOnce();
+
+	void PlayStop();
+
+	Purpose_et GetPurpose() { return m_purpose; }
+
+private:
+	IPlaySound *m_playsound = nullptr;
+
+	Purpose_et m_purpose = None;
+
+	Sdring m_soundfile;
+
+	const void *m_ptrWavBin = nullptr;
+	int m_nbWaveBin = 0;
+};
+
+extern ChimePlay g_chimeplay;
+
 
 #endif

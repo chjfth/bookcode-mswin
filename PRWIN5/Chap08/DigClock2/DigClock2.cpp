@@ -61,6 +61,8 @@ Since 2026.05: (v2.2)
 #include <DataXString.h>
 #include <DataXIni.h>
 
+#include <mswin/IPlaySound_mswin.h>
+
 #include "iversion.h"
 #include "utils.h"
 
@@ -116,6 +118,10 @@ MY_DATA_AutoSaveINI_FORMAT(int, g_seconds_countdown_cfg, Format_int_as_HHMMSS, "
 MY_DATA_AutoSaveINI(int, g_timedue_shake_seconds, "TimeDueShakeSeconds", 1);
 const int SHAKE_TIMER_INTERVAL = 25; // millisec
 const int SHAKE_NUDGE_MAX = 20; // for 96dpi monitor
+
+MY_DATA_AutoSaveINI(bool, g_is_playsound, "PlaySoundOnTimeDue", true);
+MY_DATA_AutoSaveINI(Sdring, g_playsound_filepath, "PlaySoundFilepath", _T(""));
+static UINT g_msgval_playsound_done;
 
 
 int g_firstUpdateWindowDone = 0;
@@ -317,7 +323,7 @@ class DelaySaveIniTimer : public CHwndTimer
 public:
 	virtual void TimerCallback() cxx11_override
 	{
-		vaDBG2(_T("DelaySaveIniTimer triggered..."));
+		vaDBG2(_T("[DigClock2] DelaySaveIniTimer triggered..."));
 
 		g_xini.SaveIni();
 	}
@@ -634,12 +640,8 @@ void Hide_CountdownCfg()
 	SetFocus(hwndMain); // so that user can use keyboard arrow to move hwndMain
 }
 
-void do_CountdownDone(HWND hwnd)
+void do_CountdownDone(HWND hwnd) // Time due
 {
-	(void)hwnd;
-
-	MessageBeep(MB_OK); // time-up beep
-
 	SetDlgItemText(g_hdlgCountdownCfg, IDB_StartCountDown, _T("Start countdown"));
 
 	if (IsIconic(hwnd)) {
@@ -654,6 +656,12 @@ void do_CountdownDone(HWND hwnd)
 		const int nudge_max = AfterDpiScale(SHAKE_NUDGE_MAX);
 		g_winshaker.ShakeStart(hwnd, nudge_max, SHAKE_TIMER_INTERVAL, 
 			g_timedue_shake_seconds*1000);
+	}
+
+	// Play sound if user wants it.
+	if(g_is_playsound)
+	{
+		g_chimeplay.PlayOnce(ChimePlay::TimeDue, NULL);
 	}
 }
 
@@ -721,6 +729,15 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	s_mouselvp.SetHwnd(hwnd);
 
 	winenv_ReloadSetting(hwnd);
+
+	HRSRC hRsrc = FindResource(g_hInstance, MAKEINTRESOURCE(IDR_WAV1), _T("WAV"));
+	assert(hRsrc);
+	HGLOBAL hResource = LoadResource(g_hInstance, hRsrc);
+	assert(hResource);
+	const void *ptrWavBin = LockResource(hResource);
+	int bytesWavBin = SizeofResource(g_hInstance, hRsrc);
+	g_msgval_playsound_done = g_chimeplay.SetDefaultChime(ptrWavBin, bytesWavBin, hwnd);
+	assert(g_msgval_playsound_done>0);
 
 	return TRUE; // create ok
 }
@@ -803,6 +820,8 @@ void Cls_OnPaint(HWND hwnd)
 
 void Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
 {
+	g_chimeplay.PlayStop();
+
 	if(g_winshaker.IsTicking())
 	{ 
 		g_winshaker.ShakeStop();
@@ -948,6 +967,7 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 	
 	HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
 	HMENU hmShakeWindow = FindSubMenu_byText(hmWhenTimedue, _T("&Shake window"));
+	HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
 
 	if (hmenuPopup == hmShowDate)
 	{
@@ -982,7 +1002,7 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 			shake_seconds==1 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
 
 		CheckMenuItem(hmenuPopup, ID_SHAKE_3SEC,
-			shake_seconds ==3 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
+			shake_seconds==3 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
 
 		CheckMenuItem(hmenuPopup, ID_SHAKE_5SEC,
 			shake_seconds==5 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
@@ -1012,6 +1032,14 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 			SetMenuitemText_byID(hmShakeWindow, ID_SHAKE_CUSTOM_SEC, text);
 			CheckMenuItem(hmShakeWindow, ID_SHAKE_CUSTOM_SEC, MF_CHECKED);
 		}
+	}
+	if (hmenuPopup == hmPlaySound)
+	{
+		CheckMenuItem(hmenuPopup, ID_PLAYSOUND_NONE, 
+			!g_is_playsound ? MF_CHECKED : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_PLAYSOUND_DEFAULT, 
+			g_is_playsound && g_playsound_filepath.GetValue().is_empty() ? MF_CHECKED : MF_UNCHECKED);
 	}
 	else
 	{	// Add some debug messages.
@@ -1120,13 +1148,26 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	{
 		g_timedue_shake_seconds = -1;
 	}
+	else if(cmdid==ID_PLAYSOUND_NONE)
+	{
+		g_is_playsound = false;
+	}
+	else if (cmdid == ID_PLAYSOUND_DEFAULT)
+	{
+		g_is_playsound = true;
+	}
 	else if(cmdid==IDM_DO_TEST1)
 	{
 //		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
+
+		g_chimeplay.RepeatOnce();
 	}
-	else if (cmdid == IDM_DO_TEST2)
+	else if (cmdid==IDM_DO_TEST2)
 	{
 //		g_winshaker.ShakeStop();
+
+		g_chimeplay.PlayStop();
+		//g_chimeplay.SetDefaultChime(NULL, 0, NULL);
 	}
 	else if(cmdid==IDM_EXIT)
 	{
@@ -1171,6 +1212,25 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			winenv_ReloadSetting(hwnd);
 			return 0 ;
 	}
+
+	if(message==g_msgval_playsound_done)
+	{
+		vaDBG2(_T("[DigClock2] Got playSound-done."));
+		
+		if( g_winshaker.IsTicking() )
+		{
+			vaDBG2(_T(". Window is still shaking, so the chime should repeat."));
+			g_chimeplay.RepeatOnce();
+		}
+		else if (0) // TODO
+		{
+			vaDBG2(_T(". User is previewing sound, so the chime should repeat"));
+			g_chimeplay.RepeatOnce();
+		}
+		
+		return 0;
+	}
+
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
 
