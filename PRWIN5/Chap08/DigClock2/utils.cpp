@@ -229,7 +229,7 @@ int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox)
 	return seconds;
 }
 
-CInterpretConst& get_itcClockMode()
+const CInterpretConst& itc__ClockMode()
 {
 	// This function returns the single s_itcClockMode object.
 	//

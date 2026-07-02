@@ -18,7 +18,7 @@ using namespace itc;
 
 enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
 
-extern CInterpretConst& get_itcClockMode();
+extern const CInterpretConst& itc__ClockMode();
 
 
 #define APPNAME "DigClock2"

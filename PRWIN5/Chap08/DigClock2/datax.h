@@ -5,7 +5,7 @@ struct DataXTraits<ClockMode_et, FORMAT>
 {
 	static ClockMode_et FromString(const TCHAR* s)
 	{
-		CInterpretConst& itcClockMode = get_itcClockMode();
+		const CInterpretConst& itcClockMode = itc__ClockMode();
 		bool is_err = false;
 		ClockMode_et cm = (ClockMode_et)itcClockMode.NamesToVal(s, &is_err);
 		// -- TODO? Thrown exception when is_err==true?
@@ -15,8 +15,7 @@ struct DataXTraits<ClockMode_et, FORMAT>
 
 	static Sdring ToString(ClockMode_et val)
 	{
-		CInterpretConst& itcClockMode = get_itcClockMode();
-		Sdring text = ITCSnv(val, itcClockMode);
+		Sdring text = ITCSnv(val, itc__ClockMode);
 		return text;
 	}
 };
