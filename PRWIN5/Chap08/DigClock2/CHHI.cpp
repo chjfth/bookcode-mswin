@@ -18,7 +18,9 @@
 #include <DataXIni.h>
 
 #include <WinMultiMon.h>
+#include <Tooltip-helper.h>
 
 #include <mswin/IPlaySound_mswin.h>
+
 
 

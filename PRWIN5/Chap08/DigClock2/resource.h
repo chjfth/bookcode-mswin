@@ -21,7 +21,11 @@
 #define IDM_HELP                        2007
 #define IDM_CLICK_CHANGE_COLOR          2008
 #define IDM_SHOW_TITLE                  2009
-#define IDC_EDIT1                       3000
+#define IDC_EDIT_COUNTDOWN              2500
+#define ID_PLAYSOUND_NONE               3000
+#define ID_PLAYSOUND_DEFAULT            3001
+#define ID_PLAYSOUND_DYNA_START         3002
+#define ID_PLAYSOUND_DYNA_END_          3999
 #define ID_ACCEL_ReloadIni              4000
 #define IDM_DO_TEST1                    4005
 #define IDM_DO_TEST2                    4006
@@ -33,9 +37,6 @@
 #define ID_SHAKE_5SEC                   4012
 #define ID_SHAKE_FOREVER                4013
 #define ID_SHAKE_CUSTOM_SEC             4014
-#define ID_WHENCOUNTDOWNDUE_PLAYSOUND   4015
-#define ID_PLAYSOUND_NONE               4016
-#define ID_PLAYSOUND_DEFAULT            4017
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -44,7 +45,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
-#define _APS_NEXT_COMMAND_VALUE         4018
+#define _APS_NEXT_COMMAND_VALUE         4015
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

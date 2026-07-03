@@ -48,10 +48,12 @@ Since 2026.05: (v2.2)
 #include <CHwndTimer.h>
 #include <RECTxy.h>
 #include <win32cozy.h>
+#include <ospath.h>
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
+#include <mswin/Tooltip-helper.h>
 #include <WinMultiMon.h>
 
 #include <snTprintf.h>
@@ -123,6 +125,14 @@ MY_DATA_AutoSaveINI(bool, g_is_playsound, "PlaySoundOnTimeDue", true);
 MY_DATA_AutoSaveINI(Sdring, g_playsound_filepath, "PlaySoundFilepath", _T(""));
 static UINT g_msgval_playsound_done;
 
+#define MY_DATA_AutoSaveINI_secname(datatype, varname, secname, keyname, default_val) \
+	DataXString_AutoSaveIni<datatype> varname(g_xini, _T(secname), _T(keyname), default_val);
+
+MY_DATA_AutoSaveINI_secname(Sdring, g_chime_list, "chime_list", "list", _T("")) 
+// -- chime(.wav/.mp3) filepaths separated by \n. [chime_list] section has only one key-value.
+
+Sdrings g_chime_filepaths;
+
 
 int g_firstUpdateWindowDone = 0;
 
@@ -156,6 +166,8 @@ BOOL g_f24Hour;
 BOOL g_fSuppressHighDigit;
 
 static CWmMouseleaveHelper s_mouselvp;
+
+static CTooltipSimple g_tooltip;
 
 
 INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
@@ -214,6 +226,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 	assert(hAccel);
 
+	bool ttsucc = g_tooltip.Create(hwnd, false);
+	assert(ttsucc);
 
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
@@ -628,7 +642,7 @@ void Show_CountdownCfg()
 {
 	ShowWindow(g_hdlgCountdownCfg, SW_SHOW);
 
-	HWND hedit = GetDlgItem(g_hdlgCountdownCfg, IDC_EDIT1);
+	HWND hedit = GetDlgItem(g_hdlgCountdownCfg, IDC_EDIT_COUNTDOWN);
 	SetFocus(hedit);
 }
 
@@ -661,7 +675,7 @@ void do_CountdownDone(HWND hwnd) // Time due
 	// Play sound if user wants it.
 	if(g_is_playsound)
 	{
-		g_chimeplay.PlayOnce(ChimePlay::TimeDue, NULL);
+		g_chimeplay.PlayOnce(ChimePlay::TimeDue, g_playsound_filepath.GetValue()); // TODO: Use filepath
 	}
 }
 
@@ -1025,7 +1039,7 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 			// So we add an extra menu item to exhibit the custom value from INI.
 			if(!is_custom)
 			{
-				AppendMenu(hmShakeWindow, MF_STRING, ID_SHAKE_CUSTOM_SEC, _T("~pending~"));
+				AppendMenu(hmShakeWindow, MF_STRING, ID_SHAKE_CUSTOM_SEC, _T("set-soon"));
 			}
 			TCHAR text[40];
 			snTprintf(text, _T("%d seconds (from INI)"), shake_seconds);
@@ -1035,11 +1049,31 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 	}
 	if (hmenuPopup == hmPlaySound)
 	{
-		CheckMenuItem(hmenuPopup, ID_PLAYSOUND_NONE, 
+		CheckMenuItem(hmPlaySound, ID_PLAYSOUND_NONE,
 			!g_is_playsound ? MF_CHECKED : MF_UNCHECKED);
 
-		CheckMenuItem(hmenuPopup, ID_PLAYSOUND_DEFAULT, 
+		CheckMenuItem(hmPlaySound, ID_PLAYSOUND_DEFAULT,
 			g_is_playsound && g_playsound_filepath.GetValue().is_empty() ? MF_CHECKED : MF_UNCHECKED);
+
+		// Remove old dynamic menuitems
+		const int dyn_pos = 2;
+		while( DeleteMenu(hmPlaySound, dyn_pos, MF_BYPOSITION) );
+
+		// Add dynamic menuitems according to INI[chime_list]list=... strings.
+		g_chime_filepaths = SplitToSdrings(g_chime_list.GetValue(), false, _T("\n"), _T(" \t"));
+		for(int i=0; i<g_chime_filepaths.count(); i++)
+		{
+			const Sdring &filepath = g_chime_filepaths[i];
+			const Sdring filenam = ospath::split_filenam(filepath);
+
+			const int cmdid = ID_PLAYSOUND_DYNA_START + i;
+			AppendMenu(hmPlaySound, MF_STRING, cmdid, filenam.c_str());
+			BOOL b = SetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void*)filepath.c_str());
+			assert(b);
+
+			if(Sdring::str_match(g_playsound_filepath.GetValue(), filepath))
+				CheckMenuItem(hmPlaySound, cmdid, MF_CHECKED);
+		}
 	}
 	else
 	{	// Add some debug messages.
@@ -1052,6 +1086,54 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 			vaDBG2(_T("Unknown menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
 	}
 }
+
+void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, UINT flags)
+{
+	static int s_prev_cmdid = 0;
+
+	if(item!=0)
+		vaDBG2(_T("Menuitem hover on CMDID: hMenu=0x%X, cmdid=%d"), Ptr2Uint(hmenu), item);
+	else if(hmenuPopup)
+		vaDBG2(_T("Menuitem hover on POPUP: hMenu=0x%X, hSubmenu=0x%X"), Ptr2Uint(hmenu), Ptr2Uint(hmenuPopup));
+	else if(flags==(UINT)-1)
+	{
+		vaDBG2(_T("Menuitem hover [menu closed]"));
+	}
+	else
+		vaDBG2(_T("Menuitem hover. Weird both zero! flags=0x%X"), flags);
+
+	if(item != s_prev_cmdid)
+	{
+		vaDBG2(_T(" item(%d) != s_prev_cmdid(%d) , PlayStop()"), item, s_prev_cmdid);
+		g_chimeplay.PlayStop();
+		s_prev_cmdid = item;
+	}
+
+	if(item==ID_PLAYSOUND_DEFAULT)
+	{
+		g_tooltip.Show(true, NULL, _T("Preview playing default chime..."));
+		g_chimeplay.PlayOnce(ChimePlay::SndPreview, NULL);
+	}
+	else if(item>=ID_PLAYSOUND_DYNA_START && item<ID_PLAYSOUND_DYNA_END_)
+	{
+		HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
+		HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
+
+		const TCHAR *filepath = nullptr;
+		BOOL b = GetMenuitem_UserContext(hmPlaySound, item, MenuitemById, (void**)&filepath);
+		assert(b);
+		vaDBG2(_T("Retrieved chime filepath: %s"), filepath);
+
+		g_tooltip.Show(true, NULL, _T("%s\r\n\r\nPreview playing..."), filepath);
+		g_chimeplay.PlayOnce(ChimePlay::SndPreview, filepath);
+	}
+	else
+	{
+		g_tooltip.Show(false);
+		g_chimeplay.PlayStop();
+	}
+}
+
 
 void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 {
@@ -1156,18 +1238,32 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	{
 		g_is_playsound = true;
 	}
+	else if(cmdid>=ID_PLAYSOUND_DYNA_START && cmdid<ID_PLAYSOUND_DYNA_END_)
+	{
+		const TCHAR *filepath = nullptr;
+		HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
+		HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
+		GetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void**)&filepath);
+		g_playsound_filepath = filepath;
+	}
 	else if(cmdid==IDM_DO_TEST1)
 	{
 //		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
 
-		g_chimeplay.RepeatOnce();
+//		g_chimeplay.RepeatOnce();
+
+		POINT pt;
+		GetCursorPos(&pt);
+		g_tooltip.Show(true, NULL, _T("Hi %d,%d"), pt.x, pt.y);
 	}
 	else if (cmdid==IDM_DO_TEST2)
 	{
 //		g_winshaker.ShakeStop();
 
-		g_chimeplay.PlayStop();
+//		g_chimeplay.PlayStop();
 		//g_chimeplay.SetDefaultChime(NULL, 0, NULL);
+
+		g_tooltip.Show(false);
 	}
 	else if(cmdid==IDM_EXIT)
 	{
@@ -1205,6 +1301,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HANDLE_MSG(hwnd, WM_KEYDOWN, Cls_OnKey);
 
 		HANDLE_MSG(hwnd, WM_INITMENUPOPUP, Cls_OnInitMenuPopup);
+		HANDLE_MSG(hwnd, WM_MENUSELECT, Cls_OnMenuSelect);
+
 		HANDLE_MSG(hwnd, WM_COMMAND, Cls_OnCommand);
 		HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);
 
@@ -1222,9 +1320,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			vaDBG2(_T(". Window is still shaking, so the chime should repeat."));
 			g_chimeplay.RepeatOnce();
 		}
-		else if (0) // TODO
+		else if(g_chimeplay.GetPurpose()==ChimePlay::SndPreview)
 		{
-			vaDBG2(_T(". User is previewing sound, so the chime should repeat"));
+			vaDBG2(_T(". User is previewing sound, so the chime should repeat."));
 			g_chimeplay.RepeatOnce();
 		}
 		
@@ -1239,9 +1337,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 {
 	Sdring cfghms = Seconds_to_HMS(g_seconds_countdown_cfg);
-	SetDlgItemText(hDlg, IDC_EDIT1, cfghms);
+	SetDlgItemText(hDlg, IDC_EDIT_COUNTDOWN, cfghms);
 
-	HWND hEdit = GetDlgItem(hDlg, IDC_EDIT1);
+	HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_COUNTDOWN);
 	Editbox_EnableKbdAdjustIntnum(hEdit, 0, 59, 1, true, 2);
 
 	// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
@@ -1263,7 +1361,7 @@ void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
 		g_winshaker.ShakeStop();
 
 		TCHAR szHMS[20] = {};
-		GetDlgItemText(hDlg, IDC_EDIT1, szHMS, ARRAYSIZE(szHMS)-1);
+		GetDlgItemText(hDlg, IDC_EDIT_COUNTDOWN, szHMS, ARRAYSIZE(szHMS)-1);
 		int seconds = HMS_to_Seconds(szHMS, true);
 		if(seconds<0)
 			return;

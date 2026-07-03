@@ -323,7 +323,10 @@ UINT ChimePlay::SetDefaultChime(const void *ptrWavBin, int nBytes, HWND hwndToNo
 IPlaySound::ReCode_et 
 ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
 {
-	// First check if pszSoundFile repeats last call
+	m_purpose = purpose;
+
+	// Check if pszSoundFile matches last call.
+	// Avoid time-consuming 're-open' if match.
 
 	if(Sdring::str_match(pszSoundFile, m_soundfile))
 	{
@@ -332,7 +335,12 @@ ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
 	}
 	else
 	{
-		IPlaySound::ReCode_et pserr = m_playsound->OpenSoundFile(pszSoundFile);
+		IPlaySound::ReCode_et pserr;
+		if(pszSoundFile && pszSoundFile[0])
+			pserr = m_playsound->OpenSoundFile(pszSoundFile);
+		else
+			pserr = m_playsound->OpenWavBin(m_ptrWavBin, m_nbWaveBin);
+		
 		if (pserr)
 		{
 			vaDBG1(_T("[DigClock2] ChimePlay::PlayOnce(): OpenSoundFile(\"%s\") fails with %s"),
@@ -348,7 +356,6 @@ ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
 			return pserr;
 		}
 
-		m_purpose = purpose;
 		m_soundfile = pszSoundFile;
 
 		return IPlaySound::E_Success;
@@ -359,6 +366,8 @@ void ChimePlay::RepeatOnce()
 {
 	if (!m_playsound->IsOpened())
 	{
+		// open default sound(m_ptrWavBin)
+
 		assert(m_ptrWavBin);
 		if(!m_ptrWavBin)
 			return;
