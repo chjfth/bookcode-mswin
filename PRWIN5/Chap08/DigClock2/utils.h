@@ -95,6 +95,8 @@ public:
 	IPlaySound::ReCode_et PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile);
 	// -- If pszSoundFile==nullptr, then play the default chime.
 
+	bool IsPlaying();
+
 	void RepeatOnce();
 
 	void PlayStop();

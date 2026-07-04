@@ -345,6 +345,7 @@ ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
 		{
 			vaDBG1(_T("[DigClock2] ChimePlay::PlayOnce(): OpenSoundFile(\"%s\") fails with %s"),
 				pszSoundFile, ITCS(pserr, itc::IPlaySound_ReCode));
+			m_soundfile.set_empty();
 			return pserr;
 		}
 
@@ -353,6 +354,7 @@ ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
 		{
 			vaDBG1(_T("[DigClock2] ChimePlay::PlayOnce(): PlayOnce(\"%s\") fails with %s"),
 				pszSoundFile, ITCS(pserr, itc::IPlaySound_ReCode));
+			m_soundfile.set_empty();
 			return pserr;
 		}
 
@@ -360,6 +362,14 @@ ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
 
 		return IPlaySound::E_Success;
 	}
+}
+
+bool ChimePlay::IsPlaying()
+{
+	IPlaySound::PlayingQuery_et playquery = m_playsound->IsPlaying();
+	assert(playquery!= IPlaySound::PlayingQuery_NotSupport);
+
+	return playquery==IPlaySound::Playing ? true : false;
 }
 
 void ChimePlay::RepeatOnce()

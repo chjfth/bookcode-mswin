@@ -675,7 +675,12 @@ void do_CountdownDone(HWND hwnd) // Time due
 	// Play sound if user wants it.
 	if(g_is_playsound)
 	{
-		g_chimeplay.PlayOnce(ChimePlay::TimeDue, g_playsound_filepath.GetValue()); // TODO: Use filepath
+		Sdring fullpath = _T("");
+		const TCHAR *relapath = g_playsound_filepath.GetValue();
+		if(relapath && relapath[0])
+			 fullpath = GetFullpathRelaToExe(relapath);
+
+		g_chimeplay.PlayOnce(ChimePlay::TimeDue, fullpath);
 	}
 }
 
@@ -1124,8 +1129,10 @@ void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, UINT f
 		assert(b);
 		vaDBG2(_T("Retrieved chime filepath: %s"), filepath);
 
-		g_tooltip.Show(true, NULL, _T("%s\r\n\r\nPreview playing..."), filepath);
-		g_chimeplay.PlayOnce(ChimePlay::SndPreview, filepath);
+		Sdring fullpath = GetFullpathRelaToExe(filepath);
+
+		g_tooltip.Show(true, NULL, _T("%s\r\n\r\nPreview playing..."), fullpath.c_str());
+		g_chimeplay.PlayOnce(ChimePlay::SndPreview, fullpath);
 	}
 	else
 	{
@@ -1236,6 +1243,7 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	}
 	else if (cmdid == ID_PLAYSOUND_DEFAULT)
 	{
+		g_playsound_filepath.SetValue(_T(""));
 		g_is_playsound = true;
 	}
 	else if(cmdid>=ID_PLAYSOUND_DYNA_START && cmdid<ID_PLAYSOUND_DYNA_END_)
@@ -1244,17 +1252,16 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 		HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
 		HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
 		GetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void**)&filepath);
-		g_playsound_filepath = filepath;
+		g_playsound_filepath = Sdring(filepath);
+		// -- g_playsound_filepath = filepath; // this is wrong, will generate a temp DataXString_AutoSaveIni<Sdring> and default =assign to g_playsound_filepath.
+
+		g_is_playsound = true;
 	}
 	else if(cmdid==IDM_DO_TEST1)
 	{
 //		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
 
 //		g_chimeplay.RepeatOnce();
-
-		POINT pt;
-		GetCursorPos(&pt);
-		g_tooltip.Show(true, NULL, _T("Hi %d,%d"), pt.x, pt.y);
 	}
 	else if (cmdid==IDM_DO_TEST2)
 	{
@@ -1263,7 +1270,6 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 //		g_chimeplay.PlayStop();
 		//g_chimeplay.SetDefaultChime(NULL, 0, NULL);
 
-		g_tooltip.Show(false);
 	}
 	else if(cmdid==IDM_EXIT)
 	{
@@ -1313,7 +1319,13 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	if(message==g_msgval_playsound_done)
 	{
-		vaDBG2(_T("[DigClock2] Got playSound-done."));
+		if(g_chimeplay.IsPlaying()) 
+		{
+			vaDBG2(_T("[DigClock2] Got playSound-done. (stale)"));
+			return 0;
+		}
+		else
+			vaDBG2(_T("[DigClock2] Got playSound-done. (true)"));
 		
 		if( g_winshaker.IsTicking() )
 		{
