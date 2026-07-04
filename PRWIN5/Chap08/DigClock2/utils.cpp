@@ -317,7 +317,7 @@ UINT ChimePlay::SetDefaultChime(const void *ptrWavBin, int nBytes, HWND hwndToNo
 	m_ptrWavBin = ptrWavBin;
 	m_nbWaveBin = nBytes;
 
-	return IPlaySound_RegisterHwndNotify(m_playsound, hwndToNotify);
+	return CPlaySound_u::RegisterHwndNotify(m_playsound, hwndToNotify);
 }
 
 IPlaySound::ReCode_et 

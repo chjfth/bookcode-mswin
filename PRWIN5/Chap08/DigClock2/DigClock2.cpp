@@ -1319,13 +1319,15 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	if(message==g_msgval_playsound_done)
 	{
+		auto playdone = (CPlaySound_u::PlayDone_et)wParam;
+
 		if(g_chimeplay.IsPlaying()) 
 		{
-			vaDBG2(_T("[DigClock2] Got playSound-done. (stale)"));
+			vaDBG2(_T("[DigClock2] Got playSound-done. (stale, %s)"), ITCSnv(playdone, CPlaySound_u::PlayDone_itc));
 			return 0;
 		}
 		else
-			vaDBG2(_T("[DigClock2] Got playSound-done. (true)"));
+			vaDBG2(_T("[DigClock2] Got playSound-done. (true, %s)"), ITCSnv(playdone, CPlaySound_u::PlayDone_itc));
 		
 		if( g_winshaker.IsTicking() )
 		{
@@ -1334,8 +1336,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else if(g_chimeplay.GetPurpose()==ChimePlay::SndPreview)
 		{
-			vaDBG2(_T(". User is previewing sound, so the chime should repeat."));
-			g_chimeplay.RepeatOnce();
+			if(playdone==CPlaySound_u::PlayDone_Success)
+			{
+				vaDBG2(_T(". User is previewing sound, so the chime should repeat."));
+				g_chimeplay.RepeatOnce();
+			}
 		}
 		
 		return 0;
