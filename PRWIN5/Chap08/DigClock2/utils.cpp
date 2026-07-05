@@ -339,12 +339,12 @@ ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
 		if(pszSoundFile && pszSoundFile[0])
 			pserr = m_playsound->OpenSoundFile(pszSoundFile);
 		else
-			pserr = m_playsound->OpenWavBin(m_ptrWavBin, m_nbWaveBin);
+			pserr = m_playsound->OpenSoundBin(m_ptrWavBin, m_nbWaveBin);
 		
 		if (pserr)
 		{
 			vaDBG1(_T("[DigClock2] ChimePlay::PlayOnce(): OpenSoundFile(\"%s\") fails with %s"),
-				pszSoundFile, ITCS(pserr, itc::IPlaySound_ReCode));
+				pszSoundFile, ITCS(pserr, IPlaySound::ReCode_itc));
 			m_soundfile.set_empty();
 			return pserr;
 		}
@@ -353,7 +353,7 @@ ChimePlay::PlayOnce(Purpose_et purpose, const TCHAR *pszSoundFile)
 		if (pserr)
 		{
 			vaDBG1(_T("[DigClock2] ChimePlay::PlayOnce(): PlayOnce(\"%s\") fails with %s"),
-				pszSoundFile, ITCS(pserr, itc::IPlaySound_ReCode));
+				pszSoundFile, ITCS(pserr, IPlaySound::ReCode_itc));
 			m_soundfile.set_empty();
 			return pserr;
 		}
@@ -383,12 +383,12 @@ void ChimePlay::RepeatOnce()
 			return;
 
 		IPlaySound::ReCode_et pserr = 
-			m_playsound->OpenWavBin(m_ptrWavBin, m_nbWaveBin);
+			m_playsound->OpenSoundBin(m_ptrWavBin, m_nbWaveBin);
 
 		if (pserr)
 		{
 			vaDBG1(_T("[DigClock2] ChimePlay::RepeatOnce(): OpenSoundBin() fails with %s"),
-				ITCS(pserr, itc::IPlaySound_ReCode));
+				ITCS(pserr, IPlaySound::ReCode_itc));
 			return;
 		}
 	}
