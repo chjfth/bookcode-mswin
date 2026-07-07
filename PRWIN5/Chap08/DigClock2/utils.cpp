@@ -50,7 +50,7 @@ void ShowHelp(HWND hwndParent)
 		;
 	vaMsgBox(hwndParent, MB_OK | MB_ICONINFORMATION, _T("Help"),
 		s_help_fmt, 
-		THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD,
+		DigClock2_vmajor, DigClock2_vminor, DigClock2_vpatch,
 		GetIniStemName());
 }
 

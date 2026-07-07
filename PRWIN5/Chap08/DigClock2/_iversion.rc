@@ -1,8 +1,8 @@
 #include "iversion.h"
 
 1 VERSIONINFO
-FileVersion    THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD, 0
-ProductVersion THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD, 0
+FileVersion    DigClock2_VMAJOR, DigClock2_VMINOR, DigClock2_VPATCH, DigClock2_VTAIL
+ProductVersion DigClock2_VMAJOR, DigClock2_VMINOR, DigClock2_VPATCH, DigClock2_VTAIL
 {
     BLOCK "StringFileInfo"
     {
@@ -10,13 +10,13 @@ ProductVersion THISEXE_VMAJOR, THISEXE_VMINOR, THISEXE_VBUILD, 0
         //language ID = U.S. English, char set = Windows, Multilingual
         {
             VALUE "CompanyName", "Public Domain"
-            VALUE "ProductName",     THISEXE_NAME
-            VALUE "FileDescription", THISEXE_NAME
-            VALUE "FileVersion",    THISEXE_VMAJORs "." THISEXE_VMINORs "." THISEXE_VBUILDs
-            VALUE "ProductVersion",    THISEXE_VMAJORs "." THISEXE_VMINORs "." THISEXE_VBUILDs
+            VALUE "ProductName",     DigClock2_NAME
+            VALUE "FileDescription", DigClock2_NAME
+            VALUE "FileVersion",    DigClock2_VMAJORs "." DigClock2_VMINORs "." DigClock2_VPATCHs
+            VALUE "ProductVersion",    DigClock2_VMAJORs "." DigClock2_VMINORs "." DigClock2_VPATCHs
             VALUE "LegalCopyright",    "Public domain"
-            VALUE "OriginalFilename" , THISEXE_NAME ".exe"
-            VALUE "InternalName", THISEXE_NAME ".exe"
+            VALUE "OriginalFilename" , DigClock2_NAME ".exe"
+            VALUE "InternalName", DigClock2_NAME ".exe"
             VALUE "Comments","Presented by public domain"
         }
     }
