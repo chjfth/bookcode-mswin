@@ -45,9 +45,11 @@ Since 2026.05: (v2.2)
 #include <vaDbgTs_util.h>
 #include <CHHI_vaDBG_is_vaDbgTs.h>
 
+#include <commdefs.h>
 #include <CHwndTimer.h>
 #include <RECTxy.h>
 #include <win32cozy.h>
+#include <fsapi.h>
 #include <ospath.h>
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
@@ -680,7 +682,12 @@ void do_CountdownDone(HWND hwnd) // Time due
 		if(relapath && relapath[0])
 			 fullpath = GetFullpathRelaToExe(relapath);
 
-		g_chimeplay.PlayOnce(ChimePlay::TimeDue, fullpath);
+		auto pserr = g_chimeplay.PlayOnce(ChimePlay::TimeDue, fullpath);
+		if (pserr)
+		{	
+			vaDBG1(_T("[INFO] Playing sound file '%s' failed. Fallback to playing default chime."));
+			g_chimeplay.PlayOnce(ChimePlay::TimeDue, nullptr);
+		}
 	}
 }
 
@@ -1072,7 +1079,10 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 			const Sdring filenam = ospath::split_filenam(filepath);
 
 			const int cmdid = ID_PLAYSOUND_DYNA_START + i;
+
+			// We only add filenam as menu-item, bcz full filepath could be too long.
 			AppendMenu(hmPlaySound, MF_STRING, cmdid, filenam.c_str());
+
 			BOOL b = SetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void*)filepath.c_str());
 			assert(b);
 
@@ -1094,6 +1104,7 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 
 void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, UINT flags)
 {
+	// This is menu-item hovering notification, not for menu-item executing.
 	static int s_prev_cmdid = 0;
 
 	if(item!=0)
@@ -1131,8 +1142,21 @@ void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, UINT f
 
 		Sdring fullpath = GetFullpathRelaToExe(filepath);
 
-		g_tooltip.Show(true, NULL, _T("%s\r\n\r\nPreview playing..."), fullpath.c_str());
-		g_chimeplay.PlayOnce(ChimePlay::SndPreview, fullpath);
+		if(fsapi::file_exists(fullpath))
+		{
+			g_tooltip.Show(true, NULL, _T("%s\r\n\r\nPreview playing..."), fullpath.c_str());
+			auto pserr = g_chimeplay.PlayOnce(ChimePlay::SndPreview, fullpath);
+			if(pserr)
+			{
+				g_tooltip.Show(true, NULL, _T("%s\r\n\r\nSomething wrong, the system cannot play this sound file."), fullpath.c_str());
+			}
+		}
+		else
+		{
+			g_tooltip.Show(true, NULL, 
+				_T("%s\r\n\r\nThis sound file does NOT exist. Click to remove it from menu."), 
+				fullpath.c_str());
+		}
 	}
 	else
 	{
@@ -1252,10 +1276,29 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 		HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
 		HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
 		GetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void**)&filepath);
-		g_playsound_filepath = Sdring(filepath);
-		// -- g_playsound_filepath = filepath; // this is wrong, will generate a temp DataXString_AutoSaveIni<Sdring> and default =assign to g_playsound_filepath.
+		// -- g_playsound_filepath = filepath; // this is wrong, will generate a temp DataXString_AutoSaveIni<Sdring> and default `=` assign to g_playsound_filepath.
 
-		g_is_playsound = true;
+		Sdring fullpath = GetFullpathRelaToExe(filepath);
+
+		if(fsapi::file_exists(fullpath))
+		{
+			g_playsound_filepath = Sdring(filepath); 
+			// -- Yes, filepath instead of fullpath, bcz filepath matches text from original INI.
+			
+			g_is_playsound = true;
+		}
+		else
+		{
+			int ans = vaMsgBox(hwnd, MB_ICONQUESTION|MB_YESNO, 	_T("Confirm file delete"),
+				_T("Remove this non-existing file from menu?\r\n\r\n%s"), fullpath.c_str());
+			if(ans==IDYES)
+			{
+				int delpos = cmdid - ID_PLAYSOUND_DYNA_START;
+
+				g_chime_filepaths.DeleteAt(delpos, 1);
+				g_chime_list.SetValue( MergeFromSdrings(g_chime_filepaths, _T("\n"), _T(" \t")) );
+			}
+		}
 	}
 	else if(cmdid==IDM_DO_TEST1)
 	{
