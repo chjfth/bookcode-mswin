@@ -81,7 +81,7 @@ Since 2026.05: (v2.2)
 #define MY_TIMER_INTERVAL_1000ms 1000 // request exactly 1 seconds per WM_TIMER callback
 
 #define ID_TIMER_SECONDS_TICK   1
-#define ID_TIMER_HIDE_CFG_PANEL 2
+#define ID_TIMER_HIDE_CFG_PANEL 2 // timer to hide countdown cfg panel
 
 #define LESS_1millisec 1
 
@@ -1081,7 +1081,9 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 			const int cmdid = ID_PLAYSOUND_DYNA_START + i;
 
 			// We only add filenam as menu-item, bcz full filepath could be too long.
-			AppendMenu(hmPlaySound, MF_STRING, cmdid, filenam.c_str());
+			TCHAR menutext[256];
+			snTprintf(menutext, _T("(&%d) %s"), i+1, filenam.c_str());
+			AppendMenu(hmPlaySound, MF_STRING, cmdid, menutext);
 
 			BOOL b = SetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void*)filepath.c_str());
 			assert(b);
