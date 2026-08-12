@@ -1089,8 +1089,11 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 			BOOL b = SetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void*)filepath.c_str());
 			assert(b);
 
-			if(Sdring::str_match(g_playsound_filepath.GetValue(), filepath))
-				CheckMenuItem(hmPlaySound, cmdid, MF_CHECKED);
+			if(g_is_playsound)
+			{
+				if (Sdring::str_match(g_playsound_filepath.GetValue(), filepath))
+					CheckMenuItem(hmPlaySound, cmdid, MF_CHECKED);
+			}
 		}
 	}
 	else
@@ -1268,6 +1271,7 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	else if(cmdid==ID_PLAYSOUND_NONE)
 	{
 		g_is_playsound = false;
+		g_playsound_filepath.SetValue(_T(""));
 	}
 	else if (cmdid == ID_PLAYSOUND_DEFAULT)
 	{
