@@ -10,6 +10,7 @@
 #include <StringHelper.h>
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
+#include <mswin/util_commdlg.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
 

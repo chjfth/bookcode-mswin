@@ -53,6 +53,7 @@ Since 2026.05: (v2.2)
 #include <ospath.h>
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
+#include <mswin/util_commdlg.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
 #include <mswin/Tooltip-helper.h>
@@ -279,7 +280,7 @@ static bool ClientRectFromINI(HWND hwnd, RECT *prect)
 	if(RECTcx(r)<=0 || RECTcy(r)<=0)
 		return false;
 
-	RECT rectfix = mumo_PlaceRectInsideScreen(r, true);
+	RECT rectfix = mumo_PlaceRectInsideScreen(r);
 	if (rectfix != r)
 	{
 		vaDBG2(_T("DigClock2 client-area is outside of monitors, fix it from %s to %s"), 
@@ -1129,7 +1130,7 @@ void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, UINT f
 
 	if(item==ID_PLAYSOUND_DEFAULT)
 	{
-		g_tooltip.Show(true, NULL, _T("Preview playing default chime..."));
+		g_tooltip.ShowBelowMouse(_T("Preview playing default chime..."));
 		g_chimeplay.PlayOnce(ChimePlay::SndPreview, NULL);
 	}
 	else if(item>=ID_PLAYSOUND_DYNA_START && item<ID_PLAYSOUND_DYNA_END_)
@@ -1146,23 +1147,24 @@ void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, UINT f
 
 		if(fsapi::file_exists(fullpath))
 		{
-			g_tooltip.Show(true, NULL, _T("%s\r\n\r\nPreview playing..."), fullpath.c_str());
+			g_tooltip.ShowBelowMouse(_T("%s\r\n\r\nPreview playing..."), fullpath.c_str());
+
 			auto pserr = g_chimeplay.PlayOnce(ChimePlay::SndPreview, fullpath);
 			if(pserr)
 			{
-				g_tooltip.Show(true, NULL, _T("%s\r\n\r\nSomething wrong, the system cannot play this sound file."), fullpath.c_str());
+				g_tooltip.ShowBelowMouse(_T("%s\r\n\r\nSomething wrong, the system cannot play this sound file."), fullpath.c_str());
 			}
 		}
 		else
 		{
-			g_tooltip.Show(true, NULL, 
+			g_tooltip.ShowBelowMouse( 
 				_T("%s\r\n\r\nThis sound file does NOT exist. Click to remove it from menu."), 
 				fullpath.c_str());
 		}
 	}
 	else
 	{
-		g_tooltip.Show(false);
+		g_tooltip.Hide();
 		g_chimeplay.PlayStop();
 	}
 }
@@ -1307,6 +1309,12 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 //		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
 
 //		g_chimeplay.RepeatOnce();
+
+		Sdring arsFilter[] = { _T("Audio files;*.wav;*.mp3"), _T("All files;*.*") };
+
+		Sdrings ss = util_GetOpenFilenames(hwnd, arsFilter, ARRAYSIZE(arsFilter),
+			nullptr, _T("chime.wav"));
+		int x = ss.count();
 	}
 	else if (cmdid==IDM_DO_TEST2)
 	{
