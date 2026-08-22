@@ -12,6 +12,7 @@
 using namespace vaDbgTs_util;
 #include <utils_env.h>
 #include <CHwndTimer.h>
+#include <mswin/FlexiInfobox.h>
 
 #include <InterpretConst.h>
 using namespace itc;

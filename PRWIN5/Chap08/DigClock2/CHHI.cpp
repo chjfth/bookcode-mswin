@@ -14,12 +14,15 @@
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
 
+#include <mswin/FlexiInfobox.h>
+
 #include <InterpretConst.h>
 #include <SimpleIniEx.h>
 #include <DataXIni.h>
 
 #include <WinMultiMon.h>
 #include <Tooltip-helper.h>
+#include <mswin/DlgTooltipEasy.h>
 
 #include <mswin/IPlaySound_mswin.h>
 

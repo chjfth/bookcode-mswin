@@ -232,7 +232,11 @@ int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox)
 	{
 		if(error_msgbox)
 		{
-			vaMsgBox(NULL, MB_OK | MB_ICONWARNING, _T(APPNAME),
+			FibInput_st si;
+			si.hIcon = LoadIcon(NULL, IDI_EXCLAMATION);
+			si.szBtnOK = _T("OK");
+			si.title = _T(APPNAME);
+			ggt_vaFlexiInfobox(GetActiveWindow(), &si,
 				_T("Time format error:\r\n\r\n%s"), pszHMS);
 		}
 		return -1;
@@ -452,7 +456,7 @@ void AddNewFiles_to_ChimeList(HWND hwnd, Sdrings &ss)
 			 ssDupFiles.count(), sDupFiles.c_str());
 	}
 
-	vaMsgBox(hwnd, MB_OK, _T("Sound files added"), msg);
+	ggt_FlexiInfo(hwnd, msg);
 }
 
 

@@ -1307,9 +1307,15 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 		}
 		else
 		{
-			int ans = vaMsgBox(hwnd, MB_ICONQUESTION|MB_YESNO, 	_T("Confirm file delete"),
-				_T("Remove this non-existing file from menu?\r\n\r\n%s"), fullpath.c_str());
-			if(ans==IDYES)
+			FibInput_st si;
+			si.szBtnOK = _T("&Yes");
+			si.szBtnCancel = _T("&No");
+			si.hIcon = LoadIcon(NULL, IDI_QUESTION);
+			si.title = _T("Confirm file delete");
+			FIB_ret ans = ggt_vaFlexiInfobox(hwnd, &si,
+				_T("Remove this non-existing sound file from menu?\r\n\r\n%s"), 
+				fullpath.c_str());
+			if(ans==FIB_Yes)
 			{
 				int delpos = cmdid - ID_PLAYSOUND_DYNA_START;
 
