@@ -57,6 +57,7 @@ Since 2026.05: (v2.2)
 #include <mswin/util_commdlg.h>
 #include <mswin/WM_MOUSELEAVE_helper.h>
 #include <mswin/Editbox_EnableKbdAdjustIntnum.h>
+#include <mswin/DlgTooltipEasy.h>
 #include <mswin/Tooltip-helper.h>
 #include <WinMultiMon.h>
 
@@ -1432,6 +1433,21 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 //////////////////////////////////////////////////////////////////////////
 
+static const TCHAR* DlgtteGetText_CountdownEditbox(HWND hwndCtl, void *userctx)
+{
+	(void)userctx;
+	static DWORD s_dwInitial = GetTickCount();
+	
+	DWORD nowtick = GetTickCount();
+	if( nowtick-s_dwInitial < 5000 )
+	{
+		// only display the tooltip on first 5 seconds
+		return _T("Use keyboard Up/Down arrow to adjust time values.");
+	}
+	else
+		return NULL;
+}
+
 BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 {
 	Sdring cfghms = Seconds_to_HMS(g_seconds_countdown_cfg);
@@ -1443,6 +1459,8 @@ BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
 	int textlen = GetWindowTextLength (hEdit);
 	Edit_SetSel(hEdit, textlen, textlen);
+
+	Dlgtte_EnableTooltip(hEdit, DlgtteGetText_CountdownEditbox, nullptr);
 
 	// return FALSE to tell dialog manager: Do NOT set keyboard focus to the editbox,
 	// bcz, I want the default focus on main-window itself, so that user can move the
