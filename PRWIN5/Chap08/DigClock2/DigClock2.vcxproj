@@ -228,7 +228,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DigClock2.ico" />
-    <None Include="wav1.bin" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="chime-2sec.wav" />

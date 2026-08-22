@@ -7,6 +7,11 @@
 
 #include <_MINMAX_.h>
 #include <RECTxy.h>
+#include <sdring.h>
+#include <StringHelper.h>
+//#include <TScalableArray.h>
+#include <ospath.h>
+using namespace ospath;
 #include <mswin/utils_wingui.h>
 
 #include "utils.h"
@@ -404,6 +409,51 @@ void ChimePlay::PlayStop()
 }
 
 
+void AddNewFiles_to_ChimeList(HWND hwnd, Sdrings &ss)
+{
+	// Will change g_chime_filepaths and g_chime_list
+	// ss[0] is full-dirpath, ss[1], ss[2] etc are filenams in that dirpath.
+
+	const TCHAR *exedir = GetExeDir();
+
+	Sdring loaddir = fullpath_to_rela(exedir, ss[0]);
+	int nNewFiles = 0;
+
+	Sdrings ssDupFiles;
+
+	// Add each loaddir+filenam in ss[] to g_chime_filepaths.
+	// I prefer g_chime_filepaths[] to have relative paths(rela to ExeDir), bcz they're shorter.
+
+	for(int i=1; i<ss.count(); i++)
+	{
+		Sdring newpath = paths_join2(loaddir, ss[i]);
+		
+		int foundat = SdringsFind(g_chime_filepaths, newpath);
+		if(foundat>=0)
+		{
+			ssDupFiles.AppendTail(ss[i]);
+			continue;
+		}
+
+		g_chime_filepaths.AppendTail(newpath);
+		nNewFiles++;
+	}
+
+	g_chime_list_SetValue();
+
+	Sdring sDupFiles = MergeFromSdrings(ssDupFiles, _T("\r\n  "));
+
+	Sdring msg;
+	vaSdringAppendSelf(msg, _T("Total %d files added to sound list.\r\n\r\n"), nNewFiles);
+
+	if(ssDupFiles.count()>0)
+	{
+		vaSdringAppendSelf(msg, _T("Following %d duplicate files are ignored:\r\n  %s"),
+			 ssDupFiles.count(), sDupFiles.c_str());
+	}
+
+	vaMsgBox(hwnd, MB_OK, _T("Sound files added"), msg);
+}
 
 
 #ifndef DigClock2_DEBUG

@@ -18,14 +18,15 @@ using namespace itc;
 
 #include <mswin/IPlaySound_mswin.h>
 
+#define APPNAME "DigClock2"
+
+
 
 enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
 
 extern const CInterpretConst& itc__ClockMode();
 
-
-#define APPNAME "DigClock2"
-
+extern Sdrings g_chime_filepaths;
 
 void ShowHelp(HWND hwndParent);
 
@@ -115,6 +116,11 @@ private:
 };
 
 extern ChimePlay g_chimeplay;
+
+
+void g_chime_list_SetValue();
+
+void AddNewFiles_to_ChimeList(HWND hwnd, Sdrings &ss);
 
 
 #endif

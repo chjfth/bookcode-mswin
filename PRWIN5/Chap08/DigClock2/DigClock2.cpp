@@ -51,6 +51,7 @@ Since 2026.05: (v2.2)
 #include <win32cozy.h>
 #include <fsapi.h>
 #include <ospath.h>
+	using namespace ospath;
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
 #include <mswin/util_commdlg.h>
@@ -1095,6 +1096,9 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 					CheckMenuItem(hmPlaySound, cmdid, MF_CHECKED);
 			}
 		}
+
+		// Add menuitem "Add sound files ..."
+		AppendMenu(hmPlaySound, MF_STRING, ID_PLAYSOUND_ADDFILE, _T("&Add sound files ..."));
 	}
 	else
 	{	// Add some debug messages.
@@ -1241,10 +1245,16 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	}
 	else if(cmdid==ID_ACCEL_ReloadIni)
 	{
+		g_tooltip.ShowBelowMouse(_T("ReloadIni_and_Redraw()"));
+		g_tooltip.Hide(2000);
+
 		ReloadIni_and_Redraw(hwnd);
 	}
 	else if(cmdid==IDM_RESET_ALL_SETTINGS)
 	{
+		g_tooltip.ShowBelowMouse(_T("Reset INI to program default."));
+		g_tooltip.Hide(2000);
+
 		g_xini.ResetDefault();
 		ReloadIni_and_Redraw(hwnd);
 	}
@@ -1304,34 +1314,42 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 				int delpos = cmdid - ID_PLAYSOUND_DYNA_START;
 
 				g_chime_filepaths.DeleteAt(delpos, 1);
-				g_chime_list.SetValue( MergeFromSdrings(g_chime_filepaths, _T("\n"), _T(" \t")) );
+				g_chime_list_SetValue();
 			}
 		}
+	}
+	else if(cmdid==ID_PLAYSOUND_ADDFILE)
+	{
+		Sdring arsFilter[] = { _T("Audio files;*.wav;*.mp3"), _T("All files;*.*") };
+
+		Sdrings ss = util_GetOpenFilenames(hwnd, arsFilter, ARRAYSIZE(arsFilter),
+			nullptr, _T("chime.wav"));
+		int count = ss.count();
+		if(count>0)
+			AddNewFiles_to_ChimeList(hwnd, ss); // will change g_chime_filepaths and g_chime_list.
 	}
 	else if(cmdid==IDM_DO_TEST1)
 	{
 //		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
 
 //		g_chimeplay.RepeatOnce();
-
-		Sdring arsFilter[] = { _T("Audio files;*.wav;*.mp3"), _T("All files;*.*") };
-
-		Sdrings ss = util_GetOpenFilenames(hwnd, arsFilter, ARRAYSIZE(arsFilter),
-			nullptr, _T("chime.wav"));
-		int x = ss.count();
 	}
 	else if (cmdid==IDM_DO_TEST2)
 	{
 //		g_winshaker.ShakeStop();
 
 //		g_chimeplay.PlayStop();
-		//g_chimeplay.SetDefaultChime(NULL, 0, NULL);
-
+//		g_chimeplay.SetDefaultChime(NULL, 0, NULL);
 	}
 	else if(cmdid==IDM_EXIT)
 	{
 		PostMessage(hwnd, WM_CLOSE, 0, 0);
 	}
+}
+
+void g_chime_list_SetValue()
+{
+	g_chime_list.SetValue(MergeFromSdrings(g_chime_filepaths, _T("\n"), _T(" \t")));
 }
 
 void Cls_OnDestroy(HWND hwnd)

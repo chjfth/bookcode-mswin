@@ -24,7 +24,8 @@
 #define IDC_EDIT_COUNTDOWN              2500
 #define ID_PLAYSOUND_NONE               3000
 #define ID_PLAYSOUND_DEFAULT            3001
-#define ID_PLAYSOUND_DYNA_START         3002
+#define ID_PLAYSOUND_ADDFILE            3002
+#define ID_PLAYSOUND_DYNA_START         3010
 #define ID_PLAYSOUND_DYNA_END_          3999
 #define ID_ACCEL_ReloadIni              4000
 #define IDM_DO_TEST1                    4005
