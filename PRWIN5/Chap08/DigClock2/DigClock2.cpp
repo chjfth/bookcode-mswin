@@ -27,6 +27,11 @@ Since 2026.05: (v2.2)
 * Now user can manually set arbitrary color from INI, like this:
 *    DigitColor=RGB(255,168,88)
 
+Since 2026.08: (v2.5)
+* Provides intensive count-down due UI feedback. 
+  > User can customize window shaking duration(seconds).
+  > User can customize a wav/mp3 sound file to play.
+
 -----------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
