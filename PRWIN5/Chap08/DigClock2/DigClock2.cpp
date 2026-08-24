@@ -967,9 +967,9 @@ void Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags
 
 void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMenu)
 {
-	// The program has two popups, one is s_hmenuRootPopup.
-	// the other is "Show Date". We should only care for the very two popup.
-	// In other word, various system-menu popups should be ignored.
+	// The program has several popups, one is s_hmenuRootPopup.
+	// another is "Show Date", etc. We should only care for our own popups.
+	// In other word, various *system-menu* popups should be ignored.
 
 	if(hmenuPopup==s_hmenuRootPopup)
 	{
@@ -1349,6 +1349,14 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 //		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
 
 //		g_chimeplay.RepeatOnce();
+
+		MENUITEMINFO mii = { sizeof(mii) };
+		mii.fMask = MIIM_FTYPE | MIIM_ID;
+ 		BOOL b = GetMenuItemInfo(s_hmenuRootPopup, 0, MenuitemByPos, &mii);
+
+		b = SetMenuitem_UserContext(s_hmenuRootPopup, 2, MenuitemByPos, (void*)0x11223344);
+
+		mii.cbSize = 0;
 	}
 	else if (cmdid==IDM_DO_TEST2)
 	{
@@ -1356,6 +1364,11 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 
 //		g_chimeplay.PlayStop();
 //		g_chimeplay.SetDefaultChime(NULL, 0, NULL);
+//		BOOL b = EnableMenuItem(s_hmenuRootPopup, 2, MenuitemByPos|MF_ENABLED);
+
+		void *ctx = 0;
+		BOOL b = GetMenuitem_UserContext(s_hmenuRootPopup, 2, MenuitemByPos, &ctx);
+		b = 33;
 	}
 	else if(cmdid==IDM_EXIT)
 	{
