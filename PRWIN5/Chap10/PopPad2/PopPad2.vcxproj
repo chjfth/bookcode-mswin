@@ -115,6 +115,10 @@
         "v143" on VC2022
       -->
     <PlatformToolset Condition="$(DefaultPlatformToolset)!=''">$(DefaultPlatformToolset)</PlatformToolset>
+
+    <!-- Chj special: For VC2013 and VC2015, I want them to produce WinXP-runnable EXE. (I want v120_xp or v140_xp) -->
+    <PlatformToolset Condition="$(DefaultPlatformToolset)=='v120' or $(DefaultPlatformToolset)=='v140'">$(DefaultPlatformToolset)_xp</PlatformToolset>
+    
   </PropertyGroup>
 
   <!---->
@@ -150,7 +154,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\..\..\share;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\_devdbg;.;..;..\..\..\__chjcxx\common-include\include\mswin;..\..\..\__chjcxx\common-include\include;..\..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -201,10 +205,8 @@
    -->
   <ItemGroup>
     <ClCompile Include="PopPad2.cpp" />
-    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\share\vaDbg.h" />
   </ItemGroup>
   <!-- MSBuild system stock Cpp.targets -->
   <ItemGroup>

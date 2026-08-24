@@ -5,7 +5,9 @@
 
 #include <windows.h>
 #include "resource.h"
-#include "vaDbg.h"
+
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
 
 LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM) ;
 
@@ -99,7 +101,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hResource = LoadResource (hInst, hRsrc);
 		s_rsText = (char *) LockResource (hResource) ;
 
-		vaDbgS(_T("PoePoem resource pointers:\n")
+		vaDbgTs(_T("PoePoem resource pointers:\n")
 			_T("  FindResource() = %p\n")  // 0044E128
 			_T("  LoadResource() = %p\n")  // 0044E1A8
 			_T("  LockResource() = %p\n")  // 0044E1A8
@@ -119,6 +121,11 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 
 		// [2024-12-19] Chj: Surprising! This mem-address is writable. Why?
+		// [2026-08-24] Chj: Actually, the write will trigger Win32's first-chance exception.
+		// If VSIDE debugger turns on Win32 exception 0xC0000005 capturing, it will be 
+		// captured by VSIDE. If VSIDE ignores it, Win32 OS tolerates it, and changes
+		// the involved RC-resource mem-page's attribute from R to RW.
+		// See my Evclip [20250111.c1] .
 		//
 		*pszText = '\0' ;
 

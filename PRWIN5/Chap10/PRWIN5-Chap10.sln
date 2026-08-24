@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10-1 IconDemo", "IconDemo\IconDemo.vcxproj", "{20241215-0000-0000-0000-195315000001}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10-1 IconDemo", "1-IconDemo\IconDemo.vcxproj", "{20241215-0000-0000-0000-195315000001}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10-x PopPad2", "PopPad2\PopPad2.vcxproj", "{20241215-0000-0000-0000-204034000001}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10-2 PoePoem", "PoePoem\PoePoem.vcxproj", "{20241216-0000-0000-0000-104902000001}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10-2 PoePoem", "2-PoePoem\PoePoem.vcxproj", "{20241216-0000-0000-0000-104902000001}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
