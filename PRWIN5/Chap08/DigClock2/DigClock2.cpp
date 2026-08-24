@@ -1010,7 +1010,11 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 		MENUITEMINFO mii = { sizeof(mii) };
 		mii.fMask = MIIM_ID | MIIM_FTYPE;
 		BOOL b = GetMenuItemInfo(hmenuPopup, 0, TRUE, &mii);
-		assert(mii.wID == IDM_SHOWDATE_NO); // first item show be IDM_SHOWDATE_NO
+		assert(mii.wID == IDM_SHOWDATE_NO); // first item should be IDM_SHOWDATE_NO
+
+		Menuitem_Tune_MFTxxx(hmenuPopup, IDM_SHOWDATE_NO, MenuitemById, MFT_RADIOCHECK, 0);
+		Menuitem_Tune_MFTxxx(hmenuPopup, IDM_SHOWDATE_YES, MenuitemById, MFT_RADIOCHECK, 0);
+		Menuitem_Tune_MFTxxx(hmenuPopup, IDM_SHOWDATE_TIMEZONE, MenuitemById, MFT_RADIOCHECK, 0);
 
 		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_NO,
 			g_isShowDate ? MF_UNCHECKED : MF_CHECKED);
