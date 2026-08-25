@@ -75,7 +75,7 @@
   
   <PropertyGroup Label="Configuration">
     <ProjectGuid>{20241215-0000-0000-0000-204034000001}</ProjectGuid>
-    <ProjectName>10-x PopPad2</ProjectName>
+    <ProjectName>10-7 PopPad2</ProjectName>
      <TargetName>10-PopPad2</TargetName>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
