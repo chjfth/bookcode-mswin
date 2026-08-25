@@ -1,0 +1,121 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+1                       ICON                    "PopMenu.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+POPMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "MyMenu"
+    BEGIN
+        POPUP "&File"
+        BEGIN
+            MENUITEM "&New",                        IDM_FILE_NEW
+            MENUITEM "&Open",                       IDM_FILE_OPEN
+            MENUITEM "&Save",                       IDM_FILE_SAVE
+            MENUITEM "Save &As",                    IDM_FILE_SAVE_AS
+            MENUITEM SEPARATOR
+            MENUITEM "E&xit",                       IDM_APP_EXIT
+        END
+        POPUP "&Edit"
+        BEGIN
+            MENUITEM "&Undo",                       IDM_EDIT_UNDO
+            MENUITEM SEPARATOR
+            MENUITEM "Cu&t",                        IDM_EDIT_CUT
+            MENUITEM "&Copy",                       IDM_EDIT_COPY
+            MENUITEM "&Paste",                      IDM_EDIT_PASTE
+            MENUITEM "De&lete",                     IDM_EDIT_CLEAR
+        END
+        POPUP "&Background"
+        BEGIN
+            MENUITEM "&White",                      IDM_BKGND_WHITE, CHECKED
+            MENUITEM "&Light Gray",                 IDM_BKGND_LTGRAY
+            MENUITEM "&Gray",                       IDM_BKGND_GRAY
+            MENUITEM "&Dark Gray",                  IDM_BKGND_DKGRAY
+            MENUITEM "&Black",                      IDM_BKGND_BLACK
+        END
+        POPUP "&Help"
+        BEGIN
+            MENUITEM "&Help...",                    IDM_APP_HELP
+            MENUITEM "&About PopMenu...",           IDM_APP_ABOUT
+        END
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    "PopMenu", DIALOG
+    BEGIN
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
