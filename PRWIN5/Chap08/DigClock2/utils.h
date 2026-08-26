@@ -53,6 +53,8 @@ extern DataXString_AutoSaveIni<bool> g_is_playsound;
 extern DataXString_AutoSaveIni<Sdring> g_playsound_filepath;
 extern DataXString_AutoSaveIni<Sdring> g_chime_list;
 
+extern DataXString_AutoSaveIni<bool> g_shake_window_repaint;
+
 extern CTooltipSimple g_tooltip;
 
 //////////////////////////////////////////////////////////////////////////

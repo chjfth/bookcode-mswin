@@ -279,12 +279,17 @@ void WindowShaker::TimerCallback()
 	RECT rcnew = m_rcOrigWin;
 	OffsetRect(&rcnew, nudgeX, nudgeY);
 
-	MoveWindow(m_hwnd, RECT_disXYWH(rcnew), FALSE);
+	BOOL bRepaint = g_shake_window_repaint;
+	MoveWindow(m_hwnd, RECT_disXYWH(rcnew), bRepaint);
+	// -- [2026-08-26] On WinXP SP3, if bRepaint==FALSE, the m_hwnd will not be repainted,
+	//    and user will not be able to see the visual shaking effect. 
+	//    So it defaults to TRUE, unless INI says ShakeWindowRepaint=false .
+	//    Win7+ do not have such problem.
 }
 
 void WindowShaker::TimerOffCallback()
 {
-	MoveWindow(m_hwnd, RECT_disXYWH(m_rcOrigWin), FALSE);
+	MoveWindow(m_hwnd, RECT_disXYWH(m_rcOrigWin), TRUE);
 }
 
 

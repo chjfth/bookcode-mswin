@@ -140,6 +140,8 @@ MY_DATA_AutoSaveINI_secname(Sdring, g_chime_list, "chime_list", "list", _T(""))
 
 Sdrings g_chime_filepaths;
 
+MY_DATA_AutoSaveINI(bool, g_shake_window_repaint, "ShakeWindowRepaint", true);
+
 
 int g_firstUpdateWindowDone = 0;
 

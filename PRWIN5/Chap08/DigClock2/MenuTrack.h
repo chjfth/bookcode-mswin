@@ -107,7 +107,7 @@ public:
 		}
 		else
 		{
-			// User set in INI a seconds value that is not "stock".
+			// INI has an arbitrary seconds value, that is not in menu presets.
 			// So we add an extra menu item to exhibit the custom value from INI.
 			if (!is_custom)
 			{
