@@ -47,7 +47,7 @@ Since 2026.08: (v2.5)
 #include "resource.h"
 
 #include <vaDbgTs.h>
-#include <vaDbgTs_util.h>
+//#include <vaDbgTs_util.h>
 #include <CHHI_vaDBG_is_vaDbgTs.h>
 
 #include <commdefs.h>
@@ -174,7 +174,7 @@ BOOL g_fSuppressHighDigit;
 
 static CWmMouseleaveHelper s_mouselvp;
 
-static CTooltipSimple g_tooltip;
+CTooltipSimple g_tooltip;
 
 CMenuTracker g_menu_tracker;
 
@@ -799,6 +799,10 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	assert(!mterr);
 	mterr = g_menu_tracker.AddPopAction(CMenuTracker::s_root_popname, new CMenuPop_Root);
 	assert(!mterr);
+	mterr = g_menu_tracker.AddPopAction(_T("ShakeWindow"), new CMenuPop_ShakeWindow);
+	assert(!mterr);
+	mterr = g_menu_tracker.AddPopAction(_T("PlaySound"), new CMenuPop_PlaySound);
+	assert(!mterr);
 
 	return TRUE; // create ok
 }
@@ -995,178 +999,22 @@ void Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags
 void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMenu)
 {
 	g_menu_tracker.Do_WM_INITMENUPOPUP(hwnd, hmenuPopup, item, fSystemMenu);
-
-	// Now we should find out each popup's menu-handle([Show Date], [Shake window] etc).
-	// I do it everytime dynamically, bcz in the future, the menu text can be in
-	// different language, so it will be hard to determine that menu-handle in advance.
-
-	HMENU hmReset    = FindSubMenu_byText(s_hmenuRootPopup, _T("&Reset")); // just debug
-	assert(hmReset);
-	
-	HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
-	HMENU hmShakeWindow = FindSubMenu_byText(hmWhenTimedue, _T("&Shake window"));
-	HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
-
-	if (hmenuPopup == hmShakeWindow)
-	{
-		vaDBG2(_T("See [Shake window] menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
-		
-		bool is_stock = false;
-		const int shake_seconds = g_timedue_shake_seconds;
-
-		CheckMenuItem(hmenuPopup, ID_SHAKE_NOSHAKE, 
-			shake_seconds==0 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, ID_SHAKE_1SEC,
-			shake_seconds==1 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, ID_SHAKE_3SEC,
-			shake_seconds==3 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, ID_SHAKE_5SEC,
-			shake_seconds==5 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, ID_SHAKE_FOREVER,
-			shake_seconds<0 ? (is_stock=true, MF_CHECKED) : MF_UNCHECKED);
-
-		bool is_custom = IsMenuitemExist_byID(hmShakeWindow, ID_SHAKE_CUSTOM_SEC);
-
-		if(is_stock)
-		{
-			if(is_custom)
-			{
-				DeleteMenu(hmShakeWindow, ID_SHAKE_CUSTOM_SEC, MF_BYCOMMAND);
-			}
-		}
-		else
-		{
-			// User set in INI a seconds value that is not "stock".
-			// So we add an extra menu item to exhibit the custom value from INI.
-			if(!is_custom)
-			{
-				AppendMenu(hmShakeWindow, MF_STRING, ID_SHAKE_CUSTOM_SEC, _T("set-soon"));
-			}
-			TCHAR text[40];
-			snTprintf(text, _T("%d seconds (from INI)"), shake_seconds);
-			SetMenuitemText_byID(hmShakeWindow, ID_SHAKE_CUSTOM_SEC, text);
-			CheckMenuItem(hmShakeWindow, ID_SHAKE_CUSTOM_SEC, MF_CHECKED);
-		}
-	}
-	if (hmenuPopup == hmPlaySound)
-	{
-		CheckMenuItem(hmPlaySound, ID_PLAYSOUND_NONE,
-			!g_is_playsound ? MF_CHECKED : MF_UNCHECKED);
-
-		CheckMenuItem(hmPlaySound, ID_PLAYSOUND_DEFAULT,
-			g_is_playsound && g_playsound_filepath.GetValue().is_empty() ? MF_CHECKED : MF_UNCHECKED);
-
-		// Remove old dynamic menuitems
-		const int dyn_pos = 2;
-		while( DeleteMenu(hmPlaySound, dyn_pos, MF_BYPOSITION) );
-
-		// Add dynamic menuitems according to INI[chime_list]list=... strings.
-		g_chime_filepaths = SplitToSdrings(g_chime_list.GetValue(), false, _T("\n"), _T(" \t"));
-		for(int i=0; i<g_chime_filepaths.count(); i++)
-		{
-			const Sdring &filepath = g_chime_filepaths[i];
-			const Sdring filenam = ospath::split_filenam(filepath);
-
-			const int cmdid = ID_PLAYSOUND_DYNA_START + i;
-
-			// We only add filenam as menu-item, bcz full filepath could be too long.
-			TCHAR menutext[256];
-			snTprintf(menutext, _T("(&%d) %s"), i+1, filenam.c_str());
-			AppendMenu(hmPlaySound, MF_STRING, cmdid, menutext);
-
-			BOOL b = SetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void*)filepath.c_str());
-			assert(b);
-
-			if(g_is_playsound)
-			{
-				if (Sdring::str_match(g_playsound_filepath.GetValue(), filepath))
-					CheckMenuItem(hmPlaySound, cmdid, MF_CHECKED);
-			}
-		}
-
-		// Add menuitem "Add sound files ..."
-		AppendMenu(hmPlaySound, MF_STRING, ID_PLAYSOUND_ADDFILE, _T("&Add sound files ..."));
-	}
-	else
-	{	// Add some debug messages.
-		HMENU hSysMenu = GetSystemMenu(hwnd, FALSE);
-		if (hmenuPopup == hSysMenu)
-			vaDBG2(_T("See GetSystemMenu() popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
-		else if(hmenuPopup == hmReset)
-			vaDBG2(_T("See [Reset] menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
-		else
-			vaDBG2(_T("Unknown menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
-	}
 }
 
-void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hmenuPopup, UINT flags)
+void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hSubmenu, UINT flags)
 {
-	// This is menu-item hovering notification, not for menu-item executing.
-	static int s_prev_cmdid = 0;
-
-	if(item!=0)
-		vaDBG2(_T("Menuitem hover on CMDID: hMenu=0x%X, cmdid=%d"), Ptr2Uint(hmenu), item);
-	else if(hmenuPopup)
-		vaDBG2(_T("Menuitem hover on POPUP: hMenu=0x%X, hSubmenu=0x%X"), Ptr2Uint(hmenu), Ptr2Uint(hmenuPopup));
-	else if(flags==(UINT)-1)
+	if(hmenu==NULL)
 	{
-		vaDBG2(_T("Menuitem hover [menu closed]"));
-	}
-	else
-		vaDBG2(_T("Menuitem hover. Weird both zero! flags=0x%X"), flags);
+		// Popup-menu just collapses. (User clicks outside any menu item to close the menu.)
+		assert(flags==(UINT)-1);
 
-	if(item != s_prev_cmdid)
-	{
-		vaDBG2(_T(" item(%d) != s_prev_cmdid(%d) , PlayStop()"), item, s_prev_cmdid);
-		g_chimeplay.PlayStop();
-		s_prev_cmdid = item;
-	}
-
-	if(item==ID_PLAYSOUND_DEFAULT)
-	{
-		g_tooltip.ShowBelowMouse(_T("Preview playing default chime..."));
-		g_chimeplay.PlayOnce(ChimePlay::SndPreview, NULL);
-	}
-	else if(item>=ID_PLAYSOUND_DYNA_START && item<ID_PLAYSOUND_DYNA_END_)
-	{
-		HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
-		HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
-
-		const TCHAR *filepath = nullptr;
-		BOOL b = GetMenuitem_UserContext(hmPlaySound, item, MenuitemById, (void**)&filepath);
-		assert(b);
-		vaDBG2(_T("Retrieved chime filepath: %s"), filepath);
-
-		Sdring fullpath = GetFullpathRelaToExe(filepath);
-
-		if(fsapi::file_exists(fullpath))
-		{
-			g_tooltip.ShowBelowMouse(_T("%s\r\n\r\nPreview playing..."), fullpath.c_str());
-
-			auto pserr = g_chimeplay.PlayOnce(ChimePlay::SndPreview, fullpath);
-			if(pserr)
-			{
-				g_tooltip.ShowBelowMouse(_T("%s\r\n\r\nSomething wrong, the system cannot play this sound file."), fullpath.c_str());
-			}
-		}
-		else
-		{
-			g_tooltip.ShowBelowMouse( 
-				_T("%s\r\n\r\nThis sound file does NOT exist. Click to remove it from menu."), 
-				fullpath.c_str());
-		}
-	}
-	else
-	{
 		g_tooltip.Hide();
 		g_chimeplay.PlayStop();
+		return;
 	}
-}
 
+	g_menu_tracker.Do_WM_MENUSELECT(hwnd, hmenu, item, hSubmenu, flags);
+}
 
 void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 {
@@ -1330,26 +1178,12 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 //		g_winshaker.ShakeStart(hwnd, 20, 25, 2000);
 
 //		g_chimeplay.RepeatOnce();
-
-		MENUITEMINFO mii = { sizeof(mii) };
-		mii.fMask = MIIM_FTYPE | MIIM_ID;
- 		BOOL b = GetMenuItemInfo(s_hmenuRootPopup, 0, MenuitemByPos, &mii);
-
-		b = SetMenuitem_UserContext(s_hmenuRootPopup, 2, MenuitemByPos, (void*)0x11223344);
-
-		mii.cbSize = 0;
 	}
 	else if (cmdid==IDM_DO_TEST2)
 	{
 //		g_winshaker.ShakeStop();
 
 //		g_chimeplay.PlayStop();
-//		g_chimeplay.SetDefaultChime(NULL, 0, NULL);
-//		BOOL b = EnableMenuItem(s_hmenuRootPopup, 2, MenuitemByPos|MF_ENABLED);
-
-		void *ctx = 0;
-		BOOL b = GetMenuitem_UserContext(s_hmenuRootPopup, 2, MenuitemByPos, &ctx);
-		b = 33;
 	}
 	else if(cmdid==IDM_EXIT)
 	{

@@ -64,3 +64,76 @@ public:
 	}
 };
 
+//////////////////////////////////////////////////////////////////////////
+
+class CMenuPop_ShakeWindow : public IMenuPop
+{
+public:
+	CMenuPop_ShakeWindow() {}
+
+	virtual void On_Init(HMENU hmenuPopup, const TCHAR *popname) override
+	{
+	}
+
+	virtual void On_WM_INITMENUPOPUP(
+		HWND hwnd, HMENU hmenuPopup, UINT uItem, BOOL isSystemMenu) override
+	{
+		bool is_stock = false;
+		const int shake_seconds = g_timedue_shake_seconds;
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_NOSHAKE,
+			shake_seconds == 0 ? (is_stock = true, MF_CHECKED) : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_1SEC,
+			shake_seconds == 1 ? (is_stock = true, MF_CHECKED) : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_3SEC,
+			shake_seconds == 3 ? (is_stock = true, MF_CHECKED) : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_5SEC,
+			shake_seconds == 5 ? (is_stock = true, MF_CHECKED) : MF_UNCHECKED);
+
+		CheckMenuItem(hmenuPopup, ID_SHAKE_FOREVER,
+			shake_seconds < 0 ? (is_stock = true, MF_CHECKED) : MF_UNCHECKED);
+
+		bool is_custom = IsMenuitemExist_byID(hmenuPopup, ID_SHAKE_CUSTOM_SEC);
+
+		if (is_stock)
+		{
+			if (is_custom)
+			{
+				DeleteMenu(hmenuPopup, ID_SHAKE_CUSTOM_SEC, MF_BYCOMMAND);
+			}
+		}
+		else
+		{
+			// User set in INI a seconds value that is not "stock".
+			// So we add an extra menu item to exhibit the custom value from INI.
+			if (!is_custom)
+			{
+				AppendMenu(hmenuPopup, MF_STRING, ID_SHAKE_CUSTOM_SEC, _T("set-soon"));
+			}
+			TCHAR text[40];
+			snTprintf(text, _T("%d seconds (from INI)"), shake_seconds);
+			SetMenuitemText_byID(hmenuPopup, ID_SHAKE_CUSTOM_SEC, text);
+			CheckMenuItem(hmenuPopup, ID_SHAKE_CUSTOM_SEC, MF_CHECKED);
+		}
+	}
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class CMenuPop_PlaySound : public IMenuPop
+{
+public:
+	CMenuPop_PlaySound() {}
+
+	virtual void On_WM_INITMENUPOPUP(
+		HWND hwnd, HMENU hmenuPopup, UINT uItem, BOOL isSystemMenu) override;
+
+	virtual void On_WM_MENUSELECT(
+		HWND hwnd, HMENU hmenu, int idxItem, HMENU hSubmenu, UINT flags) override;
+
+private:
+	int m_prev_cmdid = 0;
+};

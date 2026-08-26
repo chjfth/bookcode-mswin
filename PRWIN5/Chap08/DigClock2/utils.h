@@ -18,6 +18,7 @@ using namespace vaDbgTs_util;
 using namespace itc;
 
 #include <mswin/IPlaySound_mswin.h>
+#include <mswin/Tooltip-helper.h>
 
 #include <DataXIni.h>
 
@@ -47,7 +48,12 @@ extern DataXString_AutoSaveIni<bool> g_isShowTimezone;
 extern DataXString_AutoSaveIni<bool> s_is_always_on_top;
 extern DataXString_AutoSaveIni<bool> s_is_change_color;
 extern DataXString_AutoSaveIni<bool> s_is_show_title;
+extern DataXString_AutoSaveIni<int> g_timedue_shake_seconds;
+extern DataXString_AutoSaveIni<bool> g_is_playsound;
+extern DataXString_AutoSaveIni<Sdring> g_playsound_filepath;
+extern DataXString_AutoSaveIni<Sdring> g_chime_list;
 
+extern CTooltipSimple g_tooltip;
 
 //////////////////////////////////////////////////////////////////////////
 
