@@ -19,15 +19,37 @@ using namespace itc;
 
 #include <mswin/IPlaySound_mswin.h>
 
+#include <DataXIni.h>
+
 #define APPNAME "DigClock2"
 
+
+Sdring Seconds_to_HMS(int seconds);
+int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox = false);
 
 
 enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
 
+struct Format_int_as_HHMMSS {};
+struct Format_COLORREF_as_RGB {};
+
+#include "datax.h" // should place it after `ClockMode_et` definition
+
 extern const CInterpretConst& itc__ClockMode();
 
 extern Sdrings g_chime_filepaths;
+
+extern int g_seconds_remain;
+
+extern DataXString_AutoSaveIni<ClockMode_et> g_ClockMode;
+extern DataXString_AutoSaveIni<bool> g_isShowDate;
+extern DataXString_AutoSaveIni<bool> g_isShowTimezone;
+extern DataXString_AutoSaveIni<bool> s_is_always_on_top;
+extern DataXString_AutoSaveIni<bool> s_is_change_color;
+extern DataXString_AutoSaveIni<bool> s_is_show_title;
+
+
+//////////////////////////////////////////////////////////////////////////
 
 void ShowHelp(HWND hwndParent);
 
@@ -42,9 +64,6 @@ int AfterDpiScale(int input);
 bool Is_MouseInClientRect(HWND hwnd);
 
 void MoveWindow_byOffset(HWND hwnd, int offsetx, int offsety);
-
-Sdring Seconds_to_HMS(int seconds);
-int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox=false);
 
 inline const TCHAR* GetIniStemName()
 {

@@ -74,9 +74,11 @@ Since 2026.08: (v2.5)
 #include <DataXIni.h>
 
 #include <mswin/IPlaySound_mswin.h>
+#include <mswin/MenuTracker.h>
 
 #include "iversion.h"
 #include "utils.h"
+#include "MenuTrack.h"
 
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -100,11 +102,6 @@ Since 2026.08: (v2.5)
 #define DELAY_SAVE_INI_MILLISEC 1000
 
 HINSTANCE g_hInstance;
-
-struct Format_int_as_HHMMSS {};
-struct Format_COLORREF_as_RGB {};
-
-#include "datax.h" // should place it after `ClockMode_et` definition
 
 DataXIni g_xini;
 
@@ -179,6 +176,8 @@ static CWmMouseleaveHelper s_mouselvp;
 
 static CTooltipSimple g_tooltip;
 
+CMenuTracker g_menu_tracker;
+
 
 INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -190,7 +189,7 @@ void InitOnce()
 	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+int in_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR szCmdLine, int iCmdShow)
 {
 	InitOnce();
@@ -253,6 +252,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return (int)msg.wParam;
 }
 
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+	PSTR szCmdLine, int iCmdShow)
+{
+	MSVCRT_MemCheckStart(foo);
+
+	int ret = in_WinMain(hInstance, hPrevInstance, szCmdLine, iCmdShow);
+
+	g_xini.~DataXIni();
+	g_menu_tracker.~CMenuTracker();
+
+
+	bool isleak = MSVCRT_MemCheckEnd_IsLeak(foo);
+	if (isleak) {
+		OutputDebugString(_T("Suspect memleak in my C++ code.\n"));
+		return 4;
+	}
+	else {
+		OutputDebugString(_T("No memleak.\n"));
+		return ret;
+	}
+}
 
 inline int clock_cy_from_cx(int cx)
 {
@@ -773,6 +793,13 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	g_msgval_playsound_done = g_chimeplay.SetDefaultChime(ptrWavBin, bytesWavBin, hwnd);
 	assert(g_msgval_playsound_done>0);
 
+	CMenuTracker::ReCode_et mterr = g_menu_tracker.BindMenuTree(s_hmenuRootPopup);
+	assert(!mterr);
+	mterr = g_menu_tracker.AddPopAction(_T("ShowDate"), new CMenuPop_ShowDate);
+	assert(!mterr);
+	mterr = g_menu_tracker.AddPopAction(CMenuTracker::s_root_popname, new CMenuPop_Root);
+	assert(!mterr);
+
 	return TRUE; // create ok
 }
 
@@ -967,35 +994,12 @@ void Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags
 
 void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMenu)
 {
-	// The program has several popups, one is s_hmenuRootPopup.
-	// another is "Show Date", etc. We should only care for our own popups.
-	// In other word, various *system-menu* popups should be ignored.
-
-	if(hmenuPopup==s_hmenuRootPopup)
-	{
-		CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
-			g_ClockMode==CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
-
-		EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
-			g_seconds_remain>0 ? MF_ENABLED: MF_GRAYED);
-
-		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP, 
-			s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, IDM_CLICK_CHANGE_COLOR, 
-			s_is_change_color ? MF_CHECKED : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, IDM_SHOW_TITLE, 
-			s_is_show_title ? MF_CHECKED : MF_UNCHECKED);
-
-		return;
-	}
+	g_menu_tracker.Do_WM_INITMENUPOPUP(hwnd, hmenuPopup, item, fSystemMenu);
 
 	// Now we should find out each popup's menu-handle([Show Date], [Shake window] etc).
 	// I do it everytime dynamically, bcz in the future, the menu text can be in
 	// different language, so it will be hard to determine that menu-handle in advance.
 
-	HMENU hmShowDate = FindSubMenu_byText(s_hmenuRootPopup, _T("Show Date"));
 	HMENU hmReset    = FindSubMenu_byText(s_hmenuRootPopup, _T("&Reset")); // just debug
 	assert(hmReset);
 	
@@ -1003,29 +1007,6 @@ void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMen
 	HMENU hmShakeWindow = FindSubMenu_byText(hmWhenTimedue, _T("&Shake window"));
 	HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
 
-	if (hmenuPopup == hmShowDate)
-	{
-		vaDBG2(_T("See [Show Date] menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));
-
-		MENUITEMINFO mii = { sizeof(mii) };
-		mii.fMask = MIIM_ID | MIIM_FTYPE;
-		BOOL b = GetMenuItemInfo(hmenuPopup, 0, TRUE, &mii);
-		assert(mii.wID == IDM_SHOWDATE_NO); // first item should be IDM_SHOWDATE_NO
-
-		Menuitem_Tune_MFTxxx(hmenuPopup, IDM_SHOWDATE_NO, MenuitemById, MFT_RADIOCHECK, 0);
-		Menuitem_Tune_MFTxxx(hmenuPopup, IDM_SHOWDATE_YES, MenuitemById, MFT_RADIOCHECK, 0);
-		Menuitem_Tune_MFTxxx(hmenuPopup, IDM_SHOWDATE_TIMEZONE, MenuitemById, MFT_RADIOCHECK, 0);
-
-		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_NO,
-			g_isShowDate ? MF_UNCHECKED : MF_CHECKED);
-
-		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_YES,
-			(g_isShowDate && !g_isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
-
-		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_TIMEZONE,
-			(g_isShowDate && g_isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
-
-	}
 	if (hmenuPopup == hmShakeWindow)
 	{
 		vaDBG2(_T("See [Shake window] menu popup, hmenu=0x%X"), Ptr2Uint(hmenuPopup));

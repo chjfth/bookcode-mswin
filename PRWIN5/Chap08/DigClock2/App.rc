@@ -79,7 +79,7 @@ BEGIN
         MENUITEM "Stop countdown",              IDM_STOP_COUNTDOWN
         POPUP "&When countdown due"
         BEGIN
-            POPUP "&Shake window"
+            POPUP "&Shake window //ShakeWindow"
             BEGIN
                 MENUITEM "&No shake",                   ID_SHAKE_NOSHAKE
                 MENUITEM "&1 second",                   ID_SHAKE_1SEC
@@ -87,7 +87,7 @@ BEGIN
                 MENUITEM "&5 seconds",                  ID_SHAKE_5SEC
                 MENUITEM "&Forever",                    ID_SHAKE_FOREVER
             END
-            POPUP "&Play sound"
+            POPUP "&Play sound //PlaySound"
             BEGIN
                 MENUITEM "&None",                       ID_PLAYSOUND_NONE
                 MENUITEM "&Default",                    ID_PLAYSOUND_DEFAULT
@@ -95,13 +95,13 @@ BEGIN
         END
         MENUITEM "&Always on Top",              IDM_ALWAYS_ON_TOP
         MENUITEM "&Click to change color",      IDM_CLICK_CHANGE_COLOR
-        POPUP "Show Date"
+        POPUP "&Show Date // ShowDate"
         BEGIN
             MENUITEM "No",                          IDM_SHOWDATE_NO
             MENUITEM "Yes",                         IDM_SHOWDATE_YES
             MENUITEM "Yes + Timezone",              IDM_SHOWDATE_TIMEZONE
         END
-        MENUITEM "&Show text title",            IDM_SHOW_TITLE
+        MENUITEM "Show text &title",            IDM_SHOW_TITLE
         MENUITEM "&Minimize window",            IDM_MINIMIZE_WINDOW
         POPUP "&Reset"
         BEGIN
