@@ -776,12 +776,6 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	SetTimer(hwnd, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL) ;
 	SetTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL, 500, NULL);
 
-	if(!s_hmenuRootPopup)
-	{
-		s_hmenuRootPopup = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MENU1));
-		s_hmenuRootPopup = GetSubMenu(s_hmenuRootPopup, 0) ; 
-	}
-
 	s_mouselvp.SetHwnd(hwnd);
 
 	winenv_ReloadSetting(hwnd);
@@ -794,6 +788,11 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	int bytesWavBin = SizeofResource(g_hInstance, hRsrc);
 	g_msgval_playsound_done = g_chimeplay.SetDefaultChime(ptrWavBin, bytesWavBin, hwnd);
 	assert(g_msgval_playsound_done>0);
+
+
+	assert(!s_hmenuRootPopup);
+	s_hmenuRootPopup = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MENU1));
+	s_hmenuRootPopup = GetSubMenu(s_hmenuRootPopup, 0);
 
 	CMenuTracker::ReCode_et mterr = g_menu_tracker.BindMenuTree(s_hmenuRootPopup);
 	assert(!mterr);
