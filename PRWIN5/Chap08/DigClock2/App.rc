@@ -109,7 +109,7 @@ BEGIN
             MENUITEM "&Reset all settings",         IDM_RESET_ALL_SETTINGS
         END
         MENUITEM "&Help",                       IDM_HELP
-        MENUITEM "&Exit",                       IDM_EXIT
+        MENUITEM "E&xit",                       IDM_EXIT
     END
 END
 

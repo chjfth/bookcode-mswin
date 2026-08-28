@@ -1132,17 +1132,17 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	else if(cmdid>=ID_PLAYSOUND_DYNA_START && cmdid<ID_PLAYSOUND_DYNA_END_)
 	{
 		const TCHAR *filepath = nullptr;
-		HMENU hmWhenTimedue = FindSubMenu_byText(s_hmenuRootPopup, _T("&When countdown due"));
-		HMENU hmPlaySound = FindSubMenu_byText(hmWhenTimedue, _T("&Play sound"));
+		HMENU hmPlaySound = g_menu_tracker.FindPopname(_T("PlaySound"));
 		GetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void**)&filepath);
-		// -- g_playsound_filepath = filepath; // this is wrong, will generate a temp DataXString_AutoSaveIni<Sdring> and default `=` assign to g_playsound_filepath.
 
 		Sdring fullpath = GetFullpathRelaToExe(filepath);
 
 		if(fsapi::file_exists(fullpath))
 		{
 			g_playsound_filepath = Sdring(filepath); 
-			// -- Yes, filepath instead of fullpath, bcz filepath matches text from original INI.
+			// -- Yes, filepath instead of fullpath, bcz I want it to match exact text from INI.
+			// Note: Writing `g_playsound_filepath = filepath;` is wrong, that will generate a 
+			// temp DataXString_AutoSaveIni<Sdring> and default `=` assign to g_playsound_filepath.
 			
 			g_is_playsound = true;
 		}
