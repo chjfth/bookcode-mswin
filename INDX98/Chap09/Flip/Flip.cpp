@@ -9,7 +9,7 @@
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib") // for timeGetTime()
 
-#define utils_env_IMPL
+#define CHHI_ALL_IMPL
 #include <mswin/utils_env.h>
 
 LPDIRECTDRAW            lpDD;           // DirectDraw object
@@ -251,7 +251,7 @@ BOOL UpdateFrame( HWND hwnd )
     }
     else
     {
-        _snprintf( str, _TRUNCATE, "Sprites=%d, backbuffers=%d, Flip Framerate: %d", 
+        _snprintf_s( str, _TRUNCATE, "Sprites=%d, backbuffers=%d, Flip Framerate: %d", 
 			g_sprites, g_backbuffers, dwFrames );
         SetBkColor( hdc, RGB( 0, 0, 0 ) );
         SetTextColor( hdc, RGB( 255, 255, 255 ) );

@@ -208,7 +208,6 @@
    -->
   <ItemGroup>
     <ClCompile Include="SetMode.cpp" />
-    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SetMode.rc" />
@@ -218,7 +217,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="..\..\..\share\vaDbg.h" />
   </ItemGroup>
   
   <!-- Import shared project properties used by this book. -->

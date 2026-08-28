@@ -9,16 +9,11 @@
 #include <ddraw.h>
 #include "resource.h"
 
-#define utils_env_IMPL
+#define CHHI_ALL_IMPL
 #include <mswin/utils_env.h>
-
-#define utils_wingui_IMPL
 #include <mswin/utils_wingui.h>
-
-#define JULayout2_IMPL
 #include <mswin/JULayout2.h>
 
-//#include <vaDbg.h>
 #include "CxxDialog.h"
 
 #define ExeVersion "0.3"

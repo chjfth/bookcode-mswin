@@ -30,41 +30,41 @@ REM
 set AGILE_COPY_PATTERNS="%ExeDllDir%\%TargetFilenam%"
 REM set AGILE_COPY_PATTERNS=*.exe *.dll
 REM 
-REM		This sets what files (concrete filenames, separated by spaces) or 
+REM 	This sets what files (concrete filenames, separated by spaces) or 
 REM     file-pattern (*.exe etc) to copy or clean. You can mix both.
+REM 
+REM 	This can be absolute path or relative path. If relative path, it is relative
+REM 	to $(TargetDir) from VSIDE, also referred to as %ExeDllDir% in this bat.
+REM 
+REM 	This can be a list of multiple file/file-patterns separated by spaces.
+REM 	It means you can have multiple barns, each barn gets one copy.
+REM 
+REM 	NOTE: If a pattern/filepath has space char, you must wrap it in double-quotes.
 REM	
-REM		This can be absolute path or relative path. If relative path, it is relative
-REM		to $(TargetDir) from VSIDE, also referred to as %ExeDllDir% in this bat.
-REM	
-REM		This can be a list of multiple file/file-patterns separated by spaces.
-REM		It means you can have multiple barns, each barn gets one copy.
-REM	
-REM		NOTE: If a pattern/filepath has space char, you must wrap it in double-quotes.
-REM	
-REM	(2) AGILE_BARN_DIRS
+REM (2) AGILE_BARN_DIRS
 REM 
 if exist "d:\AGILE_BARN_DIRS.txt" (
-    < d:\AGILE_BARN_DIRS.txt set /p AGILE_BARN_DIRS=
+	< d:\AGILE_BARN_DIRS.txt set /p AGILE_BARN_DIRS=
 ) else (
-    call :Echos Oops. d:\AGILE_BARN_DIRS.txt does noooot exist.
-    exit /b 4
+	call :Echos Oops. d:\AGILE_BARN_DIRS.txt does noooot exist.
+	exit /b 4
 )
 REM
-REM		You can list multiple barn dirs, separated by spaces.
+REM 	You can list multiple barn dirs, separated by spaces.
 REM 
-REM		Also, if a barn dir contains space char, you must wrap that dir-path in double-quotes.
-REM	
+REM 	Also, if a barn dir contains space char, you must wrap that dir-path in double-quotes.
+REM 
 REM Hint: You can set/modify above AGILE_xxx vars directly in this bat file, 
 REM       or set them from parent environment.
 REM 
-REM (3) BARN_SUBDIR
-REM     This creates extra subdir(s) inside a barn dir.
+REM (3) BARN_SUBDIR (optional)
+REM     This creates one extra subdir inside each of the barn dirs. 
 REM     Usually, we want to separate Debug/Release outputs, and separate Win32/x64 outputs,
 REM     so this subdir specification comes to help.
 REM     Hint: You must NOT surround BARN_SUBDIR's value with double-quotes, bcz
-REM           when we pass it to CopyFilePatternsToDirs.bat, double-quotes is added there.
+REM           when we pass it to CopyFilePatternsToDirs.bat, double-quotes are added there.
 REM 
-set BARN_SUBDIR=%PlatformName%\__%BuildConf%\InDX98
+set BARN_SUBDIR=%PlatformName%\__%BuildConf%\INDX98
 REM 
 REM =========================================================================
 
@@ -82,18 +82,26 @@ if not defined AGILE_COPY_PATTERNS (
 REM We do not check whether vspg_COPYORCLEAN_DO_CLEAN=1 here, bcz CopyFilePatternsToDirs.bat will take care of it.
 REM 
 call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ExeDllDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
-if not !errorlevel!==0 exit /b 4 
-
-
-REM ======================================
-REM ======== This project special ======== 
-REM ======================================
-REM Cope with VSPG_ExeDataFiles, these files are relative to %ProjectDir%, not %ExeDllDir%.
-REM Replace [path1;path2] into ["path1" "path2"] and set new values of:
-set AGILE_COPY_PATTERNS="%VSPG_ExeDataFiles:;=" "%"
-
-call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ProjectDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
 if not !errorlevel!==0 exit /b 4
+
+REM Copy VSPG_ExeDataFiles files if any...
+if defined VSPG_ExeDataFiles (
+	call :Echos Processing VSPG_ExeDataFiles start ...
+	
+	set AGILE_COPY_PATTERNS="%VSPG_ExeDataFiles:;=" "%"
+	set EXE_SELF_BARN_DIR=%ExeDllDir%
+
+	REM Let local EXE see those files.
+	call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ProjectDir%" AGILE_COPY_PATTERNS EXE_SELF_BARN_DIR ""
+	if not !errorlevel!==0 exit /b 4
+
+	REM Let remote EXE see those files.
+	call "%_vspg_bootsdir%\CopyFilePatternsToDirs.bat" "%ProjectDir%" AGILE_COPY_PATTERNS AGILE_BARN_DIRS "%BARN_SUBDIR%"
+	if not !errorlevel!==0 exit /b 4
+
+	call :Echos Processing VSPG_ExeDataFiles done .
+)
+
 
 exit /b 0
 

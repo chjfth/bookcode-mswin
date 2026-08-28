@@ -157,7 +157,7 @@
       <ProgramDataBaseFileName Condition="'$(TargetExt)'!='.lib' ">$(IntDir)$(TargetName).$(PlatformToolset).pdb</ProgramDataBaseFileName>
 
       <PreprocessorDefinitions>;;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -208,7 +208,6 @@
    -->
   <ItemGroup>
     <ClCompile Include="Surface.cpp" />
-    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Surface.rc" />
@@ -218,7 +217,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="..\..\..\share\vaDbg.h" />
   </ItemGroup>
   
   <!-- Import shared project properties used by this book. -->

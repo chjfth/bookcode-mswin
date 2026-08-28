@@ -29,6 +29,9 @@
   </PropertyGroup>
 
   <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..;..\..\share;..\..\..\__chjcxx\common-include\include\mswin;..\..\..\__chjcxx\common-include\include;..\..\..\__WinConst;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
     <Link>
       <AdditionalDependencies>ddraw.lib;;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
