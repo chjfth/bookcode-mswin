@@ -780,7 +780,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 
 	winenv_ReloadSetting(hwnd);
 
-	HRSRC hRsrc = FindResource(g_hInstance, MAKEINTRESOURCE(IDR_WAV1), _T("WAV"));
+	HRSRC hRsrc = FindResource(g_hInstance, MAKEINTRESOURCE(IDR_WAV_STOCK), _T("WAV"));
 	assert(hRsrc);
 	HGLOBAL hResource = LoadResource(g_hInstance, hRsrc);
 	assert(hResource);
@@ -791,7 +791,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 
 
 	assert(!s_hmenuRootPopup);
-	s_hmenuRootPopup = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MENU1));
+	s_hmenuRootPopup = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MAIN_MENU));
 	s_hmenuRootPopup = GetSubMenu(s_hmenuRootPopup, 0);
 
 	CMenuTracker::ReCode_et mterr = g_menu_tracker.BindMenuTree(s_hmenuRootPopup);
@@ -1083,7 +1083,7 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 		GetClientRect_ScreenPos(hwnd, &clirect);
 		my_AdjustClientRect(hwnd, true);
 	}
-	else if(cmdid==ID_ACCEL_ReloadIni)
+	else if(cmdid==IDM_RELOAD_FROM_INI)
 	{
 		g_tooltip.ShowBelowMouse(_T("ReloadIni_and_Redraw()"));
 		g_tooltip.Hide(2000);

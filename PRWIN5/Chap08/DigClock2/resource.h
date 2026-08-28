@@ -2,15 +2,16 @@
 // Microsoft Visual C++ generated include file.
 // Used by App.rc
 //
-#define IDR_MENU1                       101
+#define IDR_MAIN_MENU                   101
 #define IDD_COUNTDOWN_CFG               102
 #define IDR_ACCELERATOR1                129
-#define IDR_WAV1                        131
+#define IDR_WAV_STOCK                   131
 #define IDM_ALWAYS_ON_TOP               1000
 #define IDB_StartCountDown              1000
 #define IDM_RESET_SIZE                  1001
 #define IDM_RESET_ALL_SETTINGS          1002
-#define IDM_MINIMIZE_WINDOW             1003
+#define IDM_RELOAD_FROM_INI             1003
+#define IDM_MINIMIZE_WINDOW             1010
 #define IDM_COUNTDOWN_MODE              2000
 #define IDM_STOP_COUNTDOWN              2001
 #define IDM_MYPOPUP_SHOWDATE            2002

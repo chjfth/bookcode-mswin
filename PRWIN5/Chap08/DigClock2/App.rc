@@ -31,7 +31,7 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 
 IDR_ACCELERATOR1 ACCELERATORS
 BEGIN
-    "R",            ID_ACCEL_ReloadIni,     VIRTKEY, CONTROL, ALT, NOINVERT
+    "R",            IDM_RELOAD_FROM_INI,    VIRTKEY, CONTROL, ALT, NOINVERT
     "D",            IDM_RESET_ALL_SETTINGS, VIRTKEY, CONTROL, ALT, NOINVERT
     "T",            IDM_DO_TEST1,           VIRTKEY, CONTROL, ALT, NOINVERT
     "Y",            IDM_DO_TEST2,           VIRTKEY, CONTROL, ALT, NOINVERT
@@ -43,7 +43,7 @@ END
 // WAV
 //
 
-IDR_WAV1                WAV                     "chime-2sec.wav"
+IDR_WAV_STOCK            WAV                     "chime-2sec.wav"
 
 #endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ MYPROGRAM               ICON                    "DigClock2.ico"
 // Menu
 //
 
-IDR_MENU1 MENU
+IDR_MAIN_MENU MENU
 BEGIN
     POPUP "MYPOPUP"
     BEGIN
@@ -103,10 +103,11 @@ BEGIN
         END
         MENUITEM "Show text &title",            IDM_SHOW_TITLE
         MENUITEM "&Minimize window",            IDM_MINIMIZE_WINDOW
-        POPUP "&Reset"
+        POPUP "&Reset/Reload"
         BEGIN
-            MENUITEM "&Reset window size",          IDM_RESET_SIZE
-            MENUITEM "&Reset all settings",         IDM_RESET_ALL_SETTINGS
+            MENUITEM "Reset &window size",          IDM_RESET_SIZE
+            MENUITEM "Reset &all settings",         IDM_RESET_ALL_SETTINGS
+            MENUITEM "Reload from &INI ",           IDM_RELOAD_FROM_INI
         END
         MENUITEM "&Help",                       IDM_HELP
         MENUITEM "E&xit",                       IDM_EXIT
