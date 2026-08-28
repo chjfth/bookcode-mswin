@@ -1139,10 +1139,9 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 
 		if(fsapi::file_exists(fullpath))
 		{
-			g_playsound_filepath = Sdring(filepath); 
+			g_playsound_filepath = filepath; 
 			// -- Yes, filepath instead of fullpath, bcz I want it to match exact text from INI.
-			// Note: Writing `g_playsound_filepath = filepath;` is wrong, that will generate a 
-			// temp DataXString_AutoSaveIni<Sdring> and default `=` assign to g_playsound_filepath.
+			// was g_playsound_filepath = Sdring(filepath);  // not-neccessary
 			
 			g_is_playsound = true;
 		}
