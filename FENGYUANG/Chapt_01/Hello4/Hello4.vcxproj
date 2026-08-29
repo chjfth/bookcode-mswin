@@ -225,7 +225,8 @@
   
   <!-- Import shared project properties used by this book. -->
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(dirThisBook)\FENGYUANG.props" />
+    <Import Project="$(dirThisBook)\BookShare.props" />
+    <Import Project="$(dirThisBook)\UseDirectX.props" />
   </ImportGroup>
 
   <ItemGroup>

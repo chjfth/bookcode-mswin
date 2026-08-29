@@ -1,12 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   
-  <Target Name="CheckDirectXSDK" BeforeTargets="ClCompile">
-    <Exec Command="$(MSBuildThisFileDirectory)CheckDirectXSDK.bat" /> 
-  </Target>
+  <!-- 
+    If you use VC2010 to compile this book's DirectX code, you need to have
+    
+        d:\DXSDK-FengyuanG\Libddraw.lib
+        
+        or
+        
+        d:\DXSDK-FengyuanG\Lib\x86\ddraw.lib
+        d:\DXSDK-FengyuanG\Lib\x64\ddraw.lib
+    
+    The bookcode is for DX7, and luckily it can be built using DX9SDK.
+  -->
   
-  <PropertyGroup Condition="'$(PlatformToolsetVersion)' &lt; '140'">
-    <LibraryPath>$(DIR_DXSDK)\Lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
+  <PropertyGroup>
+    <dirDxsdk>d:\DXSDK-FengyuanG</dirDxsdk>
+    
+    <dirDxsdkLib>$(dirDxsdk)\Lib</dirDxsdkLib>
+    <!-- Override it if there is a in-subdir $(PlatformX)\ddraw.lib 
+    	d:\DXSDK-FengyuanG\Lib\x86\ddraw.lib
+    	d:\DXSDK-FengyuanG\Lib\x64\ddraw.lib
+    -->
+    <dirDxsdkLib Condition="exists('$(dirDxsdk)\Lib\$(PlatformX)\ddraw.lib')">$(dirDxsdk)\Lib\$(PlatformX)</dirDxsdkLib>
+    
+    <IsUsingVc2010 Condition="'$(PlatformToolset)'=='v100'">true</IsUsingVc2010>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <LibraryPath>$(dirDxsdkLib);$(LibraryPath)</LibraryPath>
+
+    <PathKeyfile>$(dirDxsdkLib)\ddraw.lib</PathKeyfile>
+    <NeedDxsdkAlert Condition="!exists('$(PathKeyfile)')">true</NeedDxsdkAlert>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ddraw.lib;;%(AdditionalDependencies)</AdditionalDependencies>
+
+	  <!-- Add legacy_stdio_definitions.lib for VC2015+ (bcz d3dx9.lib refers to _snprintf etc). -->
+	  <!-- From InD3D7's BookShare.props
+      <AdditionalDependencies Condition="'$(IsUsingVc2010)'!='true'">legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       -->
+       
+    </Link>
+  </ItemDefinitionGroup>
   
+  <Target Name="SDK_Checking_ChjAlert" BeforeTargets="InitializeBuildStatus">
+	<Error Condition="'$(dirThisBook)'==''" Text="The MSBuild property 'dirThisBook' must be defined in your .vcxproj file." />
+
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] This project needs DirectX to compile." Importance="high" />
+    <Message Condition="'$(NeedDxsdkAlert)'=='true'" Text="[ALERT] But you do NOT have '$(PathKeyfile)' on your disk." Importance="high" />
+  </Target>
+
 </Project>
