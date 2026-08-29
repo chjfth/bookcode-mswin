@@ -43,7 +43,7 @@ void CenterText(HDC hDC, int x, int y, LPCTSTR szFace,
 
     SetBkMode(hDC, TRANSPARENT);
     SetTextColor(hDC, RGB(0, 0, 0xFF));
-    TextOut(hDC, x, y, szMessage, _tcslen(szMessage));
+    TextOut(hDC, x, y, szMessage, (int)_tcslen(szMessage));
 
     SelectObject(hDC, hOld);
 	DeleteObject(hFont);
@@ -199,5 +199,5 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE,
     win.ShowWindow(nShow);
     win.UpdateWindow();
 
-    return win.MessageLoop();
+    return (int)win.MessageLoop();
 }

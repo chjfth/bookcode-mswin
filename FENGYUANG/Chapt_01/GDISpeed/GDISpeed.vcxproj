@@ -220,9 +220,6 @@
     <ResourceCompile Include="GDISpeed.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Res\graph.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
   
