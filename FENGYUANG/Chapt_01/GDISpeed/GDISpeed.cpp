@@ -41,7 +41,7 @@ int MyMessageBox(HWND hWnd, const TCHAR * text, const TCHAR * caption, DWORD sty
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCmd, int nShow)
 {
     KTimer timer;
-    TCHAR  mess[128];
+	TCHAR  mess[128]={};
 
     timer.Start(); 
 	Sleep(1000); 
@@ -52,7 +52,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR lpCmd, int nShow)
     CreateSolidBrush(RGB(0xAA, 0xAA, 0xAA));
     unsigned time = (unsigned) timer.Stop();
 
-    _sntprintf_s(mess, ARRAYSIZE(mess),
+    _sntprintf_s(mess, _TRUNCATE,
 		_T("CPU speed       %d.%d MHz\n")
         _T("KTimer overhead %d clock cycles\n")
         _T("CreateSolidBrush %d clock cycles, %d ns"),

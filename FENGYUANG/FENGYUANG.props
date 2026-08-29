@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- Note: We should place $(dirDxsdk)\Include *behind* VC2010's Win7SDK include, 
+         bcz DXSDK carries outdated basetsd.h which is not compatible with Win7SDK's other headers. 
+    -->
+    <IncludePath>$([System.String]::Concat(
+      '$(dirThisBook)\..\__chjcxx\common-include\include\mswin;',
+      '$(dirThisBook)\..\__chjcxx\common-include\include;',
+      '$(dirThisBook)\..\__chjcxx\mm_snprintf\libsrc\include;',
+      '$(dirThisBook)\..\__WinConst;',
+      '$(IncludePath);',
+      '$(dirDxsdk)\Include;'
+      ))
+    </IncludePath>
+    
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\share;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <Target Name="SDK_Checking_ChjAlert" BeforeTargets="InitializeBuildStatus">
+	<Error Condition="'$(dirThisBook)'==''" Text="The MSBuild property 'dirThisBook' must be defined in your .vcxproj file." />
+  </Target>
+
+</Project>
