@@ -15,11 +15,18 @@
 
 #pragma warning(disable : 4035)
 
+#include <intrin.h>
+
 inline unsigned __int64 GetCycleCount(void)
 {
+#ifdef _M_IX86
 	// Chj memo: Read RDTSC counter, result in EDX:EAX
     _asm    _emit 0x0F
     _asm    _emit 0x31
+#else
+	unsigned aux;
+	return __rdtscp(&aux);
+#endif
 }
 
 class KTimer
