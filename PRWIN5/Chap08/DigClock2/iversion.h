@@ -3,7 +3,7 @@
 
 #define DigClock2_VMAJOR 2
 #define DigClock2_VMINOR 6
-#define DigClock2_VPATCH 2
+#define DigClock2_VPATCH 3
 #define DigClock2_VTAIL  0
 
 #define DigClock2str__(n) #n

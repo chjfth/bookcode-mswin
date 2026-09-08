@@ -1162,9 +1162,11 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 
 		if(fsapi::file_exists(fullpath))
 		{
-			g_playsound_filepath = filepath; 
+			g_playsound_filepath = Sdring(filepath); 
 			// -- Yes, filepath instead of fullpath, bcz I want it to match exact text from INI.
-			// was g_playsound_filepath = Sdring(filepath);  // not-neccessary
+			//    or
+			// g_playsound_filepath.SetValue(filepath);
+			// -- Note: Casual codeing `g_playsound_filepath = filepath;` is WRONG!
 			
 			g_is_playsound = true;
 		}
