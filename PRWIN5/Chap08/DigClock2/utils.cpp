@@ -417,52 +417,125 @@ void ChimePlay::PlayStop()
 	m_purpose = None;
 }
 
-
-void AddNewFiles_to_ChimeList(HWND hwnd, Sdrings &ss)
+void AddNewFiles_to_ChimeList_SingleDir(HWND hwnd, const Sdrings &ss_input)
 {
-	// Will change g_chime_filepaths and g_chime_list
 	// ss[0] is full-dirpath, ss[1], ss[2] etc are filenams in that dirpath.
+	// util_GetOpenFilenames() produces this info structure.
+
+	int file_count = ss_input.count() - 1;
+	
+	assert(file_count>0);
+
+	Sdrings ssfilepath = file_count;
+
+	for(int i=0; i<file_count; i++)
+	{
+		ssfilepath[i] = paths_join2(ss_input[0], ss_input[1+i]);
+	}
+
+	AddNewFiles_to_ChimeList(hwnd, ssfilepath);
+}
+
+void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
+{
+	// Will change g_chime_list
 
 	const TCHAR *exedir = GetExeDir();
 
-	Sdring loaddir = fullpath_to_rela(exedir, ss[0]);
 	int nNewFiles = 0;
+	Sdring first_newsound;
+	Sdrings chime_filepaths = chime_list_GetValue();
 
 	Sdrings ssDupFiles;
+	Sdrings ssInvalid;
 
-	// Add each loaddir+filenam in ss[] to g_chime_filepaths.
-	// I prefer g_chime_filepaths[] to have relative paths(rela to ExeDir), bcz they're shorter.
+	// Add each ss_input[] to chime_filepaths.
+	// I prefer chime_filepaths[] to have relative paths(rela to ExeDir), 
+	// bcz they're normally shorter.
 
-	for(int i=1; i<ss.count(); i++)
+	for(int i=0; i<ss_input.count(); i++)
 	{
-		Sdring newpath = paths_join2(loaddir, ss[i]);
+		Sdring newpath = fullpath_to_rela(exedir, ss_input[i]);
 		
-		int foundat = SdringsFind(g_chime_filepaths, newpath);
-		if(foundat>=0)
+		int found_at = SdringsFind(chime_filepaths, newpath);
+		if(found_at>=0)
 		{
-			ssDupFiles.AppendTail(ss[i]);
+			// Collect duplicate-files to report. Should report *absolute* path.
+			ssDupFiles.AppendTail(ss_input[i]);
 			continue;
 		}
 
-		g_chime_filepaths.AppendTail(newpath);
+		bool extname_ok = false;
+		for(int j=0; j<n_audio_extnames; j++)
+		{ 
+			if (StrEndsWith(ss_input[i], g_audio_extnames[j]))
+			{
+				extname_ok = true;
+				break;
+			}
+		}
+		if(extname_ok==false)
+		{
+			ssInvalid.AppendTail(ss_input[i]);
+			continue;
+		}
+
+		// Now confirm a valid audio filepath.
+
+		chime_filepaths.AppendTail(newpath);
 		nNewFiles++;
+
+		if(first_newsound.is_empty())
+			first_newsound = newpath;
 	}
 
-	g_chime_list_SetValue();
+	chime_list_SetValue(chime_filepaths);
 
-	Sdring sDupFiles = MergeFromSdrings(ssDupFiles, _T("\r\n  "));
+	if(first_newsound.not_empty())
+	{ 
+		// Auto-enable the (first) dragged-in/newly-added sound.
+		g_playsound_filepath = first_newsound;
+	}
 
 	Sdring msg;
-	vaSdringAppendSelf(msg, _T("Total %d files added to sound list.\r\n\r\n"), nNewFiles);
+	vaSdringAppendSelf(msg, _T("Total %d files added to sound list.\r\n"), nNewFiles);
 
 	if(ssDupFiles.count()>0)
 	{
-		vaSdringAppendSelf(msg, _T("Following %d duplicate files are ignored:\r\n  %s"),
+		vaSdringAppendSelf(msg, _T("\r\n"));
+
+		Sdring sDupFiles = MergeFromSdrings(ssDupFiles, _T("\r\n  "));
+
+		vaSdringAppendSelf(msg, _T("Following %d duplicate files are ignored:\r\n  %s\r\n"),
 			 ssDupFiles.count(), sDupFiles.c_str());
+	}
+
+	if(ssInvalid.count()>0)
+	{
+		vaSdringAppendSelf(msg, _T("\r\n"));
+
+		Sdring sInvalid = MergeFromSdrings(ssInvalid, _T("\r\n  "));
+
+		vaSdringAppendSelf(msg, _T("Following %d files do not have valid extname(%s):\r\n  %s\r\n"),
+			ssInvalid.count(),
+			StrJoin(g_audio_extnames, n_audio_extnames, _T(" ")).c_str(), // extname(%s)
+			sInvalid.c_str()
+			);
 	}
 
 	ggt_FlexiInfo(hwnd, msg);
 }
+
+Sdrings chime_list_GetValue() // get value from g_chime_list
+{
+	return SplitToSdrings(g_chime_list.GetValue(), false, _T("\n"), _T(" \t"));
+}
+
+void chime_list_SetValue(const Sdrings& chime_filepaths) // set value to g_chime_list
+{
+	g_chime_list.SetValue(MergeFromSdrings(chime_filepaths, _T("\n"), _T(" \t")));
+}
+
 
 
 #ifndef DigClock2_DEBUG

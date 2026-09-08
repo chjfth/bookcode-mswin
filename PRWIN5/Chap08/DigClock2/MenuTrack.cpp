@@ -33,10 +33,10 @@ void CMenuPop_PlaySound::On_WM_INITMENUPOPUP(
 	while (DeleteMenu(hmenuPopup, dyn_pos, MF_BYPOSITION));
 
 	// Add dynamic menuitems according to INI[chime_list]list=... strings.
-	g_chime_filepaths = SplitToSdrings(g_chime_list.GetValue(), false, _T("\n"), _T(" \t"));
-	for (int i = 0; i < g_chime_filepaths.count(); i++)
+	m_chime_filepaths = chime_list_GetValue();
+	for (int i = 0; i < m_chime_filepaths.count(); i++)
 	{
-		const Sdring &filepath = g_chime_filepaths[i];
+		const Sdring &filepath = m_chime_filepaths[i];
 		const Sdring filenam = ospath::split_filenam(filepath);
 
 		const int cmdid = ID_PLAYSOUND_DYNA_START + i;
@@ -109,6 +109,10 @@ void CMenuPop_PlaySound::On_WM_MENUSELECT(
 				_T("%s\r\n\r\nThis sound file does NOT exist. Click to remove it from menu."),
 				fullpath.c_str());
 		}
+	}
+	else if (idxItem == ID_PLAYSOUND_ADDFILE)
+	{
+		g_tooltip.ShowBelowMouse(_T("You can also drag audio files onto DigClock2 main window to add them."));
 	}
 	else
 	{

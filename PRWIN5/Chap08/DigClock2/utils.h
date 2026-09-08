@@ -146,9 +146,15 @@ private:
 extern ChimePlay g_chimeplay;
 
 
-void g_chime_list_SetValue();
+Sdrings chime_list_GetValue(); // get value from g_chime_list
+void chime_list_SetValue(const Sdrings& chime_list); // set value to g_chime_list
 
-void AddNewFiles_to_ChimeList(HWND hwnd, Sdrings &ss);
+void AddNewFiles_to_ChimeList_SingleDir(HWND hwnd, const Sdrings &ss);
+
+void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss);
+
+extern const TCHAR * const g_audio_extnames[];
+extern const int n_audio_extnames;
 
 
 #endif

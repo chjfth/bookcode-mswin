@@ -1,6 +1,5 @@
 /*-----------------------------------------
 DIGCLOCK.c -- Digital Clock(c) Charles Petzold, 1998
-
 DigClock2.cpp -- Updated by Jimm Chen
 
 Since 2022.05:
@@ -40,9 +39,12 @@ Since 2026.08: (v2.5)
 #include <tchar.h>
 #include <assert.h>
 #include <windows.h>
-#include <windowsx.h>
+#include <ShellAPI.h>
+#include <windowsx.h> // should be after ShellAPI.h to see _INC_SHELLAPI
 #include <CommCtrl.h>
 #include <shlwapi.h>
+#include <ShellAPI.h>
+#include <WinUser.h> // WM_DROPFILES
 #include <ShlObj-winxp-patch.h>
 #include "resource.h"
 
@@ -138,7 +140,8 @@ static UINT g_msgval_playsound_done;
 MY_DATA_AutoSaveINI_secname(Sdring, g_chime_list, "chime_list", "list", _T("")) 
 // -- chime(.wav/.mp3) filepaths separated by \n. [chime_list] section has only one key-value.
 
-Sdrings g_chime_filepaths;
+const TCHAR * const g_audio_extnames[] = { _T(".wav"), _T(".mp3") };
+const int n_audio_extnames = ARRAYSIZE(g_audio_extnames);
 
 MY_DATA_AutoSaveINI(bool, g_shake_window_repaint, "ShakeWindowRepaint", true);
 
@@ -805,6 +808,8 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	mterr = g_menu_tracker.AddPopAction(_T("PlaySound"), new CMenuPop_PlaySound);
 	assert(!mterr);
 
+	DragAcceptFiles(hwnd, TRUE);
+
 	return TRUE; // create ok
 }
 
@@ -1017,6 +1022,25 @@ void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hSubmenu, UINT fla
 	g_menu_tracker.Do_WM_MENUSELECT(hwnd, hmenu, item, hSubmenu, flags);
 }
 
+void Cls_OnDropFiles(HWND hwnd, HDROP hdrop)
+{
+	TCHAR audio_path[MAX_PATH] = {};
+	int file_count = DragQueryFile(hdrop, -1, NULL, 0);
+	assert(file_count>0);
+
+	Sdrings ssfile(file_count);
+	for(int i=0; i<file_count; i++)
+	{
+		int pathlen = DragQueryFile(hdrop, i, NULL, 0);
+		ssfile[i].setbufsize(pathlen);
+		DragQueryFile(hdrop, i, ssfile[i].getbuf(), ssfile[i].rawlen()+1);
+	}
+	
+	DragFinish(hdrop); // free system-allocated memory for this drag-event
+
+	AddNewFiles_to_ChimeList(hwnd, ssfile);
+}
+
 void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 {
 	if(cmdid==IDM_COUNTDOWN_MODE)
@@ -1158,20 +1182,25 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 			{
 				int delpos = cmdid - ID_PLAYSOUND_DYNA_START;
 
-				g_chime_filepaths.DeleteAt(delpos, 1);
-				g_chime_list_SetValue();
+				Sdrings chime_filepaths = chime_list_GetValue();
+				chime_filepaths.DeleteAt(delpos, 1);
+				chime_list_SetValue(chime_filepaths);
 			}
 		}
 	}
 	else if(cmdid==ID_PLAYSOUND_ADDFILE)
 	{
-		Sdring arsFilter[] = { _T("Audio files;*.wav;*.mp3"), _T("All files;*.*") };
+		Sdring audio_extnames = StrJoin(g_audio_extnames, ARRAYSIZE(g_audio_extnames), _T("*;"));
+		// -- would result in ".wav*;.mp3"
+
+		Sdring arsFilter[] = { Sdring(_T("Audio files;*"))+audio_extnames, _T("All files;*.*") };
+		// -- would result in "Audio files;*.wav;*.mp3"
 
 		Sdrings ss = util_GetOpenFilenames(hwnd, arsFilter, ARRAYSIZE(arsFilter),
 			nullptr, _T("chime.wav"));
 		int count = ss.count();
 		if(count>0)
-			AddNewFiles_to_ChimeList(hwnd, ss); // will change g_chime_filepaths and g_chime_list.
+			AddNewFiles_to_ChimeList_SingleDir(hwnd, ss); // will change g_chime_list.
 	}
 	else if(cmdid==IDM_DO_TEST1)
 	{
@@ -1189,11 +1218,6 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	{
 		PostMessage(hwnd, WM_CLOSE, 0, 0);
 	}
-}
-
-void g_chime_list_SetValue()
-{
-	g_chime_list.SetValue(MergeFromSdrings(g_chime_filepaths, _T("\n"), _T(" \t")));
 }
 
 void Cls_OnDestroy(HWND hwnd)
@@ -1227,6 +1251,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		HANDLE_MSG(hwnd, WM_INITMENUPOPUP, Cls_OnInitMenuPopup);
 		HANDLE_MSG(hwnd, WM_MENUSELECT, Cls_OnMenuSelect);
+
+		HANDLE_MSG(hwnd, WM_DROPFILES, Cls_OnDropFiles);
 
 		HANDLE_MSG(hwnd, WM_COMMAND, Cls_OnCommand);
 		HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);

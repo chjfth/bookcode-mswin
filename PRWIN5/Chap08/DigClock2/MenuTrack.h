@@ -136,4 +136,6 @@ public:
 
 private:
 	int m_prev_cmdid = 0;
+
+	Sdrings m_chime_filepaths;
 };
