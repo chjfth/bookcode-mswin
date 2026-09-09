@@ -1166,7 +1166,8 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 			// -- Yes, filepath instead of fullpath, bcz I want it to match exact text from INI.
 			//    or
 			// g_playsound_filepath.SetValue(filepath);
-			// -- Note: Casual codeing `g_playsound_filepath = filepath;` is WRONG!
+			// -- Note: Casual coding `g_playsound_filepath = filepath;` is WRONG! 
+			//    -- will/should get compiler ambiguous error.
 			
 			g_is_playsound = true;
 		}

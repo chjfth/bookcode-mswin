@@ -446,8 +446,9 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 	Sdring first_newsound;
 	Sdrings chime_filepaths = chime_list_GetValue();
 
+	Sdrings ssNewAdds;
 	Sdrings ssDupFiles;
-	Sdrings ssInvalid;
+	Sdrings ssInvalids;
 
 	// Add each ss_input[] to chime_filepaths.
 	// I prefer chime_filepaths[] to have relative paths(rela to ExeDir), 
@@ -476,7 +477,7 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 		}
 		if(extname_ok==false)
 		{
-			ssInvalid.AppendTail(ss_input[i]);
+			ssInvalids.AppendTail(ss_input[i]);
 			continue;
 		}
 
@@ -484,6 +485,8 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 
 		chime_filepaths.AppendTail(newpath);
 		nNewFiles++;
+
+		ssNewAdds.AppendTail(ss_input[i]);
 
 		if(first_newsound.is_empty())
 			first_newsound = newpath;
@@ -498,7 +501,17 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 	}
 
 	Sdring msg;
-	vaSdringAppendSelf(msg, _T("Total %d files added to sound list.\r\n"), nNewFiles);
+
+	if(ssNewAdds.count()>0)
+	{
+		Sdring sNewAdds = MergeFromSdrings(ssNewAdds, _T("\r\n  "));
+		vaSdringAppendSelf(msg, _T("Total %d files added to sound list:\r\n  %s\r\n"), 
+			nNewFiles, sNewAdds.c_str());
+	}
+	else
+	{
+		vaSdringAppendSelf(msg, _T("No files added to sound list.\r\n"));
+	}
 
 	if(ssDupFiles.count()>0)
 	{
@@ -510,16 +523,16 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 			 ssDupFiles.count(), sDupFiles.c_str());
 	}
 
-	if(ssInvalid.count()>0)
+	if(ssInvalids.count()>0)
 	{
 		vaSdringAppendSelf(msg, _T("\r\n"));
 
-		Sdring sInvalid = MergeFromSdrings(ssInvalid, _T("\r\n  "));
+		Sdring sInvalids = MergeFromSdrings(ssInvalids, _T("\r\n  "));
 
 		vaSdringAppendSelf(msg, _T("Following %d files do not have valid extname(%s):\r\n  %s\r\n"),
-			ssInvalid.count(),
+			ssInvalids.count(),
 			StrJoin(g_audio_extnames, n_audio_extnames, _T(" ")).c_str(), // extname(%s)
-			sInvalid.c_str()
+			sInvalids.c_str()
 			);
 	}
 
