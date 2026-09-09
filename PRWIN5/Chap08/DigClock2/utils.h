@@ -21,6 +21,7 @@ using namespace itc;
 #include <mswin/Tooltip-helper.h>
 
 #include <DataXIni.h>
+#include <mswin/MenuTracker.h>
 
 #define APPNAME "DigClock2"
 
@@ -156,5 +157,6 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss);
 extern const TCHAR * const g_audio_extnames[];
 extern const int n_audio_extnames;
 
+extern CMenuTracker g_menu_tracker;
 
 #endif

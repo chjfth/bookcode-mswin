@@ -519,7 +519,7 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 
 		Sdring sDupFiles = MergeFromSdrings(ssDupFiles, _T("\r\n  "));
 
-		vaSdringAppendSelf(msg, _T("Following %d duplicate files are ignored:\r\n  %s\r\n"),
+		vaSdringAppendSelf(msg, _T("%d duplicate files are ignored:\r\n  %s\r\n"),
 			 ssDupFiles.count(), sDupFiles.c_str());
 	}
 
@@ -529,7 +529,7 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 
 		Sdring sInvalids = MergeFromSdrings(ssInvalids, _T("\r\n  "));
 
-		vaSdringAppendSelf(msg, _T("Following %d files do not have valid extname(%s):\r\n  %s\r\n"),
+		vaSdringAppendSelf(msg, _T("%d files do not have valid extname(%s):\r\n  %s\r\n"),
 			ssInvalids.count(),
 			StrJoin(g_audio_extnames, n_audio_extnames, _T(" ")).c_str(), // extname(%s)
 			sInvalids.c_str()
@@ -537,6 +537,14 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 	}
 
 	ggt_FlexiInfo(hwnd, msg);
+
+	// Pop-up the sound-list menu, so that user can see current sound-file selection.
+	//
+	HMENU hmPlaySound = g_menu_tracker.FindPopname(_T("PlaySound"));
+	RECT rcClient;
+	GetClientRect_ScreenPos(hwnd, &rcClient);
+	TrackPopupMenu(hmPlaySound, TPM_RIGHTBUTTON, rcClient.left+10, rcClient.top+10, 0, hwnd, NULL);
+
 }
 
 Sdrings chime_list_GetValue() // get value from g_chime_list
