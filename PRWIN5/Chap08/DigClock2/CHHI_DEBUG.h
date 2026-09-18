@@ -1,6 +1,6 @@
 #if 0
 
-// Actual developer can copy these to his own $prjdir/devdbg/CHHI_DEBUG.h 
+// Actual developer can copy these to his own $prjdir\_devdbg\CHHI_DEBUG.h 
 // (except that change `#if 0` to `#if 1`).
 
 #undef NDEBUG // always enable assert()
@@ -14,6 +14,12 @@
 #define DigClock2_DEBUG
 
 #define Editbox_EnableKbdAdjustNumber_DEBUG
+#define WinMultiMon_DEBUG
+
+#define DlgTooltipEasy_DEBUG
+
+#define IPlaySound_mswin_DEBUG
+
 #define SimpleIni_DEBUG
 #define SimpleIniEx_DEBUG
 #define DataXIni_DEBUG
