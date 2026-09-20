@@ -13,7 +13,7 @@
 
 #define DigClock2_DEBUG
 
-#define Editbox_EnableKbdAdjustNumber_DEBUG
+#define Editbox_EnableKbdAdjustIntnum_DEBUG
 #define WinMultiMon_DEBUG
 
 #define DlgTooltipEasy_DEBUG
