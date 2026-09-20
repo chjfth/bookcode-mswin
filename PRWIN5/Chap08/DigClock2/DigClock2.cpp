@@ -340,7 +340,7 @@ void ReloadIni_and_Redraw(HWND hwnd)
 	}
 
 	const TCHAR* const ar_inifiles[] = { exedir_ini, userdir_ini };
-	g_xini.LoadIni(ar_inifiles, ARRAYSIZE(ar_inifiles));
+	g_xini.LoadIni(ar_inifiles, ARRAYSIZE(ar_inifiles), true, DataXIni::LoadFinalFound);
 
 	// Reposition DigClock window according to new INI content.
 
