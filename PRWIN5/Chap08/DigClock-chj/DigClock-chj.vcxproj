@@ -202,13 +202,11 @@
   <ItemGroup>
     <ClCompile Include="DigClock.cpp" />
     <ClCompile Include="..\..\BeginPaint_NoFlicker.cpp" />
-    <ClCompile Include="..\..\..\share\vaDbg.cpp" />
 
     <ResourceCompile Include="App.rc" />
 
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\BeginPaint_NoFlicker.h" />
-    <ClInclude Include="..\..\..\share\vaDbg.h" />
 
     <None Include="DigClock.ico" />
   </ItemGroup>
