@@ -194,8 +194,7 @@ void InitOnce()
 	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
 }
 
-int in_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	PSTR szCmdLine, int iCmdShow)
+int in_WinMain(int argc, const TCHAR *argv[])
 {
 	InitOnce();
 
@@ -204,6 +203,7 @@ int in_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	MSG          msg;
 	WNDCLASS     wndclass;
 	HACCEL       hAccel;
+	HINSTANCE hInstance = GetModuleHandle(NULL);
 	g_hInstance = hInstance;
 
 	wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -232,7 +232,7 @@ int in_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	SetWindowText(hwnd, GetExeFilename());
 
-	ShowWindow(hwnd, iCmdShow);
+	ShowWindow(hwnd, SW_NORMAL);
 	UpdateWindow(hwnd);
 
 	g_firstUpdateWindowDone = 1;
@@ -257,16 +257,27 @@ int in_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return (int)msg.wParam;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	PSTR szCmdLine, int iCmdShow)
+int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR szParams, int iCmdShow)
 {
+	int argc = __argc;
+#ifdef UNICODE
+	PCTSTR* argv = (PCTSTR*)CommandLineToArgvW(GetCommandLine(), &argc);
+#else
+	PCTSTR* argv = (PCTSTR*)__argv;
+#endif
+	// Use argc and argv[] below, just like what traditional main() does.
+
+	// _CrtSetBreakAlloc(205);
 	MSVCRT_MemCheckStart(foo);
 
-	int ret = in_WinMain(hInstance, hPrevInstance, szCmdLine, iCmdShow);
+	int ret = in_WinMain(argc, argv);
 
 	g_xini.~DataXIni();
 	g_menu_tracker.~CMenuTracker();
 
+	// These two global objs have Sdring member, so destruct them to eliminate memleak.
+	g_playsound_filepath.~g_playsound_filepath();
+	g_chime_list.~g_chime_list();
 
 	bool isleak = MSVCRT_MemCheckEnd_IsLeak(foo);
 	if (isleak) {
