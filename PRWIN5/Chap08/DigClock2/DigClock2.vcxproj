@@ -218,6 +218,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="iversion.h" />
+    <ClInclude Include="CxxRawWinBase.h" />
+    <ClInclude Include="AppWin.h" />
     <ClInclude Include="MenuTrack.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="datax.h" />

@@ -82,6 +82,8 @@ Since 2026.08: (v2.5)
 #include "utils.h"
 #include "MenuTrack.h"
 
+#include "AppWin.h"
+
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -190,6 +192,8 @@ void ReloadIni_and_Redraw(HWND);
 
 void InitOnce()
 {
+	g_hInstance = GetModuleHandle(NULL);
+	
 	InitCommonControls();
 	// -- WinXP requires this, otherwise, g_hdlgCountdownCfg will be NULL.
 }
@@ -197,52 +201,25 @@ void InitOnce()
 int in_WinMain(int argc, const TCHAR *argv[])
 {
 	InitOnce();
+	HINSTANCE hInstance = g_hInstance;
 
 	static TCHAR szAppName[] = TEXT(APPNAME);
-	HWND         hwnd;
-	MSG          msg;
-	WNDCLASS     wndclass;
-	HACCEL       hAccel;
-	HINSTANCE hInstance = GetModuleHandle(NULL);
-	g_hInstance = hInstance;
 
-	wndclass.style = CS_HREDRAW | CS_VREDRAW;
-	wndclass.lpfnWndProc = WndProc;
-	wndclass.cbClsExtra = 0;
-	wndclass.cbWndExtra = 0;
-	wndclass.hInstance = hInstance;
-	wndclass.hIcon = LoadIcon(hInstance, _T("MYPROGRAM"));
-	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of BeginPaint_NoFlicker
-	wndclass.lpszMenuName = NULL;
-	wndclass.lpszClassName = szAppName;
-	RegisterClass(&wndclass);
+	CAppWin appwin;
+	BOOL succ = appwin.RegisterAndCreate(szAppName);
+	assert(succ);
 
-	hwnd = CreateWindowEx(0,
-		szAppName, TEXT("Digital Clock"),
-		WS_POPUPWINDOW | WS_CLIPCHILDREN, // casual, tune soon
-										  // note: WS_CLIPCHILDREN avoids re-paint flicking when floatbar is visible and counting down.
-		0, 0, 200, 100, // temporal window pos, change later in ReloadIni()
-		NULL, NULL, hInstance, NULL);
-
-	ReloadIni_and_Redraw(hwnd);
-
+	HWND hwnd = appwin.Hwnd();
 	g_hdlgCountdownCfg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwnd, Dlgproc_CountdownCfg);
 	assert(g_hdlgCountdownCfg);
 
-	SetWindowText(hwnd, GetExeFilename());
-
-	ShowWindow(hwnd, SW_NORMAL);
-	UpdateWindow(hwnd);
-
-	g_firstUpdateWindowDone = 1;
-
-	hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
+	HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 	assert(hAccel);
 
 	bool ttsucc = g_tooltip.Create(hwnd, false);
 	assert(ttsucc);
 
+	MSG msg = {};
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		if (!TranslateAccelerator(hwnd, hAccel, &msg))
@@ -289,6 +266,45 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR szParams, int iCmdShow
 		return ret;
 	}
 }
+
+BOOL CAppWin::RegisterAndCreate(const TCHAR *szAppName)
+{
+	HINSTANCE hInstance = g_hInstance;
+
+	WNDCLASS wndclass = {};
+	wndclass.style = CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc = CxxRawWinBase::s_WndProc;
+	wndclass.cbClsExtra = 0;
+	wndclass.cbWndExtra = 0;
+	wndclass.hInstance = hInstance;
+	wndclass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
+	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground = NULL; // Null-brush to disable WM_ERASEBKGND, in favor of BeginPaint_NoFlicker
+	wndclass.lpszMenuName = NULL;
+	wndclass.lpszClassName = szAppName;
+	RegisterClass(&wndclass);
+
+	HWND hwnd = CreateWindowEx(0,
+		szAppName, TEXT("Digital Clock"),
+		WS_POPUPWINDOW | WS_CLIPCHILDREN, // casual, tune soon
+			// note: WS_CLIPCHILDREN avoids re-paint flicking when floatbar is visible and counting down.
+		0, 0, 200, 100, // temporal window pos, change later in ReloadIni()
+		NULL, NULL, hInstance, 
+		this	// MUST preserve this, as LPCREATESTRUCT to WM_NCCREATE
+		);
+
+	ReloadIni_and_Redraw(hwnd);
+
+	SetWindowText(hwnd, GetExeFilename());
+
+	ShowWindow(hwnd, SW_NORMAL);
+	UpdateWindow(hwnd);
+
+	g_firstUpdateWindowDone = 1;
+
+	return TRUE;
+}
+
 
 inline int clock_cy_from_cx(int cx)
 {
@@ -440,7 +456,7 @@ COLORREF SwitchDigitColor(int shift)
 	return s_colors[s_idxcolor];
 }
 
-int Digit_ScaleDown(int value)
+inline int Digit_ScaleDown(int value)
 {
 	// Chj: For Second-value(not Hour, Minute value), we scale down the 
 	// digit display size to 75% to make the seconds value stands out.
@@ -671,7 +687,7 @@ void RefreshDateBar(HDC hdc)
 
 }
 
-void winenv_ReloadSetting(HWND hwnd)
+void CAppWin::winenv_ReloadSetting(HWND hwnd)
 {
 	TCHAR         szBuffer [2] ;
 
@@ -735,6 +751,7 @@ void do_CountdownDone(HWND hwnd) // Time due
 	}
 }
 
+
 void DoTimer(HWND hwnd, int idtimer)
 {
 	if(idtimer==ID_TIMER_SECONDS_TICK)
@@ -785,7 +802,7 @@ void DoTimer(HWND hwnd, int idtimer)
 	}
 }
 
-BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+BOOL CAppWin::Cls_OnCreate(HWND hwnd, LPCREATESTRUCT)
 {
 	SetTimer(hwnd, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL) ;
 	SetTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL, 500, NULL);
@@ -824,11 +841,11 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 	return TRUE; // create ok
 }
 
-static void OnWinMoveSize(HWND hwnd)
+void CAppWin::OnWinMoveSize(HWND hwnd)
 {
 	if(g_firstUpdateWindowDone>0 && !g_winshaker.IsTicking())
 	{
-		// Launch INI saving only AFTER Main window is shown.
+		// Do INI saving only AFTER Main window is shown.
 
 		RECT rect = { s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient+s_cyClient };
 
@@ -845,7 +862,7 @@ static void OnWinMoveSize(HWND hwnd)
 	}
 }
 
-void Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
+void CAppWin::Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
 {
 	s_cxClient = cx;
 	s_cyClient = cy;
@@ -854,7 +871,7 @@ void Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
 	OnWinMoveSize(hwnd);
 }
 
-void Cls_OnMove(HWND hwnd, int x, int y)
+void CAppWin::Cls_OnMove(HWND hwnd, int x, int y)
 {
 	POINT abspos = { 0, 0 };
 	ClientToScreen(hwnd, &abspos);
@@ -863,12 +880,12 @@ void Cls_OnMove(HWND hwnd, int x, int y)
 	OnWinMoveSize(hwnd);
 }
 
-void Cls_OnTimer(HWND hwnd, UINT id)
+void CAppWin::Cls_OnTimer(HWND hwnd, UINT id)
 {
 	DoTimer(hwnd, id);
 }
 
-void Cls_OnPaint(HWND hwnd)
+void CAppWin::Cls_OnPaint(HWND hwnd)
 {
 	PAINTSTRUCT ps = {};
 	HDC hdc = BeginPaint_NoFlicker(hwnd, &ps) ;
@@ -900,7 +917,7 @@ void Cls_OnPaint(HWND hwnd)
 	EndPaint_NoFlicker(hwnd, &ps) ;
 }
 
-void Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+void CAppWin::Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
 {
 	g_chimeplay.PlayStop();
 
@@ -918,7 +935,7 @@ void Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags
 	s_pos_mousedown.y = y;
 }
 
-void Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
+void CAppWin::Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
 {
 	// Handle window dragging
 
@@ -948,7 +965,7 @@ void Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
 	}
 }
 
-void My_OnMouseLeave(HWND hwnd)
+void CAppWin::My_OnMouseLeave(HWND hwnd)
 {
 	// Here, we check whether mouse pointer is outside the main window.
 	// If outside, we will hide the Countdown-cfg panel.
@@ -963,7 +980,7 @@ void My_OnMouseLeave(HWND hwnd)
 	}
 }
 
-void Cls_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+void CAppWin::Cls_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
 {
 	bool isCtrl = GetKeyState(VK_CONTROL)<0;
 	bool isShift = GetKeyState(VK_SHIFT)<0;
@@ -983,7 +1000,7 @@ void Cls_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
 	}
 }
 
-void Cls_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT flags)
+void CAppWin::Cls_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT flags)
 {
 	bool isCtrl = GetKeyState(VK_CONTROL)<0;
 	bool isShift = GetKeyState(VK_SHIFT)<0;
@@ -1006,19 +1023,19 @@ void Cls_OnKey(HWND hwnd, UINT vk, BOOL fDown, int cRepeat, UINT flags)
 	}
 }
 
-void Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+void CAppWin::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
 {
 	POINT point = {x, y};
 	ClientToScreen (hwnd, &point) ;
 	TrackPopupMenu(s_hmenuRootPopup, TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL) ;
 }
 
-void Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMenu)
+void CAppWin::Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMenu)
 {
 	g_menu_tracker.Do_WM_INITMENUPOPUP(hwnd, hmenuPopup, item, fSystemMenu);
 }
 
-void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hSubmenu, UINT flags)
+void CAppWin::Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hSubmenu, UINT flags)
 {
 	if(hmenu==NULL)
 	{
@@ -1033,7 +1050,7 @@ void Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hSubmenu, UINT fla
 	g_menu_tracker.Do_WM_MENUSELECT(hwnd, hmenu, item, hSubmenu, flags);
 }
 
-void Cls_OnDropFiles(HWND hwnd, HDROP hdrop)
+void CAppWin::Cls_OnDropFiles(HWND hwnd, HDROP hdrop)
 {
 	TCHAR audio_path[MAX_PATH] = {};
 	int file_count = DragQueryFile(hdrop, -1, NULL, 0);
@@ -1052,7 +1069,7 @@ void Cls_OnDropFiles(HWND hwnd, HDROP hdrop)
 	AddNewFiles_to_ChimeList(hwnd, ssfile);
 }
 
-void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
+void CAppWin::Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 {
 	if(cmdid==IDM_COUNTDOWN_MODE)
 	{
@@ -1234,7 +1251,7 @@ void Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	}
 }
 
-void Cls_OnDestroy(HWND hwnd)
+void CAppWin::Cls_OnDestroy(HWND hwnd)
 {
 	KillTimer(hwnd, ID_TIMER_SECONDS_TICK) ;
 	KillTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL);
@@ -1242,22 +1259,26 @@ void Cls_OnDestroy(HWND hwnd)
 	PostQuitMessage (0) ;
 }
 
-LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CAppWin::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
-	{
-		HANDLE_MSG(hwnd, WM_CREATE, Cls_OnCreate);
+	{{
+ 		HANDLE_MSG(hwnd, WM_CREATE, Cls_OnCreate);
+ 		HANDLE_MSG(hwnd, WM_PAINT, Cls_OnPaint);
+ 		HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);
+
+		HANDLE_MSG(hwnd, WM_COMMAND, Cls_OnCommand);
+
 		HANDLE_MSG(hwnd, WM_SIZE, Cls_OnSize);
 		HANDLE_MSG(hwnd, WM_MOVE, Cls_OnMove);
 		HANDLE_MSG(hwnd, WM_TIMER, Cls_OnTimer);
-		HANDLE_MSG(hwnd, WM_PAINT, Cls_OnPaint);
-		
-		HANDLE_MSG(hwnd, WM_LBUTTONDOWN, Cls_OnLButtonDown);
 
 		HANDLE_MSG(hwnd, WM_MOUSEMOVE, Cls_OnMouseMove);
-		case WM_MOUSELEAVE: 
+		case WM_MOUSELEAVE:
 			My_OnMouseLeave(hwnd);
 			return 0;
+
+		HANDLE_MSG(hwnd, WM_LBUTTONDOWN, Cls_OnLButtonDown);
 		HANDLE_MSG(hwnd, WM_LBUTTONUP, Cls_OnLButtonUp);
 		HANDLE_MSG(hwnd, WM_RBUTTONDOWN, Cls_OnRButtonDown);
 
@@ -1268,45 +1289,45 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		HANDLE_MSG(hwnd, WM_DROPFILES, Cls_OnDropFiles);
 
-		HANDLE_MSG(hwnd, WM_COMMAND, Cls_OnCommand);
-		HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);
-
 		case WM_SETTINGCHANGE: // for user-locale(time format) change
 			winenv_ReloadSetting(hwnd);
-			return 0 ;
-	}
+			return 0;
 
-	if(message==g_msgval_playsound_done)
+		default: ;
+	}}
+
+	if (message == g_msgval_playsound_done)
 	{
 		auto playdone = (CPlaySound_u::PlayDone_et)wParam;
 
-		if(g_chimeplay.IsPlaying()) 
+		if (g_chimeplay.IsPlaying())
 		{
 			vaDBG2(_T("[DigClock2] Got playSound-done. (stale, %s)"), ITCSnv(playdone, CPlaySound_u::PlayDone_itc));
 			return 0;
 		}
 		else
 			vaDBG2(_T("[DigClock2] Got playSound-done. (true, %s)"), ITCSnv(playdone, CPlaySound_u::PlayDone_itc));
-		
-		if( g_winshaker.IsTicking() )
+
+		if (g_winshaker.IsTicking())
 		{
 			vaDBG2(_T(". Window is still shaking, so the chime should repeat."));
 			g_chimeplay.RepeatOnce();
 		}
-		else if(g_chimeplay.GetPurpose()==ChimePlay::SndPreview)
+		else if (g_chimeplay.GetPurpose() == ChimePlay::SndPreview)
 		{
-			if(playdone==CPlaySound_u::PlayDone_Success)
+			if (playdone == CPlaySound_u::PlayDone_Success)
 			{
 				vaDBG2(_T(". User is previewing sound, so the chime should repeat."));
 				g_chimeplay.RepeatOnce();
 			}
 		}
-		
+
 		return 0;
 	}
-
+	
 	return DefWindowProc (hwnd, message, wParam, lParam) ;
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 

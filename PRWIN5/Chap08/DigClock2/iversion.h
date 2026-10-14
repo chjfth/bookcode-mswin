@@ -2,8 +2,8 @@
 #define __DigClock2_iversion_h_
 
 #define DigClock2_VMAJOR 2
-#define DigClock2_VMINOR 6
-#define DigClock2_VPATCH 8
+#define DigClock2_VMINOR 7
+#define DigClock2_VPATCH 0
 #define DigClock2_VTAIL  0
 
 #define DigClock2str__(n) #n
