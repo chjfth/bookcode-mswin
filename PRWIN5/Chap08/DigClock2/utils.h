@@ -39,24 +39,11 @@ struct Format_COLORREF_as_RGB {};
 
 extern const CInterpretConst& itc__ClockMode();
 
-extern Sdrings g_chime_filepaths;
+//extern Sdrings g_chime_filepaths;
 
-extern int g_seconds_remain;
+//extern int g_seconds_remain;
 
-extern DataXString_AutoSaveIni<ClockMode_et> g_ClockMode;
-extern DataXString_AutoSaveIni<bool> g_isShowDate;
-extern DataXString_AutoSaveIni<bool> g_isShowTimezone;
-extern DataXString_AutoSaveIni<bool> s_is_always_on_top;
-extern DataXString_AutoSaveIni<bool> s_is_change_color;
-extern DataXString_AutoSaveIni<bool> s_is_show_title;
-extern DataXString_AutoSaveIni<int> g_timedue_shake_seconds;
-extern DataXString_AutoSaveIni<bool> g_is_playsound;
-extern DataXString_AutoSaveIni<Sdring> g_playsound_filepath;
-extern DataXString_AutoSaveIni<Sdring> g_chime_list;
-
-extern DataXString_AutoSaveIni<bool> g_shake_window_repaint;
-
-extern CTooltipSimple g_tooltip;
+//extern CTooltipSimple g_tooltip;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -95,8 +82,6 @@ private:
 	RECT m_rcOrigWin; // original window position
 	int m_nudge_max;
 };
-
-extern WindowShaker g_winshaker;
 
 
 class ChimePlay  // singleton
@@ -144,19 +129,41 @@ private:
 	int m_nbWaveBin = 0;
 };
 
-extern ChimePlay g_chimeplay;
+//extern ChimePlay g_chimeplay;
 
 
-Sdrings chime_list_GetValue(); // get value from g_chime_list
-void chime_list_SetValue(const Sdrings& chime_list); // set value to g_chime_list
+//Sdrings chime_list_GetValue(); // get value from g_chime_list
+//void chime_list_SetValue(const Sdrings& chime_list); // set value to g_chime_list
 
-void AddNewFiles_to_ChimeList_SingleDir(HWND hwnd, const Sdrings &ss);
+//void AddNewFiles_to_ChimeList_SingleDir(HWND hwnd, const Sdrings &ss);
 
-void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss);
+//void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss);
 
 extern const TCHAR * const g_audio_extnames[];
 extern const int n_audio_extnames;
 
-extern CMenuTracker g_menu_tracker;
+//extern CMenuTracker g_menu_tracker;
+
+
+class CAppWin;          // Defined in AppWin.h
+class CDlgCountdownCfg; // Defined in DlgCountdownCfg.h
+
+//void CAppWin_StartCountdownSeconds(CAppWin *appwin); // todo modify name,param
+
+Sdring CAppWin_GetCountDownCfg(); // Returns sth like "00:01:00"
+bool CAppWin_StartCountDown(const TCHAR *cfghms); // cfghms like "00:01:00"
+
+
+struct GlobalPtrs_st
+{
+	CAppWin *appwin;
+	DataXIni *xini;
+
+	HWND hdlgFloatbar;
+
+	ChimePlay *chimeplay;
+};
+extern GlobalPtrs_st gp;
+
 
 #endif

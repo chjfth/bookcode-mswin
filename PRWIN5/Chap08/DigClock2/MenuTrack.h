@@ -7,6 +7,8 @@
 
 #include "utils.h"
 
+#include "AppWin.h"
+
 
 class CMenuPop_Root : public IMenuPop
 {
@@ -17,19 +19,19 @@ public:
 		HWND hwnd, HMENU hmenuPopup, UINT uItem, BOOL isSystemMenu) override
 	{
 		CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
-			g_ClockMode == CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
+			gp.appwin->m_ClockMode == CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
 
 		EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
-			g_seconds_remain > 0 ? MF_ENABLED : MF_GRAYED);
+			gp.appwin->m_seconds_remain > 0 ? MF_ENABLED : MF_GRAYED);
 
 		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP,
-			s_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
+			gp.appwin->m_is_always_on_top ? MF_CHECKED : MF_UNCHECKED);
 
 		CheckMenuItem(hmenuPopup, IDM_CLICK_CHANGE_COLOR,
-			s_is_change_color ? MF_CHECKED : MF_UNCHECKED);
+			gp.appwin->m_is_change_color ? MF_CHECKED : MF_UNCHECKED);
 
 		CheckMenuItem(hmenuPopup, IDM_SHOW_TITLE,
-			s_is_show_title ? MF_CHECKED : MF_UNCHECKED);
+			gp.appwin->m_is_show_title ? MF_CHECKED : MF_UNCHECKED);
 	}
 };
 
@@ -52,14 +54,17 @@ public:
 	virtual void On_WM_INITMENUPOPUP(
 		HWND hwnd, HMENU hmenuPopup, UINT uItem, BOOL isSystemMenu) override
 	{
+		auto &isShowDate = gp.appwin->m_isShowDate;
+		auto &isShowTimezone = gp.appwin->m_isShowTimezone;
+
 		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_NO,
-			g_isShowDate ? MF_UNCHECKED : MF_CHECKED);
+			isShowDate ? MF_UNCHECKED : MF_CHECKED);
 
 		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_YES,
-			(g_isShowDate && !g_isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
+			(isShowDate && !isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
 
 		CheckMenuItem(hmenuPopup, IDM_SHOWDATE_TIMEZONE,
-			(g_isShowDate && g_isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
+			(isShowDate && isShowTimezone) ? MF_CHECKED : MF_UNCHECKED);
 
 	}
 };
@@ -79,7 +84,7 @@ public:
 		HWND hwnd, HMENU hmenuPopup, UINT uItem, BOOL isSystemMenu) override
 	{
 		bool is_stock = false;
-		const int shake_seconds = g_timedue_shake_seconds;
+		const int shake_seconds = gp.appwin->m_timedue_shake_seconds;
 
 		CheckMenuItem(hmenuPopup, ID_SHAKE_NOSHAKE,
 			shake_seconds == 0 ? (is_stock = true, MF_CHECKED) : MF_UNCHECKED);

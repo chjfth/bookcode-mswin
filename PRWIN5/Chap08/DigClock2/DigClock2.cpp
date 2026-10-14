@@ -31,6 +31,10 @@ Since 2026.08: (v2.5)
   > User can customize window shaking duration(seconds).
   > User can customize a wav/mp3 sound file to play.
 
+Since 2026.10: (v2.7)
+* Manage HWNDs in C++ class, eliminate most global vars.
+* Now WinMain() can detect C++ memory leak on program quit.
+
 -----------------------------------------*/
 
 #define WIN32_LEAN_AND_MEAN
@@ -62,10 +66,6 @@ Since 2026.08: (v2.5)
 #include <mswin/utils_env.h>
 #include <mswin/utils_wingui.h>
 #include <mswin/util_commdlg.h>
-#include <mswin/WM_MOUSELEAVE_helper.h>
-#include <mswin/Editbox_EnableKbdAdjustIntnum.h>
-#include <mswin/DlgTooltipEasy.h>
-#include <mswin/Tooltip-helper.h>
 #include <WinMultiMon.h>
 
 #include <snTprintf.h>
@@ -83,7 +83,7 @@ Since 2026.08: (v2.5)
 #include "MenuTrack.h"
 
 #include "AppWin.h"
-
+#include "DlgCountdownCfg.h"
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -107,88 +107,71 @@ Since 2026.08: (v2.5)
 
 HINSTANCE g_hInstance;
 
-DataXIni g_xini;
-
 #define INI_SECNAME _T("cfg")
+#define INI_SECNAME_LISTS _T("file_lists")
 
-#define MY_DATA_AutoSaveINI(datatype, varname, keyname, default_val) \
-	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
+const int g_init_client_cx = 188; // Default main-window client-area size(96dpi pixels)
 
-#define MY_DATA_AutoSaveINI_FORMAT(datatype, varname, format, keyname, default_val) \
-	DataXString_AutoSaveIni<datatype, format> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
 
-MY_DATA_AutoSaveINI(ClockMode_et, g_ClockMode, "ClockMode", CM_WallTime);
+//#define MY_DATA_AutoSaveINI(datatype, varname, keyname, default_val) \
+//	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
 
-MY_DATA_AutoSaveINI(bool, g_isShowDate,       "IsShowDate", false);
-MY_DATA_AutoSaveINI(bool, g_isShowTimezone,   "IsShowTimezone", false);
+// #define MY_DATA_AutoSaveINI_FORMAT(datatype, varname, format, keyname, default_val) \
+// 	DataXString_AutoSaveIni<datatype, format> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
 
-MY_DATA_AutoSaveINI(bool, s_is_always_on_top, "AlwaysOnTop", true);
-MY_DATA_AutoSaveINI(bool, s_is_change_color,  "IsClickToChangeColor", false);
-MY_DATA_AutoSaveINI(bool, s_is_show_title,    "IsShowWindowTitle", false);
-
-MY_DATA_AutoSaveINI_FORMAT(int, g_seconds_countdown_cfg, Format_int_as_HHMMSS, "CountdownCfg", _T("00:01:00"));
-
-MY_DATA_AutoSaveINI(int, g_timedue_shake_seconds, "TimeDueShakeSeconds", 1);
 const int SHAKE_TIMER_INTERVAL = 25; // millisec
 const int SHAKE_NUDGE_MAX = 20; // for 96dpi monitor
 
-MY_DATA_AutoSaveINI(bool, g_is_playsound, "PlaySoundOnTimeDue", true);
-MY_DATA_AutoSaveINI(Sdring, g_playsound_filepath, "PlaySoundFilepath", _T(""));
-static UINT g_msgval_playsound_done;
+//MY_DATA_AutoSaveINI(bool, g_is_playsound, "PlaySoundOnTimeDue", true);
+//MY_DATA_AutoSaveINI(Sdring, g_playsound_filepath, "PlaySoundFilepath", _T(""));
 
-#define MY_DATA_AutoSaveINI_secname(datatype, varname, secname, keyname, default_val) \
-	DataXString_AutoSaveIni<datatype> varname(g_xini, _T(secname), _T(keyname), default_val);
+UINT CAppWin::s_msgval_playsound_done = 0;
 
-MY_DATA_AutoSaveINI_secname(Sdring, g_chime_list, "chime_list", "list", _T("")) 
+//#define MY_DATA_AutoSaveINI_secname(datatype, varname, secname, keyname, default_val) \
+//	DataXString_AutoSaveIni<datatype> varname(g_xini, _T(secname), _T(keyname), default_val);
+
+//MY_DATA_AutoSaveINI_secname(Sdring, g_chime_list, "chime_list", "list", _T("")) 
 // -- chime(.wav/.mp3) filepaths separated by \n. [chime_list] section has only one key-value.
 
 const TCHAR * const g_audio_extnames[] = { _T(".wav"), _T(".mp3") };
 const int n_audio_extnames = ARRAYSIZE(g_audio_extnames);
 
-MY_DATA_AutoSaveINI(bool, g_shake_window_repaint, "ShakeWindowRepaint", true);
+//MY_DATA_AutoSaveINI(bool, g_shake_window_repaint, "ShakeWindowRepaint", true);
 
 
-int g_firstUpdateWindowDone = 0;
+// int g_seconds_remain = 0;
+// DWORD g_msectick_start = 0; // value from GetTickCount()
 
-int g_seconds_remain = 0;
-DWORD g_msectick_start = 0; // value from GetTickCount()
+//HWND g_hdlgCountdownCfg;
 
-HWND g_hdlgCountdownCfg;
+//static HMENU s_hmenuRootPopup;
 
-static HMENU s_hmenuRootPopup;
+// static int s_cxClient, s_cyClient; // Clock window client-area size pixels
+// static int s_axClient, s_ayClient; // Clock window client-area absolute(screen) position(left,top).
 
-static int s_cxClient, s_cyClient; // Clock window client-area size pixels
-static int s_axClient, s_ayClient; // Clock window client-area absolute(screen) position(left,top).
+//int g_iso_client_cx; // maybe less than s_cxClient, if you squeeze clock-window's height.
 
-int g_iso_client_cx; // maybe less than s_cxClient, if you squeeze clock-window's height.
+// static POINT s_pos_mousedown; // client-area position
+// static bool s_is_dragging = false;
+// static bool s_is_moved = false;
 
-const int g_init_client_cx = 188; // Default main-window client-area size(96dpi pixels)
+//static int s_idxcolor = 0;
+//static DataXString_BindIni<Uint, Format_COLORREF_as_RGB> s_dxDigitColor(
+//	g_xini, INI_SECNAME, _T("DigitColor"), _T("RGB(64,160,255)")); // sky blue
 
-static POINT s_pos_mousedown; // client-area position
-static bool s_is_dragging = false;
-static bool s_is_moved = false;
-
-static int s_idxcolor = 0;
-static DataXString_BindIni<Uint, Format_COLORREF_as_RGB> s_dxDigitColor(
-	g_xini, INI_SECNAME, _T("DigitColor"), _T("RGB(64,160,255)")); // sky blue
-
-DataXString_BindIni<RECT> g_dxClientRect(g_xini, INI_SECNAME, _T("ClientAreaRect"));
+//DataXString_BindIni<RECT> g_dxClientRect(g_xini, INI_SECNAME, _T("ClientAreaRect"));
 // -- This should not be DataXString_AutoSaveIni, to avoid intensive INI-file writing 
 //    when user drag to change window position/size.
 
-BOOL g_f24Hour;
-BOOL g_fSuppressHighDigit;
+// BOOL g_f24Hour;
+// BOOL g_fSuppressHighDigit;
 
-static CWmMouseleaveHelper s_mouselvp;
-
-CTooltipSimple g_tooltip;
-
-CMenuTracker g_menu_tracker;
+//static CWmMouseleaveHelper s_mouselvp;
 
 
-INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-void ReloadIni_and_Redraw(HWND);
+//INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+//LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+//void ReloadIni_and_Redraw(HWND);
 
 void InitOnce()
 {
@@ -204,27 +187,35 @@ int in_WinMain(int argc, const TCHAR *argv[])
 	HINSTANCE hInstance = g_hInstance;
 
 	static TCHAR szAppName[] = TEXT(APPNAME);
+	
+	DataXIni xini;
+	gp.xini = &xini;
+
+	ChimePlay chimeplay;
+	gp.chimeplay = &chimeplay;
 
 	CAppWin appwin;
+	gp.appwin = &appwin;
+
 	BOOL succ = appwin.RegisterAndCreate(szAppName);
 	assert(succ);
+	HWND hwndApp = appwin.Hwnd();
+	assert(IsWindow(hwndApp));
 
-	HWND hwnd = appwin.Hwnd();
-	g_hdlgCountdownCfg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwnd, Dlgproc_CountdownCfg);
-	assert(g_hdlgCountdownCfg);
+	CDlgCountdownCfg dlgFloatbar;
+	HWND hdlgFloatbar = dlgFloatbar.CreateModeless(hInstance, MAKEINTRESOURCE(IDD_COUNTDOWN_CFG), hwndApp);
+	assert(IsWindow(hdlgFloatbar));
+	gp.hdlgFloatbar = hdlgFloatbar;
 
 	HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 	assert(hAccel);
 
-	bool ttsucc = g_tooltip.Create(hwnd, false);
-	assert(ttsucc);
-
 	MSG msg = {};
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		if (!TranslateAccelerator(hwnd, hAccel, &msg))
+		if (!TranslateAccelerator(hwndApp, hAccel, &msg))
 		{
-			if (!IsDialogMessage(g_hdlgCountdownCfg, &msg))
+			if (!IsDialogMessage(hdlgFloatbar, &msg))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -249,13 +240,6 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR szParams, int iCmdShow
 
 	int ret = in_WinMain(argc, argv);
 
-	g_xini.~DataXIni();
-	g_menu_tracker.~CMenuTracker();
-
-	// These two global objs have Sdring member, so destruct them to eliminate memleak.
-	g_playsound_filepath.~g_playsound_filepath();
-	g_chime_list.~g_chime_list();
-
 	bool isleak = MSVCRT_MemCheckEnd_IsLeak(foo);
 	if (isleak) {
 		OutputDebugString(_T("Suspect memleak in my C++ code.\n"));
@@ -266,6 +250,55 @@ int WINAPI _tWinMain(HINSTANCE hinstExe, HINSTANCE, PTSTR szParams, int iCmdShow
 		return ret;
 	}
 }
+
+
+#define MK_DATA_AutoSaveINI(datatype, varname, keyname, default_val) \
+	varname.~DataXString_AutoSaveIni(); \
+	new(&varname) DataXString_AutoSaveIni<datatype>(*gp.xini, INI_SECNAME, _T(keyname), default_val);
+
+#define MY_DATA_AutoSaveINI_FORMAT(datatype, varname, format, keyname, default_val) \
+	varname.~DataXString_AutoSaveIni(); \
+	new(&varname) DataXString_AutoSaveIni<datatype, format>(*gp.xini, INI_SECNAME, _T(keyname), default_val);
+
+#define MK_DATA_AutoSaveINI_secname(datatype, varname, secname, keyname, default_val) \
+	varname.~DataXString_AutoSaveIni(); \
+	new(&varname) DataXString_AutoSaveIni<datatype>(*gp.xini, secname, _T(keyname), default_val);
+
+
+void CAppWin::_ctor()
+{
+	m_pos_mousedown = POINT();
+
+	//////////////////////////////////////////////////////////////////////////
+
+	MK_DATA_AutoSaveINI(ClockMode_et, m_ClockMode, "ClockMode", CM_WallTime);
+
+	MK_DATA_AutoSaveINI(bool, m_isShowDate, "IsShowDate", false);
+	MK_DATA_AutoSaveINI(bool, m_isShowTimezone, "IsShowTimezone", false);
+	MK_DATA_AutoSaveINI(bool, m_is_always_on_top, "AlwaysOnTop", true);
+	MK_DATA_AutoSaveINI(bool, m_is_change_color, "IsClickToChangeColor", false);
+	MK_DATA_AutoSaveINI(bool, m_is_show_title, "IsShowWindowTitle", false);
+
+	MY_DATA_AutoSaveINI_FORMAT(int, m_seconds_countdown_cfg, Format_int_as_HHMMSS, "CountdownCfg", _T("00:01:00"));
+
+	MK_DATA_AutoSaveINI(int, m_timedue_shake_seconds, "TimeDueShakeSeconds", 1);
+	MK_DATA_AutoSaveINI(bool, m_shake_window_repaint, "ShakeWindowRepaint", true);
+
+	MK_DATA_AutoSaveINI(bool, m_is_playsound, "PlaySoundOnTimeDue", true);
+	MK_DATA_AutoSaveINI(Sdring, m_playsound_filepath, "PlaySoundFilepath", _T(""));
+
+	MK_DATA_AutoSaveINI_secname(Sdring, m_chime_list, INI_SECNAME_LISTS, "chime_list", _T(""));
+	// -- chime(.wav/.mp3) filepaths separated by \n.
+
+	// The following two: I do NOT apply auto-save on them.
+
+	new(&m_dxClientRect) DataXString_BindIni<RECT>(
+		*gp.xini, INI_SECNAME, _T("ClientAreaRect"));
+
+	new(&m_dxDigitColor) DataXString_BindIni<Uint, Format_COLORREF_as_RGB>(
+		*gp.xini, INI_SECNAME, _T("DigitColor"), _T("RGB(64,160,255)")); // default is sky blue
+}
+
 
 BOOL CAppWin::RegisterAndCreate(const TCHAR *szAppName)
 {
@@ -300,19 +333,19 @@ BOOL CAppWin::RegisterAndCreate(const TCHAR *szAppName)
 	ShowWindow(hwnd, SW_NORMAL);
 	UpdateWindow(hwnd);
 
-	g_firstUpdateWindowDone = 1;
+	m_firstUpdateWindowDone = true;
 
 	return TRUE;
 }
 
 
-inline int clock_cy_from_cx(int cx)
+int CAppWin::clock_cy_from_cx(int cx)
 {
-	int logicy = LOGICY_HHMMSS + (g_isShowDate ? LOGICY_DATE : 0);
+	int logicy = LOGICY_HHMMSS + (m_isShowDate ? LOGICY_DATE : 0);
 	return cx * logicy / LOGICX_HHMMSS;
 }
 
-void my_MoveWindow_byClientRect(HWND hwnd, const RECT& rcClient)
+void CAppWin::my_MoveWindow_byClientRect(HWND hwnd, const RECT& rcClient)
 {
 	static struct StyleBits
 	{
@@ -324,16 +357,16 @@ void my_MoveWindow_byClientRect(HWND hwnd, const RECT& rcClient)
 		{ WS_OVERLAPPEDWINDOW , WS_EX_TOOLWINDOW }, // style bits for has-title window
 	};
 
-	bool istitle = s_is_show_title;
+	bool istitle = m_is_show_title;
 	UINT winstyle = Hwnd_TuneWinStyleBits(hwnd, s_two_styles[istitle].bits_on, s_two_styles[!istitle].bits_on);
 	UINT exstyle = Hwnd_TuneWinStyleExBits(hwnd, s_two_styles[istitle].bits_on_ex, s_two_styles[!istitle].bits_on_ex);
 	MoveWindow_byClientRect(hwnd, &rcClient, winstyle, exstyle);
 }
 
-static bool ClientRectFromINI(HWND hwnd, RECT *prect)
+bool CAppWin::ClientRectFromINI(HWND hwnd, RECT *prect)
 {
 	RECT &r = *prect;
-	r = g_dxClientRect;
+	r = m_dxClientRect;
 
 	// Check if INI-provided RECT is empty
 	if(RECTcx(r)<=0 || RECTcy(r)<=0)
@@ -352,7 +385,7 @@ static bool ClientRectFromINI(HWND hwnd, RECT *prect)
 	return true;
 }
 
-void ReloadIni_and_Redraw(HWND hwnd)
+void CAppWin::ReloadIni_and_Redraw(HWND hwnd)
 {
 	static TCHAR exedir_ini[MAX_PATH] = {};
 	static TCHAR userdir[MAX_PATH] = {}, userdir_ini[MAX_PATH] = {};
@@ -367,7 +400,7 @@ void ReloadIni_and_Redraw(HWND hwnd)
 	}
 
 	const TCHAR* const ar_inifiles[] = { exedir_ini, userdir_ini };
-	g_xini.LoadIni(ar_inifiles, ARRAYSIZE(ar_inifiles), true, DataXIni::LoadFinalFound);
+	gp.xini->LoadIni(ar_inifiles, ARRAYSIZE(ar_inifiles), true, DataXIni::LoadFinalFound);
 
 	// Reposition DigClock window according to new INI content.
 
@@ -390,7 +423,7 @@ void ReloadIni_and_Redraw(HWND hwnd)
 
 	my_MoveWindow_byClientRect(hwnd, clirect);
 
-	Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
+	Hwnd_SetAlwaysOnTop(hwnd, m_is_always_on_top);
 }
 
 
@@ -401,12 +434,12 @@ public:
 	{
 		vaDBG2(_T("[DigClock2] DelaySaveIniTimer triggered..."));
 
-		g_xini.SaveIni();
+		gp.xini->SaveIni();
 	}
 } s_DelaySaveIniTimer;
 
 
-void my_AdjustClientRect(HWND hwnd, bool is_default_width=false)
+void CAppWin::my_AdjustClientRect(HWND hwnd, bool is_default_width)
 {
 	RECT clirect = {};
 	GetClientRect_ScreenPos(hwnd, &clirect);
@@ -418,7 +451,7 @@ void my_AdjustClientRect(HWND hwnd, bool is_default_width=false)
 	}
 	else
 	{
-		width = g_iso_client_cx;
+		width = m_iso_client_cx;
 	}
 
 	clirect.right = clirect.left + width;
@@ -557,7 +590,7 @@ void DisplayWallTime (HDC hdc, BOOL f24Hour, BOOL fSuppress)
 	DisplayTwoDigits (hdc, st.wSecond, FALSE, true) ;
 }
 
-void DisplayCountDown(HDC hdc)
+void CAppWin::DisplayCountDown(HDC hdc)
 {
 	HBRUSH hbrushGray = CreateSolidBrush(RGB(220,220,220));
 	HBRUSH hbrushOrig = NULL;
@@ -566,14 +599,14 @@ void DisplayCountDown(HDC hdc)
 	// Drawing clock digits
 	//
 
-	if(g_seconds_remain==0)
+	if(m_seconds_remain==0)
 	{
 		// Show gray digits to imply count-down finished.
 		hbrushOrig = (HBRUSH) SelectObject(hdc, hbrushGray);
 	}
 
-	int zSeconds = g_seconds_remain % 60;
-	int tmp = g_seconds_remain / 60;
+	int zSeconds = m_seconds_remain % 60;
+	int tmp = m_seconds_remain / 60;
 	int zMinutes = tmp % 60;
 	int zHours = (tmp / 60) % 100;
 	
@@ -599,12 +632,12 @@ void DisplayCountDown(HDC hdc)
 	// draw background gray bar
 	Rectangle(hdc, rcBar.left, rcBar.top, rcBar.right, rcBar.bottom); 
 
-	if(g_seconds_remain>0)
+	if(m_seconds_remain>0)
 	{
 		// draw remain percent using original color(as user picked)
 		SelectObject(hdc, hbrushOrig);
 
-		double frac = (double)g_seconds_remain/g_seconds_countdown_cfg;
+		double frac = (double)m_seconds_remain/m_seconds_countdown_cfg;
 		int draw_width = (int)((rcBar.right-rcBar.left)*frac) + 1;
 		Rectangle(hdc, rcBar.left, rcBar.top, min(rcBar.left+draw_width, rcBar.right), rcBar.bottom); 
 	}
@@ -612,18 +645,17 @@ void DisplayCountDown(HDC hdc)
 	DeleteObject(hbrushGray);
 }
 
-void RefreshTheClock(HDC hdc)
+void CAppWin::RefreshTheClock(HDC hdc)
 {
-	COLORREF digitcolor = s_dxDigitColor;
+	COLORREF digitcolor = m_dxDigitColor;
 	HBRUSH hbrush = CreateSolidBrush(digitcolor);
 
 	SelectObject (hdc, GetStockObject (NULL_PEN)) ;
 	SelectObject (hdc, hbrush) ;
 
-//	vaDbg(_T("RefreshTheClock()..."));
-	if(g_ClockMode==CM_WallTime)
-		DisplayWallTime (hdc, g_f24Hour, g_fSuppressHighDigit) ;
-	else if(g_ClockMode==CM_Countdown)
+	if(m_ClockMode==CM_WallTime)
+		DisplayWallTime (hdc, m_f24Hour, m_fSuppressHighDigit) ;
+	else if(m_ClockMode==CM_Countdown)
 		DisplayCountDown(hdc);
 	else
 		assert(0);
@@ -632,9 +664,9 @@ void RefreshTheClock(HDC hdc)
 	DeleteObject(hbrush);
 }
 
-void RefreshDateBar(HDC hdc)
+void CAppWin::RefreshDateBar(HDC hdc)
 {
-	if(!g_isShowDate)
+	if(!m_isShowDate)
 		return;
 
 	SYSTEMTIME st = {};
@@ -642,7 +674,7 @@ void RefreshDateBar(HDC hdc)
 	TCHAR szDate[40];
 	_sntprintf_s(szDate, _TRUNCATE, _T("%04d-%02d-%02d"), st.wYear, st.wMonth, st.wDay);
 
-	if(g_isShowTimezone)
+	if(m_isShowTimezone)
 	{
 		TCHAR tzs[16];
 		int minutes = util_GetTimeZoneOffset();
@@ -672,7 +704,7 @@ void RefreshDateBar(HDC hdc)
 
 	// Set background/foreground color, the inverse of HH:MM:SS
 
-	COLORREF digitcolor = s_dxDigitColor;
+	COLORREF digitcolor = m_dxDigitColor;
 	HBRUSH hbrush = CreateSolidBrush(digitcolor);
 	FillRect(hdc, &rc, hbrush);
 
@@ -692,33 +724,58 @@ void CAppWin::winenv_ReloadSetting(HWND hwnd)
 	TCHAR         szBuffer [2] ;
 
 	GetLocaleInfo (LOCALE_USER_DEFAULT, LOCALE_ITIME, szBuffer, 2) ;
-	g_f24Hour = (szBuffer[0] == '1') ;
+	m_f24Hour = (szBuffer[0] == '1') ;
 
 	GetLocaleInfo (LOCALE_USER_DEFAULT, LOCALE_ITLZERO, szBuffer, 2) ;
-	g_fSuppressHighDigit = (szBuffer[0] == '0') ;
+	m_fSuppressHighDigit = (szBuffer[0] == '0') ;
 
 	InvalidateRect (hwnd, NULL, TRUE) ;
 }
 
 void Show_CountdownCfg()
 {
-	ShowWindow(g_hdlgCountdownCfg, SW_SHOW);
+	ShowWindow(gp.hdlgFloatbar, SW_SHOW);
 
-	HWND hedit = GetDlgItem(g_hdlgCountdownCfg, IDC_EDIT_COUNTDOWN);
+	HWND hedit = GetDlgItem(gp.hdlgFloatbar, IDC_EDIT_COUNTDOWN);
 	SetFocus(hedit);
 }
 
 void Hide_CountdownCfg()
 {
-	ShowWindow(g_hdlgCountdownCfg, SW_HIDE);
+	ShowWindow(gp.hdlgFloatbar, SW_HIDE);
 
-	HWND hwndMain = GetParent(g_hdlgCountdownCfg);
+	HWND hwndMain = GetParent(gp.hdlgFloatbar);
 	SetFocus(hwndMain); // so that user can use keyboard arrow to move hwndMain
 }
 
-void do_CountdownDone(HWND hwnd) // Time due
+bool CAppWin::StartCountDown(const TCHAR *cfghms)
 {
-	SetDlgItemText(g_hdlgCountdownCfg, IDB_StartCountDown, _T("Start countdown"));
+	m_winshaker.ShakeStop();
+
+	int seconds = HMS_to_Seconds(cfghms, true);
+	if (seconds < 0)
+		return false;
+
+	m_seconds_countdown_cfg = seconds;
+	
+	m_msectick_start = GetTickCount();
+
+	m_seconds_remain = 1; // set to arbitrary >0 value, will recalculate in DoTimer()
+	DoTimer(m_hwnd, ID_TIMER_SECONDS_TICK);
+
+	// Restart timer to align timing boundary.
+	SetTimer(m_hwnd, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL);
+
+	InvalidateRect(m_hwnd, NULL, TRUE);
+
+	Hide_CountdownCfg();
+
+	return true;
+}
+
+void CAppWin::do_CountdownDone(HWND hwnd) // Time due
+{
+	SetDlgItemText(gp.hdlgFloatbar, IDB_StartCountDown, _T("Start countdown"));
 
 	if (IsIconic(hwnd)) {
 		ShowWindow(hwnd, SW_RESTORE);
@@ -727,43 +784,45 @@ void do_CountdownDone(HWND hwnd) // Time due
 	SetForegroundWindow(hwnd);
 
 	// Shake the window if user wants it.
-	if(g_timedue_shake_seconds!=0)
+	if(m_timedue_shake_seconds!=0)
 	{
 		const int nudge_max = AfterDpiScale(SHAKE_NUDGE_MAX);
-		g_winshaker.ShakeStart(hwnd, nudge_max, SHAKE_TIMER_INTERVAL, 
-			g_timedue_shake_seconds*1000);
+		m_winshaker.ShakeStart(hwnd, nudge_max, SHAKE_TIMER_INTERVAL, 
+			m_timedue_shake_seconds*1000);
 	}
 
 	// Play sound if user wants it.
-	if(g_is_playsound)
+	if(m_is_playsound)
 	{
+		auto &chimeplay = *gp.chimeplay;
+
 		Sdring fullpath = _T("");
-		const TCHAR *relapath = g_playsound_filepath.GetValue();
+		const TCHAR *relapath = m_playsound_filepath.GetValue();
 		if(relapath && relapath[0])
 			 fullpath = GetFullpathRelaToExe(relapath);
 
-		auto pserr = g_chimeplay.PlayOnce(ChimePlay::TimeDue, fullpath);
+		auto pserr = chimeplay.PlayOnce(ChimePlay::TimeDue, fullpath);
 		if (pserr)
 		{	
 			vaDBG1(_T("[INFO] Playing sound file '%s' failed. Fallback to playing default chime."));
-			g_chimeplay.PlayOnce(ChimePlay::TimeDue, nullptr);
+			chimeplay.PlayOnce(ChimePlay::TimeDue, nullptr);
 		}
 	}
 }
 
 
-void DoTimer(HWND hwnd, int idtimer)
+void CAppWin::DoTimer(HWND hwnd, int idtimer)
 {
 	if(idtimer==ID_TIMER_SECONDS_TICK)
 	{
-		int prev_remain = g_seconds_remain;
+		int prev_remain = m_seconds_remain;
 
-		if(g_seconds_remain>0)
+		if(m_seconds_remain>0)
 		{
 			// Yes, even if the UI is in walltime mode, we let the countdown go,
 			// so that the user can temporarily switch back to peek the walltime. 
 
-			DWORD msectick_end = g_msectick_start + g_seconds_countdown_cfg*1000 - LESS_1millisec;
+			DWORD msectick_end = m_msectick_start + m_seconds_countdown_cfg*1000 - LESS_1millisec;
 
 			DWORD now_msectick = GetTickCount();
 
@@ -772,24 +831,24 @@ void DoTimer(HWND hwnd, int idtimer)
 			if(msec_remain>0)
 			{
 				// So that remaining 1ms ~ 999ms all considered "remaining one second".
-				g_seconds_remain = msec_remain / 1000 + 1;
+				m_seconds_remain = msec_remain / 1000 + 1;
 			}
 			else 
 			{
-				g_seconds_remain = 0;
+				m_seconds_remain = 0;
 			}
 
-			assert(g_seconds_remain>=0);
+			assert(m_seconds_remain>=0);
 
-			if(prev_remain>0 && g_seconds_remain==0)
+			if(prev_remain>0 && m_seconds_remain==0)
 			{
 				do_CountdownDone(hwnd);
 			}
 
-			InvalidateRect(hwnd, NULL, TRUE); // Redraw UI according to g_seconds_remain.
+			InvalidateRect(hwnd, NULL, TRUE); // Redraw UI according to m_seconds_remain.
 
-		} // g_seconds_remain>0		
-		else if(g_ClockMode==CM_WallTime)
+		} // m_seconds_remain>0		
+		else if(m_ClockMode==CM_WallTime)
 		{
 			InvalidateRect(hwnd, NULL, TRUE); // Redraw current time.
 		}
@@ -807,9 +866,12 @@ BOOL CAppWin::Cls_OnCreate(HWND hwnd, LPCREATESTRUCT)
 	SetTimer(hwnd, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL) ;
 	SetTimer(hwnd, ID_TIMER_HIDE_CFG_PANEL, 500, NULL);
 
-	s_mouselvp.SetHwnd(hwnd);
+	m_mouselvp.SetHwnd(hwnd);
 
 	winenv_ReloadSetting(hwnd);
+
+	bool succ = m_tooltip.Create(hwnd, false);
+	assert(succ);
 
 	HRSRC hRsrc = FindResource(g_hInstance, MAKEINTRESOURCE(IDR_WAV_STOCK), _T("WAV"));
 	assert(hRsrc);
@@ -817,23 +879,22 @@ BOOL CAppWin::Cls_OnCreate(HWND hwnd, LPCREATESTRUCT)
 	assert(hResource);
 	const void *ptrWavBin = LockResource(hResource);
 	int bytesWavBin = SizeofResource(g_hInstance, hRsrc);
-	g_msgval_playsound_done = g_chimeplay.SetDefaultChime(ptrWavBin, bytesWavBin, hwnd);
-	assert(g_msgval_playsound_done>0);
+	s_msgval_playsound_done = gp.chimeplay->SetDefaultChime(ptrWavBin, bytesWavBin, hwnd);
+	assert(s_msgval_playsound_done>0);
 
+	assert(!m_hmenuRootPopup);
+	m_hmenuRootPopup = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MAIN_MENU));
+	m_hmenuRootPopup = GetSubMenu(m_hmenuRootPopup, 0);
 
-	assert(!s_hmenuRootPopup);
-	s_hmenuRootPopup = LoadMenu(NULL, MAKEINTRESOURCE(IDR_MAIN_MENU));
-	s_hmenuRootPopup = GetSubMenu(s_hmenuRootPopup, 0);
-
-	CMenuTracker::ReCode_et mterr = g_menu_tracker.BindMenuTree(s_hmenuRootPopup);
+	CMenuTracker::ReCode_et mterr = m_menu_tracker.BindMenuTree(m_hmenuRootPopup);
 	assert(!mterr);
-	mterr = g_menu_tracker.AddPopAction(_T("ShowDate"), new CMenuPop_ShowDate);
+	mterr = m_menu_tracker.AddPopAction(_T("ShowDate"), new CMenuPop_ShowDate);
 	assert(!mterr);
-	mterr = g_menu_tracker.AddPopAction(CMenuTracker::s_root_popname, new CMenuPop_Root);
+	mterr = m_menu_tracker.AddPopAction(CMenuTracker::s_root_popname, new CMenuPop_Root);
 	assert(!mterr);
-	mterr = g_menu_tracker.AddPopAction(_T("ShakeWindow"), new CMenuPop_ShakeWindow);
+	mterr = m_menu_tracker.AddPopAction(_T("ShakeWindow"), new CMenuPop_ShakeWindow);
 	assert(!mterr);
-	mterr = g_menu_tracker.AddPopAction(_T("PlaySound"), new CMenuPop_PlaySound);
+	mterr = m_menu_tracker.AddPopAction(_T("PlaySound"), new CMenuPop_PlaySound);
 	assert(!mterr);
 
 	DragAcceptFiles(hwnd, TRUE);
@@ -843,11 +904,11 @@ BOOL CAppWin::Cls_OnCreate(HWND hwnd, LPCREATESTRUCT)
 
 void CAppWin::OnWinMoveSize(HWND hwnd)
 {
-	if(g_firstUpdateWindowDone>0 && !g_winshaker.IsTicking())
+	if(m_firstUpdateWindowDone && !m_winshaker.IsTicking())
 	{
 		// Do INI saving only AFTER Main window is shown.
 
-		RECT rect = { s_axClient, s_ayClient, s_axClient+s_cxClient, s_ayClient+s_cyClient };
+		RECT rect = { m_axClient, m_ayClient, m_axClient+m_cxClient, m_ayClient+m_cyClient };
 
 		// Note: On Win10, When a window is minimized, we can see rect.left=rect.top=-32000,
 		// and rect.right, rect.bottom may be (-31770,-31902), 
@@ -855,7 +916,7 @@ void CAppWin::OnWinMoveSize(HWND hwnd)
 
 		if(!(rect.left==-32000 && rect.top==-32000) && RECTcx(rect)>0 && RECTcx(rect)>0)
 		{
-			g_dxClientRect = rect;
+			m_dxClientRect = rect;
 		}
 
 		s_DelaySaveIniTimer.StartDelayedWork(hwnd, DELAY_SAVE_INI_MILLISEC);
@@ -864,10 +925,10 @@ void CAppWin::OnWinMoveSize(HWND hwnd)
 
 void CAppWin::Cls_OnSize(HWND hwnd, UINT state, int cx, int cy)
 {
-	s_cxClient = cx;
-	s_cyClient = cy;
+	m_cxClient = cx;
+	m_cyClient = cy;
 
-	// vaDbgTs(_T("compare s_cxClient, g_iso_client_cx: %d vs %d"), s_cxClient, g_iso_client_cx);
+	vaDBG2(_T("compare m_cxClient, m_iso_client_cx: %d vs %d"), m_cxClient, m_iso_client_cx);
 	OnWinMoveSize(hwnd);
 }
 
@@ -875,7 +936,7 @@ void CAppWin::Cls_OnMove(HWND hwnd, int x, int y)
 {
 	POINT abspos = { 0, 0 };
 	ClientToScreen(hwnd, &abspos);
-	s_axClient = abspos.x; s_ayClient = abspos.y;
+	m_axClient = abspos.x; m_ayClient = abspos.y;
 
 	OnWinMoveSize(hwnd);
 }
@@ -898,10 +959,10 @@ void CAppWin::Cls_OnPaint(HWND hwnd)
 
 	SetMapMode (hdc, MM_ISOTROPIC) ;
 	SetWindowExtEx (hdc, logicx, logicy, NULL) ;
-	SetViewportExtEx (hdc, s_cxClient, s_cyClient, NULL) ;
+	SetViewportExtEx (hdc, m_cxClient, m_cyClient, NULL) ;
 
 	SetWindowOrgEx (hdc, logicx/2-1, logicy/2-1, NULL) ;
-	SetViewportOrgEx (hdc, s_cxClient / 2, s_cyClient / 2, NULL) ;
+	SetViewportOrgEx (hdc, m_cxClient / 2, m_cyClient / 2, NULL) ;
 
 	// learn by debug
 	SIZE extWinChk = {}, extVptChk = {};
@@ -909,7 +970,7 @@ void CAppWin::Cls_OnPaint(HWND hwnd)
 	assert(extWinChk.cx==logicx && extWinChk.cy==logicy);
 	GetViewportExtEx(hdc, &extVptChk); // [WinXP] one of extVptChk.cx, extVptChk.cy may differ to SetViewportExtEx's
 	//
-	g_iso_client_cx = extVptChk.cx;
+	m_iso_client_cx = extVptChk.cx;
 
 	RefreshDateBar(hdc);
 	RefreshTheClock(hdc); 
@@ -919,35 +980,55 @@ void CAppWin::Cls_OnPaint(HWND hwnd)
 
 void CAppWin::Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
 {
-	g_chimeplay.PlayStop();
+	gp.chimeplay->PlayStop();
 
-	if(g_winshaker.IsTicking())
+	if(m_winshaker.IsTicking())
 	{ 
-		g_winshaker.ShakeStop();
+		m_winshaker.ShakeStop();
 		return;
 	}
 
-	s_is_dragging = true;
-	s_is_moved = false;
+	m_is_dragging = true;
+	m_is_moved = false;
 	SetCapture(hwnd);
 
-	s_pos_mousedown.x = x;
-	s_pos_mousedown.y = y;
+	m_pos_mousedown.x = x;
+	m_pos_mousedown.y = y;
+}
+
+void CAppWin::Cls_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+{
+	bool isCtrl = GetKeyState(VK_CONTROL) < 0;
+	bool isShift = GetKeyState(VK_SHIFT) < 0;
+
+	m_is_dragging = false;
+	ReleaseCapture();
+
+	if (m_is_moved == false)
+	{
+		if (m_is_change_color)
+		{
+			m_dxDigitColor = SwitchDigitColor(isCtrl || isShift ? -1 : 1);
+			InvalidateRect(hwnd, NULL, TRUE);
+
+			s_DelaySaveIniTimer.StartDelayedWork(hwnd, DELAY_SAVE_INI_MILLISEC);
+		}
+	}
 }
 
 void CAppWin::Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
 {
 	// Handle window dragging
 
-	if(s_is_dragging==true)
+	if(m_is_dragging==true)
 	{
 		// Set new window pos
 
-		int offsetx = x - s_pos_mousedown.x;
-		int offsety = y - s_pos_mousedown.y;
+		int offsetx = x - m_pos_mousedown.x;
+		int offsety = y - m_pos_mousedown.y;
 		if(offsetx!=0 || offsety!=0)
 		{
-			s_is_moved = true;
+			m_is_moved = true;
 		}
 
 //		vaDbg(_T("pos_mousedown: %d,%d => offset %d,%d"), s_pos_mousedown.x, s_pos_mousedown.y, offsetx, offsety);
@@ -957,10 +1038,10 @@ void CAppWin::Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
 
 	// Handle Countdown-cfg panel show/hide
 
-	CWmMouseleaveHelper::Move_ret moveret = s_mouselvp.do_WM_MOUSEMOVE();
+	CWmMouseleaveHelper::Move_ret moveret = m_mouselvp.do_WM_MOUSEMOVE();
 	if(moveret==CWmMouseleaveHelper::JustEntered)
 	{
-		if(g_ClockMode==CM_Countdown)
+		if(m_ClockMode==CM_Countdown)
 			Show_CountdownCfg();
 	}
 }
@@ -972,31 +1053,11 @@ void CAppWin::My_OnMouseLeave(HWND hwnd)
 	// Note: If the mouse is over the cfg panel, WM_MOUSELEAVE *is* generated,
 	// but we should *not* consider it outside(=should not hide the panel).
 
-	s_mouselvp.do_WM_MOUSELEAVE();
+	m_mouselvp.do_WM_MOUSELEAVE();
 
 	if(!Is_MouseInClientRect(hwnd)) // mouse outside
 	{
 		Hide_CountdownCfg();
-	}
-}
-
-void CAppWin::Cls_OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
-{
-	bool isCtrl = GetKeyState(VK_CONTROL)<0;
-	bool isShift = GetKeyState(VK_SHIFT)<0;
-
-	s_is_dragging = false;
-	ReleaseCapture();
-
-	if(s_is_moved==false)
-	{
-		if(s_is_change_color)
-		{
-			s_dxDigitColor = SwitchDigitColor(isCtrl||isShift ? -1 : 1);
-			InvalidateRect(hwnd, NULL, TRUE);
-
-			s_DelaySaveIniTimer.StartDelayedWork(hwnd, DELAY_SAVE_INI_MILLISEC);
-		}
 	}
 }
 
@@ -1027,12 +1088,12 @@ void CAppWin::Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT
 {
 	POINT point = {x, y};
 	ClientToScreen (hwnd, &point) ;
-	TrackPopupMenu(s_hmenuRootPopup, TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL) ;
+	TrackPopupMenu(m_hmenuRootPopup, TPM_RIGHTBUTTON, point.x, point.y, 0, hwnd, NULL) ;
 }
 
 void CAppWin::Cls_OnInitMenuPopup(HWND hwnd, HMENU hmenuPopup, UINT item, BOOL fSystemMenu)
 {
-	g_menu_tracker.Do_WM_INITMENUPOPUP(hwnd, hmenuPopup, item, fSystemMenu);
+	m_menu_tracker.Do_WM_INITMENUPOPUP(hwnd, hmenuPopup, item, fSystemMenu);
 }
 
 void CAppWin::Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hSubmenu, UINT flags)
@@ -1042,12 +1103,12 @@ void CAppWin::Cls_OnMenuSelect(HWND hwnd, HMENU hmenu, int item, HMENU hSubmenu,
 		// Popup-menu just collapses. (User clicks outside any menu item to close the menu.)
 		assert(flags==(UINT)-1);
 
-		g_tooltip.Hide();
-		g_chimeplay.PlayStop();
+		m_tooltip.Hide();
+		gp.chimeplay->PlayStop();
 		return;
 	}
 
-	g_menu_tracker.Do_WM_MENUSELECT(hwnd, hmenu, item, hSubmenu, flags);
+	m_menu_tracker.Do_WM_MENUSELECT(hwnd, hmenu, item, hSubmenu, flags);
 }
 
 void CAppWin::Cls_OnDropFiles(HWND hwnd, HDROP hdrop)
@@ -1073,16 +1134,16 @@ void CAppWin::Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 {
 	if(cmdid==IDM_COUNTDOWN_MODE)
 	{
-		g_ClockMode = ClockMode_et(!g_ClockMode);
+		m_ClockMode = ClockMode_et(!m_ClockMode);
 
-		if(g_ClockMode==CM_WallTime)
+		if(m_ClockMode==CM_WallTime)
 			Hide_CountdownCfg();
 
 		InvalidateRect(hwnd, NULL, TRUE);
 	}
 	else if(cmdid==IDM_STOP_COUNTDOWN)
 	{
-		g_seconds_remain = 0;
+		m_seconds_remain = 0;
 
 		do_CountdownDone(hwnd);
 
@@ -1090,35 +1151,35 @@ void CAppWin::Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	}
 	else if(cmdid==IDM_ALWAYS_ON_TOP)
 	{
-		s_is_always_on_top = !s_is_always_on_top;
+		m_is_always_on_top = !m_is_always_on_top;
 
-		Hwnd_SetAlwaysOnTop(hwnd, s_is_always_on_top);
+		Hwnd_SetAlwaysOnTop(hwnd, m_is_always_on_top);
 	}
 	else if(cmdid==IDM_CLICK_CHANGE_COLOR)
 	{
-		s_is_change_color = !s_is_change_color;
+		m_is_change_color = !m_is_change_color;
 	}
 	else if(cmdid==IDM_SHOWDATE_NO)
 	{
-		g_isShowDate = FALSE;
-		g_isShowTimezone = FALSE;
+		m_isShowDate = FALSE;
+		m_isShowTimezone = FALSE;
 		my_AdjustClientRect(hwnd);
 	}
 	else if(cmdid==IDM_SHOWDATE_YES)
 	{
-		g_isShowDate = TRUE;
-		g_isShowTimezone = FALSE;
+		m_isShowDate = TRUE;
+		m_isShowTimezone = FALSE;
 		my_AdjustClientRect(hwnd);
 	}
 	else if(cmdid==IDM_SHOWDATE_TIMEZONE)
 	{
-		g_isShowDate = TRUE;
-		g_isShowTimezone = TRUE;
+		m_isShowDate = TRUE;
+		m_isShowTimezone = TRUE;
 		my_AdjustClientRect(hwnd);
 	}
 	else if(cmdid==IDM_SHOW_TITLE)
 	{
-		s_is_show_title = !s_is_show_title;
+		m_is_show_title = !m_is_show_title;
 		my_AdjustClientRect(hwnd);
 	}
 	else if(cmdid==IDM_MINIMIZE_WINDOW)
@@ -1137,67 +1198,62 @@ void CAppWin::Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 	}
 	else if(cmdid==IDM_RELOAD_FROM_INI)
 	{
-		g_tooltip.ShowBelowMouse(_T("ReloadIni_and_Redraw()"));
-		g_tooltip.Hide(2000);
+		m_tooltip.ShowBelowMouse(_T("ReloadIni_and_Redraw()"));
+		m_tooltip.Hide(2000);
 
 		ReloadIni_and_Redraw(hwnd);
 	}
 	else if(cmdid==IDM_RESET_ALL_SETTINGS)
 	{
-		g_tooltip.ShowBelowMouse(_T("Reset INI to program default."));
-		g_tooltip.Hide(2000);
+		m_tooltip.ShowBelowMouse(_T("Reset INI to program default."));
+		m_tooltip.Hide(2000);
 
-		g_xini.ResetDefault();
+		gp.xini->ResetDefault();
 		ReloadIni_and_Redraw(hwnd);
 	}
-	else if(cmdid==ID_SHAKE_NOSHAKE)
-	{
-		g_timedue_shake_seconds = 0;
+	else if(cmdid==ID_SHAKE_NOSHAKE) {
+		m_timedue_shake_seconds = 0;
 	}
-	else if(cmdid==ID_SHAKE_1SEC)
-	{
-		g_timedue_shake_seconds = 1;
+	else if(cmdid==ID_SHAKE_1SEC) {
+		m_timedue_shake_seconds = 1;
 	}
-	else if(cmdid==ID_SHAKE_3SEC)
-	{
-		g_timedue_shake_seconds = 3;
+	else if(cmdid==ID_SHAKE_3SEC) {
+		m_timedue_shake_seconds = 3;
 	}
-	else if(cmdid==ID_SHAKE_5SEC)
-	{
-		g_timedue_shake_seconds = 5;
+	else if(cmdid==ID_SHAKE_5SEC) {
+		m_timedue_shake_seconds = 5;
 	}
-	else if(cmdid==ID_SHAKE_FOREVER)
-	{
-		g_timedue_shake_seconds = -1;
+	else if(cmdid==ID_SHAKE_FOREVER) {
+		m_timedue_shake_seconds = -1;
 	}
 	else if(cmdid==ID_PLAYSOUND_NONE)
 	{
-		g_is_playsound = false;
-		g_playsound_filepath.SetValue(_T(""));
+		m_is_playsound = false;
+		m_playsound_filepath.SetValue(_T(""));
 	}
 	else if (cmdid == ID_PLAYSOUND_DEFAULT)
 	{
-		g_playsound_filepath.SetValue(_T(""));
-		g_is_playsound = true;
+		m_playsound_filepath.SetValue(_T(""));
+		m_is_playsound = true;
 	}
 	else if(cmdid>=ID_PLAYSOUND_DYNA_START && cmdid<ID_PLAYSOUND_DYNA_END_)
 	{
 		const TCHAR *filepath = nullptr;
-		HMENU hmPlaySound = g_menu_tracker.FindPopname(_T("PlaySound"));
+		HMENU hmPlaySound = m_menu_tracker.FindPopname(_T("PlaySound"));
 		GetMenuitem_UserContext(hmPlaySound, cmdid, MenuitemById, (void**)&filepath);
 
 		Sdring fullpath = GetFullpathRelaToExe(filepath);
 
 		if(fsapi::file_exists(fullpath))
 		{
-			g_playsound_filepath = Sdring(filepath); 
+			m_playsound_filepath = Sdring(filepath); 
 			// -- Yes, filepath instead of fullpath, bcz I want it to match exact text from INI.
 			//    or
 			// g_playsound_filepath.SetValue(filepath);
 			// -- Note: Casual coding `g_playsound_filepath = filepath;` is WRONG! 
 			//    -- will/should get compiler ambiguous error.
 			
-			g_is_playsound = true;
+			m_is_playsound = true;
 		}
 		else
 		{
@@ -1296,11 +1352,12 @@ LRESULT CAppWin::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		default: ;
 	}}
 
-	if (message == g_msgval_playsound_done)
+	if (message == s_msgval_playsound_done)
 	{
 		auto playdone = (CPlaySound_u::PlayDone_et)wParam;
+		auto &chimeplay = *gp.chimeplay;
 
-		if (g_chimeplay.IsPlaying())
+		if (chimeplay.IsPlaying())
 		{
 			vaDBG2(_T("[DigClock2] Got playSound-done. (stale, %s)"), ITCSnv(playdone, CPlaySound_u::PlayDone_itc));
 			return 0;
@@ -1308,17 +1365,17 @@ LRESULT CAppWin::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		else
 			vaDBG2(_T("[DigClock2] Got playSound-done. (true, %s)"), ITCSnv(playdone, CPlaySound_u::PlayDone_itc));
 
-		if (g_winshaker.IsTicking())
+		if (m_winshaker.IsTicking())
 		{
 			vaDBG2(_T(". Window is still shaking, so the chime should repeat."));
-			g_chimeplay.RepeatOnce();
+			chimeplay.RepeatOnce();
 		}
-		else if (g_chimeplay.GetPurpose() == ChimePlay::SndPreview)
+		else if (chimeplay.GetPurpose() == ChimePlay::SndPreview)
 		{
 			if (playdone == CPlaySound_u::PlayDone_Success)
 			{
 				vaDBG2(_T(". User is previewing sound, so the chime should repeat."));
-				g_chimeplay.RepeatOnce();
+				chimeplay.RepeatOnce();
 			}
 		}
 
@@ -1331,82 +1388,15 @@ LRESULT CAppWin::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 //////////////////////////////////////////////////////////////////////////
 
-static const TCHAR* DlgtteGetText_CountdownEditbox(HWND hwndCtl, void *userctx)
-{
-	(void)userctx;
-	static DWORD s_dwInitial = GetTickCount();
-	
-	DWORD nowtick = GetTickCount();
-	if( nowtick-s_dwInitial < 5000 )
-	{
-		// only display the tooltip on first 5 seconds
-		return _T("Use keyboard Up/Down arrow to adjust time values.");
-	}
-	else
-		return NULL;
+
+Sdring CAppWin_GetCountDownCfg() {
+	return gp.appwin->GetCountDownCfg();
 }
 
-BOOL CountdownCfg_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
-{
-	Sdring cfghms = Seconds_to_HMS(g_seconds_countdown_cfg);
-	SetDlgItemText(hDlg, IDC_EDIT_COUNTDOWN, cfghms);
-
-	HWND hEdit = GetDlgItem(hDlg, IDC_EDIT_COUNTDOWN);
-	Editbox_EnableKbdAdjustIntnum(hEdit, 0, 59, 1, true, 2);
-
-	// Place editbox caret at end, bcz when debugging, we fiddle with seconds often.
-	int textlen = GetWindowTextLength (hEdit);
-	Edit_SetSel(hEdit, textlen, textlen);
-
-	Dlgtte_EnableTooltip(hEdit, DlgtteGetText_CountdownEditbox, nullptr);
-
-	// return FALSE to tell dialog manager: Do NOT set keyboard focus to the editbox,
-	// bcz, I want the default focus on main-window itself, so that user can move the
-	// main-window by keyboard arrow keys.
-	return FALSE; 
+bool CAppWin_StartCountDown(const TCHAR *cfghms) {
+	return gp.appwin->StartCountDown(cfghms);
 }
 
-void CountdownCfg_OnCommand(HWND hDlg, int idcmd, HWND hwndCtl, UINT codeNotify)
-{
-	HWND hwndMain = GetParent(hDlg);
-
-	if(idcmd==IDB_StartCountDown)
-	{
-		g_winshaker.ShakeStop();
-
-		TCHAR szHMS[20] = {};
-		GetDlgItemText(hDlg, IDC_EDIT_COUNTDOWN, szHMS, ARRAYSIZE(szHMS)-1);
-		int seconds = HMS_to_Seconds(szHMS, true);
-		if(seconds<0)
-			return;
-
-		g_seconds_countdown_cfg = seconds;
-		g_msectick_start = GetTickCount();
-
-		g_seconds_remain = 1; // arbitrary >0 value, will recalculate in DoTimer()
-		DoTimer(hwndMain, ID_TIMER_SECONDS_TICK);
-
-		// Restart timer to align timing boundary.
-		SetTimer(hwndMain, ID_TIMER_SECONDS_TICK, MY_TIMER_INTERVAL_1000ms, NULL);
-
-		Hide_CountdownCfg();
-
-		SetDlgItemText(hDlg, IDB_StartCountDown, _T("Restart countdown"));
-
-		InvalidateRect(hwndMain, NULL, TRUE);			
-	}
-}
-
-INT_PTR CALLBACK 
-Dlgproc_CountdownCfg (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-		HANDLE_dlgMSG(hwnd, WM_INITDIALOG, CountdownCfg_OnInitDialog);
-		HANDLE_dlgMSG(hwnd, WM_COMMAND, CountdownCfg_OnCommand);
-	}
-	return FALSE; // Let Dlg-manager do default for current message.
-}
 
 
 #ifndef DigClock2_DEBUG

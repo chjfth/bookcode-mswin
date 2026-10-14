@@ -9,6 +9,7 @@
 
 #include <ospath.h>
 #include <fsapi.h>
+#include <RECTxy.h>
 
 #include "resource.h"
 
@@ -22,18 +23,21 @@
 void CMenuPop_PlaySound::On_WM_INITMENUPOPUP(
 	HWND hwnd, HMENU hmenuPopup, UINT uItem, BOOL isSystemMenu)
 {
+	auto &is_playsound = gp.appwin->m_is_playsound;
+	auto &playsound_filepath = gp.appwin->m_playsound_filepath;
+
 	CheckMenuItem(hmenuPopup, ID_PLAYSOUND_NONE,
-		!g_is_playsound ? MF_CHECKED : MF_UNCHECKED);
+		!is_playsound ? MF_CHECKED : MF_UNCHECKED);
 
 	CheckMenuItem(hmenuPopup, ID_PLAYSOUND_DEFAULT,
-		g_is_playsound && g_playsound_filepath.GetValue().is_empty() ? MF_CHECKED : MF_UNCHECKED);
+		is_playsound && playsound_filepath.GetValue().is_empty() ? MF_CHECKED : MF_UNCHECKED);
 
 	// Remove old dynamic menuitems
 	const int dyn_pos = 2;
 	while (DeleteMenu(hmenuPopup, dyn_pos, MF_BYPOSITION));
 
 	// Add dynamic menuitems according to INI[chime_list]list=... strings.
-	m_chime_filepaths = chime_list_GetValue();
+	m_chime_filepaths = gp.appwin->chime_list_GetValue();
 	for (int i = 0; i < m_chime_filepaths.count(); i++)
 	{
 		const Sdring &filepath = m_chime_filepaths[i];
@@ -49,9 +53,9 @@ void CMenuPop_PlaySound::On_WM_INITMENUPOPUP(
 		BOOL b = SetMenuitem_UserContext(hmenuPopup, cmdid, MenuitemById, (void*)filepath.c_str());
 		assert(b);
 
-		if (g_is_playsound)
+		if (is_playsound)
 		{
-			if (Sdring::str_match(g_playsound_filepath.GetValue(), filepath))
+			if (Sdring::str_match(playsound_filepath.GetValue(), filepath))
 				CheckMenuItem(hmenuPopup, cmdid, MF_CHECKED);
 		}
 	}
@@ -63,6 +67,9 @@ void CMenuPop_PlaySound::On_WM_INITMENUPOPUP(
 void CMenuPop_PlaySound::On_WM_MENUSELECT(
 	HWND hwnd, HMENU hmenu, int idxItem, HMENU hSubmenu, UINT flags)
 {
+	auto &tooltip = gp.appwin->m_tooltip;
+	auto &chimeplay = *gp.chimeplay;
+
 	if (idxItem != 0)
 		vaDBG2(_T("Menuitem hover on CMDID: hMenu=0x%X, cmdid=%d"), Ptr2Uint(hmenu), idxItem);
 	else if (hSubmenu)
@@ -72,8 +79,8 @@ void CMenuPop_PlaySound::On_WM_MENUSELECT(
 
 	if (idxItem != m_prev_cmdid)
 	{
-		vaDBG2(_T("> item(%d) != s_prev_cmdid(%d) , g_chimeplay.PlayStop()"), idxItem, m_prev_cmdid);
-		g_chimeplay.PlayStop();
+		vaDBG2(_T("> item(%d) != s_prev_cmdid(%d) , chimeplay.PlayStop()"), idxItem, m_prev_cmdid);
+		chimeplay.PlayStop();
 		m_prev_cmdid = idxItem;
 	}
 
@@ -81,8 +88,8 @@ void CMenuPop_PlaySound::On_WM_MENUSELECT(
 
 	if (idxItem == ID_PLAYSOUND_DEFAULT)
 	{
-		g_tooltip.ShowBelowMouse(_T("Preview playing default chime..."));
-		g_chimeplay.PlayOnce(ChimePlay::SndPreview, NULL);
+		tooltip.ShowBelowMouse(_T("Preview playing default chime..."));
+		chimeplay.PlayOnce(ChimePlay::SndPreview, NULL);
 	}
 	else if (idxItem >= ID_PLAYSOUND_DYNA_START && idxItem < ID_PLAYSOUND_DYNA_END_)
 	{
@@ -95,29 +102,29 @@ void CMenuPop_PlaySound::On_WM_MENUSELECT(
 
 		if (fsapi::file_exists(fullpath))
 		{
-			g_tooltip.ShowBelowMouse(_T("%s\r\n\r\nPreview playing..."), fullpath.c_str());
+			tooltip.ShowBelowMouse(_T("%s\r\n\r\nPreview playing..."), fullpath.c_str());
 
-			auto pserr = g_chimeplay.PlayOnce(ChimePlay::SndPreview, fullpath);
+			auto pserr = chimeplay.PlayOnce(ChimePlay::SndPreview, fullpath);
 			if (pserr)
 			{
-				g_tooltip.ShowBelowMouse(_T("%s\r\n\r\nSomething wrong, the system cannot play this sound file."), fullpath.c_str());
+				tooltip.ShowBelowMouse(_T("%s\r\n\r\nSomething wrong, the system cannot play this sound file."), fullpath.c_str());
 			}
 		}
 		else
 		{
-			g_tooltip.ShowBelowMouse(
+			tooltip.ShowBelowMouse(
 				_T("%s\r\n\r\nThis sound file does NOT exist. Click to remove it from menu."),
 				fullpath.c_str());
 		}
 	}
 	else if (idxItem == ID_PLAYSOUND_ADDFILE)
 	{
-		g_tooltip.ShowBelowMouse(_T("You can also drag audio files onto DigClock2 main window to add them."));
+		tooltip.ShowBelowMouse(_T("You can also drag audio files onto DigClock2 main window to add them."));
 	}
 	else
 	{
-		g_tooltip.Hide();
-		g_chimeplay.PlayStop();
+		tooltip.Hide();
+		chimeplay.PlayStop();
 	}
 
 }

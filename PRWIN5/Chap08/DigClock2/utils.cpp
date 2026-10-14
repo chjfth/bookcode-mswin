@@ -18,16 +18,15 @@ using namespace ospath;
 
 #include "iversion.h"
 
+#include "AppWin.h"
+
 #include <CHHI_vaDBG_is_vaDbgTs.h>
 
 #ifndef DigClock2_DEBUG
 #include <CHHI_vaDBG_hide.h> // Suppress/invalidate vaDBG macros, from now on
 #endif
 
-
-WindowShaker g_winshaker;
-
-ChimePlay g_chimeplay;
+GlobalPtrs_st gp;
 
 
 void ShowHelp(HWND hwndParent)
@@ -279,7 +278,7 @@ void WindowShaker::TimerCallback()
 	RECT rcnew = m_rcOrigWin;
 	OffsetRect(&rcnew, nudgeX, nudgeY);
 
-	BOOL bRepaint = g_shake_window_repaint;
+	BOOL bRepaint = gp.appwin->m_shake_window_repaint;
 	MoveWindow(m_hwnd, RECT_disXYWH(rcnew), bRepaint);
 	// -- [2026-08-26] On WinXP SP3, if bRepaint==FALSE, the m_hwnd will not be repainted,
 	//    and user will not be able to see the visual shaking effect. 
@@ -417,7 +416,7 @@ void ChimePlay::PlayStop()
 	m_purpose = None;
 }
 
-void AddNewFiles_to_ChimeList_SingleDir(HWND hwnd, const Sdrings &ss_input)
+void CAppWin::AddNewFiles_to_ChimeList_SingleDir(HWND hwnd, const Sdrings &ss_input)
 {
 	// ss[0] is full-dirpath, ss[1], ss[2] etc are filenams in that dirpath.
 	// util_GetOpenFilenames() produces this info structure.
@@ -436,7 +435,7 @@ void AddNewFiles_to_ChimeList_SingleDir(HWND hwnd, const Sdrings &ss_input)
 	AddNewFiles_to_ChimeList(hwnd, ssfilepath);
 }
 
-void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
+void CAppWin::AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 {
 	// Will change g_chime_list
 
@@ -497,7 +496,7 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 	if(first_newsound.not_empty())
 	{ 
 		// Auto-enable the (first) dragged-in/newly-added sound.
-		g_playsound_filepath = first_newsound;
+		m_playsound_filepath = first_newsound;
 	}
 
 	Sdring msg;
@@ -540,22 +539,26 @@ void AddNewFiles_to_ChimeList(HWND hwnd, const Sdrings &ss_input)
 
 	// Pop-up the sound-list menu, so that user can see current sound-file selection.
 	//
-	HMENU hmPlaySound = g_menu_tracker.FindPopname(_T("PlaySound"));
+	HMENU hmPlaySound = m_menu_tracker.FindPopname(_T("PlaySound"));
 	RECT rcClient;
 	GetClientRect_ScreenPos(hwnd, &rcClient);
 	TrackPopupMenu(hmPlaySound, TPM_RIGHTBUTTON, rcClient.left+10, rcClient.top+10, 0, hwnd, NULL);
 
 }
 
-Sdrings chime_list_GetValue() // get value from g_chime_list
+Sdrings CAppWin::chime_list_GetValue() // get value from m_chime_list
 {
-	return SplitToSdrings(g_chime_list.GetValue(), false, _T("\n"), _T(" \t"));
+	return SplitToSdrings(m_chime_list.GetValue(), false, _T("\n"), _T(" \t"));
 }
 
-void chime_list_SetValue(const Sdrings& chime_filepaths) // set value to g_chime_list
+void CAppWin::chime_list_SetValue(const Sdrings& chime_filepaths) // set value to m_chime_list
 {
-	g_chime_list.SetValue(MergeFromSdrings(chime_filepaths, _T("\n"), _T(" \t")));
+	m_chime_list.SetValue(MergeFromSdrings(chime_filepaths, _T("\n"), _T(" \t")));
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+
 
 
 
