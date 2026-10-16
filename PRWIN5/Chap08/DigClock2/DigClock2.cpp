@@ -112,66 +112,14 @@ HINSTANCE g_hInstance;
 
 const int g_init_client_cx = 188; // Default main-window client-area size(96dpi pixels)
 
-
-//#define MY_DATA_AutoSaveINI(datatype, varname, keyname, default_val) \
-//	DataXString_AutoSaveIni<datatype> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
-
-// #define MY_DATA_AutoSaveINI_FORMAT(datatype, varname, format, keyname, default_val) \
-// 	DataXString_AutoSaveIni<datatype, format> varname(g_xini, INI_SECNAME, _T(keyname), default_val);
-
 const int SHAKE_TIMER_INTERVAL = 25; // millisec
 const int SHAKE_NUDGE_MAX = 20; // for 96dpi monitor
-
-//MY_DATA_AutoSaveINI(bool, g_is_playsound, "PlaySoundOnTimeDue", true);
-//MY_DATA_AutoSaveINI(Sdring, g_playsound_filepath, "PlaySoundFilepath", _T(""));
-
-UINT CAppWin::s_msgval_playsound_done = 0;
-
-//#define MY_DATA_AutoSaveINI_secname(datatype, varname, secname, keyname, default_val) \
-//	DataXString_AutoSaveIni<datatype> varname(g_xini, _T(secname), _T(keyname), default_val);
-
-//MY_DATA_AutoSaveINI_secname(Sdring, g_chime_list, "chime_list", "list", _T("")) 
-// -- chime(.wav/.mp3) filepaths separated by \n. [chime_list] section has only one key-value.
 
 const TCHAR * const g_audio_extnames[] = { _T(".wav"), _T(".mp3") };
 const int n_audio_extnames = ARRAYSIZE(g_audio_extnames);
 
-//MY_DATA_AutoSaveINI(bool, g_shake_window_repaint, "ShakeWindowRepaint", true);
+UINT CAppWin::s_msgval_playsound_done = 0;
 
-
-// int g_seconds_remain = 0;
-// DWORD g_msectick_start = 0; // value from GetTickCount()
-
-//HWND g_hdlgCountdownCfg;
-
-//static HMENU s_hmenuRootPopup;
-
-// static int s_cxClient, s_cyClient; // Clock window client-area size pixels
-// static int s_axClient, s_ayClient; // Clock window client-area absolute(screen) position(left,top).
-
-//int g_iso_client_cx; // maybe less than s_cxClient, if you squeeze clock-window's height.
-
-// static POINT s_pos_mousedown; // client-area position
-// static bool s_is_dragging = false;
-// static bool s_is_moved = false;
-
-//static int s_idxcolor = 0;
-//static DataXString_BindIni<Uint, Format_COLORREF_as_RGB> s_dxDigitColor(
-//	g_xini, INI_SECNAME, _T("DigitColor"), _T("RGB(64,160,255)")); // sky blue
-
-//DataXString_BindIni<RECT> g_dxClientRect(g_xini, INI_SECNAME, _T("ClientAreaRect"));
-// -- This should not be DataXString_AutoSaveIni, to avoid intensive INI-file writing 
-//    when user drag to change window position/size.
-
-// BOOL g_f24Hour;
-// BOOL g_fSuppressHighDigit;
-
-//static CWmMouseleaveHelper s_mouselvp;
-
-
-//INT_PTR CALLBACK Dlgproc_CountdownCfg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-//LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-//void ReloadIni_and_Redraw(HWND);
 
 void InitOnce()
 {
