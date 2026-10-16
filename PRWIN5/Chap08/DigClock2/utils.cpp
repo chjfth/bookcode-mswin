@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <Shlwapi.h>
+#include <time.h>
 
 #include <_MINMAX_.h>
 #include <RECTxy.h>
@@ -247,6 +248,21 @@ int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox)
 	int seconds = (zHours*60+zMinutes) * 60 + zSeconds;
 	return seconds;
 }
+
+Sdring HMS_after_seconds(int seconds)
+{
+	__time64_t t64now = _time64(NULL);
+	__time64_t t64after = t64now + seconds;
+	
+	struct tm tm = {}, *ptm = &tm;
+	_localtime64_s(&tm, &t64after);
+
+	TCHAR szHMS[60] = {};
+	snTprintf(szHMS, _T("%04d-%02d-%02d %02d:%02d:%02d"), 
+		ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+	return Sdring(szHMS);
+}
+
 
 const CInterpretConst& itc__ClockMode()
 {

@@ -26,9 +26,10 @@ using namespace itc;
 #define APPNAME "DigClock2"
 
 
-Sdring Seconds_to_HMS(int seconds);
+Sdring Seconds_to_HMS(int seconds); // 62 seconds converts to "00:01:02"
 int HMS_to_Seconds(const TCHAR *szHMS, bool error_msgbox = false);
 
+Sdring HMS_after_seconds(int seconds);
 
 enum ClockMode_et { CM_WallTime = 0, CM_Countdown = 1 };
 
@@ -39,11 +40,6 @@ struct Format_COLORREF_as_RGB {};
 
 extern const CInterpretConst& itc__ClockMode();
 
-//extern Sdrings g_chime_filepaths;
-
-//extern int g_seconds_remain;
-
-//extern CTooltipSimple g_tooltip;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -54,8 +50,6 @@ void Hwnd_SetAlwaysOnTop(HWND hwnd, bool istop);
 //void MySaveSysDpiScaling();
 int AfterDpiScale(int input);
 
-//void MyAdjustClientSize(HWND hwnd, bool istitle, int cli_width=-1, int cli_height=-1,
-//	bool isDpiScaling=false);
 
 bool Is_MouseInClientRect(HWND hwnd);
 

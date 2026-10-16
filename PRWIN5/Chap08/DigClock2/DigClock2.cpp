@@ -993,7 +993,20 @@ void CAppWin::Cls_OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
 	if(moveret==CWmMouseleaveHelper::JustEntered)
 	{
 		if(m_ClockMode==CM_Countdown)
+		{
 			Show_CountdownCfg();
+
+			// Show tooltip telling time-due walltime.
+			// Would show from left-bottom corner.
+			//
+			if(m_seconds_remain>0)
+			{
+				Sdring hms_due = HMS_after_seconds(m_seconds_remain);
+				POINT pt {0, -1};
+				m_tooltip.Show(CTooltipSimple::Show_ClientPos, &pt, 
+					_T("Time due @%s"), hms_due.c_str());
+			}
+		}
 	}
 }
 
@@ -1009,6 +1022,8 @@ void CAppWin::My_OnMouseLeave(HWND hwnd)
 	if(!Is_MouseInClientRect(hwnd)) // mouse outside
 	{
 		Hide_CountdownCfg();
+
+		m_tooltip.Hide();
 	}
 }
 

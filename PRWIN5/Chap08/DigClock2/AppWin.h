@@ -80,6 +80,10 @@ private:
 	Sdrings chime_list_GetValue();
 	void chime_list_SetValue(const Sdrings& chime_filepaths);
 
+	bool IsCountingDown() { 
+		return (m_ClockMode==CM_Countdown && m_seconds_remain>0) ? true : false;
+	}
+
 private: // private program states here.
 
 	bool m_firstUpdateWindowDone = false;
