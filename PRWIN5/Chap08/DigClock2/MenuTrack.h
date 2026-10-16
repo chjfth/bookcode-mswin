@@ -21,7 +21,7 @@ public:
 		CheckMenuItem(hmenuPopup, IDM_COUNTDOWN_MODE,
 			gp.appwin->m_ClockMode == CM_Countdown ? MF_CHECKED : MF_UNCHECKED);
 
-		EnableMenuItem(hmenuPopup, IDM_STOP_COUNTDOWN,
+		EnableMenuItem(hmenuPopup, IDM_CANCEL_COUNTDOWN,
 			gp.appwin->m_seconds_remain > 0 ? MF_ENABLED : MF_GRAYED);
 
 		CheckMenuItem(hmenuPopup, IDM_ALWAYS_ON_TOP,

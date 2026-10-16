@@ -62,7 +62,7 @@ private:
 	void RefreshDateBar(HDC hdc);
 	void DisplayCountDown(HDC hdc);
 
-	void do_CountdownDone(HWND hwnd); // Time due
+	void do_CountdownDone(HWND hwnd, bool isAlert); // Time due
 
 	void winenv_ReloadSetting(HWND hwnd);
 	void ReloadIni_and_Redraw(HWND hwnd);

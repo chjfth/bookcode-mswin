@@ -76,7 +76,7 @@ BEGIN
     POPUP "MYPOPUP"
     BEGIN
         MENUITEM "Count-&down mode",            IDM_COUNTDOWN_MODE
-        MENUITEM "Stop countdown",              IDM_STOP_COUNTDOWN
+        MENUITEM "Cancel countdown",              IDM_CANCEL_COUNTDOWN
         POPUP "&When countdown due"
         BEGIN
             POPUP "&Shake window //ShakeWindow"

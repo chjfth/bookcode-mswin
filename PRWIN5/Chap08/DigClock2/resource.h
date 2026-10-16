@@ -13,7 +13,7 @@
 #define IDM_RELOAD_FROM_INI             1003
 #define IDM_MINIMIZE_WINDOW             1010
 #define IDM_COUNTDOWN_MODE              2000
-#define IDM_STOP_COUNTDOWN              2001
+#define IDM_CANCEL_COUNTDOWN            2001
 #define IDM_MYPOPUP_SHOWDATE            2002
 #define IDM_SHOWDATE_NO                 2003
 #define IDM_SHOWDATE_YES                2004

@@ -721,9 +721,12 @@ bool CAppWin::StartCountDown(const TCHAR *cfghms)
 	return true;
 }
 
-void CAppWin::do_CountdownDone(HWND hwnd) // Time due
+void CAppWin::do_CountdownDone(HWND hwnd, bool isAlert) // Time due
 {
 	SetDlgItemText(gp.hdlgFloatbar, IDB_StartCountDown, _T("Start countdown"));
+
+	if(!isAlert)
+		return;
 
 	if (IsIconic(hwnd)) {
 		ShowWindow(hwnd, SW_RESTORE);
@@ -790,7 +793,7 @@ void CAppWin::DoTimer(HWND hwnd, int idtimer)
 
 			if(prev_remain>0 && m_seconds_remain==0)
 			{
-				do_CountdownDone(hwnd);
+				do_CountdownDone(hwnd, true);
 			}
 
 			InvalidateRect(hwnd, NULL, TRUE); // Redraw UI according to m_seconds_remain.
@@ -1089,11 +1092,11 @@ void CAppWin::Cls_OnCommand(HWND hwnd, int cmdid, HWND hwndCtl, UINT codeNotify)
 
 		InvalidateRect(hwnd, NULL, TRUE);
 	}
-	else if(cmdid==IDM_STOP_COUNTDOWN)
+	else if(cmdid==IDM_CANCEL_COUNTDOWN)
 	{
 		m_seconds_remain = 0;
 
-		do_CountdownDone(hwnd);
+		do_CountdownDone(hwnd, false);
 
 		InvalidateRect(hwnd, NULL, TRUE);
 	}
