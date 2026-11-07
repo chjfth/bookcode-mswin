@@ -14,11 +14,14 @@ Then, WinMan will drop out(=NOT send) that trailing WM_SETFOCUS.
 
 Key code: ChildWndProc WM_SETFOCUS, WM_KILLFOCUS processing and debug message.
 
-Evernote timetag: 20241212.1
+Evclip: 20241212.1
   -------------------------------------------------*/
 
 #include <windows.h>
-#include "vaDbg.h"
+
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
+
 
 #define DIVISIONS 5
 

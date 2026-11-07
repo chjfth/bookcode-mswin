@@ -13,7 +13,9 @@
 -------------------------------------------------*/
 
 #include <windows.h>
-#include "vaDbg.h"
+
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
 
 #define MY_TIMER_ID 10
 
@@ -142,7 +144,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					(HINSTANCE) GetWindowLongPtr (hwnd, GWLP_HINSTANCE),
 					NULL) ;
 
-				vaDbgS(_T("Created child window: [%d,%d] hwnd=0x%08X"), x, y, hwndChild[x][y]);
+				vaDbgTs(_T("Created child window: [%d,%d] hwnd=0x%08X"), x, y, hwndChild[x][y]);
 			}
 		}
 

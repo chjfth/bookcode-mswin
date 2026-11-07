@@ -4,7 +4,9 @@
   -------------------------------------------------*/
 
 #include <windows.h>
-#include "vaDbg.h"
+
+#define CHHI_ALL_IMPL
+#include <vaDbgTs.h>
 
 #define DIVISIONS 5
 
