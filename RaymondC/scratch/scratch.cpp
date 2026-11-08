@@ -14,6 +14,9 @@ that this function contains specific content for this specific project.
 
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
+#define CHHI_ALL_IMPL
+#include <mswin/utils_wingui.h>
+
 const TCHAR *MAINWND_CLASSNAME = _T("Scratch");
 
 HINSTANCE g_hinst;          /* This application's HINSTANCE */
@@ -37,6 +40,7 @@ void OnSize(HWND hwnd, UINT state, int cx, int cy)
  */
 BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpcs)
 {
+	util_SetWindowIcon(hwnd, MAKEINTRESOURCE(1));
 	return TRUE;
 }
 
